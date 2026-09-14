@@ -1,0 +1,625 @@
+{
+  "page": {
+    "title": "الرحلات",
+    "description": "أنشئ رحلاتك ونظّمها وأدرها.",
+    "createTrip": "إنشاء رحلة",
+    "clearFilters": "مسح عوامل التصفية",
+    "resultCount_one": "رحلة واحدة",
+    "resultCount_two": "رحلتان",
+    "resultCount_few": "{{count}} رحلات",
+    "resultCount_many": "{{count}} رحلة",
+    "resultCount_other": "{{count}} رحلة",
+    "resultCountFiltered": "{{results}} من أصل {{total}} رحلة"
+  },
+  "create": {
+    "title": "إنشاء رحلة",
+    "subtitle": "ابدأ بالأساسيات — يمكنك تعديل كل شيء لاحقًا.",
+    "closeAria": "إغلاق إنشاء الرحلة",
+    "name": {
+      "label": "اسم الرحلة",
+      "helper": "مثال: اكتشاف إسطنبول — 7 أيام",
+      "placeholder": "اكتشاف إسطنبول"
+    },
+    "format": {
+      "label": "نوع الرحلة",
+      "placeholder": "اختر النوع"
+    },
+    "scope": {
+      "label": "النطاق الجغرافي"
+    },
+    "destination": {
+      "label": "الوجهة",
+      "helper": "أين تأخذ هذه الرحلة المسافرين."
+    },
+    "availability": {
+      "label": "التوفر"
+    },
+    "duration": {
+      "label": "المدة"
+    },
+    "cancel": "إلغاء",
+    "submit": "إنشاء رحلة",
+    "successTitle": "تم إنشاء المسودة",
+    "successDescription": "أكمل إعدادها من الأسفل."
+  },
+  "duration": {
+    "prompt": "اختر النوع أولًا لتحديد مدة الرحلة.",
+    "sameDay": "رحلة يومية — لا مبيت.",
+    "flexible": {
+      "label": "مدة مرنة",
+      "helper": "لا عدد ثابت — يُتفق عليه مع كل عميل."
+    },
+    "flexibleNote": "مدة مرنة — تُحدَّد مع العميل.",
+    "hours": {
+      "label": "المدة (ساعات)",
+      "helper": "تجارب قصيرة تدوم بضع ساعات."
+    },
+    "days": {
+      "label": "أيام"
+    },
+    "nights": {
+      "label": "ليالٍ",
+      "helper": "مقترح من الأيام، قابل للتعديل."
+    },
+    "hours_one": "ساعة واحدة",
+    "hours_two": "ساعتان",
+    "hours_few": "{{count}} ساعات",
+    "hours_many": "{{count}} ساعة",
+    "hours_other": "{{count}} ساعة",
+    "days_one": "يوم واحد",
+    "days_two": "يومان",
+    "days_few": "{{count}} أيام",
+    "days_many": "{{count}} يومًا",
+    "days_other": "{{count}} يوم"
+  },
+  "readiness": {
+    "title": "الحالة والجاهزية",
+    "progress": {
+      "label": "الجاهزية للنشر",
+      "count": "{{completed}} من {{total}}",
+      "completedItem": "مكتمل",
+      "incompleteItem": "غير مكتمل بعد"
+    },
+    "recommended": {
+      "title": "موصى به قبل النشر",
+      "meetingInstructions": "تعليمات الالتقاء",
+      "themes": "المواضيع",
+      "itinerary": "برنامج الرحلة"
+    },
+    "items": {
+      "name": "المعلومات الأساسية",
+      "destination": "الوجهة",
+      "shortDescription": "الملخص الموجَّه للعملاء",
+      "coverImage": "صورة الغلاف",
+      "pricing": "الأسعار",
+      "availability": "التوفر"
+    }
+  },
+  "toolbar": {
+    "searchPlaceholder": "ابحث في الرحلات",
+    "searchAria": "ابحث في الرحلات",
+    "clearSearchAria": "مسح البحث",
+    "filterStatusAria": "تصفية حسب الحالة",
+    "allStatuses": "كل الحالات",
+    "filterFormatAria": "تصفية حسب النوع",
+    "allFormats": "كل الأنواع",
+    "filterScopeAria": "تصفية حسب النطاق الجغرافي",
+    "allScopes": "كل النطاقات",
+    "filterDestinationAria": "تصفية حسب الوجهة",
+    "allDestinations": "كل الوجهات"
+  },
+  "table": {
+    "columnTrip": "الرحلة",
+    "columnDestination": "الوجهة",
+    "columnFormat": "النوع",
+    "columnNextDeparture": "موعد الانطلاق القادم",
+    "columnPrice": "السعر",
+    "columnStatus": "الحالة",
+    "columnActions": "الإجراءات",
+    "fromPrice": "ابتداءً من",
+    "moreDestinations": "أخرى",
+    "noUpcomingDeparture": "لا يوجد موعد انطلاق قادم",
+    "editTripAria": "تعديل {{name}}"
+  },
+  "empty": {
+    "title": "لا توجد رحلات بعد",
+    "description": "أنشئ رحلتك الأولى للبدء بإضافة مواعيد الانطلاق والأسعار.",
+    "createTrip": "إنشاء رحلة"
+  },
+  "noResults": {
+    "title": "لا توجد رحلات مطابقة لعوامل التصفية",
+    "description": "جرّب تعديل البحث أو عامل تصفية الوجهة.",
+    "clearFilters": "مسح عوامل التصفية"
+  },
+  "editor": {
+    "sections": {
+      "overview": "نظرة عامة",
+      "itinerary": "برنامج الرحلة",
+      "departures": "مواعيد الانطلاق والأسعار",
+      "details": "التفاصيل",
+      "media": "الوسائط",
+      "booking": "إعدادات الحجز"
+    },
+    "navAria": "أقسام الرحلة",
+    "header": {
+      "backAria": "العودة إلى الرحلات",
+      "newTrip": "رحلة جديدة",
+      "untitled": "رحلة بدون عنوان",
+      "newDraftHint": "مسودة — لم تُجدول مواعيد انطلاق بعد.",
+      "editingHint": "جارٍ تعديل {{tripId}}",
+      "tripsCrumb": "الرحلات",
+      "nameAria": "اسم الرحلة"
+    },
+    "footer": {
+      "newHint": "يحفظ مسودة جديدة.",
+      "editHint": "يُطبَّق على هذه الرحلة.",
+      "publish": "نشر",
+      "saveDraft": "حفظ المسودة",
+      "saveChanges": "حفظ التغييرات",
+      "unsaved": "تغييرات غير محفوظة",
+      "discard": "تجاهل"
+    },
+    "publishGuard": {
+      "title": "لم تعد هذه الرحلة جاهزة للنشر",
+      "description": "تجعل هذه التغييرات الرحلة غير مكتملة للنشر. لا يمكن النشر إلا عند استيفاء كل المتطلبات. للحفاظ على هذه التغييرات، ستُحال الرحلة إلى مسودة.",
+      "confirm": "الإحالة إلى مسودة وحفظ",
+      "cancel": "إلغاء"
+    }
+  },
+  "format": {
+    "experience": "تجربة / نشاط",
+    "day_excursion": "رحلة يومية",
+    "stay": "إقامة",
+    "circuit": "جولة سياحية",
+    "cruise": "رحلة بحرية"
+  },
+  "scope": {
+    "domestic": "داخل الجزائر",
+    "international": "دولية"
+  },
+  "availability": {
+    "scheduled": "مواعيد انطلاق محددة",
+    "on_request": "حسب الطلب",
+    "custom_quote": "عرض سعر مخصص"
+  },
+  "participation": {
+    "shared_group": "مجموعة مشتركة",
+    "private": "انطلاق خاص / عقد خاص",
+    "individual": "فردي ذاتي التوجيه"
+  },
+  "guidance": {
+    "guided": "مرافقة كاملة",
+    "escorted": "مرافِق",
+    "self_guided": "توجيه ذاتي",
+    "mixed": "مختلط"
+  },
+  "theme": {
+    "nature": "طبيعة",
+    "mountain": "جبال",
+    "sahara_desert": "الصحراء",
+    "beach_coastal": "شاطئ / ساحل",
+    "cultural": "ثقافي",
+    "heritage_history": "تراث / تاريخ",
+    "religious_spiritual": "ديني / روحي",
+    "wellness": "استرخاء وعافية",
+    "adventure": "مغامرة",
+    "eco_tourism": "سياحة بيئية",
+    "urban_city": "مدينة",
+    "gastronomy": "مأكولات",
+    "festival_event": "مهرجان / فعالية",
+    "luxury": "الفخامة"
+  },
+  "activity": {
+    "hiking": "مشي",
+    "trekking": "مشي جبلي",
+    "walking_tour": "جولة مشي",
+    "sightseeing": "معالم سياحية",
+    "guided_visit": "زيارة مرافَقة",
+    "museum_archaeology": "متاحف / آثار",
+    "camping": "تخييم",
+    "offroad_4x4": "سيارة دفع رباعي (4x4)",
+    "camel_trek": "رحلة بالجمال",
+    "cycling": "ركوب الدراجات",
+    "horse_riding": "ركوب الخيل",
+    "boat_trip": "رحلة بالقارب",
+    "swimming_beach": "سباحة / شاطئ",
+    "fishing": "صيد",
+    "skiing_snow": "تزلج",
+    "climbing": "تسلق",
+    "kayaking": "كاياك",
+    "diving": "غوص",
+    "wellness_hammam": "استرخاء وحمّام",
+    "craft_workshop": "ورشة حرفية",
+    "food_tasting": "تذوق طعام",
+    "photography": "تصوير فوتوغرافي",
+    "festival": "مهرجان / فعالية"
+  },
+  "audience": {
+    "families": "عائلات",
+    "couples": "أزواج",
+    "honeymoon": "شهر عسل",
+    "friends": "أصدقاء",
+    "solo": "مسافرون منفردون",
+    "youth": "شباب",
+    "seniors": "كبار السن",
+    "corporate": "مجموعات شركات"
+  },
+  "transport": {
+    "bus": "حافلة",
+    "minibus": "حافلة صغيرة / فان",
+    "car": "سيارة",
+    "flight": "طائرة",
+    "train": "قطار",
+    "boat": "قارب",
+    "offroad_4x4": "دفع رباعي 4x4",
+    "camel": "جمل",
+    "bicycle": "دراجة",
+    "walking": "مشيًا",
+    "self_drive": "قيادة ذاتية",
+    "mixed": "مختلط"
+  },
+  "accommodation": {
+    "none": "لا يوجد",
+    "hotel": "فندق",
+    "resort": "منتجع",
+    "guesthouse": "ضيافة",
+    "homestay": "إقامة لدى عائلة",
+    "camp": "مخيم",
+    "mixed": "مختلط"
+  },
+  "difficulty": {
+    "easy": "سهل",
+    "moderate": "متوسط",
+    "challenging": "شاق"
+  },
+  "fitness": {
+    "basic": "أساسية",
+    "normal": "عادية",
+    "good": "جيدة",
+    "high": "عالية"
+  },
+  "status": {
+    "draft": "مسودة",
+    "published": "منشور",
+    "archived": "مؤرشف"
+  },
+  "departureStatus": {
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "sold_out": "نفدت المقاعد",
+    "cancelled": "ملغى"
+  },
+  "pricingBasis": {
+    "per_person": "لكل شخص",
+    "per_booking": "لكل حجز"
+  },
+  "overview": {
+    "basicInfo": {
+      "title": "المعلومات الأساسية"
+    },
+    "name": {
+      "label": "اسم الرحلة",
+      "helper": "مثال: اكتشاف إسطنبول — 7 أيام",
+      "placeholder": "Istanbul Discovery"
+    },
+    "internalRef": {
+      "label": "المرجع الداخلي",
+      "helper": "للاستخدام الداخلي فقط.",
+      "placeholder": "IST-7D-001"
+    },
+    "format": {
+      "label": "نوع الرحلة",
+      "placeholder": "اختر النوع"
+    },
+    "scope": {
+      "label": "النطاق الجغرافي",
+      "helper": "ما إذا كانت الرحلة داخل الدولة.",
+      "placeholder": "اختر النطاق"
+    },
+    "origin": {
+      "title": "نقطة الانطلاق",
+      "wilaya": {
+        "label": "الولاية",
+        "placeholder": "ابحث واختر ولاية…",
+        "helper": "يبقى الانطلاق داخل الجزائر.",
+        "empty": "لا توجد ولاية",
+        "searchAria": "البحث في الولايات",
+        "clearAria": "مسح الولاية",
+        "triggerAria": "فتح البحث عن الولايات"
+      },
+      "city": {
+        "label": "البلدية",
+        "placeholder": "اكتب البلدية…",
+        "searchAria": "البلدية"
+      }
+    },
+    "destination": {
+      "singleTitle": "الوجهة",
+      "circuitTitle": "الوجهات",
+      "stepLabel": "الوجهة {{n}}",
+      "editAria": "تعديل الوجهة {{n}}",
+      "doneAria": "إنهاء تعديل الوجهة {{n}}",
+      "moveUpAria": "تحريك الوجهة {{n}} لأعلى",
+      "moveDownAria": "تحريك الوجهة {{n}} لأسفل",
+      "removeAria": "إزالة الوجهة {{n}}",
+      "emptySummary": "الوجهة غير محددة",
+      "add": "إضافة وجهة",
+      "wilaya": {
+        "label": "الولاية",
+        "placeholder": "ابحث واختر ولاية…",
+        "empty": "لا توجد ولاية",
+        "searchAria": "البحث في الولايات",
+        "clearAria": "مسح الولاية",
+        "triggerAria": "فتح البحث عن الولايات"
+      },
+      "city": {
+        "label": "البلدية",
+        "placeholder": "اكتب البلدية…",
+        "searchAria": "البلدية"
+      },
+      "place": {
+        "label": "مكان محدد",
+        "placeholder": "تيقجدة",
+        "helper": "أين يذهب المسافر فعلياً."
+      },
+      "internationalLabel": "الوجهة (الدولة / المدينة)",
+      "internationalPlaceholder": "مثال: إسطنبول"
+    },
+    "availability": {
+      "label": "التوفر"
+    },
+    "participation": {
+      "label": "طريقة المشاركة"
+    },
+    "guidance": {
+      "label": "المرافقة"
+    },
+    "minTravelers": {
+      "label": "الحد الأدنى للمسافرين"
+    },
+    "classification": {
+      "title": "التصنيف"
+    },
+    "themes": {
+      "label": "المواضيع",
+      "placeholder": "أضف موضوعًا..."
+    },
+    "activities": {
+      "label": "الأنشطة",
+      "placeholder": "أضف نشاطًا..."
+    },
+    "audience": {
+      "label": "الفئة",
+      "placeholder": "أضف فئة..."
+    },
+    "activityRequirements": {
+      "title": "متطلبات النشاط"
+    },
+    "difficultyLabel": "الصعوبة",
+    "fitnessLabel": "مستوى اللياقة",
+    "distanceLabel": "المسافة (كم)",
+    "elevationLabel": "الارتفاع المكتسب (م)",
+    "minimumAgeLabel": "الحد الأدنى للعمر",
+    "equipment": {
+      "label": "المعدات المطلوبة",
+      "placeholder": "أحذية مشي قوية، واقٍ من الشمس"
+    },
+    "description": {
+      "title": "الوصف",
+      "helper": "النص الذي يراه المسافرون على بطاقات المتجر وفي ملف هذه الرحلة."
+    },
+    "shortDescription": {
+      "label": "وصف مختصر",
+      "helper": "{{count}}/160 — يُستخدم على بطاقات المتجر ونتائج البحث.",
+      "placeholder": "جملة موجزة جذابة لتجربة السفر."
+    },
+    "fullDescription": {
+      "label": "الوصف الكامل",
+      "helper": "صِف التجربة العامة فقط. لبرنامج الرحلة والمشمولات والسياسات أقسامها الخاصة.",
+      "placeholder": "القصة الكاملة لهذه التجربة..."
+    },
+    "highlights": {
+      "title": "أبرز المحطات",
+      "helper": "اللحظات المميزة التي تجعل هذه الرحلة تستحق الحجز.",
+      "placeholder": "رحلة في مضيق البوسفور",
+      "removeAria": "إزالة المحطة {{n}}",
+      "add": "إضافة محطة مميزة"
+    },
+    "notSpecified": "غير محدد",
+    "duration": {
+      "label": "المدة"
+    },
+    "languages": {
+      "label": "اللغات",
+      "helper": "اللغات التي يتحدثها مرشدو هذه الرحلة عند توفر الإرشاد.",
+      "placeholder": "الفرنسية",
+      "add": "إضافة",
+      "removeAria": "إزالة {{language}}"
+    },
+    "structuralChange": {
+      "title": "تغيير هيكل الرحلة؟",
+      "description": "يُعيد تغيير النوع أو النطاق أو التوفر تشكيل هذه الرحلة، وقد تُمسح حقول مرتبطة. هل تريد المتابعة؟",
+      "confirm": "تطبيق التغيير",
+      "cancel": "إلغاء"
+    },
+"route": {
+      "title": "المسار والمدة",
+      "destinationsTip": "تُحفظ الوجهات في المسار بترتيب السفر."
+    },
+    "setup": {
+      "title": "إعداد الرحلة",
+      "helper": "كيف يحجز المسافرون، وينضمُّون، ويُرافقون."
+    },
+    "status": {
+      "title": "الحالة",
+      "label": "الحالة"
+    }
+  },
+  "itinerary": {
+    "intro": "خطة يومًا بيوم. يمكن وصف الوجبات والفنادق والأنشطة في وصف كل يوم.",
+    "dayLabel": "اليوم {{n}}",
+    "moveUpAria": "تحريك اليوم {{n}} للأعلى",
+    "moveDownAria": "تحريك اليوم {{n}} للأسفل",
+    "removeAria": "إزالة اليوم {{n}}",
+    "titleLabel": "العنوان",
+    "titlePlaceholder": "الوصول إلى إسطنبول",
+    "locationLabel": "الموقع",
+    "locationPlaceholder": "إسطنبول",
+    "descriptionLabel": "الوصف",
+    "descriptionPlaceholder": "الوصول، النقل من المطار، تسجيل الدخول في الفندق...",
+    "add": "إضافة يوم"
+  },
+  "pricingEditor": {
+    "title": "خيارات الأسعار",
+    "helper": "فئات فقط — تُحدد الأسعار النهائية لكل انطلاق أدناه.",
+    "empty": "لا توجد خيارات أسعار بعد. أضف واحدًا مثل {{name}} أو {{alternate}}.",
+    "namePlaceholder": "بالغ",
+    "childPlaceholder": "طفل",
+    "nameAria": "اسم خيار السعر {{n}}",
+    "removeAria": "إزالة خيار السعر {{n}}",
+    "descriptionLabel": "الوصف",
+    "descriptionPlaceholder": "من سن 12 عامًا فما فوق",
+    "basisLabel": "الأساس",
+    "activeLabel": "فعال",
+    "add": "إضافة خيار سعر"
+  },
+  "departures": {
+    "title": "مواعيد الانطلاق",
+    "helper": "كل انطلاق هو موعد محدد له سعته وآخر موعد حجز وحالته وأسعاره.",
+    "empty": "لا توجد مواعيد انطلاق بعد. أضف واحدًا لجدولة الرحلة.",
+    "departureLabel": "انطلاق {{n}}",
+    "statusAria": "حالة الانطلاق {{n}}",
+    "removeAria": "إزالة الانطلاق {{n}}",
+    "startLabel": "البداية (التاريخ والوقت)",
+    "startHelper": "يرى المسافرون وقت اليوم.",
+    "endLabel": "النهاية (التاريخ والوقت)",
+    "capacityLabel": "السعة",
+    "capacityPlaceholder": "40",
+    "deadlineLabel": "آخر موعد للحجز",
+    "pricesLabel": "الأسعار",
+    "noPriceHint": "أضف خيارات الأسعار أعلاه لتحديد أسعار الانطلاق.",
+    "priceAria": "سعر {{option}} للانطلاق {{n}}",
+    "notesLabel": "ملاحظات داخلية",
+    "notesHelper": "لا يظهر إلا لفريقك.",
+    "notesPlaceholder": "ملاحظات داخلية اختيارية لهذا الانطلاق.",
+    "add": "إضافة موعد انطلاق"
+  },
+  "availabilityInfo": {
+    "helper": "لا تُنشأ مواعيد انطلاق مجدولة لهذا الوضع.",
+    "bodyOnRequest": "لا توجد مواعيد انطلاق محددة لهذه الرحلة. عندما يبدي مسافر اهتمامه، تُؤكد التواريخ حسب الحالة ويُنشأ موعد انطلاق عندئذٍ.",
+    "bodyCustomQuote": "يُسعَّر هذا المنتج حسب الطلب. لا توجد مواعيد انطلاق محددة — يُتفق على السعر بشكل فردي مع كل مسافر."
+  },
+  "details": {
+    "contentTitle": "نظرة الرحلة",
+    "contentHelper": "النصوص التي يراها المسافرون على بطاقات المتجر وصفحة هذه الرحلة.",
+    "includedTitle": "يشمل",
+    "includedHelper": "ما يحصل عليه المسافرون في الرحلة.",
+    "includedPlaceholder": "الإقامة الفندقية",
+    "notIncludedTitle": "لا يشمل",
+    "notIncludedHelper": "اذكر ما هو مستبعد بوضوح.",
+    "notIncludedPlaceholder": "رسوم التأشيرة",
+    "logisticsTitle": "اللوجستيات والإقامة",
+    "logisticsHelper": "كيف يتنقل المسافرون وأين يقيمون خلال الرحلة.",
+    "transportLabel": "وسائل النقل",
+    "transportPlaceholder": "أضف وسيلة نقل...",
+    "accommodationLabel": "أنواع الإقامة",
+    "accommodationPlaceholder": "أضف نوع إقامة...",
+    "accommodationHelper": "«لا يوجد» مناسب للرحلات اليومية أو القصيرة.",
+    "policiesTitle": "السياسات",
+    "policiesHelper": "السياسات واللوجستيات التي يحتاج المسافرون إلى معرفتها.",
+    "importantInfo": {
+      "label": "معلومات مهمة",
+      "helper": "قاعدة أو ملاحظة في كل سطر، مثل: جوازات السفر، قواعد العمر.",
+      "placeholder": "يجب أن يكون جواز السفر صالحًا لمدة 6 أشهر على الأقل.\nيجب أن يرافق المسافرين دون 18 عامًا شخص بالغ."
+    },
+    "cancellation": {
+      "label": "سياسة الإلغاء",
+      "helper": "صف سياسة الإلغاء واسترداد المبلغ.",
+      "placeholder": "إلغاء مجاني حتى 14 يومًا قبل موعد الانطلاق."
+    },
+    "meetingPoint": {
+      "label": "نقطة الالتقاء",
+      "placeholder": "مطار هواري بومدين — الصالة 1"
+    },
+    "meetingInstructions": {
+      "label": "تعليمات الالتقاء",
+      "placeholder": "قابِل ممثل الوكالة قرب البوابة B."
+    },
+    "extras": {
+      "title": "الخدمات الإضافية",
+      "helper": "إضافات اختيارية يمكن شراؤها مع الرحلة.",
+      "empty": "لا توجد خدمات إضافية بعد. أضف واحدة لتقديم إضافات اختيارية.",
+      "nameLabel": "الاسم",
+      "namePlaceholder": "خدمة كبار الشخصيات في المطار",
+      "priceLabel": "السعر",
+      "pricePlaceholder": "5000",
+      "descriptionLabel": "الوصف",
+      "descriptionPlaceholder": "تسريع إجراءات الجوازات والوصول إلى صالة الانتظار.",
+      "removeAria": "إزالة الخدمة {{n}}",
+      "add": "إضافة خدمة إضافية"
+    },
+    "textList": {
+      "itemAria": "عنصر «{{label}}» رقم {{n}}",
+      "removeAria": "إزالة عنصر «{{label}}» رقم {{n}}",
+      "add": "إضافة عنصر"
+    }
+  },
+  "media": {
+    "cover": {
+      "title": "صورة الغلاف",
+      "helper": "الصورة الأساسية التي يراها المسافرون على بطاقات المتجر.",
+      "hint": "الصق رابط صورة عامًا لصورة الغلاف.",
+      "urlAria": "رابط صورة الغلاف"
+    },
+    "gallery": {
+      "title": "المعرض",
+      "helper": "صور إضافية تُعرَض في معرض الرحلة.",
+      "urlAria": "رابط صورة المعرض {{n}}",
+      "removeAria": "إزالة صورة المعرض {{n}}",
+      "empty": "لا توجد صور في المعرض بعد."
+    },
+    "urlPlaceholder": "https://...",
+    "addImage": "إضافة صورة"
+  },
+  "booking": {
+    "title": "إعدادات الحجز",
+    "description": "قواعد الحجز ومعلومات المسافرين الخاصة بهذه الرحلة.",
+    "configureTitle": "قواعد المجموعة",
+    "configureHelper": "قواعد على مستوى الرحلة تنطبق على كل حجز."
+  },
+  "taxonomy": {
+    "clearAll": "مسح الكل",
+    "addAria": "إضافة {{label}}",
+    "removeAria": "إزالة {{label}}"
+  },
+  "validation": {
+    "highlightRequired": "نص المحطة مطلوب",
+    "dayTitleRequired": "عنوان اليوم مطلوب",
+    "locationRequired": "الموقع مطلوب",
+    "pricingOptionNameRequired": "اسم خيار السعر مطلوب",
+    "itemRequired": "العنصر مطلوب",
+    "extraNameRequired": "اسم الخدمة الإضافية مطلوب",
+    "priceNotNegative": "لا يمكن أن يكون السعر سالبًا",
+    "startAtRequired": "تاريخ ووقت البدء مطلوب",
+    "endAtRequired": "تاريخ ووقت النهاية مطلوب",
+    "capacityPositive": "يجب أن تكون السعة عددًا موجبًا",
+    "bookingDeadlineRequired": "آخر موعد للحجز مطلوب",
+    "endAfterStart": "يجب أن يكون تاريخ ووقت النهاية في نفس موعد البدء أو بعده",
+    "distanceNotNegative": "لا يمكن أن تكون المسافة سالبة",
+    "elevationNotNegative": "لا يمكن أن يكون الارتفاع المكتسب سالبًا",
+    "minimumAgeNotNegative": "لا يمكن أن يكون الحد الأدنى للعمر سالبًا",
+    "tripNameRequired": "اسم الرحلة مطلوب",
+    "atLeastOneDestination": "أضف وجهة واحدة على الأقل",
+    "minimumTravelersNotNegative": "لا يمكن أن يكون الحد الأدنى للمسافرين سالبًا",
+    "shortDescriptionRequired": "الوصف المختصر مطلوب",
+    "shortDescriptionMax": "اجعله أقل من 160 حرفًا",
+    "formatRequired": "اختر نوع الرحلة",
+    "scopeRequired": "اختر النطاق الجغرافي",
+    "hoursPositive": "يجب أن تكون الساعات عددًا صحيحًا موجبًا",
+    "daysPositive": "يجب أن تكون الأيام عددًا صحيحًا موجبًا",
+    "nightsNotNegative": "لا يمكن أن تكون الليالي سالبة",
+    "nightsExceedDays": "لا يمكن أن تزيد الليالي عن الأيام",
+    "destinationWilayaRequired": "اختر ولاية الوجهة.",
+    "destinationPlaceRequired": "اكتب دولة أو مدينة الوجهة."
+  }
+}

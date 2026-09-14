@@ -1,0 +1,241 @@
+{
+  "page": {
+    "title": "ملف الوكالة",
+    "description": "إدارة ملف الوكالة العام وجهات الاتصال والمواقع والخدمات.",
+    "loading": "جارٍ تحميل ملف الوكالة…",
+    "navAria": "أقسام إعدادات الوكالة",
+    "noAgencyTitle": "لا يوجد ملف وكالة",
+    "noAgencyDescription": "أكمل عملية التسجيل لإنشاء ملف وكالتك."
+  },
+  "sections": {
+    "general": "عام",
+    "brand": "العلامة التجارية والوسائط",
+    "contacts": "جهات الاتصال",
+    "locations": "المواقع",
+    "services": "الخدمات",
+    "legal": "المعلومات القانونية والثقة",
+    "social": "الروابط الاجتماعية"
+  },
+  "readiness": {
+    "title": "جاهزية الملف العام",
+    "required": "إلزامي",
+    "recommended": "موصى به",
+    "progress": "{{done}} من {{total}} من العناصر الإلزامية",
+    "complete": "ملفك العام جاهز",
+    "agencyName": "اسم الوكالة",
+    "logo": "الشعار",
+    "shortDescription": "وصف مختصر",
+    "primaryPublicPhone": "هاتف رئيسي عام",
+    "primaryPublicEmail": "بريد إلكتروني رئيسي عام",
+    "primaryLocation": "الموقع الرئيسي",
+    "tourismLicenseNumber": "رقم رخصة السياحة",
+    "services": "خدمة واحدة على الأقل",
+    "tagline": "شعار الوكالة",
+    "fullAbout": "الوصف الكامل",
+    "openingHours": "ساعات العمل",
+    "whatsapp": "واتساب",
+    "heroImage": "الصورة الرئيسية",
+    "socialLinks": "الروابط الاجتماعية",
+    "serviceLanguages": "لغات الخدمة"
+  },
+  "actions": {
+    "save": "حفظ",
+    "saving": "جارٍ الحفظ…",
+    "remove": "إزالة",
+    "unsaved": "تغييرات غير محفوظة",
+    "generalSaved": "تم حفظ المعلومات العامة",
+    "brandSaved": "تم حفظ إعدادات العلامة التجارية",
+    "contactsSaved": "تم حفظ جهات الاتصال",
+    "locationsSaved": "تم حفظ المواقع",
+    "servicesSaved": "تم حفظ الخدمات",
+    "legalSaved": "تم حفظ المعلومات القانونية",
+    "socialSaved": "تم حفظ الروابط الاجتماعية"
+  },
+  "general": {
+    "agencyName": {
+      "label": "اسم الوكالة",
+      "placeholder": "أطلس للسياحة"
+    },
+    "tagline": {
+      "label": "شعار الوكالة",
+      "placeholder": "رحلتك تبدأ معنا."
+    },
+    "shortDescription": {
+      "label": "وصف مختصر",
+      "placeholder": "جملة موجزة تظهر في ملفك العام.",
+      "helper": "الحد الأقصى 200 حرف."
+    },
+    "fullAbout": {
+      "label": "عن وكالتنا",
+      "placeholder": "تاريخ وكالتك ورسالتها وما يميزها."
+    }
+  },
+  "brand": {
+    "logo": {
+      "label": "رابط الشعار",
+      "placeholder": "https://example.com/logo.png",
+      "helper": "الصق الرابط الكامل لصورة الشعار."
+    },
+    "hero": {
+      "label": "رابط الصورة الرئيسية",
+      "placeholder": "https://example.com/hero.jpg",
+      "helper": "صورة بانر كبيرة لملفك العام."
+    },
+    "mediaNote": "رفع الصور غير متاح بعد. الصق روابط الصور المباشرة فقط."
+  },
+  "visibility": {
+    "public": "عام",
+    "internal": "داخلي"
+  },
+  "contacts": {
+    "helper": "حدد جهة الاتصال الرئيسية لكل نوع. جهات الاتصال الداخلية لا تظهر أبدًا في ملفك العام.",
+    "add": {
+      "phone": "إضافة هاتف",
+      "mobile": "إضافة هاتف محمول",
+      "whatsapp": "إضافة واتساب",
+      "email": "إضافة بريد إلكتروني"
+    },
+    "types": {
+      "phone": "هاتف",
+      "mobile": "محمول",
+      "whatsapp": "واتساب",
+      "email": "بريد إلكتروني"
+    },
+    "valueLabel": "الرقم أو العنوان",
+    "valuePlaceholder": "+213 555 000 000",
+    "primary": "رئيسي",
+    "primaryHelper": "جهة اتصال رئيسية واحدة لكل نوع"
+  },
+  "locations": {
+    "helper": "مكاتبك ونقاط تواصلك. حدد موقعًا واحدًا كموقع رئيسي.",
+    "add": "إضافة موقع",
+    "name": {
+      "label": "اسم الموقع",
+      "placeholder": "المكتب الرئيسي"
+    },
+    "primary": "المكتب الرئيسي",
+    "wilaya": {
+      "label": "الولاية",
+      "placeholder": "اختر الولاية",
+      "searchAria": "البحث عن الولايات",
+      "empty": "لا توجد نتائج"
+    },
+    "commune": {
+      "label": "البلدية / المدينة",
+      "placeholder": "اسم البلدية (بيانات المرجع غير متوفرة بعد)"
+    },
+    "address": {
+      "label": "العنوان",
+      "placeholder": "الشارع، المبنى، معلم قريب"
+    },
+    "openingHours": "ساعات العمل",
+    "maxOnePrimary": "لا يمكن تحديد أكثر من موقع رئيسي واحد"
+  },
+  "openingHours": {
+    "helper": "حدد ساعات العمل الأسبوعية.",
+    "isOpen": "مفتوح",
+    "closed": "مغلق",
+    "opensAt": "يفتح",
+    "closesAt": "يغلق",
+    "days": {
+      "saturday": "السبت",
+      "sunday": "الأحد",
+      "monday": "الاثنين",
+      "tuesday": "الثلاثاء",
+      "wednesday": "الأربعاء",
+      "thursday": "الخميس",
+      "friday": "الجمعة"
+    }
+  },
+  "services": {
+    "helper": "الخدمات التي تقدمها وكالتك. تُدار تصاريح العمرة والحج الموسمية ضمن قسم المعلومات القانونية.",
+    "add": "إضافة خدمة",
+    "types": {
+      "domestic_tours": "جولات داخلية",
+      "international_tours": "جولات دولية",
+      "desert_safari": "سفاري الصحراء",
+      "beach_holidays": "عطلات شاطئية",
+      "cultural_heritage": "تراث ثقافي",
+      "omra": "عمرة",
+      "hajj": "حج",
+      "business_travel": "سفر أعمال",
+      "visa_assistance": "مساعدة في التأشيرة",
+      "airline_tickets": "تذاكر طيران",
+      "hotel_reservations": "حجوزات فنادق",
+      "transfers": "نقل",
+      "custom_travel": "رحلات مخصصة",
+      "other": "أخرى"
+    },
+    "typeLabel": "نوع الخدمة",
+    "customLabel": {
+      "label": "اسم الخدمة",
+      "placeholder": "مثال: مخيم صحراوي"
+    },
+    "description": {
+      "label": "الوصف",
+      "placeholder": "وصف مختصر لهذه الخدمة"
+    },
+    "languages": {
+      "label": "لغات الخدمة",
+      "helper": "لغات التواصل مع العملاء.",
+      "options": {
+        "ar": "العربية",
+        "fr": "الفرنسية",
+        "en": "الإنجليزية"
+      }
+    }
+  },
+  "legal": {
+    "helper": "معلومات الرخصة مُصرَّح بها ذاتيًا وتظهر في ملفك العام.",
+    "tourismLicense": {
+      "label": "رقم رخصة السياحة",
+      "placeholder": "مثال: 12345/2024",
+      "helper": "مطلوب لإكمال ملفك العام."
+    },
+    "specialAuthorizations": {
+      "title": "التصاريح الخاصة",
+      "helper": "تصاريح العمرة والحج لها تاريخ صلاحية. التصاريح المنتهية لا تُحسب أبدًا كتصاريح نشطة في ملفك.",
+      "add": "إضافة تصريح",
+      "typeLabel": "النوع",
+      "type": {
+        "omra": "عمرة",
+        "hajj": "حج"
+      },
+      "referenceNumber": {
+        "label": "رقم المرجع",
+        "placeholder": "مثال: 2024/001"
+      },
+      "season": {
+        "label": "الفترة",
+        "placeholder": "مثال: رمضان 2025"
+      },
+      "validUntil": {
+        "label": "صالح حتى"
+      },
+      "expired": "منتهي الصلاحية"
+    }
+  },
+  "social": {
+    "add": "إضافة رابط",
+    "platformLabel": "المنصة",
+    "url": {
+      "label": "الرابط",
+      "placeholder": "https://…"
+    },
+    "platforms": {
+      "facebook": "فيسبوك",
+      "instagram": "إنستغرام",
+      "tiktok": "تيك توك",
+      "youtube": "يوتيوب",
+      "linkedin": "لينكد إن"
+    }
+  },
+  "validation": {
+    "nameRequired": "اسم الوكالة مطلوب",
+    "shortDescriptionMax": "يجب أن يكون الوصف بحد أقصى 200 حرف",
+    "serviceRequired": "أضف خدمة واحدة على الأقل",
+    "multiplePrimary": "لا يُسمح إلا بجهة اتصال رئيسية واحدة من نوع {{type}}",
+    "multiplePrimaryLocations": "لا يمكن تحديد أكثر من موقع رئيسي واحد",
+    "validPhone": "أدخل رقم هاتف صحيح"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "close": "إغلاق",
+  "nav": {
+    "overview": "نظرة عامة",
+    "trips": "الرحلات",
+    "bookings": "الحجوزات",
+    "customers": "العملاء",
+    "agencyProfile": "ملف الوكالة",
+    "team": "الفريق",
+    "settings": "الإعدادات"
+  },
+  "sidebar": {
+    "navAriaLabel": "التنقل الرئيسي"
+  },
+  "header": {
+    "ariaToggleSidebar": "فتح وإغلاق الشريط الجانبي",
+    "brand": "Travel SaaS"
+  },
+  "userMenu": {
+    "account": "الحساب",
+    "agencyProfile": "ملف الوكالة",
+    "settings": "الإعدادات",
+    "signOut": "تسجيل الخروج",
+    "language": "اللغة"
+  },
+  "locale": {
+    "english": "English",
+    "arabic": "العربية"
+  },
+  "placeholder": {
+    "defaultDescription": "هذا القسم جزء من خارطة طريق لوحة التحكم المعتمدة وسيُضاف في مرحلة لاحقة.",
+    "backToOverview": "العودة إلى النظرة العامة"
+  },
+  "notFound": {
+    "title": "الصفحة غير موجودة",
+    "description": "الصفحة التي تبحث عنها غير موجودة.",
+    "backToDashboard": "العودة إلى لوحة التحكم"
+  },
+  "dashboard": {
+    "title": "نظرة عامة",
+    "description": "أداء الوكالة وأنشطتها في لمحة.",
+    "placeholder": "صفحة النظرة العامة جزء من مرحلة قادمة."
+  },
+  "aria": {
+    "add": "إضافة {{label}}",
+    "remove": "إزالة {{label}}"
+  }
+}

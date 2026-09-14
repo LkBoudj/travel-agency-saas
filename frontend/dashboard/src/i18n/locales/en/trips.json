@@ -1,0 +1,619 @@
+{
+  "page": {
+    "title": "Trips",
+    "description": "Create, organize, and manage your travel experiences.",
+    "createTrip": "Create trip",
+    "clearFilters": "Clear filters",
+    "resultCount_one": "{{count}} trip",
+    "resultCount_other": "{{count}} trips",
+    "resultCountFiltered": "{{results}} of {{total}} trips"
+  },
+  "create": {
+    "title": "Create a trip",
+    "subtitle": "Start with the essentials — you can edit everything later.",
+    "closeAria": "Close create trip",
+    "name": {
+      "label": "Trip name",
+      "helper": "For example: Istanbul Discovery — 7 Days",
+      "placeholder": "Istanbul Discovery"
+    },
+    "format": {
+      "label": "Trip format",
+      "placeholder": "Select format"
+    },
+    "scope": {
+      "label": "Geographic scope"
+    },
+    "destination": {
+      "label": "Destination",
+      "helper": "Where this trip takes travelers."
+    },
+    "availability": {
+      "label": "Availability"
+    },
+    "duration": {
+      "label": "Duration"
+    },
+    "cancel": "Cancel",
+    "submit": "Create trip",
+    "successTitle": "Draft created",
+    "successDescription": "Continue setting it up below."
+  },
+  "duration": {
+    "prompt": "Select a format first to define the trip duration.",
+    "sameDay": "Same day — no overnight stays.",
+    "flexible": {
+      "label": "Flexible duration",
+      "helper": "No fixed number — agreed with each customer."
+    },
+    "flexibleNote": "Flexible duration — the length is agreed with the customer.",
+    "hours": {
+      "label": "Duration (hours)",
+      "helper": "Short experiences lasting a few hours."
+    },
+    "days": {
+      "label": "Days"
+    },
+    "nights": {
+      "label": "Nights",
+      "helper": "Suggested from days, editable."
+    },
+    "hours_one": "{{count}} hr",
+    "hours_other": "{{count}} hrs",
+    "days_one": "{{count}} day",
+    "days_two": "{{count}} days",
+    "days_few": "{{count}} days",
+    "days_many": "{{count}} days",
+    "days_other": "{{count}} days"
+  },
+  "readiness": {
+    "title": "Status & readiness",
+    "progress": {
+      "label": "Publish readiness",
+      "count": "{{completed}} of {{total}}",
+      "completedItem": "Completed",
+      "incompleteItem": "Not yet completed"
+    },
+    "recommended": {
+      "title": "Recommended before publish",
+      "meetingInstructions": "Meeting instructions",
+      "themes": "Themes",
+      "itinerary": "Itinerary"
+    },
+    "items": {
+      "name": "Basic information",
+      "destination": "Destination",
+      "shortDescription": "Customer-facing summary",
+      "coverImage": "Cover photo",
+      "pricing": "Pricing",
+      "availability": "Availability"
+    }
+  },
+  "toolbar": {
+    "searchPlaceholder": "Search trips...",
+    "searchAria": "Search trips",
+    "clearSearchAria": "Clear search",
+    "filterStatusAria": "Filter by status",
+    "allStatuses": "All statuses",
+    "filterFormatAria": "Filter by format",
+    "allFormats": "All formats",
+    "filterScopeAria": "Filter by geographic scope",
+    "allScopes": "All scopes",
+    "filterDestinationAria": "Filter by destination",
+    "allDestinations": "All destinations"
+  },
+  "table": {
+    "columnTrip": "Trip",
+    "columnDestination": "Destination",
+    "columnFormat": "Format",
+    "columnNextDeparture": "Next departure",
+    "columnPrice": "Price",
+    "columnStatus": "Status",
+    "columnActions": "Actions",
+    "fromPrice": "From",
+    "moreDestinations": "more",
+    "noUpcomingDeparture": "No upcoming departure",
+    "editTripAria": "Edit {{name}}"
+  },
+  "empty": {
+    "title": "No trips yet",
+    "description": "Create your first trip to start adding departures and pricing.",
+    "createTrip": "Create trip"
+  },
+  "noResults": {
+    "title": "No trips match your filters",
+    "description": "Try adjusting your search or destination filter.",
+    "clearFilters": "Clear filters"
+  },
+  "editor": {
+    "sections": {
+      "overview": "Overview",
+      "itinerary": "Itinerary",
+      "departures": "Departures & Pricing",
+      "details": "Details",
+      "media": "Media",
+      "booking": "Booking Settings"
+    },
+    "navAria": "Trip sections",
+    "header": {
+      "backAria": "Back to trips",
+      "newTrip": "New trip",
+      "untitled": "Untitled trip",
+      "newDraftHint": "Draft — no departures scheduled yet.",
+      "editingHint": "Editing {{tripId}}",
+      "tripsCrumb": "Trips",
+      "nameAria": "Trip name"
+    },
+    "footer": {
+      "newHint": "Saves a new draft.",
+      "editHint": "Applies to this trip.",
+      "publish": "Publish",
+      "saveDraft": "Save draft",
+      "saveChanges": "Save changes",
+      "unsaved": "Unsaved changes",
+      "discard": "Discard"
+    },
+    "publishGuard": {
+      "title": "This trip is no longer ready to publish",
+      "description": "These changes make the trip incomplete for publication. Publishing is only possible while everything required is in place. To keep these changes, the trip will be unpublished.",
+      "confirm": "Unpublish & save",
+      "cancel": "Cancel"
+    }
+  },
+  "format": {
+    "experience": "Experience / Activity",
+    "day_excursion": "Day Excursion",
+    "stay": "Stay",
+    "circuit": "Circuit / Tour",
+    "cruise": "Cruise"
+  },
+  "scope": {
+    "domestic": "Domestic",
+    "international": "International"
+  },
+  "availability": {
+    "scheduled": "Scheduled departures",
+    "on_request": "Available on request",
+    "custom_quote": "Custom quotation"
+  },
+  "participation": {
+    "shared_group": "Shared group",
+    "private": "Private departure / charter",
+    "individual": "Self-guided individual"
+  },
+  "guidance": {
+    "guided": "Fully guided",
+    "escorted": "Escorted",
+    "self_guided": "Self-guided",
+    "mixed": "Mixed"
+  },
+  "theme": {
+    "nature": "Nature",
+    "mountain": "Mountain",
+    "sahara_desert": "Sahara / Desert",
+    "beach_coastal": "Beach / Coastal",
+    "cultural": "Cultural",
+    "heritage_history": "Heritage / History",
+    "religious_spiritual": "Religious / Spiritual",
+    "wellness": "Wellness",
+    "adventure": "Adventure",
+    "eco_tourism": "Eco Tourism",
+    "urban_city": "Urban / City",
+    "gastronomy": "Gastronomy",
+    "festival_event": "Festival / Event",
+    "luxury": "Luxury"
+  },
+  "activity": {
+    "hiking": "Hiking",
+    "trekking": "Trekking",
+    "walking_tour": "Walking Tour",
+    "sightseeing": "Sightseeing",
+    "guided_visit": "Guided Visit",
+    "museum_archaeology": "Museum / Archaeology",
+    "camping": "Camping / Bivouac",
+    "offroad_4x4": "4x4 Off-road",
+    "camel_trek": "Camel Trek",
+    "cycling": "Cycling",
+    "horse_riding": "Horse Riding",
+    "boat_trip": "Boat Trip",
+    "swimming_beach": "Swimming / Beach",
+    "fishing": "Fishing",
+    "skiing_snow": "Skiing / Snow",
+    "climbing": "Climbing",
+    "kayaking": "Kayaking",
+    "diving": "Diving",
+    "wellness_hammam": "Wellness / Hammam",
+    "craft_workshop": "Craft Workshop",
+    "food_tasting": "Food / Tasting",
+    "photography": "Photography",
+    "festival": "Festival / Event"
+  },
+  "audience": {
+    "families": "Families",
+    "couples": "Couples",
+    "honeymoon": "Honeymoon",
+    "friends": "Friends",
+    "solo": "Solo Travelers",
+    "youth": "Youth",
+    "seniors": "Seniors",
+    "corporate": "Corporate Groups"
+  },
+  "transport": {
+    "bus": "Bus",
+    "minibus": "Minibus / Van",
+    "car": "Car",
+    "flight": "Flight",
+    "train": "Train",
+    "boat": "Boat",
+    "offroad_4x4": "4x4 Off-road",
+    "camel": "Camel",
+    "bicycle": "Bicycle",
+    "walking": "Walking",
+    "self_drive": "Self-drive",
+    "mixed": "Mixed"
+  },
+  "accommodation": {
+    "none": "None",
+    "hotel": "Hotel",
+    "resort": "Resort",
+    "guesthouse": "Guesthouse",
+    "homestay": "Homestay",
+    "camp": "Camp / Bivouac",
+    "mixed": "Mixed"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "moderate": "Moderate",
+    "challenging": "Challenging"
+  },
+  "fitness": {
+    "basic": "Basic",
+    "normal": "Normal",
+    "good": "Good",
+    "high": "High"
+  },
+  "status": {
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "departureStatus": {
+    "open": "Open",
+    "closed": "Closed",
+    "sold_out": "Sold out",
+    "cancelled": "Cancelled"
+  },
+  "pricingBasis": {
+    "per_person": "Per person",
+    "per_booking": "Per booking"
+  },
+  "overview": {
+    "basicInfo": {
+      "title": "Basic information"
+    },
+    "name": {
+      "label": "Trip name",
+      "helper": "For example: Istanbul Discovery — 7 Days",
+      "placeholder": "Istanbul Discovery"
+    },
+    "internalRef": {
+      "label": "Internal reference",
+      "helper": "For internal use only.",
+      "placeholder": "IST-7D-001"
+    },
+    "format": {
+      "label": "Trip format",
+      "placeholder": "Select format"
+    },
+    "scope": {
+      "label": "Geographic scope",
+      "helper": "Whether the trip stays in the home country.",
+      "placeholder": "Select scope"
+    },
+    "origin": {
+      "title": "Departure location",
+      "wilaya": {
+        "label": "Wilaya",
+        "placeholder": "Search and select a wilaya…",
+        "helper": "Departures stay in Algeria.",
+        "empty": "No wilaya found",
+        "searchAria": "Search wilayas",
+        "clearAria": "Clear wilaya",
+        "triggerAria": "Open wilaya search"
+      },
+      "city": {
+        "label": "City / Commune",
+        "placeholder": "Type the commune…",
+        "searchAria": "City or commune"
+      }
+    },
+    "destination": {
+      "singleTitle": "Destination",
+      "circuitTitle": "Destinations",
+      "stepLabel": "Destination {{n}}",
+      "editAria": "Edit destination {{n}}",
+      "doneAria": "Finish editing destination {{n}}",
+      "moveUpAria": "Move destination {{n}} up",
+      "moveDownAria": "Move destination {{n}} down",
+      "removeAria": "Remove destination {{n}}",
+      "emptySummary": "Destination not set",
+      "add": "Add destination",
+      "wilaya": {
+        "label": "Wilaya",
+        "placeholder": "Search and select a wilaya…",
+        "empty": "No wilaya found",
+        "searchAria": "Search wilayas",
+        "clearAria": "Clear wilaya",
+        "triggerAria": "Open wilaya search"
+      },
+      "city": {
+        "label": "City / Commune",
+        "placeholder": "Type the commune…",
+        "searchAria": "City or commune"
+      },
+      "place": {
+        "label": "Specific place",
+        "placeholder": "Tikjda",
+        "helper": "Where the traveler actually goes."
+      },
+      "internationalLabel": "Destination (country / city)",
+      "internationalPlaceholder": "e.g. Istanbul"
+    },
+    "availability": {
+      "label": "Availability"
+    },
+    "participation": {
+      "label": "Participation"
+    },
+    "guidance": {
+      "label": "Guidance"
+    },
+    "minTravelers": {
+      "label": "Minimum travelers"
+    },
+    "classification": {
+      "title": "Classification"
+    },
+    "themes": {
+      "label": "Themes",
+      "placeholder": "Add a theme..."
+    },
+    "activities": {
+      "label": "Activities",
+      "placeholder": "Add an activity..."
+    },
+    "audience": {
+      "label": "Audience",
+      "placeholder": "Add an audience..."
+    },
+    "activityRequirements": {
+      "title": "Activity requirements"
+    },
+    "difficultyLabel": "Difficulty",
+    "fitnessLabel": "Fitness level",
+    "distanceLabel": "Distance (km)",
+    "elevationLabel": "Elevation gain (m)",
+    "minimumAgeLabel": "Minimum age",
+    "equipment": {
+      "label": "Required equipment",
+      "placeholder": "Sturdy hiking shoes, sunscreen"
+    },
+    "description": {
+      "title": "Description",
+      "helper": "The copy travelers see on marketplace cards and this trip's profile."
+    },
+    "shortDescription": {
+      "label": "Short description",
+      "helper": "{{count}}/160 — used on marketplace cards and search results.",
+      "placeholder": "A compact hook for your travel experience."
+    },
+    "fullDescription": {
+      "label": "Full description",
+      "helper": "Describe the overall experience only. Itinerary, inclusions, and policies have their own sections.",
+      "placeholder": "The full story of this travel experience..."
+    },
+    "highlights": {
+      "title": "Highlights",
+      "helper": "The standout moments that make this trip worth booking.",
+      "placeholder": "Bosphorus cruise",
+      "removeAria": "Remove highlight {{n}}",
+      "add": "Add highlight"
+    },
+    "notSpecified": "Not specified",
+    "duration": {
+      "label": "Duration"
+    },
+    "languages": {
+      "label": "Languages",
+      "helper": "Spoken by this trip's guides when guidance is offered.",
+      "placeholder": "French",
+      "add": "Add",
+      "removeAria": "Remove {{language}}"
+    },
+    "structuralChange": {
+      "title": "Change trip structure?",
+      "description": "Switching the format, scope, or availability reshapes this trip. Related fields may be cleared. Do you want to continue?",
+      "confirm": "Apply change",
+      "cancel": "Cancel"
+    },
+    "route": {
+      "title": "Route & duration",
+      "destinationsTip": "Circuits keep destinations in travel order."
+    },
+    "setup": {
+      "title": "Trip setup",
+      "helper": "How travelers book, join, and are guided."
+    },
+    "status": {
+      "title": "Status",
+      "label": "Status"
+    }
+  },
+  "itinerary": {
+    "intro": "Day-by-day plan. Meals, hotels, and activities can be described in each day's description.",
+    "dayLabel": "Day {{n}}",
+    "moveUpAria": "Move day {{n}} up",
+    "moveDownAria": "Move day {{n}} down",
+    "removeAria": "Remove day {{n}}",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Arrival in Istanbul",
+    "locationLabel": "Location",
+    "locationPlaceholder": "Istanbul",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Arrival, airport transfer, hotel check-in...",
+    "add": "Add day"
+  },
+  "pricingEditor": {
+    "title": "Pricing options",
+    "helper": "Categories only — final prices are set per departure below.",
+    "empty": "No pricing options yet. Add one like {{name}} or {{alternate}}.",
+    "namePlaceholder": "Adult",
+    "childPlaceholder": "Child",
+    "nameAria": "Pricing option {{n}} name",
+    "removeAria": "Remove pricing option {{n}}",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Ages 12 and above",
+    "basisLabel": "Basis",
+    "activeLabel": "Active",
+    "add": "Add pricing option"
+  },
+  "departures": {
+    "title": "Departures",
+    "helper": "Each departure is one scheduled occurrence with its own capacity, deadline, status, and prices.",
+    "empty": "No departures yet. Add one to schedule this trip.",
+    "departureLabel": "Departure {{n}}",
+    "statusAria": "Departure {{n}} status",
+    "removeAria": "Remove departure {{n}}",
+    "startLabel": "Start (date & time)",
+    "startHelper": "Travelers see the time of day.",
+    "endLabel": "End (date & time)",
+    "capacityLabel": "Capacity",
+    "capacityPlaceholder": "40",
+    "deadlineLabel": "Booking deadline",
+    "pricesLabel": "Prices",
+    "noPriceHint": "Add pricing options above to set departure prices.",
+    "priceAria": "{{option}} price for departure {{n}}",
+    "notesLabel": "Internal notes",
+    "notesHelper": "Only visible to your team.",
+    "notesPlaceholder": "Optional internal notes for this departure.",
+    "add": "Add departure"
+  },
+  "availabilityInfo": {
+    "helper": "No scheduled departures are created for this mode.",
+    "bodyOnRequest": "This trip has no scheduled departures. When a traveler shows interest, dates are confirmed case by case and a departure is created at that point.",
+    "bodyCustomQuote": "This product is quoted per request. There are no scheduled departures — pricing is agreed individually with each traveler."
+  },
+  "details": {
+    "contentTitle": "Experience overview",
+    "contentHelper": "The copy travelers see on marketplace cards and this trip's profile.",
+    "includedTitle": "Included",
+    "includedHelper": "What travelers get on the trip.",
+    "includedPlaceholder": "Hotel accommodation",
+    "notIncludedTitle": "Not included",
+    "notIncludedHelper": "Clearly state what is excluded.",
+    "notIncludedPlaceholder": "Visa fees",
+    "logisticsTitle": "Logistics & accommodation",
+    "logisticsHelper": "How travelers move and where they stay on this trip.",
+    "transportLabel": "Transport modes",
+    "transportPlaceholder": "Add a transport mode...",
+    "accommodationLabel": "Accommodation types",
+    "accommodationPlaceholder": "Add an accommodation type...",
+    "accommodationHelper": "\"None\" is expected for same-day or short experiences.",
+    "policiesTitle": "Policies",
+    "policiesHelper": "Policies and logistics travelers need to know.",
+    "importantInfo": {
+      "label": "Important information",
+      "helper": "One rule or note per line, e.g. passports, age rules.",
+      "placeholder": "Passport must be valid for at least 6 months.\nTravelers under 18 must be accompanied by an adult."
+    },
+    "cancellation": {
+      "label": "Cancellation policy",
+      "helper": "Describe your cancellation and refund policy.",
+      "placeholder": "Free cancellation until 14 days before departure."
+    },
+    "meetingPoint": {
+      "label": "Meeting point",
+      "placeholder": "Houari Boumediene Airport — Terminal 1"
+    },
+    "meetingInstructions": {
+      "label": "Meeting instructions",
+      "placeholder": "Meet the agency representative near Gate B."
+    },
+    "extras": {
+      "title": "Extras",
+      "helper": "Optional add-ons purchasable with the trip.",
+      "empty": "No extras yet. Add one to offer optional add-ons.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Airport VIP service",
+      "priceLabel": "Price",
+      "pricePlaceholder": "5000",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Fast-track through immigration and lounge access.",
+      "removeAria": "Remove extra {{n}}",
+      "add": "Add extra"
+    },
+    "textList": {
+      "itemAria": "{{label}} item {{n}}",
+      "removeAria": "Remove {{label}} item {{n}}",
+      "add": "Add item"
+    }
+  },
+  "media": {
+    "cover": {
+      "title": "Cover image",
+      "helper": "The primary image travelers see on marketplace cards.",
+      "hint": "Paste a public image URL for the cover photo.",
+      "urlAria": "Cover image URL"
+    },
+    "gallery": {
+      "title": "Gallery",
+      "helper": "Additional images shown in the trip gallery.",
+      "urlAria": "Gallery image {{n}} URL",
+      "removeAria": "Remove gallery image {{n}}",
+      "empty": "No gallery images yet."
+    },
+    "urlPlaceholder": "https://...",
+    "addImage": "Add image"
+  },
+  "booking": {
+    "title": "Booking settings",
+    "description": "Booking rules and traveler information for this trip.",
+    "configureTitle": "Group rules",
+    "configureHelper": "Trip-level rules that apply to every booking."
+  },
+  "taxonomy": {
+    "clearAll": "Clear all",
+    "addAria": "Add {{label}}",
+    "removeAria": "Remove {{label}}"
+  },
+  "validation": {
+    "highlightRequired": "Highlight text is required",
+    "dayTitleRequired": "Day title is required",
+    "locationRequired": "Location is required",
+    "pricingOptionNameRequired": "Pricing option name is required",
+    "itemRequired": "Item is required",
+    "extraNameRequired": "Extra name is required",
+    "priceNotNegative": "Price cannot be negative",
+    "startAtRequired": "Start date and time are required",
+    "endAtRequired": "End date and time are required",
+    "capacityPositive": "Capacity must be a positive number",
+    "bookingDeadlineRequired": "Booking deadline is required",
+    "endAfterStart": "End date and time must be on or after the start",
+    "distanceNotNegative": "Distance cannot be negative",
+    "elevationNotNegative": "Elevation gain cannot be negative",
+    "minimumAgeNotNegative": "Minimum age cannot be negative",
+    "tripNameRequired": "Trip name is required",
+    "atLeastOneDestination": "Add at least one destination",
+    "minimumTravelersNotNegative": "Minimum travelers cannot be negative",
+    "shortDescriptionRequired": "Short description is required",
+    "shortDescriptionMax": "Keep it under 160 characters",
+    "formatRequired": "Select a trip format",
+    "scopeRequired": "Select a geographic scope",
+    "hoursPositive": "Hours must be a positive whole number",
+    "daysPositive": "Days must be a positive whole number",
+    "nightsNotNegative": "Nights cannot be negative",
+    "nightsExceedDays": "Nights cannot exceed days",
+    "destinationWilayaRequired": "Choose the destination wilaya.",
+    "destinationPlaceRequired": "Type the destination country or city."
+  }
+}
