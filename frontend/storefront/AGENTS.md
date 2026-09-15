@@ -197,7 +197,28 @@ generate SEO
 
 Themes are platform-owned presentation systems.
 
-A Theme may conceptually expose:
+The implemented Theme engine lives in `themes/` — read the actual contracts
+before changing any of it:
+
+```text
+themes/contracts.ts   ← authoritative StorefrontTheme contract (types only)
+themes/settings.ts    ← schema-validated settings resolution with defaults
+themes/registry.ts    ← THEME_REGISTRY + loadTheme; DEFAULT_THEME_ID
+themes/resolver.ts    ← getActiveStorefront(agency): theme resolution +
+                        settings + ThemeRenderContext composition
+themes/<theme-id>/    ← a Theme: index.ts (StorefrontTheme export), manifest,
+                        settings schema+defaults, layout.tsx, pages/
+```
+
+Shared business read-models live in `features/` (agency, tours, destinations,
+stories, promotions, trust-points, search hooks, `features/storefront` view
+model). Demo data is confined to `features/*/demo-data.ts` and identifies the
+production integration gap; never scatter fixtures through themes.
+
+`themes/explorer` is Explorer v1, the default Theme — the former single-agency
+Home sections + Header/Footer moved into `themes/explorer/components/`.
+
+A Theme conceptually exposes:
 
 ```ts
 interface StorefrontTheme {

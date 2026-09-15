@@ -1,0 +1,62 @@
+import type { Tour } from "./types";
+
+// TEMPORARY demo data — replace with the `featuredTours` payload from the backend.
+export const demoTours: Tour[] = [
+  {
+    id: "santorini-escape",
+    slug: "santorini-escape",
+    title: "Santorini Escape",
+    image: {
+      src: "/tours/santorini-escape.jpg",
+      alt: "Whitewashed cliffside houses and blue domes above the Aegean Sea in Santorini at golden hour",
+      width: 3840,
+      height: 2560,
+      objectPosition: "50% 38%",
+    },
+    destination: "Santorini, Greece",
+    duration: "7 Days",
+    rating: 4.9,
+    reviewCount: 320,
+    price: 1250,
+    currency: "USD",
+    badge: "best-seller",
+  },
+  {
+    id: "istanbul-discovery",
+    slug: "istanbul-discovery",
+    title: "Istanbul Discovery",
+    image: {
+      src: "/tours/istanbul-discovery.jpg",
+      alt: "Hagia Sophia silhouette and minarets along the Bosphorus at sunset in Istanbul",
+      width: 2680,
+      height: 2064,
+      objectPosition: "50% 42%",
+    },
+    destination: "Istanbul, Türkiye",
+    duration: "5 Days",
+    rating: 4.8,
+    reviewCount: 210,
+    price: 890,
+    currency: "USD",
+    badge: "featured",
+  },
+  {
+    id: "dubai-adventure",
+    slug: "dubai-adventure",
+    title: "Dubai Adventure",
+    image: {
+      src: "/tours/dubai-adventure.jpg",
+      alt: "Dubai skyline rising above sand dunes during a desert dusk",
+      width: 3840,
+      height: 2560,
+      objectPosition: "50% 45%",
+    },
+    destination: "Dubai, UAE",
+    duration: "6 Days",
+    rating: 4.7,
+    reviewCount: 184,
+    price: 1100,
+    currency: "USD",
+    badge: "limited-availability",
+  },
+];
