@@ -68,7 +68,13 @@ Do not invent exact package patch versions before installation.
 
 - REST; business endpoints under `/v1`; Nest official URI versioning —
   controllers do not hand-write `v1` into paths.
-- Operational `GET /health` is version-neutral and liveness-only.
+- IMPLEMENTED (auth): URI versioning enabled via
+  `app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' })`
+  in `src/setup-app.ts` (`configureApp`, shared by `main.ts` and tests);
+  business routes live under `/v1` (`/v1/auth/...`; existing `/` and
+  `/prisma-check` now serve at `/v1` and `/v1/prisma-check`).
+- Operational `GET /health` is version-neutral and liveness-only — still
+  NOT implemented.
 - Operational routes are excluded from the frontend business API contract.
 
 ## [API_CONTRACT]
@@ -103,6 +109,9 @@ Nest routes
   - Foundation/boot: `NODE_ENV`, `PORT`.
   - DB milestone: `DATABASE_URL` (pooled runtime connection) added to runtime
     config.
+  - Auth milestone: `JWT_SECRET` (required, >= 32 chars — from validated env,
+    never hardcoded) and `JWT_EXPIRES_IN` (default `15m`, short-lived access
+    token) added to runtime config.
 - Prisma tooling/migrations: `DATABASE_URL_UNPOOLED` (direct/unpooled) via
   Prisma CLI configuration; NOT required for Nest application boot.
 - No `process.env` scattered through feature code.
@@ -176,6 +185,44 @@ IMPLEMENTED (Group 1) — database foundation:
   (`app_user.email CITEXT UNIQUE`); activation versioned in the migration.
 - No business roles/permissions/catalog seeded (seed deferred).
 
+## [AUTH]
+
+IMPLEMENTED (authentication vertical slice, Group 1 scope):
+
+- Dependencies: `@nestjs/passport@12`, `passport@0.7`, `passport-local@1`,
+  `@nestjs/jwt@12`, `passport-jwt@4`, `argon2@0.45` (argon2id), plus
+  `@types/passport-local` / `@types/passport-jwt` (dev).
+- Flow: `email + password` → Passport Local → `AuthService` → Prisma `appUser`
+  → argon2id verify → `JwtService.sign({ sub })` → HttpOnly cookie →
+  Passport JWT (cookie extractor) → `JwtAuthGuard` → `request.user`.
+- Endpoints under `/v1/auth/*`:
+  - `POST /v1/auth/register` — Zod/Standard-Schema validated
+    (`z.email()`, password 8–72), argon2id-hashed via service, `app_user.code`
+    generated as `USR-<12 uppercase hex>` (project `USR-…` convention, fits
+    `VARCHAR(24)`); client-supplied `code`/`id`/`passwordHash` are never
+    accepted (Zod object strips unknown fields); duplicate CITEXT email →
+    409 `EMAIL_ALREADY_REGISTERED` (Prisma P2002 handled via
+    `Prisma.PrismaClientKnownRequestError`); returns the safe user only.
+  - `POST /v1/auth/login` — Passport Local (`usernameField: 'email'`);
+    JWT payload = `{ sub: <appUser.id> }` only (no roles/permissions/password/
+    email); JWT written to the HttpOnly cookie, never included in response
+    JSON; returns the safe user.
+  - `POST /v1/auth/logout` — clears the auth cookie; no server-side token
+    persistence (refresh/system-store deferred).
+  - `GET /v1/auth/me` — `JwtAuthGuard`; returns the safe user
+    `{ code, email, firstName, lastName }`.
+- JWT transport: `HttpOnly` cookie `travel_access_token`; `Secure` only when
+  `NODE_ENV=production`; `SameSite=Lax` (same-site dashboard/backend
+  architecture); `Path=/`; cookie `Max-Age` mirrors `JWT_EXPIRES_IN`. No
+  localStorage/sessionStorage (frontend concern) and no Authorization-header
+  dependency — the JWT strategy extracts exclusively from the cookie.
+- JWT validation: `sub` → Prisma `appUser` lookup (bigint) → safe
+  authenticated user; missing/non-numeric/unknown subject → 401.
+- Config: `JWT_SECRET` from validated env (never hardcoded/logged);
+  cookie options centralized in `src/auth/auth.cookie.ts`;
+  `PassportModule.register({ session: false })`; stateless.
+- No Role assignment, no CASL, no Agency, no refresh tokens (Group 2+).
+
 ## [TENANCY]
 
 - Tenant = Agency; shared PostgreSQL; backend-enforced isolation.
@@ -188,7 +235,12 @@ IMPLEMENTED (Group 1) — database foundation:
 
 - Zod 4 + Standard Schema (`StandardSchemaValidationPipe` where appropriate;
   Standard-Schema response serialization where appropriate).
-- Pipes/interceptors are NOT implemented yet.
+- IMPLEMENTED (auth): global `StandardSchemaValidationPipe` registered in
+  `configureApp` (`src/setup-app.ts`) + per-parameter schemas
+  (`@Body({ schema })`) for `/v1/auth/register` and `/v1/auth/login`
+  (`src/auth/schemas.ts`). Unknown body fields are stripped by the Zod
+  objects (client-supplied `code`/`id`/`passwordHash` can never reach
+  persistence).
 
 ## [ERROR_CONTRACT]
 
@@ -196,8 +248,12 @@ IMPLEMENTED (Group 1) — database foundation:
   validation details only when genuinely needed.
 - Never expose: stack traces, database errors, SQL, secrets, internal
   implementation details.
-- Concrete reusable runtime error machinery deferred until a real business
-  endpoint needs it.
+- IMPLEMENTED (auth): machine-readable `errorCode`
+  (`EMAIL_ALREADY_REGISTERED`, `USER_CREATE_CONFLICT`) on auth conflicts;
+  login failures surface as generic 401 (`Invalid credentials` — no user
+  enumeration); invalid tokens as 401.
+- Concrete reusable runtime error machinery deferred until more endpoints
+  need it.
 
 ## [LOGGING]
 
@@ -277,6 +333,12 @@ Only what actually exists now:
     email behavior, invalid scope rejection, duplicate `permission.key` rejection,
     duplicate `(scope, name)` role rejection, same name in different scope allowed,
     `code` removal, scope constraint name (`role_scope_check` confirmed)
+- authentication vertical slice (see [AUTH]): Nest URI versioning `/v1`
+  (default version), global `StandardSchemaValidationPipe`, `AuthModule`
+  (Passport Local + JWT-in-cookie), `/v1/auth/{register,login,logout,me}`,
+  argon2id hashing, `USR-` code generation, HttpOnly `travel_access_token`
+  cookie (Secure in production, SameSite=Lax), minimal `{ sub }` JWT,
+  `JwtAuthGuard`, `@CurrentUser`; auth unit + HTTP integration specs
 
 Identifier convention (final): business entities may carry a user-facing
 `code` when justified (`app_user.code`, e.g. USR-…); RBAC `role` has no
@@ -284,25 +346,25 @@ business code (internal `id`, display `name`, `scope` context); `permission`
 uses a stable technical authorization `key` (e.g. AGENCY_APPROVE), NOT a
 business code.
 
-NOT implemented: URI versioning `/v1`, `GET /health`, OpenAPI/Swagger,
-api-contract, business modules, tenant enforcement, auth, seed, business
-models beyond `app_user`/`role`/`permission`/`role_permission`. M1 baseline
-checks were intentionally skipped by project decision (see [STATUS]) and are
-NOT marked verified.
+NOT implemented: `GET /health`, api-contract, Agency model, tenant enforcement,
+`user_role` assignment, CASL/Nest authorization guards beyond JWT auth, role/
+permission seeds, business models beyond `app_user`/`role`/`permission`/
+`role_permission`. M1 baseline checks were intentionally skipped by project
+decision (see [STATUS]) and are NOT marked verified; the auth slice is
+implemented but NOT yet verified (sandbox could not run node/npm).
 
 ## [SELECTED_NOT_IMPLEMENTED]
 
 Major approved architecture awaiting implementation (concise):
 
-- HTTP foundation: URI versioning `/v1`, version-neutral `GET /health`
-- API contract foundation: OpenAPI generation, `packages/api-contract/`,
-  generated TypeScript contract, deterministic drift detection
-- First business vertical slice (separate planning task)
-- Identity + RBAC application layer: `user_role` assignment table (awaits
-  `agency` FK), Agency model, PLATFORM/AGENCY role assignments, CASL
-  integration, Nest authorization guards, login/registration endpoints,
-  password hashing implementation, sessions/JWT, role seed catalog,
-  permission seed catalog
+- HTTP foundation: version-neutral `GET /health`
+- API contract foundation: OpenAPI/Swagger drift-verified contract,
+  `packages/api-contract/`, generated TypeScript contract
+- First business vertical slice beyond auth (separate planning task)
+- Identity + RBAC application layer (Group 2+): `user_role` assignment table
+  (awaits `agency` FK), Agency model, PLATFORM/AGENCY role assignments, CASL
+  integration, Nest authorization guards, role seed catalog, permission seed
+  catalog, refresh-token/system session store (auth today is stateless JWT-in-cookie)
 - Architecture decision: `platform_admin` table NOT USED — platform
   administration is modeled through unified `app_user` → role → permission
 

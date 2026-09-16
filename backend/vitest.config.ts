@@ -9,5 +9,8 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['**/*.spec.ts'],
+    env: {
+      JWT_SECRET: 'vitest-secret-that-is-at-least-thirty-two-characters',
+    },
   },
 });
