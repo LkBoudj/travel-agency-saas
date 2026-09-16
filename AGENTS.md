@@ -12,15 +12,15 @@ travel-saas/
 ├── AGENTS.md               # This file — how to work (repo-wide base)
 ├── opencode.json           # Repo-wide OpenCode config + instructions
 ├── .opencode/skills/       # Repo-wide skills (discovered from anywhere)
+├── backend/                # Backend — exists (OpenCode environment; Nest runtime NOT scaffolded yet)
 └── frontend/
     ├── dashboard/          # Agency Dashboard (Vite + React SPA) — exists
     └── storefront/         # Public storefront (Next 16 App Router) — exists
     # marketplace/          # Public marketplace — does NOT exist yet
     # admin/                # Platform Admin — does NOT exist yet
-# backend/                  # Does NOT exist yet
 ```
 
-`backend/`, `admin/`, and `marketplace/` do **not** exist. Do not create them, reference their files, or fabricate their behavior unless the user explicitly requests the work.
+`admin/` and `marketplace/` do **not** exist. Do not create them, reference their files, or fabricate their behavior unless the user explicitly requests the work. `backend/` exists but currently contains only the backend OpenCode environment; the NestJS runtime application is not scaffolded yet.
 
 Work only inside the app directory relevant to the task unless the user explicitly requests changes elsewhere.
 
@@ -31,7 +31,7 @@ A multi-tenant Travel SaaS platform. Two apps exist:
 - **Dashboard** — per-agency management (auth, trips, bookings, customers, agency profile, website/theme, team, settings).
 - **Storefront** — one Next.js app serving storefronts for **many** agencies. `agency.themeId` selects a theme from a registry; themes are server components rendered with props only. The platform owns tenant resolution, routing (`/[locale]`), SEO, and preview mode (always noindex). See `frontend/storefront/AGENTS.md`.
 
-The backend is a separate system not present in this repo. Frontend code must **not** invent backend behavior: no fake APIs, no fake auth, no simulated multi-tenancy enforcement in UI logic. Build clean integration boundaries only.
+The backend is a separate system being built in this repo under `backend/` (OpenCode environment exists; NestJS runtime application not scaffolded yet). Frontend code must **not** invent backend behavior: no fake APIs, no fake auth, no simulated multi-tenancy enforcement in UI logic. Build clean integration boundaries only.
 
 ## 3. Core Invariants
 

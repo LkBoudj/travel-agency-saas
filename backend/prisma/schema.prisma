@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AppUser {
+  id           BigInt   @id @default(autoincrement())
+  code         String   @unique @db.VarChar(24)
+  email        String   @unique @db.Citext
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  firstName    String?  @map("first_name") @db.VarChar(100)
+  lastName     String?  @map("last_name") @db.VarChar(100)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  @@map("app_user")
+}
+
+model Role {
+  id          BigInt   @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  scope       String   @db.VarChar(16)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  permissions RolePermission[]
+
+  @@unique([scope, name])
+  @@map("role")
+}
+
+model Permission {
+  id          BigInt   @id @default(autoincrement())
+  key         String   @unique @db.VarChar(64)
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  roles RolePermission[]
+
+  @@map("permission")
+}
+
+model RolePermission {
+  roleId       BigInt @map("role_id")
+  permissionId BigInt @map("permission_id")
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permission")
+}

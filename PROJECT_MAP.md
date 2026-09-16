@@ -14,8 +14,11 @@ anonymous travelers, platform operators.
 - Platform operator: future Admin app.
 
 ## [SYSTEM_BOUNDARIES]
-- backend/        FUTURE: single NestJS + TypeScript modular monolith; Prisma →
-                  PostgreSQL (hosted via Neon); REST under /v1. Does NOT exist yet.
+- backend/        EXISTS as backend OpenCode environment (AGENTS.md, opencode.json,
+                  skills) only. NestJS runtime application NOT scaffolded yet.
+                  SELECTED: single NestJS + TypeScript modular monolith; Prisma →
+                  PostgreSQL (hosted via Neon); REST under /v1; OpenAPI-based
+                  backend/frontend contract.
 - frontend/dashboard/    React SPA — agency management only; does NOT render the
                          public storefront.
 - frontend/storefront/   Next.js 16.3.5 App Router PUBLIC STOREFRONT — one app,
@@ -34,9 +37,10 @@ anonymous travelers, platform operators.
               server components fed via props only.
 - marketplace: future, undrafted.
 - admin: undecided; lean same-pattern as dashboard.
-- backend: NestJS (TypeScript) modular monolith · Prisma · PostgreSQL · Neon —
-           AGREED architecture, NOT implemented; exact versions pinned when the
-           backend is scaffolded (do not fabricate them today).
+- backend: NestJS (TypeScript) modular monolith · REST /v1 · Prisma · PostgreSQL ·
+           Neon · OpenAPI-based backend/frontend contract — SELECTED (approved),
+           NOT implemented; exact versions pinned when the backend is scaffolded
+           (do not fabricate them today).
 
 ## [DOMAIN_MODEL]
 Platform-owned: User, Theme{id,nameKey,version,preview,settingsSchema},
