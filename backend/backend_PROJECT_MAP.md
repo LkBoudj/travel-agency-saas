@@ -15,9 +15,10 @@ PENDING for the backend.
 - Version source of truth: installed `backend/package.json` + `package-lock.json`.
 - `prisma/` (schema + `prisma.config.ts`), `.env.example` (tracked), `.env`
   (gitignored) now exist.
-- Current phase = Group 1 complete (Identity + RBAC database foundation via
-  Prisma migrations) on top of M2. M1 baseline checks remain intentionally
-  skipped (see below).
+- Current phase = Group 1 backend RBAC complete: scoped PLATFORM permission
+  catalog (11 code-owned permissions), PLATFORM Role CRUD, available-permissions,
+  Role↔Permission API, CASL-backed `PermissionGuard`, idempotent seed and
+  Swagger, on top of the Identity + RBAC database foundation and M2.
 
 ### M1 baseline checks — intentionally skipped (project decision)
 
@@ -148,17 +149,30 @@ Nest routes
   (pooled `DATABASE_URL`).
 - IMPLEMENTED (Group 1): business Prisma migrations
   `20260916101639_identity_rbac_foundation`, `20260916102901_drop_role_permission_code`,
-  `20260916103945_refine_rbac_identifiers`, `20260916104751_role_scope_name_unique`.
+  `20260916103945_refine_rbac_identifiers`, `20260916104751_role_scope_name_unique`,
+  `20260916195827_platform_role_assignment`, `20260917051422_scoped_platform_permissions`.
   Customized migration history:
   manually adds `CREATE EXTENSION IF NOT EXISTS citext;` and the
-  `role_scope_check` CHECK constraint (`scope IN ('PLATFORM','AGENCY')`);
+  `role_scope_check` / `permission_scope_check` CHECK constraints
+  (`scope IN ('PLATFORM','AGENCY')`);
   `role` additionally constrained by unique `(scope, name)`
   (`role_scope_name_key`), so a role name is allowed once per scope;
   no `postgresqlExtensions` preview feature or `extensions` datasource field.
   Uses `BIGSERIAL` for BIGINT autoincrement PKs (Prisma's supported
   PostgreSQL autoincrement mapping).
+- `20260917051422_scoped_platform_permissions` adds `permission.scope`
+  VARCHAR(16) NOT NULL, `permission.resource` VARCHAR(64) NOT NULL and
+  `permission.action` VARCHAR(32) NOT NULL (+ `permission_scope_idx`),
+  backfills legacy rows and renames legacy key `X` → `PLATFORM_<RESOURCE>_<ACTION>`
+  in two phases so existing `role_permission` links (which reference
+  `permission.id`) are preserved.
 - Migrations: `prisma/migrations/` existing; migration order authoritative.
-- No seed; no models beyond Group 1.
+- Seed: `prisma/seed.ts` implemented (run via `prisma db seed` →
+  `prisma/seed.command.ts` → Vitest). Idempotently syncs the code-owned
+  permission catalog metadata, upserts `PLATFORM_ADMIN`, links every catalog
+  permission, prunes stale catalog keys, and optionally assigns the role to
+  the `RBAC_BOOTSTRAP_EMAIL` user when that user already exists (no hardcoded
+  personal emails).
 
 ## [IDENTITY_AND_RBAC]
 
@@ -170,20 +184,74 @@ IMPLEMENTED (Group 1) — database foundation:
   VARCHAR(255), optional first_name/last_name, timestamptz created_at/
   updated_at). No separate `platform_admin`/agency-owner/staff identity tables.
 - `app_user` is intentionally NOT yet connected to roles (no `user_role`).
-- Unified RBAC: `role` (id, name, scope VARCHAR(16),
-  unique `(scope, name)` so each role name is allowed once per scope,
-  description, timestamptz created_at/updated_at), `permission` (id,
+- Unified RBAC: `role` (id, name, scope VARCHAR(16), nullable `agency_id`
+  ownership discriminator, description, timestamptz created_at/updated_at),
+  `permission` (id,
   key VARCHAR(64) unique technical authorization identity, name,
-  description, created_at — no updated_at),
+  description, scope VARCHAR(16), resource VARCHAR(64), action VARCHAR(32),
+  created_at — no updated_at),
   `role_permission` (composite PK role_id+permission_id, permission_id index,
   FKs ON DELETE CASCADE). No `user_permission`/overrides. No `code` business
   keys on `role`/`permission`; `permission.key` is a technical authorization
   key, not a business identifier.
 - Role scope: `PLATFORM` | `AGENCY`, enforced in DB by `role_scope_check`
   CHECK constraint (verified by name in DB; no PostgreSQL ENUM).
+- Role ownership (migration `20260917061114_role_agency_ownership`): `scope` +
+  nullable `agency_id` encode the three role kinds with no extra `isGlobal`/
+  `isSystem` boolean — PLATFORM + NULL = Platform Role, AGENCY + NULL = Global
+  Agency Role (Platform-Admin-managed), AGENCY + X = Custom Agency Role owned
+  by agency X. `role_agency_scope_check` forbids a non-null `agency_id` on
+  PLATFORM roles. Name uniqueness moved from `role_scope_name_key` to two
+  partial unique indexes: `role_global_name_key` UNIQUE `(scope, name)` WHERE
+  `agency_id IS NULL` (Platform + Global Agency names unique per scope) and
+  `role_agency_name_key` UNIQUE `(agency_id, name)` WHERE `agency_id IS NOT
+  NULL` (the same custom role name may exist in two different agencies).
+  `agency_id` is intentionally NOT yet a foreign key — the `agency` table does
+  not exist (Group 2); the FK is added by the migration that introduces
+  `agency`. Live-verified: PLATFORM role + `agency_id` rejected, duplicate
+  global names rejected, same custom name for two agencies allowed.
+- Permission scope: same `PLATFORM` | `AGENCY` values, enforced by
+  `permission_scope_check`; permission keys follow
+  `<SCOPE>_<RESOURCE>_<ACTION>` (e.g. `PLATFORM_ROLE_VIEW`). A role may only
+  receive permissions of its own scope (`CROSS_SCOPE_PERMISSION_KEYS`), checked
+  against the role's actual `scope`.
+- `platform_role_assignment` (unique `app_user_id` + `role_id`, reverse index
+  on `role_id`, cascade FKs) connects `app_user` to PLATFORM `role`s.
 - Case-insensitive email identity via PostgreSQL `citext` extension
   (`app_user.email CITEXT UNIQUE`); activation versioned in the migration.
-- No business roles/permissions/catalog seeded (seed deferred).
+- Catalog seeded from code: `RBAC_PERMISSION_CATALOG` defines 11 PLATFORM
+  permissions; `PLATFORM_ADMIN` owns all of them. The catalog is code-owned —
+  there is no Permission CRUD API. No AGENCY permissions yet, so AGENCY roles
+  currently resolve to an empty available-permission set.
+
+## [PLATFORM_AUTHORIZATION]
+
+IMPLEMENTED (Group 1 backend only):
+
+- Application layer over the RBAC tables in `src/rbac/` (`RbacModule`):
+  - `GET /v1/permissions` — read-only, code-defined PLATFORM catalog
+    (requires `PLATFORM_ROLE_VIEW`). No POST/PATCH/DELETE exist.
+  - `/v1/roles` CRUD is PLATFORM-only and scope is server-owned/immutable:
+    list/get/patch/delete filter `scope = PLATFORM`; create always writes
+    `scope = PLATFORM` (a client-supplied `scope` is stripped by Zod).
+    Existing permission keys: `PLATFORM_ROLE_VIEW`, `PLATFORM_ROLE_CREATE`,
+    `PLATFORM_ROLE_UPDATE`, `PLATFORM_ROLE_DELETE`.
+  - `GET /v1/roles/available-permissions` — PLATFORM permissions only
+    (`PLATFORM_ROLE_VIEW`), declared before `/:id`.
+  - `GET /v1/roles/:id/permissions` (`PLATFORM_ROLE_VIEW`) and
+    `PUT /v1/roles/:id/permissions` (`PLATFORM_ROLE_PERMISSION_MANAGE`):
+    atomic replace, dedupes keys, rejects unknown keys
+    (`UNKNOWN_PERMISSION_KEYS`) and cross-scope keys
+    (`CROSS_SCOPE_PERMISSION_KEYS`) with 400, empty array clears, returns the
+    final sorted set. Deleting a role with assignments → 409
+    (`ROLE_HAS_PLATFORM_ASSIGNMENTS`).
+- Enforcement: `JwtAuthGuard` (identity-only JWT) + `PermissionGuard` +
+  `@RequirePermissions`; `PlatformPermissionsService` loads effective
+  `permission.key`s from PLATFORM assignments and filters **both**
+  `role.scope = PLATFORM` and `permission.scope = PLATFORM`; `CaslAbilityFactory`
+  builds the ability from those keys. Permission changes take effect without
+  reissuing the JWT.
+- Swagger documents all PLATFORM role/permission endpoints and error cases.
 
 ## [AUTH]
 
@@ -221,7 +289,8 @@ IMPLEMENTED (authentication vertical slice, Group 1 scope):
 - Config: `JWT_SECRET` from validated env (never hardcoded/logged);
   cookie options centralized in `src/auth/auth.cookie.ts`;
   `PassportModule.register({ session: false })`; stateless.
-- No Role assignment, no CASL, no Agency, no refresh tokens (Group 2+).
+- No Agency, no refresh tokens, no User↔Platform-Role management endpoints
+  (Group 2+). Platform role assignment exists only through the RBAC seed.
 
 ## [TENANCY]
 
@@ -329,6 +398,10 @@ Only what actually exists now:
     role_scope_check; plus `code` drop and permission `key` intro) applied
     to Neon dev
   - role `(scope, name)` uniqueness (`role_scope_name_key`) applied to Neon dev
+  - Group 1 refinement `20260917061114_role_agency_ownership`: `role.agency_id`
+    (nullable, indexed) + `role_agency_scope_check` + partial unique indexes
+    `role_global_name_key` / `role_agency_name_key` (replacing
+    `role_scope_name_key`); `prisma db seed` re-verified idempotent
   - real Neon verification: tables, constraints, unique indexes, case-insensitive
     email behavior, invalid scope rejection, duplicate `permission.key` rejection,
     duplicate `(scope, name)` role rejection, same name in different scope allowed,
@@ -347,11 +420,14 @@ uses a stable technical authorization `key` (e.g. AGENCY_APPROVE), NOT a
 business code.
 
 NOT implemented: `GET /health`, api-contract, Agency model, tenant enforcement,
-`user_role` assignment, CASL/Nest authorization guards beyond JWT auth, role/
-permission seeds, business models beyond `app_user`/`role`/`permission`/
-`role_permission`. M1 baseline checks were intentionally skipped by project
-decision (see [STATUS]) and are NOT marked verified; the auth slice is
-implemented but NOT yet verified (sandbox could not run node/npm).
+User↔Platform-Role management endpoints, Users CRUD, AGENCY permission catalog,
+agency-side role APIs/assignments (the `agency` table, and therefore the
+`role.agency_id` foreign key, do not exist yet), business models beyond
+`app_user`/`role`/`permission`/`role_permission`/
+`platform_role_assignment`. The Group 1 backend RBAC slice (scoped permission
+catalog, PLATFORM Role CRUD, available-permissions, Role↔Permission API,
+CASL-backed guard, idempotent seed, Swagger, role ownership schema foundation)
+IS implemented and unit/HTTP/live verified.
 
 ## [SELECTED_NOT_IMPLEMENTED]
 
@@ -361,10 +437,10 @@ Major approved architecture awaiting implementation (concise):
 - API contract foundation: OpenAPI/Swagger drift-verified contract,
   `packages/api-contract/`, generated TypeScript contract
 - First business vertical slice beyond auth (separate planning task)
-- Identity + RBAC application layer (Group 2+): `user_role` assignment table
-  (awaits `agency` FK), Agency model, PLATFORM/AGENCY role assignments, CASL
-  integration, Nest authorization guards, role seed catalog, permission seed
-  catalog, refresh-token/system session store (auth today is stateless JWT-in-cookie)
+- Identity + RBAC application layer (Group 2+): User↔Platform-Role management
+  endpoints, Agency model, AGENCY-scoped role assignments, AGENCY permission
+  catalog, refresh-token/system session store (auth today is stateless
+  JWT-in-cookie)
 - Architecture decision: `platform_admin` table NOT USED — platform
   administration is modeled through unified `app_user` → role → permission
 

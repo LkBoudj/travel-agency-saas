@@ -37,3 +37,8 @@ export type Permission = Prisma.PermissionModel
  * 
  */
 export type RolePermission = Prisma.RolePermissionModel
+/**
+ * Model PlatformRoleAssignment
+ * 
+ */
+export type PlatformRoleAssignment = Prisma.PlatformRoleAssignmentModel

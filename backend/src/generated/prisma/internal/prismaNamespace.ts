@@ -400,7 +400,8 @@ export const ModelName = {
   AppUser: 'AppUser',
   Role: 'Role',
   Permission: 'Permission',
-  RolePermission: 'RolePermission'
+  RolePermission: 'RolePermission',
+  PlatformRoleAssignment: 'PlatformRoleAssignment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -416,7 +417,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "appUser" | "role" | "permission" | "rolePermission"
+    modelProps: "appUser" | "role" | "permission" | "rolePermission" | "platformRoleAssignment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -716,6 +717,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PlatformRoleAssignment: {
+      payload: Prisma.$PlatformRoleAssignmentPayload<ExtArgs>
+      fields: Prisma.PlatformRoleAssignmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PlatformRoleAssignmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PlatformRoleAssignmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload>
+        }
+        findFirst: {
+          args: Prisma.PlatformRoleAssignmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PlatformRoleAssignmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload>
+        }
+        findMany: {
+          args: Prisma.PlatformRoleAssignmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload>[]
+        }
+        create: {
+          args: Prisma.PlatformRoleAssignmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload>
+        }
+        createMany: {
+          args: Prisma.PlatformRoleAssignmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PlatformRoleAssignmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload>[]
+        }
+        delete: {
+          args: Prisma.PlatformRoleAssignmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload>
+        }
+        update: {
+          args: Prisma.PlatformRoleAssignmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PlatformRoleAssignmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PlatformRoleAssignmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PlatformRoleAssignmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.PlatformRoleAssignmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PlatformRoleAssignmentPayload>
+        }
+        aggregate: {
+          args: Prisma.PlatformRoleAssignmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePlatformRoleAssignment>
+        }
+        groupBy: {
+          args: Prisma.PlatformRoleAssignmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformRoleAssignmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PlatformRoleAssignmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PlatformRoleAssignmentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -773,6 +848,7 @@ export const RoleScalarFieldEnum = {
   id: 'id',
   name: 'name',
   scope: 'scope',
+  agencyId: 'agencyId',
   description: 'description',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -786,6 +862,9 @@ export const PermissionScalarFieldEnum = {
   key: 'key',
   name: 'name',
   description: 'description',
+  scope: 'scope',
+  resource: 'resource',
+  action: 'action',
   createdAt: 'createdAt'
 } as const
 
@@ -798,6 +877,16 @@ export const RolePermissionScalarFieldEnum = {
 } as const
 
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
+
+
+export const PlatformRoleAssignmentScalarFieldEnum = {
+  id: 'id',
+  roleId: 'roleId',
+  appUserId: 'appUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type PlatformRoleAssignmentScalarFieldEnum = (typeof PlatformRoleAssignmentScalarFieldEnum)[keyof typeof PlatformRoleAssignmentScalarFieldEnum]
 
 
 export const SortOrder = {
@@ -1054,6 +1143,7 @@ export type GlobalOmitConfig = {
   role?: Prisma.RoleOmit
   permission?: Prisma.PermissionOmit
   rolePermission?: Prisma.RolePermissionOmit
+  platformRoleAssignment?: Prisma.PlatformRoleAssignmentOmit
 }
 
 /* Types for Logging */

@@ -240,6 +240,7 @@ export type AppUserWhereInput = {
   lastName?: Prisma.StringNullableFilter<"AppUser"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AppUser"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AppUser"> | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentListRelationFilter
 }
 
 export type AppUserOrderByWithRelationInput = {
@@ -251,6 +252,7 @@ export type AppUserOrderByWithRelationInput = {
   lastName?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentOrderByRelationAggregateInput
 }
 
 export type AppUserWhereUniqueInput = Prisma.AtLeast<{
@@ -265,6 +267,7 @@ export type AppUserWhereUniqueInput = Prisma.AtLeast<{
   lastName?: Prisma.StringNullableFilter<"AppUser"> | string | null
   createdAt?: Prisma.DateTimeFilter<"AppUser"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AppUser"> | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentListRelationFilter
 }, "id" | "code" | "email">
 
 export type AppUserOrderByWithAggregationInput = {
@@ -306,6 +309,7 @@ export type AppUserCreateInput = {
   lastName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutAppUserInput
 }
 
 export type AppUserUncheckedCreateInput = {
@@ -317,6 +321,7 @@ export type AppUserUncheckedCreateInput = {
   lastName?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutAppUserInput
 }
 
 export type AppUserUpdateInput = {
@@ -328,6 +333,7 @@ export type AppUserUpdateInput = {
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutAppUserNestedInput
 }
 
 export type AppUserUncheckedUpdateInput = {
@@ -339,6 +345,7 @@ export type AppUserUncheckedUpdateInput = {
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutAppUserNestedInput
 }
 
 export type AppUserCreateManyInput = {
@@ -415,6 +422,11 @@ export type AppUserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
 }
 
+export type AppUserScalarRelationFilter = {
+  is?: Prisma.AppUserWhereInput
+  isNot?: Prisma.AppUserWhereInput
+}
+
 export type BigIntFieldUpdateOperationsInput = {
   set?: bigint | number
   increment?: bigint | number
@@ -435,6 +447,109 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
+export type AppUserCreateNestedOneWithoutPlatformRoleAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutPlatformRoleAssignmentsInput, Prisma.AppUserUncheckedCreateWithoutPlatformRoleAssignmentsInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutPlatformRoleAssignmentsInput
+  connect?: Prisma.AppUserWhereUniqueInput
+}
+
+export type AppUserUpdateOneRequiredWithoutPlatformRoleAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutPlatformRoleAssignmentsInput, Prisma.AppUserUncheckedCreateWithoutPlatformRoleAssignmentsInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutPlatformRoleAssignmentsInput
+  upsert?: Prisma.AppUserUpsertWithoutPlatformRoleAssignmentsInput
+  connect?: Prisma.AppUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppUserUpdateToOneWithWhereWithoutPlatformRoleAssignmentsInput, Prisma.AppUserUpdateWithoutPlatformRoleAssignmentsInput>, Prisma.AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput>
+}
+
+export type AppUserCreateWithoutPlatformRoleAssignmentsInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AppUserUncheckedCreateWithoutPlatformRoleAssignmentsInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AppUserCreateOrConnectWithoutPlatformRoleAssignmentsInput = {
+  where: Prisma.AppUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutPlatformRoleAssignmentsInput, Prisma.AppUserUncheckedCreateWithoutPlatformRoleAssignmentsInput>
+}
+
+export type AppUserUpsertWithoutPlatformRoleAssignmentsInput = {
+  update: Prisma.XOR<Prisma.AppUserUpdateWithoutPlatformRoleAssignmentsInput, Prisma.AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput>
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutPlatformRoleAssignmentsInput, Prisma.AppUserUncheckedCreateWithoutPlatformRoleAssignmentsInput>
+  where?: Prisma.AppUserWhereInput
+}
+
+export type AppUserUpdateToOneWithWhereWithoutPlatformRoleAssignmentsInput = {
+  where?: Prisma.AppUserWhereInput
+  data: Prisma.XOR<Prisma.AppUserUpdateWithoutPlatformRoleAssignmentsInput, Prisma.AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput>
+}
+
+export type AppUserUpdateWithoutPlatformRoleAssignmentsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+
+/**
+ * Count Type AppUserCountOutputType
+ */
+
+export type AppUserCountOutputType = {
+  platformRoleAssignments: number
+}
+
+export type AppUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  platformRoleAssignments?: boolean | AppUserCountOutputTypeCountPlatformRoleAssignmentsArgs
+}
+
+/**
+ * AppUserCountOutputType without action
+ */
+export type AppUserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AppUserCountOutputType
+   */
+  select?: Prisma.AppUserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * AppUserCountOutputType without action
+ */
+export type AppUserCountOutputTypeCountPlatformRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PlatformRoleAssignmentWhereInput
+}
 
 
 export type AppUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -446,6 +561,8 @@ export type AppUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   lastName?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  platformRoleAssignments?: boolean | Prisma.AppUser$platformRoleAssignmentsArgs<ExtArgs>
+  _count?: boolean | Prisma.AppUserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["appUser"]>
 
 export type AppUserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -482,10 +599,18 @@ export type AppUserSelectScalar = {
 }
 
 export type AppUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "email" | "passwordHash" | "firstName" | "lastName" | "createdAt" | "updatedAt", ExtArgs["result"]["appUser"]>
+export type AppUserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  platformRoleAssignments?: boolean | Prisma.AppUser$platformRoleAssignmentsArgs<ExtArgs>
+  _count?: boolean | Prisma.AppUserCountOutputTypeDefaultArgs<ExtArgs>
+}
+export type AppUserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type AppUserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $AppUserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AppUser"
-  objects: {}
+  objects: {
+    platformRoleAssignments: Prisma.$PlatformRoleAssignmentPayload<ExtArgs>[]
+  }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
     code: string
@@ -889,6 +1014,7 @@ readonly fields: AppUserFieldRefs;
  */
 export interface Prisma__AppUserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  platformRoleAssignments<T extends Prisma.AppUser$platformRoleAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppUser$platformRoleAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformRoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -943,6 +1069,10 @@ export type AppUserFindUniqueArgs<ExtArgs extends runtime.Types.Extensions.Inter
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
+  /**
    * Filter, which AppUser to fetch.
    */
   where: Prisma.AppUserWhereUniqueInput
@@ -961,6 +1091,10 @@ export type AppUserFindUniqueOrThrowArgs<ExtArgs extends runtime.Types.Extension
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
+  /**
    * Filter, which AppUser to fetch.
    */
   where: Prisma.AppUserWhereUniqueInput
@@ -978,6 +1112,10 @@ export type AppUserFindFirstArgs<ExtArgs extends runtime.Types.Extensions.Intern
    * Omit specific fields from the AppUser
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
   /**
    * Filter, which AppUser to fetch.
    */
@@ -1027,6 +1165,10 @@ export type AppUserFindFirstOrThrowArgs<ExtArgs extends runtime.Types.Extensions
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
+  /**
    * Filter, which AppUser to fetch.
    */
   where?: Prisma.AppUserWhereInput
@@ -1074,6 +1216,10 @@ export type AppUserFindManyArgs<ExtArgs extends runtime.Types.Extensions.Interna
    * Omit specific fields from the AppUser
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
   /**
    * Filter, which AppUsers to fetch.
    */
@@ -1123,6 +1269,10 @@ export type AppUserCreateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
+  /**
    * The data needed to create a AppUser.
    */
   data: Prisma.XOR<Prisma.AppUserCreateInput, Prisma.AppUserUncheckedCreateInput>
@@ -1170,6 +1320,10 @@ export type AppUserUpdateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    * Omit specific fields from the AppUser
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
   /**
    * The data needed to update a AppUser.
    */
@@ -1237,6 +1391,10 @@ export type AppUserUpsertArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
+  /**
    * The filter to search for the AppUser to update in case it exists.
    */
   where: Prisma.AppUserWhereUniqueInput
@@ -1263,6 +1421,10 @@ export type AppUserDeleteArgs<ExtArgs extends runtime.Types.Extensions.InternalA
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
   /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
+  /**
    * Filter which AppUser to delete.
    */
   where: Prisma.AppUserWhereUniqueInput
@@ -1283,6 +1445,30 @@ export type AppUserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
 }
 
 /**
+ * AppUser.platformRoleAssignments
+ */
+export type AppUser$platformRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PlatformRoleAssignment
+   */
+  select?: Prisma.PlatformRoleAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PlatformRoleAssignment
+   */
+  omit?: Prisma.PlatformRoleAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PlatformRoleAssignmentInclude<ExtArgs> | null
+  where?: Prisma.PlatformRoleAssignmentWhereInput
+  orderBy?: Prisma.PlatformRoleAssignmentOrderByWithRelationInput | Prisma.PlatformRoleAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.PlatformRoleAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PlatformRoleAssignmentScalarFieldEnum | Prisma.PlatformRoleAssignmentScalarFieldEnum[]
+}
+
+/**
  * AppUser without action
  */
 export type AppUserDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -1294,4 +1480,8 @@ export type AppUserDefaultArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * Omit specific fields from the AppUser
    */
   omit?: Prisma.AppUserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AppUserInclude<ExtArgs> | null
 }

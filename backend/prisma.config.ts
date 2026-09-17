@@ -6,4 +6,7 @@ export default defineConfig({
   datasource: {
     url: env('DATABASE_URL_UNPOOLED'),
   },
+  migrations: {
+    seed: './node_modules/.bin/vitest run --config vitest.seed.config.ts',
+  },
 });

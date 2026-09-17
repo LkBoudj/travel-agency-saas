@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy as PassportJwtStrategy } from 'passport-jwt';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { AUTH_COOKIE_NAME } from '../auth.constants.js';
-import { AuthUser, JwtPayload, toAuthUser } from '../auth-user.js';
+import { InternalAuthUser, JwtPayload, toInternalAuthUser } from '../auth-user.js';
 
 function cookieJwtExtractor(cookieName: string): (request: {
   headers?: Record<string, unknown>;
@@ -41,7 +41,7 @@ export class JwtStrategy extends PassportStrategy(PassportJwtStrategy) {
     });
   }
 
-  async validate(payload: JwtPayload): Promise<AuthUser> {
+  async validate(payload: JwtPayload): Promise<InternalAuthUser> {
     if (!payload?.sub) {
       throw new UnauthorizedException('Invalid token');
     }
@@ -58,6 +58,6 @@ export class JwtStrategy extends PassportStrategy(PassportJwtStrategy) {
       throw new UnauthorizedException('Invalid token');
     }
 
-    return toAuthUser(appUser);
+    return toInternalAuthUser(appUser);
   }
 }

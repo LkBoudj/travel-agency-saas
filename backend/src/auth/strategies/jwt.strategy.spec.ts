@@ -55,20 +55,20 @@ describe('JwtStrategy', () => {
     expect(extractor({ headers: { authorization: 'Bearer TOKEN123' } })).toBeNull();
   });
 
-  it('resolves the AppUser by the JWT subject and returns a safe user', async () => {
+  it('resolves the AppUser by the JWT subject and returns the identity (never the password hash)', async () => {
     prismaMock.appUser.findUnique.mockResolvedValue(row);
 
     const result = await strategy.validate({ sub: '1' });
 
     expect(prismaMock.appUser.findUnique).toHaveBeenCalledWith({ where: { id: 1n } });
     expect(result).toEqual({
+      id: '1',
       code: 'USR-ABCDEF123456',
       email: 'owner@example.com',
       firstName: 'Ada',
       lastName: 'Lovelace',
     });
     expect(result).not.toHaveProperty('passwordHash');
-    expect(result).not.toHaveProperty('id');
   });
 
   it('rejects a token whose subject does not exist', async () => {

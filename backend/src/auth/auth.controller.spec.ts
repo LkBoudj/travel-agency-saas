@@ -195,6 +195,26 @@ describe('Auth API (POST /v1/auth/register, POST /v1/auth/login, POST /v1/auth/l
 
       expect(res.status).toBe(401);
     });
+
+    it('returns 401 when the JWT cookie is expired', async () => {
+      const expiredToken = app.get(JwtService).sign({ sub: '1' }, { expiresIn: '-1s' });
+
+      const res = await request(app.getHttpServer())
+        .get('/v1/auth/me')
+        .set('Cookie', `${AUTH_COOKIE_NAME}=${expiredToken}`);
+
+      expect(res.status).toBe(401);
+    });
+
+    it('returns 401 when the JWT subject does not exist', async () => {
+      const orphanToken = app.get(JwtService).sign({ sub: '999' });
+
+      const res = await request(app.getHttpServer())
+        .get('/v1/auth/me')
+        .set('Cookie', `${AUTH_COOKIE_NAME}=${orphanToken}`);
+
+      expect(res.status).toBe(401);
+    });
   });
 
   describe('logout', () => {
@@ -208,6 +228,14 @@ describe('Auth API (POST /v1/auth/register, POST /v1/auth/login, POST /v1/auth/l
       expect(authCookie).toBeDefined();
       expect(authCookie).toMatch(/Expires=Thu, 01 Jan 1970/i);
       expect(authCookie).toMatch(/HttpOnly/i);
+    });
+
+    it('/me returns 401 when the cleared cookie is replayed', async () => {
+      const res = await request(app.getHttpServer())
+        .get('/v1/auth/me')
+        .set('Cookie', `${AUTH_COOKIE_NAME}=`);
+
+      expect(res.status).toBe(401);
     });
   });
 });

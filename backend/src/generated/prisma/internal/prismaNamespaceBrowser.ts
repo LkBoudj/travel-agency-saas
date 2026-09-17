@@ -54,7 +54,8 @@ export const ModelName = {
   AppUser: 'AppUser',
   Role: 'Role',
   Permission: 'Permission',
-  RolePermission: 'RolePermission'
+  RolePermission: 'RolePermission',
+  PlatformRoleAssignment: 'PlatformRoleAssignment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -91,6 +92,7 @@ export const RoleScalarFieldEnum = {
   id: 'id',
   name: 'name',
   scope: 'scope',
+  agencyId: 'agencyId',
   description: 'description',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -104,6 +106,9 @@ export const PermissionScalarFieldEnum = {
   key: 'key',
   name: 'name',
   description: 'description',
+  scope: 'scope',
+  resource: 'resource',
+  action: 'action',
   createdAt: 'createdAt'
 } as const
 
@@ -116,6 +121,16 @@ export const RolePermissionScalarFieldEnum = {
 } as const
 
 export type RolePermissionScalarFieldEnum = (typeof RolePermissionScalarFieldEnum)[keyof typeof RolePermissionScalarFieldEnum]
+
+
+export const PlatformRoleAssignmentScalarFieldEnum = {
+  id: 'id',
+  roleId: 'roleId',
+  appUserId: 'appUserId',
+  createdAt: 'createdAt'
+} as const
+
+export type PlatformRoleAssignmentScalarFieldEnum = (typeof PlatformRoleAssignmentScalarFieldEnum)[keyof typeof PlatformRoleAssignmentScalarFieldEnum]
 
 
 export const SortOrder = {
