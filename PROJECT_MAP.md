@@ -11,7 +11,7 @@ anonymous travelers, platform operators.
 - Owner: user + owner membership; full agency control.
 - Staff: user + staff membership; agency data, owner-gated ops server-side.
 - Traveler: no account; reads Marketplace + Storefronts via public APIs only.
-- Platform operator: future Admin app.
+- Platform operator: Platform Admin app (frontend/admin) — shell + RBAC UI implemented.
 
 ## [SYSTEM_BOUNDARIES]
 - backend/        EXISTS as backend OpenCode environment (AGENTS.md, opencode.json,
@@ -26,7 +26,9 @@ anonymous travelers, platform operators.
 - frontend/marketplace/  PUBLIC web = Marketplace + Trip Details + Agency
                          Profiles (future; will reuse the storefront renderer
                          for `{slug}.platform.com`). Does NOT exist yet.
-- frontend/admin/        future, undrafted (pattern: Vite+React+shadcn).
+- frontend/admin/        Platform Super Dashboard — authenticated shell +
+                         Roles & Permissions (platform RBAC UI). Overview and
+                         Users are honest placeholders. Exists.
 
 ## [TECH_STACK]
 - dashboard: React19+TS+Vite+RR7+Tailwind4+shadcn(@base-ui)+TSQuery/Table+
@@ -36,7 +38,9 @@ anonymous travelers, platform operators.
               tenant resolution, locale, SEO, preview, not-found; themes are
               server components fed via props only.
 - marketplace: future, undrafted.
-- admin: undecided; lean same-pattern as dashboard.
+- admin: Vite+React19+TS+RR7+Tailwind4+shadcn(base-nova/@base-ui)+TSQuery+
+         RHF+Zod3+Lucide — CONFIRMED. Consumes the backend RBAC API with cookie
+         sessions.
 - backend: NestJS (TypeScript) modular monolith · REST /v1 · Prisma · PostgreSQL ·
            Neon · OpenAPI-based backend/frontend contract — SELECTED (approved),
            NOT implemented; exact versions pinned when the backend is scaffolded
@@ -119,6 +123,22 @@ primary; each location carries its own opening hours. Legal data is
 self-declared and clearly not verified. Algeria legal compliance (Loi
 18-05 Art. 8 & 11 tourist-activity licence requirements) is a FUTURE
 backend-enforced gate, not a Dashboard claim.
+
+## [PLATFORM_ADMIN]
+IMPLEMENTED in `frontend/admin/`: authenticated Platform Super Dashboard shell
+(cookie-session login, `RequireAuth`/`GuestOnly` guards, sidebar shell, Overview
+and Users placeholders) plus the Roles & Permissions feature. The RBAC UI
+consumes the backend RBAC API only (`GET/POST /v1/roles`, `GET/PATCH/DELETE
+/v1/roles/:id`, `GET /v1/roles/available-permissions`, `GET/PUT
+/v1/roles/:id/permissions`) with `credentials: "include"`; it never decodes the
+JWT, never stores tokens in web storage, never hardcodes a second permission
+catalog, and exposes no Permission CRUD. `scope` is server-owned and never sent
+by the client. Permission grouping and labels derive from backend
+`resource`/`name`; duplicate-name (409), assigned-role delete (409) and rejected
+permission keys (400) surface as explicit messages, and 401 re-validates the
+session so the guard redirects. Pure RBAC helpers are tested with Node's
+built-in `node --test` (no test runner dependency). Platform user CRUD and
+user↔role assignment are NOT implemented.
 
 ## [THEME_SYSTEM]
 Platform-owned presentation system. Explorer (`explorer`) is the current first
