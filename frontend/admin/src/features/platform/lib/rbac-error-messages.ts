@@ -7,14 +7,15 @@ export type RbacErrorOperation =
 const FALLBACK_MESSAGE = "Something went wrong. Please try again."
 
 /**
- * Maps an RBAC request failure to a user-facing message. Status codes are
- * handled explicitly so permission-denied and conflict responses never leak
- * raw backend error codes into the UI.
+ * Maps an RBAC request failure to a user-facing message. Status codes and
+ * machine codes are handled explicitly so permission-denied and field-level
+ * conflict responses never leak raw backend error codes into the UI.
  */
 export function rbacErrorMessage(
   operation: RbacErrorOperation,
   status: number | undefined,
-  serverMessage?: string
+  serverMessage?: string,
+  errorCode?: string
 ): string {
   const trimmed = serverMessage?.trim() ?? ""
 
@@ -23,6 +24,9 @@ export function rbacErrorMessage(
   }
 
   if (status === 403) {
+    if (operation === "create-role") {
+      return "You do not have permission to create this role."
+    }
     return "You do not have permission to perform this action."
   }
 
@@ -34,13 +38,16 @@ export function rbacErrorMessage(
     if (operation === "delete-role") {
       return "This role is assigned to one or more platform users and cannot be deleted."
     }
+    if (errorCode === "ROLE_KEY_SCOPE_CONFLICT") {
+      return "A role with this technical key already exists."
+    }
     return "A role with this name already exists."
   }
 
   if (status === 400 && operation === "replace-permissions") {
     return (
       trimmed ||
-      "One or more selected permissions are not available for platform roles."
+      "One or more selected permissions are not available for this role scope."
     )
   }
 

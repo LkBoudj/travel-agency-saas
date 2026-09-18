@@ -12,45 +12,60 @@ import type {
   PermissionResponse,
   ReplaceRolePermissionsResponse,
   RoleResponse,
+  RoleScope,
 } from './rbac.types.js';
 
-const PLATFORM_SCOPE = 'PLATFORM';
-
+/**
+ * Manages the two Platform-Admin-owned role kinds:
+ *
+ *   scope=PLATFORM, agencyId=null  -> Platform Role
+ *   scope=AGENCY,   agencyId=null  -> Global Agency Role
+ *
+ * Custom Agency roles (scope=AGENCY with a non-null agencyId) are Group 2 and
+ * are never matched by these queries.
+ */
 @Injectable()
 export class RolesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async list(): Promise<RoleResponse[]> {
+  async list(scope: RoleScope): Promise<RoleResponse[]> {
     const roles = await this.prisma.role.findMany({
-      where: { scope: PLATFORM_SCOPE },
+      where: { scope, agencyId: null },
       orderBy: { name: 'asc' },
     });
     return roles.map(toRoleResponse);
   }
 
-  async getById(rawId: string): Promise<RoleResponse> {
-    return toRoleResponse(await this.requirePlatformRole(rawId));
+  async getById(scope: RoleScope, rawId: string): Promise<RoleResponse> {
+    return toRoleResponse(await this.requireRole(scope, rawId));
   }
 
-  async create(input: CreateRoleBody): Promise<RoleResponse> {
+  async create(scope: RoleScope, input: CreateRoleBody): Promise<RoleResponse> {
+    await this.assertKeyAvailable(scope, input.key);
+    await this.assertNameAvailable(scope, input.name);
+
     try {
       const role = await this.prisma.role.create({
         data: {
+          key: input.key,
           name: input.name,
-          scope: PLATFORM_SCOPE,
+          scope,
           agencyId: null,
           description: input.description ?? null,
         },
       });
       return toRoleResponse(role);
     } catch (error) {
-      this.throwNameScopeConflict(error);
+      this.throwUniqueConflict(error);
     }
   }
 
-  async update(rawId: string, input: UpdateRoleBody): Promise<RoleResponse> {
-    const id = this.parseRoleId(rawId);
-    await this.ensurePlatformRoleExists(id);
+  async update(scope: RoleScope, rawId: string, input: UpdateRoleBody): Promise<RoleResponse> {
+    const id = await this.requireRoleId(scope, rawId);
+
+    if (input.name !== undefined) {
+      await this.assertNameAvailable(scope, input.name, id);
+    }
 
     const data: Prisma.RoleUpdateInput = {};
     if (input.name !== undefined) data.name = input.name;
@@ -60,38 +75,39 @@ export class RolesService {
       const role = await this.prisma.role.update({ where: { id }, data });
       return toRoleResponse(role);
     } catch (error) {
-      this.throwNameScopeConflict(error);
+      this.throwUniqueConflict(error);
     }
   }
 
-  async remove(rawId: string): Promise<void> {
-    const id = this.parseRoleId(rawId);
-    await this.ensurePlatformRoleExists(id);
+  async remove(scope: RoleScope, rawId: string): Promise<void> {
+    const id = await this.requireRoleId(scope, rawId);
 
-    const assignmentCount = await this.prisma.platformRoleAssignment.count({
-      where: { roleId: id },
-    });
-    if (assignmentCount > 0) {
-      throw new ConflictException({
-        statusCode: 409,
-        message: 'Cannot delete a role that still has platform assignments',
-        errorCode: 'ROLE_HAS_PLATFORM_ASSIGNMENTS',
+    if (scope === 'PLATFORM') {
+      const assignmentCount = await this.prisma.platformRoleAssignment.count({
+        where: { roleId: id },
       });
+      if (assignmentCount > 0) {
+        throw new ConflictException({
+          statusCode: 409,
+          message: 'Cannot delete a role that still has platform assignments',
+          errorCode: 'ROLE_HAS_PLATFORM_ASSIGNMENTS',
+        });
+      }
     }
 
     await this.prisma.role.delete({ where: { id } });
   }
 
-  async listAvailablePermissions(): Promise<PermissionResponse[]> {
+  async listAvailablePermissions(scope: RoleScope): Promise<PermissionResponse[]> {
     const permissions = await this.prisma.permission.findMany({
-      where: { scope: PLATFORM_SCOPE },
+      where: { scope },
       orderBy: { key: 'asc' },
     });
     return permissions.map(toPermissionResponse);
   }
 
-  async getRolePermissionKeys(rawId: string): Promise<string[]> {
-    const role = await this.requirePlatformRole(rawId);
+  async getRolePermissionKeys(scope: RoleScope, rawId: string): Promise<string[]> {
+    const role = await this.requireRole(scope, rawId);
 
     const links = await this.prisma.rolePermission.findMany({
       where: { roleId: role.id, permission: { is: { scope: role.scope } } },
@@ -101,10 +117,11 @@ export class RolesService {
   }
 
   async replaceRolePermissions(
+    scope: RoleScope,
     rawId: string,
     permissionKeys: string[],
   ): Promise<ReplaceRolePermissionsResponse> {
-    const role = await this.requirePlatformRole(rawId);
+    const role = await this.requireRole(scope, rawId);
     const id = role.id;
 
     const uniqueKeys = [...new Set(permissionKeys)];
@@ -155,23 +172,27 @@ export class RolesService {
     return { roleId: rawId, permissionKeys: finalKeys };
   }
 
-  private async requirePlatformRole(rawId: string) {
+  private async requireRole(scope: RoleScope, rawId: string) {
     const id = this.parseRoleId(rawId);
-    const role = await this.prisma.role.findFirst({ where: { id, scope: PLATFORM_SCOPE } });
+    const role = await this.prisma.role.findFirst({
+      where: { id, scope, agencyId: null },
+    });
     if (!role) {
       throw new NotFoundException('Role not found');
     }
     return role;
   }
 
-  private async ensurePlatformRoleExists(id: bigint): Promise<void> {
+  private async requireRoleId(scope: RoleScope, rawId: string): Promise<bigint> {
+    const id = this.parseRoleId(rawId);
     const role = await this.prisma.role.findFirst({
-      where: { id, scope: PLATFORM_SCOPE },
+      where: { id, scope, agencyId: null },
       select: { id: true },
     });
     if (!role) {
       throw new NotFoundException('Role not found');
     }
+    return id;
   }
 
   private parseRoleId(rawId: string): bigint {
@@ -182,8 +203,68 @@ export class RolesService {
     }
   }
 
-  private throwNameScopeConflict(error: unknown): never {
+  private async assertKeyAvailable(scope: RoleScope, key: string): Promise<void> {
+    const existing = await this.prisma.role.findFirst({
+      where: { scope, key, agencyId: null },
+      select: { id: true },
+    });
+    if (existing) {
+      throw new ConflictException({
+        statusCode: 409,
+        message: 'A role with this technical key already exists for the given scope',
+        errorCode: 'ROLE_KEY_SCOPE_CONFLICT',
+      });
+    }
+  }
+
+  private async assertNameAvailable(
+    scope: RoleScope,
+    name: string,
+    excludeId?: bigint,
+  ): Promise<void> {
+    const existing = await this.prisma.role.findFirst({
+      where: { scope, name, agencyId: null, ...(excludeId ? { id: { not: excludeId } } : {}) },
+      select: { id: true },
+    });
+    if (existing) {
+      throw new ConflictException({
+        statusCode: 409,
+        message: 'A role with this name already exists for the given scope',
+        errorCode: 'ROLE_NAME_SCOPE_CONFLICT',
+      });
+    }
+  }
+
+  /**
+   * Translates a unique-constraint violation into a specific conflict. Partial
+   * unique indexes make the violated target either `key` or `name`
+   * (`role_global_name_key` also contains "key", so "name" is checked first).
+   */
+  private throwUniqueConflict(error: unknown): never {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      const rawTarget = error.meta?.target;
+      const target = Array.isArray(rawTarget)
+        ? (rawTarget as unknown[]).join(',')
+        : typeof rawTarget === 'string'
+          ? rawTarget
+          : '';
+
+      if (target.includes('name')) {
+        throw new ConflictException({
+          statusCode: 409,
+          message: 'A role with this name already exists for the given scope',
+          errorCode: 'ROLE_NAME_SCOPE_CONFLICT',
+        });
+      }
+
+      if (target.includes('key')) {
+        throw new ConflictException({
+          statusCode: 409,
+          message: 'A role with this technical key already exists for the given scope',
+          errorCode: 'ROLE_KEY_SCOPE_CONFLICT',
+        });
+      }
+
       throw new ConflictException({
         statusCode: 409,
         message: 'A role with this name already exists for the given scope',

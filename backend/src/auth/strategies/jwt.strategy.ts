@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy as PassportJwtStrategy } from 'passport-jwt';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { AUTH_COOKIE_NAME } from '../auth.constants.js';
-import { InternalAuthUser, JwtPayload, toInternalAuthUser } from '../auth-user.js';
+import { AppUserAccountStatus, InternalAuthUser, JwtPayload, toInternalAuthUser } from '../auth-user.js';
 
 function cookieJwtExtractor(cookieName: string): (request: {
   headers?: Record<string, unknown>;
@@ -58,6 +58,10 @@ export class JwtStrategy extends PassportStrategy(PassportJwtStrategy) {
       throw new UnauthorizedException('Invalid token');
     }
 
-    return toInternalAuthUser(appUser);
+    if (appUser.status === 'SUSPENDED') {
+      throw new UnauthorizedException('Account is suspended');
+    }
+
+    return toInternalAuthUser({ ...appUser, status: appUser.status as AppUserAccountStatus });
   }
 }

@@ -9,7 +9,7 @@ export function getRbacErrorMessage(
   error: unknown
 ): string {
   if (error instanceof ApiError) {
-    return rbacErrorMessage(operation, error.status, error.message)
+    return rbacErrorMessage(operation, error.status, error.message, error.code)
   }
   return rbacErrorMessage(operation, undefined)
 }

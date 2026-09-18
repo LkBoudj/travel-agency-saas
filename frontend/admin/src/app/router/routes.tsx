@@ -28,7 +28,11 @@ export function createAppRouter() {
           children: [
             { index: true, element: <Navigate to={ROUTES.overview} replace /> },
             { path: ROUTES.overview, element: <OverviewPage /> },
-            { path: ROUTES.users, element: <UsersPage /> },
+            {
+              path: ROUTES.users,
+              element: <Navigate to={ROUTES.platformUsers} replace />,
+            },
+            { path: ROUTES.platformUsers, element: <UsersPage /> },
             { path: ROUTES.rolesAndPermissions, element: <RolesPermissionsPage /> },
           ],
         },

@@ -1,7 +1,14 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RBAC_BOOTSTRAP_EMAIL_ENV } from '../../prisma/seed.js';
-import { getBootstrapEmail, seedPlatformBootstrap } from '../../prisma/seed.js';
-import { PLATFORM_ADMIN_ROLE, RBAC_PERMISSION_CATALOG } from './rbac.constants.js';
+import { getBootstrapEmail, seedRbacBootstrap } from '../../prisma/seed.js';
+import {
+  ALL_PLATFORM_PERMISSION_KEYS,
+  DEFAULT_GLOBAL_AGENCY_ROLES,
+  DEFAULT_PLATFORM_ROLES,
+  PLATFORM_ADMIN_ROLE_KEY,
+  RBAC_PERMISSION_CATALOG,
+} from './rbac.constants.js';
+import type { RolePreset } from './rbac.types.js';
 
 type StoredPermission = {
   id: bigint;
@@ -14,6 +21,7 @@ type StoredPermission = {
 };
 type StoredRole = {
   id: bigint;
+  key: string;
   name: string;
   scope: string;
   agencyId: bigint | null;
@@ -25,7 +33,8 @@ type StoredAssignment = { appUserId: bigint; roleId: bigint };
 const store = {
   permissions: new Map<string, StoredPermission>(),
   nextPermissionId: 1n,
-  role: null as StoredRole | null,
+  roles: new Map<string, StoredRole>(),
+  nextRoleId: 1n,
   links: new Set<string>(),
   users: new Map<string, StoredUser>(),
   assignments: [] as StoredAssignment[],
@@ -88,13 +97,13 @@ const prismaMock = {
         for (const row of staleRows) {
           store.permissions.delete(row.key);
         }
-        const remainingIds = new Set([...store.permissions.values()].map((permission) => permission.id));
-        let removedLinks = 0;
-        for (const key of store.links) {
-          const permissionId = BigInt(key.split(':')[1]);
+        const remainingIds = new Set(
+          [...store.permissions.values()].map((permission) => permission.id),
+        );
+        for (const link of store.links) {
+          const permissionId = BigInt(link.split(':')[1]);
           if (!remainingIds.has(permissionId)) {
-            store.links.delete(key);
-            removedLinks += 1;
+            store.links.delete(link);
           }
         }
         return { count: staleRows.length };
@@ -104,41 +113,37 @@ const prismaMock = {
   role: {
     findFirst: vi.fn(
       async (args: {
-        where: { scope: string; name: string; agencyId: bigint | null };
-      }) => {
+        where: { scope: string; key: string; agencyId: bigint | null };
+      }): Promise<StoredRole | null> => {
+        const role = store.roles.get(args.where.key);
         if (
-          store.role &&
-          store.role.scope === args.where.scope &&
-          store.role.name === args.where.name &&
-          store.role.agencyId === args.where.agencyId
+          role &&
+          role.scope === args.where.scope &&
+          role.key === args.where.key &&
+          role.agencyId === args.where.agencyId
         ) {
-          return store.role;
+          return role;
         }
         return null;
       },
     ),
-    update: vi.fn(
-      async (args: { where: { id: bigint }; data: { description: string | null } }) => {
-        if (!store.role) throw new Error('role.update: no role');
-        store.role.description = args.data.description;
-        return store.role;
-      },
-    ),
-    create: vi.fn(async (args: { data: Omit<StoredRole, 'id'> }) => {
-      const row: StoredRole = { id: 1n, ...args.data };
-      store.role = row;
+    create: vi.fn(async (args: { data: Omit<StoredRole, 'id'> }): Promise<StoredRole> => {
+      const row: StoredRole = { id: store.nextRoleId, ...args.data };
+      store.nextRoleId += 1n;
+      store.roles.set(row.key, row);
       return row;
     }),
   },
   rolePermission: {
-    upsert: vi.fn(
+    createMany: vi.fn(
       async (args: {
-        where: { roleId_permissionId: { roleId: bigint; permissionId: bigint } };
-        create: { roleId: bigint; permissionId: bigint };
-      }) => {
-        const key = `${args.create.roleId}:${args.create.permissionId}`;
-        store.links.add(key);
-        return {};
+        data: { roleId: bigint; permissionId: bigint }[];
+        skipDuplicates?: boolean;
+      }): Promise<{ count: number }> => {
+        for (const link of args.data) {
+          store.links.add(`${link.roleId}:${link.permissionId}`);
+        }
+        return { count: args.data.length };
       },
     ),
   },
@@ -149,12 +154,11 @@ const prismaMock = {
   },
   platformRoleAssignment: {
     upsert: vi.fn(
-      async (args: {
-        create: StoredAssignment;
-        update: Record<string, never>;
-      }) => {
+      async (args: { create: StoredAssignment; update: Record<string, never> }) => {
         const exists = store.assignments.some(
-          (a) => a.appUserId === args.create.appUserId && a.roleId === args.create.roleId,
+          (assignment) =>
+            assignment.appUserId === args.create.appUserId &&
+            assignment.roleId === args.create.roleId,
         );
         if (!exists) {
           store.assignments.push(args.create);
@@ -163,14 +167,30 @@ const prismaMock = {
       },
     ),
   },
+  $transaction: vi.fn(async (arg: unknown) => {
+    if (typeof arg === 'function') {
+      return (arg as (tx: typeof prismaMock) => Promise<unknown>)(prismaMock);
+    }
+    throw new Error('$transaction: array form is not used by the seed');
+  }),
 };
 
 const BOOTSTRAP_EMAIL = 'super@mail.com';
 
+const ALL_PRESETS: ReadonlyArray<RolePreset> = [
+  ...DEFAULT_PLATFORM_ROLES,
+  ...DEFAULT_GLOBAL_AGENCY_ROLES,
+];
+
+function countLinks(roleId: bigint): number {
+  return [...store.links].filter((link) => link.startsWith(`${roleId}:`)).length;
+}
+
 function pristineDatabase(): void {
   store.permissions.clear();
   store.nextPermissionId = 1n;
-  store.role = null;
+  store.roles.clear();
+  store.nextRoleId = 1n;
   store.links.clear();
   store.users.clear();
   store.assignments = [];
@@ -187,7 +207,7 @@ function pristineDatabase(): void {
   });
 }
 
-describe('prisma/seed.ts platform bootstrap', () => {
+describe('prisma/seed.ts RBAC bootstrap', () => {
   beforeEach(() => {
     pristineDatabase();
     process.env[RBAC_BOOTSTRAP_EMAIL_ENV] = BOOTSTRAP_EMAIL;
@@ -204,32 +224,26 @@ describe('prisma/seed.ts platform bootstrap', () => {
     expect(getBootstrapEmail()).toBeUndefined();
   });
 
-  it('defines exactly eleven PLATFORM permissions whose key matches scope_resource_action', () => {
-    expect(RBAC_PERMISSION_CATALOG).toHaveLength(11);
-    for (const permission of RBAC_PERMISSION_CATALOG) {
-      expect(permission.scope).toBe('PLATFORM');
-      expect(permission.key).toBe(
-        `${permission.scope}_${permission.resource}_${permission.action}`,
-      );
-    }
-    expect(new Set(RBAC_PERMISSION_CATALOG.map((p) => p.key)).size).toBe(11);
-  });
+  it('seeds the full catalog, every default role, its links and the bootstrap assignment', async () => {
+    await seedRbacBootstrap(prismaMock);
 
-  it('seeds every catalog permission, the PLATFORM_ADMIN role, all links and the bootstrap assignment', async () => {
-    await seedPlatformBootstrap(prismaMock);
-
-    for (const permission of RBAC_PERMISSION_CATALOG) {
-      expect(store.permissions.has(permission.key)).toBe(true);
-    }
     expect(store.permissions.size).toBe(RBAC_PERMISSION_CATALOG.length);
-    expect(store.role).toMatchObject({
-      name: PLATFORM_ADMIN_ROLE.name,
-      scope: PLATFORM_ADMIN_ROLE.scope,
-    });
-    expect(store.links.size).toBe(RBAC_PERMISSION_CATALOG.length);
-    expect(store.assignments).toEqual([
-      { appUserId: 900n, roleId: store.role!.id },
-    ]);
+    expect(store.roles.size).toBe(ALL_PRESETS.length);
+
+    for (const preset of ALL_PRESETS) {
+      const role = store.roles.get(preset.key);
+      expect(role, preset.key).toMatchObject({
+        key: preset.key,
+        name: preset.name,
+        scope: preset.scope,
+        agencyId: null,
+      });
+      expect(countLinks(role!.id), preset.key).toBe(preset.permissionKeys.length);
+    }
+
+    const admin = store.roles.get(PLATFORM_ADMIN_ROLE_KEY)!;
+    expect(countLinks(admin.id)).toBe(ALL_PLATFORM_PERMISSION_KEYS.length);
+    expect(store.assignments).toEqual([{ appUserId: 900n, roleId: admin.id }]);
   });
 
   it('synchronizes scope, resource and action metadata from the catalog', async () => {
@@ -244,7 +258,7 @@ describe('prisma/seed.ts platform bootstrap', () => {
       action: 'STALE',
     });
 
-    await seedPlatformBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
 
     expect(store.permissions.get(target.key)).toMatchObject({
       name: target.name,
@@ -256,32 +270,34 @@ describe('prisma/seed.ts platform bootstrap', () => {
   });
 
   it('is idempotent: a second and third run do not duplicate rows', async () => {
-    await seedPlatformBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
     const afterFirst = {
       permissions: store.permissions.size,
+      roles: store.roles.size,
       links: store.links.size,
       assignments: store.assignments.length,
     };
 
     vi.clearAllMocks();
-    await seedPlatformBootstrap(prismaMock);
-    await seedPlatformBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
 
     expect(store.permissions.size).toBe(afterFirst.permissions);
+    expect(store.roles.size).toBe(afterFirst.roles);
     expect(store.links.size).toBe(afterFirst.links);
-    expect(store.assignments.length).toBe(afterFirst.assignments);
+    expect(store.assignments).toHaveLength(afterFirst.assignments);
     expect(store.assignments).toHaveLength(1);
   });
 
   it('removes pre-existing permissions that are no longer defined in the catalog', async () => {
-    await seedPlatformBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
 
     expect(store.permissions.has('ROLE_MANAGE_LEGACY')).toBe(false);
     const deleteManyMock = prismaMock.permission.deleteMany as ReturnType<typeof vi.fn>;
     const staleKeys = deleteManyMock.mock.calls[0][0].where?.key?.in ?? [];
     expect(staleKeys).toContain('ROLE_MANAGE_LEGACY');
 
-    await seedPlatformBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
     expect(store.permissions.has('ROLE_MANAGE_LEGACY')).toBe(false);
     expect(store.permissions.size).toBe(RBAC_PERMISSION_CATALOG.length);
   });
@@ -297,22 +313,84 @@ describe('prisma/seed.ts platform bootstrap', () => {
       action: 'VIEW',
     });
 
-    await seedPlatformBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
 
     expect(store.permissions.has('USER_VIEW')).toBe(false);
-    expect([...store.permissions.keys()].every((key) => key.startsWith('PLATFORM_'))).toBe(true);
+  });
+
+  it('never overwrites an existing non-system preset or its permission mappings', async () => {
+    const preset = DEFAULT_GLOBAL_AGENCY_ROLES.find((role) => role.key === 'AGENCY_BOOKING_AGENT')!;
+    store.permissions.clear();
+    const seededPermission = await prismaMock.permission.upsert({
+      where: { key: 'AGENCY_BOOKING_VIEW' },
+      update: {
+        name: 'View bookings',
+        description: 'View bookings',
+        scope: 'AGENCY',
+        resource: 'BOOKING',
+        action: 'VIEW',
+      },
+      create: {
+        id: 1n,
+        key: 'AGENCY_BOOKING_VIEW',
+        name: 'View bookings',
+        description: 'View bookings',
+        scope: 'AGENCY',
+        resource: 'BOOKING',
+        action: 'VIEW',
+      },
+    });
+    const custom: StoredRole = {
+      id: 500n,
+      key: preset.key,
+      name: 'Custom Booking Team',
+      scope: 'AGENCY',
+      agencyId: null,
+      description: 'Hand-crafted by the platform admin',
+    };
+    store.roles.set(custom.key, custom);
+    store.nextRoleId = 501n;
+    store.links.add(`${custom.id}:${seededPermission.id}`);
+
+    await seedRbacBootstrap(prismaMock);
+
+    const after = store.roles.get(preset.key)!;
+    expect(after.name).toBe('Custom Booking Team');
+    expect(after.description).toBe('Hand-crafted by the platform admin');
+    expect(countLinks(after.id)).toBe(1);
+    expect(after.id).toBe(500n);
+  });
+
+  it('keeps a customized PLATFORM_ADMIN name while synchronizing its permissions', async () => {
+    store.roles.set(PLATFORM_ADMIN_ROLE_KEY, {
+      id: 700n,
+      key: PLATFORM_ADMIN_ROLE_KEY,
+      name: 'Renamed Admin',
+      scope: 'PLATFORM',
+      agencyId: null,
+      description: 'Locally customized',
+    });
+    store.nextRoleId = 701n;
+
+    await seedRbacBootstrap(prismaMock);
+
+    const after = store.roles.get(PLATFORM_ADMIN_ROLE_KEY)!;
+    expect(after.id).toBe(700n);
+    expect(after.name).toBe('Renamed Admin');
+    expect(after.description).toBe('Locally customized');
+    expect(countLinks(after.id)).toBe(ALL_PLATFORM_PERMISSION_KEYS.length);
   });
 
   it('skips assignment when the bootstrap email does not match any user', async () => {
     process.env[RBAC_BOOTSTRAP_EMAIL_ENV] = 'nobody@example.com';
-    await seedPlatformBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
 
     expect(store.assignments).toHaveLength(0);
   });
 
   it('does not attempt an assignment when no bootstrap email is configured', async () => {
     delete process.env[RBAC_BOOTSTRAP_EMAIL_ENV];
-    await seedPlatformBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
 
     expect(store.assignments).toHaveLength(0);
     expect(prismaMock.appUser.findUnique).not.toHaveBeenCalled();

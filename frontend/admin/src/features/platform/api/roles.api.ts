@@ -2,66 +2,93 @@ import { apiRequest } from "@/lib/api"
 import type {
   PlatformRole,
   ReplaceRolePermissionsResponse,
+  RoleScope,
 } from "../types/rbac.types"
 
-export const ROLES_QUERY_KEY = ["rbac", "roles"] as const
-
-export function roleQueryKey(roleId: string) {
-  return ["rbac", "roles", roleId] as const
+/**
+ * Scope determines the endpoint. The client never sends `scope` or `agencyId`
+ * in a request body; the backend derives them from the chosen collection.
+ */
+function rolesPath(scope: RoleScope): string {
+  return scope === "PLATFORM" ? "/v1/roles" : "/v1/agency-roles"
 }
 
-export function rolePermissionsQueryKey(roleId: string) {
-  return ["rbac", "roles", roleId, "permissions"] as const
+function rolePath(scope: RoleScope, roleId: string): string {
+  return `${rolesPath(scope)}/${encodeURIComponent(roleId)}`
 }
 
-export type RoleWriteInput = {
+export function rolesQueryKey(scope: RoleScope) {
+  return ["rbac", "roles", scope] as const
+}
+
+export function roleQueryKey(scope: RoleScope, roleId: string) {
+  return ["rbac", "roles", scope, roleId] as const
+}
+
+export function rolePermissionsQueryKey(scope: RoleScope, roleId: string) {
+  return ["rbac", "roles", scope, roleId, "permissions"] as const
+}
+
+export type RoleCreateInput = {
+  key: string
   name: string
   description: string | null
 }
 
-export function getRoles(): Promise<PlatformRole[]> {
-  return apiRequest<PlatformRole[]>("/v1/roles")
+export type RoleUpdateInput = {
+  name: string
+  description: string | null
 }
 
-export function getRole(roleId: string): Promise<PlatformRole> {
-  return apiRequest<PlatformRole>(`/v1/roles/${encodeURIComponent(roleId)}`)
+export function getRoles(scope: RoleScope): Promise<PlatformRole[]> {
+  return apiRequest<PlatformRole[]>(rolesPath(scope))
 }
 
-export function createRole(input: RoleWriteInput): Promise<PlatformRole> {
-  return apiRequest<PlatformRole>("/v1/roles", {
+export function getRole(scope: RoleScope, roleId: string): Promise<PlatformRole> {
+  return apiRequest<PlatformRole>(rolePath(scope, roleId))
+}
+
+export function createRole(
+  scope: RoleScope,
+  input: RoleCreateInput
+): Promise<PlatformRole> {
+  return apiRequest<PlatformRole>(rolesPath(scope), {
     method: "POST",
     body: JSON.stringify(input),
   })
 }
 
 export function updateRole(
+  scope: RoleScope,
   roleId: string,
-  input: RoleWriteInput
+  input: RoleUpdateInput
 ): Promise<PlatformRole> {
-  return apiRequest<PlatformRole>(`/v1/roles/${encodeURIComponent(roleId)}`, {
+  return apiRequest<PlatformRole>(rolePath(scope, roleId), {
     method: "PATCH",
     body: JSON.stringify(input),
   })
 }
 
-export function deleteRole(roleId: string): Promise<void> {
-  return apiRequest<void>(`/v1/roles/${encodeURIComponent(roleId)}`, {
+export function deleteRole(scope: RoleScope, roleId: string): Promise<void> {
+  return apiRequest<void>(rolePath(scope, roleId), {
     method: "DELETE",
   })
 }
 
-export function getRolePermissions(roleId: string): Promise<string[]> {
-  return apiRequest<string[]>(
-    `/v1/roles/${encodeURIComponent(roleId)}/permissions`
-  )
+export function getRolePermissions(
+  scope: RoleScope,
+  roleId: string
+): Promise<string[]> {
+  return apiRequest<string[]>(`${rolePath(scope, roleId)}/permissions`)
 }
 
 export function replaceRolePermissions(
+  scope: RoleScope,
   roleId: string,
   permissionKeys: string[]
 ): Promise<ReplaceRolePermissionsResponse> {
   return apiRequest<ReplaceRolePermissionsResponse>(
-    `/v1/roles/${encodeURIComponent(roleId)}/permissions`,
+    `${rolePath(scope, roleId)}/permissions`,
     {
       method: "PUT",
       body: JSON.stringify({ permissionKeys }),

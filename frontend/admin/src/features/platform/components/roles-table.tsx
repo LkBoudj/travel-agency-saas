@@ -79,8 +79,9 @@ export function RolesTable({
         <TableHeader>
           <TableRow>
             <TableHead>Role</TableHead>
-            <TableHead className="hidden md:table-cell">Description</TableHead>
-            <TableHead className="hidden lg:table-cell">Updated</TableHead>
+            <TableHead className="hidden md:table-cell">Key</TableHead>
+            <TableHead className="hidden lg:table-cell">Description</TableHead>
+            <TableHead className="hidden xl:table-cell">Updated</TableHead>
             <TableHead className="w-12 text-right">
               <span className="sr-only">Actions</span>
             </TableHead>
@@ -92,15 +93,21 @@ export function RolesTable({
               <TableCell className="font-medium">
                 <span className="block">{role.name}</span>
                 <span className="mt-0.5 block max-w-xs truncate text-xs font-normal text-muted-foreground md:hidden">
-                  {role.description ?? "No description"}
+                  <span className="font-mono">{role.key}</span>
+                  {role.description ? ` · ${role.description}` : ""}
                 </span>
               </TableCell>
-              <TableCell className="hidden max-w-md whitespace-normal text-muted-foreground md:table-cell">
+              <TableCell className="hidden md:table-cell">
+                <span className="font-mono text-xs text-muted-foreground">
+                  {role.key}
+                </span>
+              </TableCell>
+              <TableCell className="hidden max-w-md whitespace-normal text-muted-foreground lg:table-cell">
                 {role.description ?? (
                   <span className="italic">No description</span>
                 )}
               </TableCell>
-              <TableCell className="hidden text-muted-foreground lg:table-cell">
+              <TableCell className="hidden text-muted-foreground xl:table-cell">
                 {formatDate(role.updatedAt)}
               </TableCell>
               <TableCell className="text-right">

@@ -6,6 +6,9 @@ import { AuthModule } from './auth/auth.module.js';
 import { AuthorizationModule } from './authorization/authorization.module.js';
 import { validateEnv } from './config/env.js';
 import { PrismaModule } from './prisma/prisma.module.js';
+import { PlatformUsersModule } from './platform-users/platform-users.module.js';
+import { AgencyApplicationsModule } from './agency-applications/agency-applications.module.js';
+import { AgenciesModule } from './agencies/agencies.module.js';
 import { RbacModule } from './rbac/rbac.module.js';
 
 @Module({
@@ -15,6 +18,9 @@ import { RbacModule } from './rbac/rbac.module.js';
     AuthModule,
     AuthorizationModule,
     RbacModule,
+    PlatformUsersModule,
+    AgencyApplicationsModule,
+    AgenciesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

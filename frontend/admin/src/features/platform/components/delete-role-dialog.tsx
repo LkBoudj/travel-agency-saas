@@ -20,15 +20,17 @@ import type { PlatformRole } from "../types/rbac.types"
 export type DeleteRoleDialogProps = {
   role: PlatformRole
   open: boolean
+  onSuccess?: (message: string) => void
   onOpenChange: (open: boolean) => void
 }
 
 export function DeleteRoleDialog({
   role,
   open,
+  onSuccess,
   onOpenChange,
 }: DeleteRoleDialogProps) {
-  const mutation = useDeleteRole()
+  const mutation = useDeleteRole(role.scope)
   const redirectOnSessionExpiry = useSessionExpiryRedirect()
 
   useEffect(() => {
@@ -42,7 +44,12 @@ export function DeleteRoleDialog({
     : undefined
 
   const handleDelete = () => {
-    mutation.mutate(role.id, { onSuccess: () => onOpenChange(false) })
+    mutation.mutate(role.id, {
+      onSuccess: () => {
+        onSuccess?.("Role deleted.")
+        onOpenChange(false)
+      },
+    })
   }
 
   return (

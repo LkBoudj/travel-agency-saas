@@ -1,14 +1,15 @@
 import { useQuery } from "@tanstack/react-query"
 
 import {
-  AVAILABLE_PERMISSIONS_QUERY_KEY,
+  availablePermissionsQueryKey,
   getAvailablePermissions,
 } from "../api/permissions.api"
+import type { RoleScope } from "../types/rbac.types"
 
-export function useAvailablePermissions() {
+export function useAvailablePermissions(scope: RoleScope) {
   return useQuery({
-    queryKey: AVAILABLE_PERMISSIONS_QUERY_KEY,
-    queryFn: getAvailablePermissions,
+    queryKey: availablePermissionsQueryKey(scope),
+    queryFn: () => getAvailablePermissions(scope),
     staleTime: 5 * 60_000,
   })
 }

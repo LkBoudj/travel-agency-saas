@@ -15,21 +15,42 @@ PENDING for the backend.
 - Version source of truth: installed `backend/package.json` + `package-lock.json`.
 - `prisma/` (schema + `prisma.config.ts`), `.env.example` (tracked), `.env`
   (gitignored) now exist.
-- Current phase = Group 1 backend RBAC complete: scoped PLATFORM permission
-  catalog (11 code-owned permissions), PLATFORM Role CRUD, available-permissions,
-  Role↔Permission API, CASL-backed `PermissionGuard`, idempotent seed and
-  Swagger, on top of the Identity + RBAC database foundation and M2.
+- Current phase = Group 1 backend RBAC + Platform Users slice complete:
+  canonical scoped permission catalog (31 PLATFORM + 38 AGENCY = 69
+  code-owned permissions), 11 default role presets (5 PLATFORM + 6 Global
+  AGENCY), PLATFORM Role CRUD, Global Agency Role CRUD,
+  available-permissions, Role↔Permission API, CASL-backed `PermissionGuard`,
+  idempotent seed and Swagger, on top of the Identity + RBAC database
+  foundation and M2, plus Platform User CRUD + platform-role assignment +
+  ACTIVE/SUSPENDED status (see [PLATFORM_USERS]).
 
-### M1 baseline checks — intentionally skipped (project decision)
+### Group 1 closure verification (verified reality)
 
-The following M1 baseline checks were NOT executed and are NOT considered
-verified or passed:
+The former M1 baseline checks are now executed and passing:
 
-- build verification (`npm run build`)
-- lint verification (`npm run lint`)
-- unit-test verification (`npm test`)
-- e2e verification (`npm run test:e2e`)
-- runtime boot / HTTP verification
+- build verification (`npm run build`) — passes
+- lint verification (`npm run lint`) — 0 warnings / 0 errors
+- unit/HTTP tests (`npm test`) — 168 tests pass (12 files)
+- e2e verification (`npm run test:e2e`) — 2 tests pass against the
+  `configureApp`-configured app (versioned `GET /v1` serves, unversioned `/`
+  is 404)
+- seed idempotency — `npx prisma db seed` run twice, both succeed
+- migration status — `npx prisma migrate status` reports "Database schema is
+  up to date!" (9 migrations)
+- runtime boot + HTTP — backend boots on `:3000`; Swagger UI `/docs` and
+  `/docs-json` return 200
+- live end-to-end — login, HttpOnly cookie, `/me`, PLATFORM role CRUD, role↔
+  permission management, 409 assigned-role delete conflict, logout and
+  protected-route redirect verified against the running backend +
+  `frontend/admin`
+- live Platform Users end-to-end (real Neon) — list/search/order, create with
+  platform roles, permission-guarded create/assign (403 for a read-only
+  operator), profile edit, role replace, duplicate email → 409
+  `EMAIL_ALREADY_REGISTERED`, AGENCY role key → 400
+  `AGENCY_ROLE_NOT_ASSIGNABLE`, unknown key → 400 `UNKNOWN_PLATFORM_ROLE_KEYS`,
+  self-suspension → 400 `CANNOT_SUSPEND_OWN_ACCOUNT`, suspend → login 401 and
+  previously issued JWT 401, reactivate → login 200, no `passwordHash`/`id`
+  leakage; synthetic verification users removed afterwards
 
 ## [SELECTED_STACK]
 
@@ -129,7 +150,11 @@ Nest routes
 - Runtime app connection: `DATABASE_URL` (pooled).
 - Prisma CLI/migrations: `DATABASE_URL_UNPOOLED` (direct/unpooled).
 - Neon development database connected and verified: real `SELECT 1` through the
-  actual `PrismaService` (M2-E). No business schema, migrations, or seed.
+  actual `PrismaService` (M2-E). Business schema, migrations and seed now exist
+  (see [PRISMA] / [IDENTITY_AND_RBAC]); live state after the canonical RBAC
+  bootstrap is 69 permissions (31 PLATFORM + 38 AGENCY), 11 default roles
+  (5 PLATFORM + 6 Global AGENCY), 204 role↔permission links and 1 platform
+  role assignment.
 
 ## [PRISMA]
 
@@ -150,7 +175,9 @@ Nest routes
 - IMPLEMENTED (Group 1): business Prisma migrations
   `20260916101639_identity_rbac_foundation`, `20260916102901_drop_role_permission_code`,
   `20260916103945_refine_rbac_identifiers`, `20260916104751_role_scope_name_unique`,
-  `20260916195827_platform_role_assignment`, `20260917051422_scoped_platform_permissions`.
+  `20260916195827_platform_role_assignment`, `20260917051422_scoped_platform_permissions`,
+  `20260917061114_role_agency_ownership`, `20260917071337_add_role_key`,
+  `20260917100000_add_app_user_status`.
   Customized migration history:
   manually adds `CREATE EXTENSION IF NOT EXISTS citext;` and the
   `role_scope_check` / `permission_scope_check` CHECK constraints
@@ -167,12 +194,15 @@ Nest routes
   in two phases so existing `role_permission` links (which reference
   `permission.id`) are preserved.
 - Migrations: `prisma/migrations/` existing; migration order authoritative.
-- Seed: `prisma/seed.ts` implemented (run via `prisma db seed` →
-  `prisma/seed.command.ts` → Vitest). Idempotently syncs the code-owned
-  permission catalog metadata, upserts `PLATFORM_ADMIN`, links every catalog
-  permission, prunes stale catalog keys, and optionally assigns the role to
-  the `RBAC_BOOTSTRAP_EMAIL` user when that user already exists (no hardcoded
-  personal emails).
+- Seed: `prisma/seed.ts` (`seedRbacBootstrap`, run via `prisma db seed` →
+  `prisma/seed.command.ts` → Vitest, wrapped in one interactive transaction
+  with a 60s timeout). Idempotently syncs the code-owned permission catalog
+  metadata, prunes stale catalog keys, always synchronizes `PLATFORM_ADMIN` to
+  every PLATFORM permission, and creates the remaining default role presets
+  with their canonical permission sets only when missing (existing preset
+  names, descriptions and permission mappings are never overwritten).
+  Optionally assigns `PLATFORM_ADMIN` to the `RBAC_BOOTSTRAP_EMAIL` user when
+  that user already exists (no hardcoded personal emails).
 
 ## [IDENTITY_AND_RBAC]
 
@@ -181,9 +211,12 @@ IMPLEMENTED (Group 1) — database foundation:
 - Unified identity + RBAC database foundation on PostgreSQL (Neon dev).
 - One user identity: `app_user` (id BIGINT identity, code VARCHAR(24) unique
   user-facing identifier, email CITEXT unique login identifier, password_hash
-  VARCHAR(255), optional first_name/last_name, timestamptz created_at/
-  updated_at). No separate `platform_admin`/agency-owner/staff identity tables.
-- `app_user` is intentionally NOT yet connected to roles (no `user_role`).
+  VARCHAR(255), optional first_name/last_name, status VARCHAR(16) NOT NULL
+  DEFAULT 'ACTIVE' constrained by `app_user_status_check` to ACTIVE | SUSPENDED
+  (see [PLATFORM_USERS] status model), timestamptz created_at/updated_at).
+  No separate `platform_admin`/agency-owner/staff identity tables.
+- `app_user` connects to PLATFORM roles through `platform_role_assignment`.
+  There is no generic `user_role`; AGENCY-side membership is Group 2+.
 - Unified RBAC: `role` (id, name, scope VARCHAR(16), nullable `agency_id`
   ownership discriminator, description, timestamptz created_at/updated_at),
   `permission` (id,
@@ -219,10 +252,14 @@ IMPLEMENTED (Group 1) — database foundation:
   on `role_id`, cascade FKs) connects `app_user` to PLATFORM `role`s.
 - Case-insensitive email identity via PostgreSQL `citext` extension
   (`app_user.email CITEXT UNIQUE`); activation versioned in the migration.
-- Catalog seeded from code: `RBAC_PERMISSION_CATALOG` defines 11 PLATFORM
-  permissions; `PLATFORM_ADMIN` owns all of them. The catalog is code-owned —
-  there is no Permission CRUD API. No AGENCY permissions yet, so AGENCY roles
-  currently resolve to an empty available-permission set.
+- Catalog seeded from code: `RBAC_PERMISSION_CATALOG` defines the canonical
+  69 permissions (31 PLATFORM + 38 AGENCY), and
+  `DEFAULT_PLATFORM_ROLES` / `DEFAULT_GLOBAL_AGENCY_ROLES` define 11 default
+  role presets. `PLATFORM_ADMIN` owns all PLATFORM permissions and
+  `AGENCY_OWNER` owns all AGENCY permissions. `validateRbacCatalog()` enforces
+  key shape, uniqueness, known scope/resource/action, same-scope references and
+  the two baseline sets at startup (`RbacModule.onModuleInit`), at seed time and
+  in tests. The catalog is code-owned — there is no Permission CRUD API.
 
 ## [PLATFORM_AUTHORIZATION]
 
@@ -236,6 +273,13 @@ IMPLEMENTED (Group 1 backend only):
     `scope = PLATFORM` (a client-supplied `scope` is stripped by Zod).
     Existing permission keys: `PLATFORM_ROLE_VIEW`, `PLATFORM_ROLE_CREATE`,
     `PLATFORM_ROLE_UPDATE`, `PLATFORM_ROLE_DELETE`.
+  - `/v1/agency-roles` mirrors the CRUD/available-permissions/permission-set
+    surface for Global Agency roles (`scope = AGENCY`, `agencyId = null`),
+    authorized by the dedicated `PLATFORM_AGENCY_ROLE_VIEW`,
+    `PLATFORM_AGENCY_ROLE_CREATE`, `PLATFORM_AGENCY_ROLE_UPDATE`,
+    `PLATFORM_AGENCY_ROLE_DELETE` and `PLATFORM_AGENCY_ROLE_PERMISSION_MANAGE`
+    capabilities; custom agency roles (`agencyId != null`) are Group 2 and
+    return 404 here.
   - `GET /v1/roles/available-permissions` — PLATFORM permissions only
     (`PLATFORM_ROLE_VIEW`), declared before `/:id`.
   - `GET /v1/roles/:id/permissions` (`PLATFORM_ROLE_VIEW`) and
@@ -334,8 +378,10 @@ IMPLEMENTED (authentication vertical slice, Group 1 scope):
 ## [TESTING]
 
 - Use the test tooling produced by the actual Nest scaffold: Vitest (ESM runner)
-  + oxlint, with `@nestjs/testing` in the dev baseline. Baseline test/lint/build
-  runs were intentionally skipped at M1 by project decision — not verified yet.
+  + oxlint, with `@nestjs/testing` in the dev baseline. As of the canonical
+  RBAC bootstrap, `npm test` (122 tests), `npm run test:e2e` (2 tests),
+  `npm run lint` (0/0) and `npm run build` all pass; see
+  "Group 1 closure verification" in [STATUS].
 - `nestjs-testing` skill governs Nest framework testing mechanics.
 
 ## [AGENT_TOOLING]
@@ -415,19 +461,28 @@ Only what actually exists now:
 
 Identifier convention (final): business entities may carry a user-facing
 `code` when justified (`app_user.code`, e.g. USR-…); RBAC `role` has no
-business code (internal `id`, display `name`, `scope` context); `permission`
+business code but carries a stable technical `key` (uppercase snake case,
+immutable, unique per ownership context — the HTTP identifier for role
+assignment); `permission`
 uses a stable technical authorization `key` (e.g. AGENCY_APPROVE), NOT a
 business code.
 
+Platform Users (IMPLEMENTED, verified against the live backend and frontend):
+see [PLATFORM_USERS] for the full slice — list/search, get, create (atomic
+user + roles), profile edit, ACTIVE/SUSPENDED status, role view/replace.
+Suspended users are rejected at login and on every JWT validation, so an
+existing HttpOnly cookie stops working immediately after suspension.
+
 NOT implemented: `GET /health`, api-contract, Agency model, tenant enforcement,
-User↔Platform-Role management endpoints, Users CRUD, AGENCY permission catalog,
-agency-side role APIs/assignments (the `agency` table, and therefore the
+custom agency roles and
+agency-side role assignments (the `agency` table, and therefore the
 `role.agency_id` foreign key, do not exist yet), business models beyond
 `app_user`/`role`/`permission`/`role_permission`/
-`platform_role_assignment`. The Group 1 backend RBAC slice (scoped permission
-catalog, PLATFORM Role CRUD, available-permissions, Role↔Permission API,
-CASL-backed guard, idempotent seed, Swagger, role ownership schema foundation)
-IS implemented and unit/HTTP/live verified.
+`platform_role_assignment`. The Group 1 backend RBAC slice (canonical scoped
+permission catalog, default role presets, PLATFORM Role CRUD, Global Agency
+Role CRUD, available-permissions, Role↔Permission API, CASL-backed guard,
+idempotent seed, Swagger, role ownership schema foundation) IS implemented and
+unit/HTTP/live verified.
 
 ## [SELECTED_NOT_IMPLEMENTED]
 
@@ -438,8 +493,8 @@ Major approved architecture awaiting implementation (concise):
   `packages/api-contract/`, generated TypeScript contract
 - First business vertical slice beyond auth (separate planning task)
 - Identity + RBAC application layer (Group 2+): User↔Platform-Role management
-  endpoints, Agency model, AGENCY-scoped role assignments, AGENCY permission
-  catalog, refresh-token/system session store (auth today is stateless
+  endpoints, Agency model, custom agency roles and AGENCY-scoped role
+  assignments, refresh-token/system session store (auth today is stateless
   JWT-in-cookie)
 - Architecture decision: `platform_admin` table NOT USED — platform
   administration is modeled through unified `app_user` → role → permission

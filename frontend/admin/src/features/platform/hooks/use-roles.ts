@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { ROLES_QUERY_KEY, getRoles } from "../api/roles.api"
+import { getRoles, rolesQueryKey } from "../api/roles.api"
+import type { RoleScope } from "../types/rbac.types"
 
-export function useRoles() {
+export function useRoles(scope: RoleScope) {
   return useQuery({
-    queryKey: ROLES_QUERY_KEY,
-    queryFn: getRoles,
+    queryKey: rolesQueryKey(scope),
+    queryFn: () => getRoles(scope),
   })
 }

@@ -1,21 +1,21 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 import {
-  ROLES_QUERY_KEY,
   roleQueryKey,
+  rolesQueryKey,
   updateRole,
-  type RoleWriteInput,
+  type RoleUpdateInput,
 } from "../api/roles.api"
-import type { PlatformRole } from "../types/rbac.types"
+import type { PlatformRole, RoleScope } from "../types/rbac.types"
 
-export function useUpdateRole(roleId: string) {
+export function useUpdateRole(scope: RoleScope, roleId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (input: RoleWriteInput) => updateRole(roleId, input),
+    mutationFn: (input: RoleUpdateInput) => updateRole(scope, roleId, input),
     onSuccess: async (role: PlatformRole) => {
-      queryClient.setQueryData(roleQueryKey(roleId), role)
-      await queryClient.invalidateQueries({ queryKey: ROLES_QUERY_KEY })
+      queryClient.setQueryData(roleQueryKey(scope, roleId), role)
+      await queryClient.invalidateQueries({ queryKey: rolesQueryKey(scope) })
     },
   })
 }

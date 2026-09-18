@@ -39,6 +39,7 @@ export type RoleSumAggregateOutputType = {
 export type RoleMinAggregateOutputType = {
   id: bigint | null
   name: string | null
+  key: string | null
   scope: string | null
   agencyId: bigint | null
   description: string | null
@@ -49,6 +50,7 @@ export type RoleMinAggregateOutputType = {
 export type RoleMaxAggregateOutputType = {
   id: bigint | null
   name: string | null
+  key: string | null
   scope: string | null
   agencyId: bigint | null
   description: string | null
@@ -59,6 +61,7 @@ export type RoleMaxAggregateOutputType = {
 export type RoleCountAggregateOutputType = {
   id: number
   name: number
+  key: number
   scope: number
   agencyId: number
   description: number
@@ -81,6 +84,7 @@ export type RoleSumAggregateInputType = {
 export type RoleMinAggregateInputType = {
   id?: true
   name?: true
+  key?: true
   scope?: true
   agencyId?: true
   description?: true
@@ -91,6 +95,7 @@ export type RoleMinAggregateInputType = {
 export type RoleMaxAggregateInputType = {
   id?: true
   name?: true
+  key?: true
   scope?: true
   agencyId?: true
   description?: true
@@ -101,6 +106,7 @@ export type RoleMaxAggregateInputType = {
 export type RoleCountAggregateInputType = {
   id?: true
   name?: true
+  key?: true
   scope?: true
   agencyId?: true
   description?: true
@@ -198,6 +204,7 @@ export type RoleGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type RoleGroupByOutputType = {
   id: bigint
   name: string
+  key: string
   scope: string
   agencyId: bigint | null
   description: string | null
@@ -231,6 +238,7 @@ export type RoleWhereInput = {
   NOT?: Prisma.RoleWhereInput | Prisma.RoleWhereInput[]
   id?: Prisma.BigIntFilter<"Role"> | bigint | number
   name?: Prisma.StringFilter<"Role"> | string
+  key?: Prisma.StringFilter<"Role"> | string
   scope?: Prisma.StringFilter<"Role"> | string
   agencyId?: Prisma.BigIntNullableFilter<"Role"> | bigint | number | null
   description?: Prisma.StringNullableFilter<"Role"> | string | null
@@ -238,11 +246,13 @@ export type RoleWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Role"> | Date | string
   permissions?: Prisma.RolePermissionListRelationFilter
   platformAssignments?: Prisma.PlatformRoleAssignmentListRelationFilter
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentListRelationFilter
 }
 
 export type RoleOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  key?: Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -250,6 +260,7 @@ export type RoleOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   permissions?: Prisma.RolePermissionOrderByRelationAggregateInput
   platformAssignments?: Prisma.PlatformRoleAssignmentOrderByRelationAggregateInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentOrderByRelationAggregateInput
 }
 
 export type RoleWhereUniqueInput = Prisma.AtLeast<{
@@ -258,6 +269,7 @@ export type RoleWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.RoleWhereInput[]
   NOT?: Prisma.RoleWhereInput | Prisma.RoleWhereInput[]
   name?: Prisma.StringFilter<"Role"> | string
+  key?: Prisma.StringFilter<"Role"> | string
   scope?: Prisma.StringFilter<"Role"> | string
   agencyId?: Prisma.BigIntNullableFilter<"Role"> | bigint | number | null
   description?: Prisma.StringNullableFilter<"Role"> | string | null
@@ -265,11 +277,13 @@ export type RoleWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Role"> | Date | string
   permissions?: Prisma.RolePermissionListRelationFilter
   platformAssignments?: Prisma.PlatformRoleAssignmentListRelationFilter
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentListRelationFilter
 }, "id">
 
 export type RoleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  key?: Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -288,6 +302,7 @@ export type RoleScalarWhereWithAggregatesInput = {
   NOT?: Prisma.RoleScalarWhereWithAggregatesInput | Prisma.RoleScalarWhereWithAggregatesInput[]
   id?: Prisma.BigIntWithAggregatesFilter<"Role"> | bigint | number
   name?: Prisma.StringWithAggregatesFilter<"Role"> | string
+  key?: Prisma.StringWithAggregatesFilter<"Role"> | string
   scope?: Prisma.StringWithAggregatesFilter<"Role"> | string
   agencyId?: Prisma.BigIntNullableWithAggregatesFilter<"Role"> | bigint | number | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Role"> | string | null
@@ -298,6 +313,7 @@ export type RoleScalarWhereWithAggregatesInput = {
 export type RoleCreateInput = {
   id?: bigint | number
   name: string
+  key: string
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -305,11 +321,13 @@ export type RoleCreateInput = {
   updatedAt?: Date | string
   permissions?: Prisma.RolePermissionCreateNestedManyWithoutRoleInput
   platformAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutRoleInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentCreateNestedManyWithoutRoleInput
 }
 
 export type RoleUncheckedCreateInput = {
   id?: bigint | number
   name: string
+  key: string
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -317,11 +335,13 @@ export type RoleUncheckedCreateInput = {
   updatedAt?: Date | string
   permissions?: Prisma.RolePermissionUncheckedCreateNestedManyWithoutRoleInput
   platformAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutRoleInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentUncheckedCreateNestedManyWithoutRoleInput
 }
 
 export type RoleUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -329,11 +349,13 @@ export type RoleUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   permissions?: Prisma.RolePermissionUpdateManyWithoutRoleNestedInput
   platformAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutRoleNestedInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentUpdateManyWithoutRoleNestedInput
 }
 
 export type RoleUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -341,11 +363,13 @@ export type RoleUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   permissions?: Prisma.RolePermissionUncheckedUpdateManyWithoutRoleNestedInput
   platformAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutRoleNestedInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentUncheckedUpdateManyWithoutRoleNestedInput
 }
 
 export type RoleCreateManyInput = {
   id?: bigint | number
   name: string
+  key: string
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -356,6 +380,7 @@ export type RoleCreateManyInput = {
 export type RoleUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -366,6 +391,7 @@ export type RoleUpdateManyMutationInput = {
 export type RoleUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -376,6 +402,7 @@ export type RoleUncheckedUpdateManyInput = {
 export type RoleCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  key?: Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -391,6 +418,7 @@ export type RoleAvgOrderByAggregateInput = {
 export type RoleMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  key?: Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -401,6 +429,7 @@ export type RoleMaxOrderByAggregateInput = {
 export type RoleMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
+  key?: Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -454,26 +483,44 @@ export type RoleUpdateOneRequiredWithoutPlatformAssignmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.RoleUpdateToOneWithWhereWithoutPlatformAssignmentsInput, Prisma.RoleUpdateWithoutPlatformAssignmentsInput>, Prisma.RoleUncheckedUpdateWithoutPlatformAssignmentsInput>
 }
 
+export type RoleCreateNestedOneWithoutAgencyRoleAssignmentsInput = {
+  create?: Prisma.XOR<Prisma.RoleCreateWithoutAgencyRoleAssignmentsInput, Prisma.RoleUncheckedCreateWithoutAgencyRoleAssignmentsInput>
+  connectOrCreate?: Prisma.RoleCreateOrConnectWithoutAgencyRoleAssignmentsInput
+  connect?: Prisma.RoleWhereUniqueInput
+}
+
+export type RoleUpdateOneRequiredWithoutAgencyRoleAssignmentsNestedInput = {
+  create?: Prisma.XOR<Prisma.RoleCreateWithoutAgencyRoleAssignmentsInput, Prisma.RoleUncheckedCreateWithoutAgencyRoleAssignmentsInput>
+  connectOrCreate?: Prisma.RoleCreateOrConnectWithoutAgencyRoleAssignmentsInput
+  upsert?: Prisma.RoleUpsertWithoutAgencyRoleAssignmentsInput
+  connect?: Prisma.RoleWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.RoleUpdateToOneWithWhereWithoutAgencyRoleAssignmentsInput, Prisma.RoleUpdateWithoutAgencyRoleAssignmentsInput>, Prisma.RoleUncheckedUpdateWithoutAgencyRoleAssignmentsInput>
+}
+
 export type RoleCreateWithoutPermissionsInput = {
   id?: bigint | number
   name: string
+  key: string
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   platformAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutRoleInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentCreateNestedManyWithoutRoleInput
 }
 
 export type RoleUncheckedCreateWithoutPermissionsInput = {
   id?: bigint | number
   name: string
+  key: string
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   platformAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutRoleInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentUncheckedCreateNestedManyWithoutRoleInput
 }
 
 export type RoleCreateOrConnectWithoutPermissionsInput = {
@@ -495,45 +542,53 @@ export type RoleUpdateToOneWithWhereWithoutPermissionsInput = {
 export type RoleUpdateWithoutPermissionsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   platformAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutRoleNestedInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentUpdateManyWithoutRoleNestedInput
 }
 
 export type RoleUncheckedUpdateWithoutPermissionsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   platformAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutRoleNestedInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentUncheckedUpdateManyWithoutRoleNestedInput
 }
 
 export type RoleCreateWithoutPlatformAssignmentsInput = {
   id?: bigint | number
   name: string
+  key: string
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   permissions?: Prisma.RolePermissionCreateNestedManyWithoutRoleInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentCreateNestedManyWithoutRoleInput
 }
 
 export type RoleUncheckedCreateWithoutPlatformAssignmentsInput = {
   id?: bigint | number
   name: string
+  key: string
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
   permissions?: Prisma.RolePermissionUncheckedCreateNestedManyWithoutRoleInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentUncheckedCreateNestedManyWithoutRoleInput
 }
 
 export type RoleCreateOrConnectWithoutPlatformAssignmentsInput = {
@@ -555,23 +610,95 @@ export type RoleUpdateToOneWithWhereWithoutPlatformAssignmentsInput = {
 export type RoleUpdateWithoutPlatformAssignmentsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   permissions?: Prisma.RolePermissionUpdateManyWithoutRoleNestedInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentUpdateManyWithoutRoleNestedInput
 }
 
 export type RoleUncheckedUpdateWithoutPlatformAssignmentsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   permissions?: Prisma.RolePermissionUncheckedUpdateManyWithoutRoleNestedInput
+  agencyRoleAssignments?: Prisma.AgencyRoleAssignmentUncheckedUpdateManyWithoutRoleNestedInput
+}
+
+export type RoleCreateWithoutAgencyRoleAssignmentsInput = {
+  id?: bigint | number
+  name: string
+  key: string
+  scope: string
+  agencyId?: bigint | number | null
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  permissions?: Prisma.RolePermissionCreateNestedManyWithoutRoleInput
+  platformAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutRoleInput
+}
+
+export type RoleUncheckedCreateWithoutAgencyRoleAssignmentsInput = {
+  id?: bigint | number
+  name: string
+  key: string
+  scope: string
+  agencyId?: bigint | number | null
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  permissions?: Prisma.RolePermissionUncheckedCreateNestedManyWithoutRoleInput
+  platformAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutRoleInput
+}
+
+export type RoleCreateOrConnectWithoutAgencyRoleAssignmentsInput = {
+  where: Prisma.RoleWhereUniqueInput
+  create: Prisma.XOR<Prisma.RoleCreateWithoutAgencyRoleAssignmentsInput, Prisma.RoleUncheckedCreateWithoutAgencyRoleAssignmentsInput>
+}
+
+export type RoleUpsertWithoutAgencyRoleAssignmentsInput = {
+  update: Prisma.XOR<Prisma.RoleUpdateWithoutAgencyRoleAssignmentsInput, Prisma.RoleUncheckedUpdateWithoutAgencyRoleAssignmentsInput>
+  create: Prisma.XOR<Prisma.RoleCreateWithoutAgencyRoleAssignmentsInput, Prisma.RoleUncheckedCreateWithoutAgencyRoleAssignmentsInput>
+  where?: Prisma.RoleWhereInput
+}
+
+export type RoleUpdateToOneWithWhereWithoutAgencyRoleAssignmentsInput = {
+  where?: Prisma.RoleWhereInput
+  data: Prisma.XOR<Prisma.RoleUpdateWithoutAgencyRoleAssignmentsInput, Prisma.RoleUncheckedUpdateWithoutAgencyRoleAssignmentsInput>
+}
+
+export type RoleUpdateWithoutAgencyRoleAssignmentsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
+  agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  permissions?: Prisma.RolePermissionUpdateManyWithoutRoleNestedInput
+  platformAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutRoleNestedInput
+}
+
+export type RoleUncheckedUpdateWithoutAgencyRoleAssignmentsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  key?: Prisma.StringFieldUpdateOperationsInput | string
+  scope?: Prisma.StringFieldUpdateOperationsInput | string
+  agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  permissions?: Prisma.RolePermissionUncheckedUpdateManyWithoutRoleNestedInput
+  platformAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutRoleNestedInput
 }
 
 
@@ -582,11 +709,13 @@ export type RoleUncheckedUpdateWithoutPlatformAssignmentsInput = {
 export type RoleCountOutputType = {
   permissions: number
   platformAssignments: number
+  agencyRoleAssignments: number
 }
 
 export type RoleCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   permissions?: boolean | RoleCountOutputTypeCountPermissionsArgs
   platformAssignments?: boolean | RoleCountOutputTypeCountPlatformAssignmentsArgs
+  agencyRoleAssignments?: boolean | RoleCountOutputTypeCountAgencyRoleAssignmentsArgs
 }
 
 /**
@@ -613,10 +742,18 @@ export type RoleCountOutputTypeCountPlatformAssignmentsArgs<ExtArgs extends runt
   where?: Prisma.PlatformRoleAssignmentWhereInput
 }
 
+/**
+ * RoleCountOutputType without action
+ */
+export type RoleCountOutputTypeCountAgencyRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgencyRoleAssignmentWhereInput
+}
+
 
 export type RoleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  key?: boolean
   scope?: boolean
   agencyId?: boolean
   description?: boolean
@@ -624,12 +761,14 @@ export type RoleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   updatedAt?: boolean
   permissions?: boolean | Prisma.Role$permissionsArgs<ExtArgs>
   platformAssignments?: boolean | Prisma.Role$platformAssignmentsArgs<ExtArgs>
+  agencyRoleAssignments?: boolean | Prisma.Role$agencyRoleAssignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.RoleCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["role"]>
 
 export type RoleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  key?: boolean
   scope?: boolean
   agencyId?: boolean
   description?: boolean
@@ -640,6 +779,7 @@ export type RoleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type RoleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   name?: boolean
+  key?: boolean
   scope?: boolean
   agencyId?: boolean
   description?: boolean
@@ -650,6 +790,7 @@ export type RoleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
 export type RoleSelectScalar = {
   id?: boolean
   name?: boolean
+  key?: boolean
   scope?: boolean
   agencyId?: boolean
   description?: boolean
@@ -657,10 +798,11 @@ export type RoleSelectScalar = {
   updatedAt?: boolean
 }
 
-export type RoleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "scope" | "agencyId" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["role"]>
+export type RoleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "key" | "scope" | "agencyId" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["role"]>
 export type RoleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   permissions?: boolean | Prisma.Role$permissionsArgs<ExtArgs>
   platformAssignments?: boolean | Prisma.Role$platformAssignmentsArgs<ExtArgs>
+  agencyRoleAssignments?: boolean | Prisma.Role$agencyRoleAssignmentsArgs<ExtArgs>
   _count?: boolean | Prisma.RoleCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type RoleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -671,10 +813,12 @@ export type $RolePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     permissions: Prisma.$RolePermissionPayload<ExtArgs>[]
     platformAssignments: Prisma.$PlatformRoleAssignmentPayload<ExtArgs>[]
+    agencyRoleAssignments: Prisma.$AgencyRoleAssignmentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
     name: string
+    key: string
     scope: string
     agencyId: bigint | null
     description: string | null
@@ -1076,6 +1220,7 @@ export interface Prisma__RoleClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   permissions<T extends Prisma.Role$permissionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Role$permissionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$RolePermissionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   platformAssignments<T extends Prisma.Role$platformAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Role$platformAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformRoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agencyRoleAssignments<T extends Prisma.Role$agencyRoleAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Role$agencyRoleAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgencyRoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1107,6 +1252,7 @@ export interface Prisma__RoleClient<T, Null = never, ExtArgs extends runtime.Typ
 export interface RoleFieldRefs {
   readonly id: Prisma.FieldRef<"Role", 'BigInt'>
   readonly name: Prisma.FieldRef<"Role", 'String'>
+  readonly key: Prisma.FieldRef<"Role", 'String'>
   readonly scope: Prisma.FieldRef<"Role", 'String'>
   readonly agencyId: Prisma.FieldRef<"Role", 'BigInt'>
   readonly description: Prisma.FieldRef<"Role", 'String'>
@@ -1550,6 +1696,30 @@ export type Role$platformAssignmentsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.PlatformRoleAssignmentScalarFieldEnum | Prisma.PlatformRoleAssignmentScalarFieldEnum[]
+}
+
+/**
+ * Role.agencyRoleAssignments
+ */
+export type Role$agencyRoleAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgencyRoleAssignment
+   */
+  select?: Prisma.AgencyRoleAssignmentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgencyRoleAssignment
+   */
+  omit?: Prisma.AgencyRoleAssignmentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgencyRoleAssignmentInclude<ExtArgs> | null
+  where?: Prisma.AgencyRoleAssignmentWhereInput
+  orderBy?: Prisma.AgencyRoleAssignmentOrderByWithRelationInput | Prisma.AgencyRoleAssignmentOrderByWithRelationInput[]
+  cursor?: Prisma.AgencyRoleAssignmentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgencyRoleAssignmentScalarFieldEnum | Prisma.AgencyRoleAssignmentScalarFieldEnum[]
 }
 
 /**

@@ -23,6 +23,7 @@ const row = {
   passwordHash: 'mock-hashed-password',
   firstName: 'Ada',
   lastName: 'Lovelace',
+  status: 'ACTIVE',
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -55,6 +56,7 @@ describe('LocalStrategy', () => {
       email: 'owner@example.com',
       firstName: 'Ada',
       lastName: 'Lovelace',
+      status: 'ACTIVE',
     });
     expect(result).not.toHaveProperty('passwordHash');
   });
@@ -74,5 +76,15 @@ describe('LocalStrategy', () => {
     await expect(strategy.validate('ghost@example.com', 'secret123')).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
+  });
+
+  it('rejects a suspended account even with correct credentials', async () => {
+    prismaMock.appUser.findUnique.mockResolvedValue({ ...row, status: 'SUSPENDED' });
+    vi.mocked(verify).mockResolvedValue(true);
+
+    const promise = strategy.validate('owner@example.com', 'secret123');
+
+    await expect(promise).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(promise).rejects.toMatchObject({ response: { message: 'Account is suspended' } });
   });
 });

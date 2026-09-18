@@ -1,7 +1,9 @@
 export const ROLE_EXAMPLE = {
   id: '17',
   name: 'Content Manager',
+  key: 'CONTENT_MANAGER',
   scope: 'PLATFORM',
+  agencyId: null,
   description: 'Manages public-facing roles',
   createdAt: '2026-09-16T10:00:00.000Z',
   updatedAt: '2026-09-16T10:00:00.000Z',
@@ -11,8 +13,21 @@ export const ROLE_SCHEMA = {
   type: 'object',
   properties: {
     id: { type: 'string', example: ROLE_EXAMPLE.id, description: 'Serialized BigInt id' },
-    name: { type: 'string', example: ROLE_EXAMPLE.name },
+    name: { type: 'string', example: ROLE_EXAMPLE.name, description: 'Human-readable display name' },
+    key: {
+      type: 'string',
+      example: ROLE_EXAMPLE.key,
+      description:
+        'Stable technical identifier in uppercase snake case. Set on creation and immutable afterwards.',
+    },
     scope: { type: 'string', enum: ['PLATFORM', 'AGENCY'], example: ROLE_EXAMPLE.scope },
+    agencyId: {
+      type: 'string',
+      nullable: true,
+      example: ROLE_EXAMPLE.agencyId,
+      description:
+        'Ownership discriminator. Null for PLATFORM roles and Platform-Admin-managed global AGENCY roles; a serialized agency id for a Custom Agency role.',
+    },
     description: { type: 'string', nullable: true, example: ROLE_EXAMPLE.description },
     createdAt: { type: 'string', format: 'date-time', example: ROLE_EXAMPLE.createdAt },
     updatedAt: { type: 'string', format: 'date-time', example: ROLE_EXAMPLE.updatedAt },

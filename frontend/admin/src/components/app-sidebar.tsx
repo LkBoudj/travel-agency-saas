@@ -23,8 +23,15 @@ const platformNav: NavItem[] = [
   },
   {
     title: "Users",
-    url: ROUTES.users,
+    url: ROUTES.platformUsers,
     icon: <UsersIcon />,
+    isActive: true,
+    items: [
+      {
+        title: "Platform Users",
+        url: ROUTES.platformUsers,
+      },
+    ],
   },
   {
     title: "Roles & Permissions",

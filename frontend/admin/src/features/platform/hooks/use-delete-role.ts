@@ -1,19 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 
-import {
-  ROLES_QUERY_KEY,
-  deleteRole,
-  roleQueryKey,
-} from "../api/roles.api"
+import { deleteRole, roleQueryKey, rolesQueryKey } from "../api/roles.api"
+import type { RoleScope } from "../types/rbac.types"
 
-export function useDeleteRole() {
+export function useDeleteRole(scope: RoleScope) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (roleId: string) => deleteRole(roleId),
+    mutationFn: (roleId: string) => deleteRole(scope, roleId),
     onSuccess: async (_data, roleId) => {
-      queryClient.removeQueries({ queryKey: roleQueryKey(roleId) })
-      await queryClient.invalidateQueries({ queryKey: ROLES_QUERY_KEY })
+      queryClient.removeQueries({ queryKey: roleQueryKey(scope, roleId) })
+      await queryClient.invalidateQueries({ queryKey: rolesQueryKey(scope) })
     },
   })
 }

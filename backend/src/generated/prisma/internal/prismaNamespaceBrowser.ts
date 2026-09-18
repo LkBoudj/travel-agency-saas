@@ -55,7 +55,11 @@ export const ModelName = {
   Role: 'Role',
   Permission: 'Permission',
   RolePermission: 'RolePermission',
-  PlatformRoleAssignment: 'PlatformRoleAssignment'
+  PlatformRoleAssignment: 'PlatformRoleAssignment',
+  Agency: 'Agency',
+  AgencyApplication: 'AgencyApplication',
+  AgencyMembership: 'AgencyMembership',
+  AgencyRoleAssignment: 'AgencyRoleAssignment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -81,6 +85,7 @@ export const AppUserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   firstName: 'firstName',
   lastName: 'lastName',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -91,6 +96,7 @@ export type AppUserScalarFieldEnum = (typeof AppUserScalarFieldEnum)[keyof typeo
 export const RoleScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  key: 'key',
   scope: 'scope',
   agencyId: 'agencyId',
   description: 'description',
@@ -131,6 +137,62 @@ export const PlatformRoleAssignmentScalarFieldEnum = {
 } as const
 
 export type PlatformRoleAssignmentScalarFieldEnum = (typeof PlatformRoleAssignmentScalarFieldEnum)[keyof typeof PlatformRoleAssignmentScalarFieldEnum]
+
+
+export const AgencyScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  name: 'name',
+  status: 'status',
+  country: 'country',
+  website: 'website',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyScalarFieldEnum = (typeof AgencyScalarFieldEnum)[keyof typeof AgencyScalarFieldEnum]
+
+
+export const AgencyApplicationScalarFieldEnum = {
+  id: 'id',
+  appUserId: 'appUserId',
+  agencyName: 'agencyName',
+  country: 'country',
+  website: 'website',
+  description: 'description',
+  status: 'status',
+  reviewNote: 'reviewNote',
+  reviewedAt: 'reviewedAt',
+  reviewedByAppUserId: 'reviewedByAppUserId',
+  agencyId: 'agencyId',
+  approvedAt: 'approvedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyApplicationScalarFieldEnum = (typeof AgencyApplicationScalarFieldEnum)[keyof typeof AgencyApplicationScalarFieldEnum]
+
+
+export const AgencyMembershipScalarFieldEnum = {
+  id: 'id',
+  agencyId: 'agencyId',
+  appUserId: 'appUserId',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyMembershipScalarFieldEnum = (typeof AgencyMembershipScalarFieldEnum)[keyof typeof AgencyMembershipScalarFieldEnum]
+
+
+export const AgencyRoleAssignmentScalarFieldEnum = {
+  id: 'id',
+  membershipId: 'membershipId',
+  roleId: 'roleId'
+} as const
+
+export type AgencyRoleAssignmentScalarFieldEnum = (typeof AgencyRoleAssignmentScalarFieldEnum)[keyof typeof AgencyRoleAssignmentScalarFieldEnum]
 
 
 export const SortOrder = {

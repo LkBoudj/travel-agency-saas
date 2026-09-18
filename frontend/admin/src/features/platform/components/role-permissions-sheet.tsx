@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react"
-import { CircleAlertIcon, Loader2Icon, RotateCcwIcon } from "lucide-react"
+import {
+  CircleAlertIcon,
+  Loader2Icon,
+  RotateCcwIcon,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -13,6 +17,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet"
 import { Skeleton } from "@/components/ui/skeleton"
+import { toast } from "@/components/ui/toast-manager"
 import { useAvailablePermissions } from "../hooks/use-available-permissions"
 import { useReplaceRolePermissions } from "../hooks/use-replace-role-permissions"
 import { useRolePermissions } from "../hooks/use-role-permissions"
@@ -25,7 +30,7 @@ import {
   togglePermissionKey,
   type PermissionGroup,
 } from "../lib/permission-catalog"
-import type { PlatformRole } from "../types/rbac.types"
+import type { PlatformRole, RoleScope } from "../types/rbac.types"
 
 export type RolePermissionsSheetProps = {
   role: PlatformRole
@@ -112,17 +117,19 @@ function PermissionsSkeleton() {
 }
 
 function PermissionEditor({
+  scope,
   role,
   groups,
   totalPermissions,
   initialKeys,
 }: {
+  scope: RoleScope
   role: PlatformRole
   groups: PermissionGroup[]
   totalPermissions: number
   initialKeys: string[]
 }) {
-  const replaceMutation = useReplaceRolePermissions(role.id)
+  const replaceMutation = useReplaceRolePermissions(scope, role.id)
   const redirectOnSessionExpiry = useSessionExpiryRedirect()
   const [selectedKeys, setSelectedKeys] = useState(initialKeys)
   const [savedKeys, setSavedKeys] = useState(initialKeys)
@@ -138,6 +145,7 @@ function PermissionEditor({
       onSuccess: (result) => {
         setSelectedKeys(result.permissionKeys)
         setSavedKeys(result.permissionKeys)
+        toast.success("Permissions saved.")
       },
     })
   }
@@ -152,11 +160,11 @@ function PermissionEditor({
               group={group}
               selectedKeys={selectedKeys}
               disabled={replaceMutation.isPending}
-              onToggle={(key, checked) =>
+              onToggle={(key, checked) => {
                 setSelectedKeys((previous) =>
                   togglePermissionKey(previous, key, checked)
                 )
-              }
+              }}
             />
           ))}
         </div>
@@ -177,7 +185,9 @@ function PermissionEditor({
               variant="outline"
               size="sm"
               disabled={!isDirty || replaceMutation.isPending}
-              onClick={() => setSelectedKeys(savedKeys)}
+              onClick={() => {
+                setSelectedKeys(savedKeys)
+              }}
             >
               <RotateCcwIcon />
               Reset
@@ -204,8 +214,9 @@ export function RolePermissionsSheet({
   open,
   onOpenChange,
 }: RolePermissionsSheetProps) {
-  const permissionsQuery = useAvailablePermissions()
-  const rolePermissionsQuery = useRolePermissions(role.id, open)
+  const scope = role.scope
+  const permissionsQuery = useAvailablePermissions(scope)
+  const rolePermissionsQuery = useRolePermissions(scope, role.id, open)
 
   const groups = useMemo(
     () => groupPermissionsByResource(permissionsQuery.data ?? []),
@@ -216,6 +227,7 @@ export function RolePermissionsSheet({
   const isLoading = permissionsQuery.isPending || rolePermissionsQuery.isPending
   const isError = permissionsQuery.isError || rolePermissionsQuery.isError
   const serverKeys = rolePermissionsQuery.data
+  const scopeLabel = scope === "PLATFORM" ? "platform" : "agency"
 
   const handleRetry = () => {
     void permissionsQuery.refetch()
@@ -231,7 +243,7 @@ export function RolePermissionsSheet({
         <SheetHeader className="border-b">
           <SheetTitle>Manage permissions</SheetTitle>
           <SheetDescription>
-            Choose the platform permissions granted to{" "}
+            Choose the {scopeLabel} permissions granted to{" "}
             <span className="font-medium text-foreground">{role.name}</span>.
           </SheetDescription>
         </SheetHeader>
@@ -258,14 +270,16 @@ export function RolePermissionsSheet({
         {!isLoading && !isError && totalPermissions === 0 ? (
           <div className="flex-1 overflow-y-auto px-4 py-4">
             <p className="text-sm text-muted-foreground">
-              No platform permissions are available.
+              {scope === "PLATFORM"
+                ? "No platform permissions are available."
+                : "No agency permissions are available yet."}
             </p>
           </div>
         ) : null}
 
         {!isLoading && !isError && totalPermissions > 0 && serverKeys ? (
           <PermissionEditor
-            key={`${role.id}:${serverKeys.join("|")}`}
+            scope={scope}
             role={role}
             groups={groups}
             totalPermissions={totalPermissions}

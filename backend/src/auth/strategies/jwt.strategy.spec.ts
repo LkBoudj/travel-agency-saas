@@ -23,6 +23,7 @@ const row = {
   passwordHash: 'mock-hashed-password',
   firstName: 'Ada',
   lastName: 'Lovelace',
+  status: 'ACTIVE',
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -67,6 +68,7 @@ describe('JwtStrategy', () => {
       email: 'owner@example.com',
       firstName: 'Ada',
       lastName: 'Lovelace',
+      status: 'ACTIVE',
     });
     expect(result).not.toHaveProperty('passwordHash');
   });
@@ -75,6 +77,15 @@ describe('JwtStrategy', () => {
     prismaMock.appUser.findUnique.mockResolvedValue(null);
 
     await expect(strategy.validate({ sub: '999' })).rejects.toBeInstanceOf(UnauthorizedException);
+  });
+
+  it('rejects a token belonging to a suspended account (immediate revocation)', async () => {
+    prismaMock.appUser.findUnique.mockResolvedValue({ ...row, status: 'SUSPENDED' });
+
+    const promise = strategy.validate({ sub: '1' });
+
+    await expect(promise).rejects.toBeInstanceOf(UnauthorizedException);
+    await expect(promise).rejects.toMatchObject({ response: { message: 'Account is suspended' } });
   });
 
   it('rejects a token without a subject', async () => {

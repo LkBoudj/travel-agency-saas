@@ -4,16 +4,17 @@ import {
   replaceRolePermissions,
   rolePermissionsQueryKey,
 } from "../api/roles.api"
+import type { RoleScope } from "../types/rbac.types"
 
-export function useReplaceRolePermissions(roleId: string) {
+export function useReplaceRolePermissions(scope: RoleScope, roleId: string) {
   const queryClient = useQueryClient()
 
   return useMutation({
     mutationFn: (permissionKeys: string[]) =>
-      replaceRolePermissions(roleId, permissionKeys),
+      replaceRolePermissions(scope, roleId, permissionKeys),
     onSuccess: (result) => {
       queryClient.setQueryData(
-        rolePermissionsQueryKey(roleId),
+        rolePermissionsQueryKey(scope, roleId),
         result.permissionKeys
       )
     },

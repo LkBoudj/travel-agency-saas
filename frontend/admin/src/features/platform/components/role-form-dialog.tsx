@@ -1,7 +1,7 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2Icon } from "lucide-react"
-import { useForm } from "react-hook-form"
+import { useForm, useWatch } from "react-hook-form"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog"
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
@@ -24,91 +25,150 @@ import { useCreateRole } from "../hooks/use-create-role"
 import { useSessionExpiryRedirect } from "../hooks/use-session-expiry-redirect"
 import { useUpdateRole } from "../hooks/use-update-role"
 import { getRbacErrorMessage } from "../lib/rbac-errors"
+import { suggestRoleKey } from "../lib/role-key"
 import {
   roleFormSchema,
   type RoleFormValues,
 } from "../schemas/role-form.schema"
-import type { PlatformRole } from "../types/rbac.types"
+import type { PlatformRole, RoleScope } from "../types/rbac.types"
 
 export type RoleFormDialogProps = {
   mode: "create" | "edit"
+  scope: RoleScope
   role?: PlatformRole
   open: boolean
+  onSuccess?: (message: string, role: PlatformRole) => void
   onOpenChange: (open: boolean) => void
 }
 
 export function RoleFormDialog({
   mode,
+  scope,
   role,
   open,
+  onSuccess,
   onOpenChange,
 }: RoleFormDialogProps) {
-  const createRole = useCreateRole()
-  const updateRole = useUpdateRole(role?.id ?? "")
+  const createRole = useCreateRole(scope)
+  const updateRole = useUpdateRole(scope, role?.id ?? "")
   const redirectOnSessionExpiry = useSessionExpiryRedirect()
-  const mutation = mode === "create" ? createRole : updateRole
+  const [keyEdited, setKeyEdited] = useState(false)
 
-  const { register, handleSubmit, reset, formState } = useForm<RoleFormValues>({
-    resolver: zodResolver(roleFormSchema),
-    defaultValues: { name: "", description: "" },
-  })
+  const { register, handleSubmit, setValue, control, formState } =
+    useForm<RoleFormValues>({
+      resolver: zodResolver(roleFormSchema),
+      defaultValues: {
+        name: role?.name ?? "",
+        key: role?.key ?? "",
+        description: role?.description ?? "",
+      },
+    })
+
+  const nameValue = useWatch({ control, name: "name" })
 
   useEffect(() => {
-    if (!open) {
+    if (!open || mode === "edit" || keyEdited) {
       return
     }
-    reset({
-      name: role?.name ?? "",
-      description: role?.description ?? "",
+    setValue("key", suggestRoleKey(scope, nameValue ?? ""), {
+      shouldValidate: false,
     })
-  }, [open, role, reset])
+  }, [open, mode, scope, keyEdited, nameValue, setValue])
+
+  const mutation = mode === "create" ? createRole : updateRole
+  const isPending = mutation.isPending
+  const error = mutation.error
+  const isError = mutation.isError
 
   useEffect(() => {
-    if (mutation.isError) {
-      redirectOnSessionExpiry(mutation.error)
+    if (isError) {
+      redirectOnSessionExpiry(error)
     }
-  }, [mutation.isError, mutation.error, redirectOnSessionExpiry])
+  }, [isError, error, redirectOnSessionExpiry])
 
-  const serverErrorMessage = mutation.isError
+  const serverErrorMessage = isError
     ? getRbacErrorMessage(
         mode === "create" ? "create-role" : "update-role",
-        mutation.error
+        error
       )
     : undefined
 
   const onSubmit = handleSubmit((values) => {
     const description = values.description.trim()
-    mutation.mutate(
-      {
-        name: values.name.trim(),
-        description: description.length > 0 ? description : null,
+    const payload = {
+      name: values.name.trim(),
+      description: description.length > 0 ? description : null,
+    }
+
+    if (mode === "create") {
+      createRole.mutate(
+        { ...payload, key: values.key.trim() },
+        {
+          onSuccess: (created) => {
+            onSuccess?.("Role created.", created)
+            onOpenChange(false)
+          },
+        }
+      )
+      return
+    }
+
+    updateRole.mutate(payload, {
+      onSuccess: (updated) => {
+        onSuccess?.("Role updated.", updated)
+        onOpenChange(false)
       },
-      { onSuccess: () => onOpenChange(false) }
-    )
+    })
   })
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{mode === "create" ? "Create role" : "Edit role"}</DialogTitle>
+          <DialogTitle>
+            {mode === "create" ? "Create role" : "Edit role"}
+          </DialogTitle>
           <DialogDescription>
             {mode === "create"
-              ? "New roles are created for the platform scope."
-              : "Update the role name or description. Scope cannot be changed."}
+              ? "Add a role, then choose its permissions next."
+              : "Update the display name or description. The technical key cannot be changed."}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={onSubmit} noValidate>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="role-name">Name</FieldLabel>
+              <FieldLabel htmlFor="role-name">Display name</FieldLabel>
               <Input
                 id="role-name"
                 autoComplete="off"
+                autoFocus
                 aria-invalid={!!formState.errors.name}
                 {...register("name")}
               />
-              <FieldError errors={[{ message: formState.errors.name?.message }]} />
+              <FieldError
+                errors={[{ message: formState.errors.name?.message }]}
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="role-key">Technical key</FieldLabel>
+              <Input
+                id="role-key"
+                autoComplete="off"
+                spellCheck={false}
+                readOnly={mode === "edit"}
+                className="font-mono"
+                aria-invalid={!!formState.errors.key}
+                aria-readonly={mode === "edit"}
+                {...register("key", {
+                  onChange: () => setKeyEdited(true),
+                })}
+              />
+              <FieldDescription>
+                {mode === "create"
+                  ? "Suggested from the display name. Uppercase letters, digits and underscores, starting with a letter."
+                  : "Technical keys are permanent and cannot be edited."}
+              </FieldDescription>
+              <FieldError errors={[{ message: formState.errors.key?.message }]} />
             </Field>
             <Field>
               <FieldLabel htmlFor="role-description">Description</FieldLabel>
@@ -132,14 +192,12 @@ export function RoleFormDialog({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={mutation.isPending}
+              disabled={isPending}
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={mutation.isPending}>
-              {mutation.isPending ? (
-                <Loader2Icon className="animate-spin" />
-              ) : null}
+            <Button type="submit" disabled={isPending}>
+              {isPending ? <Loader2Icon className="animate-spin" /> : null}
               {mode === "create" ? "Create role" : "Save changes"}
             </Button>
           </DialogFooter>

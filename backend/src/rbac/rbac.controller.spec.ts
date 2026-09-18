@@ -8,11 +8,16 @@ import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { configureApp } from '../setup-app.js';
 import { RbacModule } from './rbac.module.js';
-import { RBAC_PERMISSION_CATALOG } from './rbac.constants.js';
+import {
+  ALL_AGENCY_PERMISSION_KEYS,
+  ALL_PLATFORM_PERMISSION_KEYS,
+  RBAC_PERMISSION_CATALOG,
+} from './rbac.constants.js';
 
 type RoleRow = {
   id: bigint;
   name: string;
+  key: string;
   scope: string;
   agencyId: bigint | null;
   description: string | null;
@@ -42,6 +47,7 @@ const existingUser = {
   passwordHash: 'mock-hashed-password',
   firstName: 'Ada',
   lastName: 'Lovelace',
+  status: 'ACTIVE',
   createdAt: NOW,
   updatedAt: NOW,
 };
@@ -80,10 +86,12 @@ function addRole(
   scope: string,
   keys: string[] = [],
   agencyId: bigint | null = null,
+  key = name,
 ): RoleRow {
   const row: RoleRow = {
     id: id(),
     name,
+    key,
     scope,
     agencyId,
     description: null,
@@ -91,8 +99,10 @@ function addRole(
     updatedAt: NOW,
   };
   DB.roles.set(row.id, row);
-  for (const key of keys) {
-    const permission = [...DB.permissions.values()].find((p) => p.key === key) ?? addPermission(key);
+  for (const permissionKey of keys) {
+    const permission =
+      [...DB.permissions.values()].find((p) => p.key === permissionKey) ??
+      addPermission(permissionKey);
     DB.links.push({ roleId: row.id, permissionId: permission.id });
   }
   return row;
@@ -134,13 +144,42 @@ const prismaMock = {
     }),
   },
   role: {
-    findMany: vi.fn(async ({ where }: { where?: { scope?: string } } = {}) => {
+    findMany: vi.fn(
+      async (
+        { where }: { where?: { scope?: string; agencyId?: bigint | null } } = {},
+      ) => {
+        let rows = [...DB.roles.values()];
+        if (where?.scope) {
+          rows = rows.filter((r) => r.scope === where.scope);
+        }
+        if (where && 'agencyId' in where) {
+          rows = rows.filter((r) => r.agencyId === where.agencyId);
+        }
+        return rows;
+      },
+    ),
+    findFirst: vi.fn(async ({ where }: { where: Record<string, unknown> }) => {
       const rows = [...DB.roles.values()];
-      return where?.scope ? rows.filter((r) => r.scope === where.scope) : rows;
-    }),
-    findFirst: vi.fn(async ({ where }: { where: { id: bigint; scope: string } }) => {
-      const row = DB.roles.get(where.id);
-      return row && row.scope === where.scope ? row : null;
+      const match = rows.find((r) => {
+        if ('id' in where) {
+          const idCondition = where.id as bigint | { not: bigint };
+          if (
+            typeof idCondition === 'object' &&
+            idCondition !== null &&
+            'not' in idCondition
+          ) {
+            if (r.id === idCondition.not) return false;
+          } else if (r.id !== idCondition) {
+            return false;
+          }
+        }
+        if ('scope' in where && r.scope !== where.scope) return false;
+        if ('name' in where && r.name !== where.name) return false;
+        if ('key' in where && r.key !== where.key) return false;
+        if ('agencyId' in where && r.agencyId !== where.agencyId) return false;
+        return true;
+      });
+      return match ?? null;
     }),
     findUnique: vi.fn(async ({ where }: { where: { id?: bigint } }) => {
       return where.id === undefined ? null : DB.roles.get(where.id) ?? null;
@@ -149,16 +188,29 @@ const prismaMock = {
       async ({
         data,
       }: {
-        data: { name: string; scope: string; agencyId: bigint | null; description: string | null };
+        data: {
+          key: string;
+          name: string;
+          scope: string;
+          agencyId: bigint | null;
+          description: string | null;
+        };
       }) => {
-        const exists = [...DB.roles.values()].some(
+        const nameExists = [...DB.roles.values()].some(
           (r) => r.name === data.name && r.scope === data.scope && r.agencyId === data.agencyId,
         );
-        if (exists) {
-          throw p2002({ target: ['scope', 'name'] });
+        if (nameExists) {
+          throw p2002({ target: 'role_global_name_key' });
+        }
+        const keyExists = [...DB.roles.values()].some(
+          (r) => r.key === data.key && r.scope === data.scope && r.agencyId === data.agencyId,
+        );
+        if (keyExists) {
+          throw p2002({ target: 'role_global_key_key' });
         }
         const row: RoleRow = {
           id: id(),
+          key: data.key,
           name: data.name,
           scope: data.scope,
           agencyId: data.agencyId ?? null,
@@ -184,6 +236,7 @@ const prismaMock = {
           ...current,
           name: data.name ?? current.name,
           scope: current.scope,
+          key: current.key,
           agencyId: current.agencyId,
           description: data.description !== undefined ? data.description : current.description,
           updatedAt: NOW,
@@ -196,7 +249,7 @@ const prismaMock = {
             r.agencyId === updated.agencyId,
         );
         if (conflict) {
-          throw p2002({ target: ['scope', 'name'] });
+          throw p2002({ target: 'role_global_name_key' });
         }
         DB.roles.set(updated.id, updated);
         return updated;
@@ -283,7 +336,7 @@ const prismaMock = {
   }),
 };
 
-const PLATFORM_KEYS = RBAC_PERMISSION_CATALOG.map((permission) => permission.key);
+const PLATFORM_KEYS = ALL_PLATFORM_PERMISSION_KEYS;
 const VIEWER_KEY = 'PLATFORM_ROLE_VIEW';
 const MANAGE_KEY = 'PLATFORM_ROLE_PERMISSION_MANAGE';
 
@@ -301,6 +354,7 @@ function baseline(): void {
   const admin = addRole('PLATFORM_ADMIN', 'PLATFORM', PLATFORM_KEYS);
   DB.assignments.push({ appUserId: existingUser.id, roleId: admin.id });
   addRole('AGENCY_OP', 'AGENCY', []);
+  addRole('CUSTOM_AGENT', 'AGENCY', [], 7n);
   addRole('VIEWER', 'PLATFORM', [VIEWER_KEY]);
 }
 
@@ -346,6 +400,10 @@ describe('RBAC HTTP API (roles + permissions + role permissions)', () => {
     [...DB.roles.values()].find((r) => r.name === name && r.scope === 'PLATFORM')!;
   const agencyRole = (): RoleRow =>
     [...DB.roles.values()].find((r) => r.scope === 'AGENCY')!;
+  const globalAgencyRole = (name: string): RoleRow =>
+    [...DB.roles.values()].find(
+      (r) => r.name === name && r.scope === 'AGENCY' && r.agencyId === null,
+    )!;
 
   async function authorizeOnly(...keys: string[]): Promise<void> {
     DB.roles.clear();
@@ -398,16 +456,47 @@ describe('RBAC HTTP API (roles + permissions + role permissions)', () => {
     it('creates a PLATFORM role and ignores a client-supplied scope', async () => {
       const res = await api
         .post('/v1/roles')
-        .send({ name: 'Content Manager', scope: 'AGENCY', description: 'Content editors' });
+        .send({
+          key: 'PLATFORM_CONTENT_MANAGER',
+          name: 'Content Manager',
+          scope: 'AGENCY',
+          description: 'Content editors',
+        });
       expect(res.status).toBe(201);
       expect(res.body.name).toBe('Content Manager');
+      expect(res.body.key).toBe('PLATFORM_CONTENT_MANAGER');
       expect(res.body.scope).toBe('PLATFORM');
+      expect(res.body.agencyId).toBeNull();
       expect(res.body.description).toBe('Content editors');
       expect(typeof res.body.id).toBe('string');
     });
 
+    it('400 when creating without a key', async () => {
+      const res = await api.post('/v1/roles').send({ name: 'No Key Role' });
+      expect(res.status).toBe(400);
+    });
+
+    it('400 when the key is not uppercase snake case', async () => {
+      for (const key of ['lower_case', 'with space', '1_LEADING_DIGIT', 'HAS-DASH']) {
+        const res = await api
+          .post('/v1/roles')
+          .send({ key, name: `Role ${key}` });
+        expect(res.status).toBe(400);
+      }
+    });
+
+    it('409 with ROLE_KEY_SCOPE_CONFLICT on duplicate key', async () => {
+      const res = await api
+        .post('/v1/roles')
+        .send({ key: 'VIEWER', name: 'Another Viewer' });
+      expect(res.status).toBe(409);
+      expect(res.body.errorCode).toBe('ROLE_KEY_SCOPE_CONFLICT');
+    });
+
     it('409 on duplicate PLATFORM name', async () => {
-      const res = await api.post('/v1/roles').send({ name: 'VIEWER' });
+      const res = await api
+        .post('/v1/roles')
+        .send({ key: 'PLATFORM_VIEWER_COPY', name: 'VIEWER' });
       expect(res.status).toBe(409);
       expect(res.body.errorCode).toBe('ROLE_NAME_SCOPE_CONFLICT');
     });
@@ -425,6 +514,16 @@ describe('RBAC HTTP API (roles + permissions + role permissions)', () => {
       expect(res.status).toBe(200);
       expect(res.body.description).toBe('Read-only platform viewer');
       expect(res.body.name).toBe('VIEWER');
+    });
+
+    it('never changes the key on update (key is immutable)', async () => {
+      const viewer = platformRole('VIEWER');
+      const res = await api
+        .patch(`/v1/roles/${viewer.id.toString()}`)
+        .send({ name: 'Viewer Renamed', key: 'PLATFORM_HACKED_KEY' });
+      expect(res.status).toBe(200);
+      expect(res.body.name).toBe('Viewer Renamed');
+      expect(res.body.key).toBe('VIEWER');
     });
 
     it('ignores a client-supplied scope on update (scope is immutable)', async () => {
@@ -480,21 +579,7 @@ describe('RBAC HTTP API (roles + permissions + role permissions)', () => {
       const res = await api.get('/v1/permissions');
       expect(res.status).toBe(200);
       const keys = res.body.map((p: PermissionRow) => p.key);
-      for (const expected of [
-        'PLATFORM_USER_VIEW',
-        'PLATFORM_USER_CREATE',
-        'PLATFORM_USER_UPDATE',
-        'PLATFORM_USER_DISABLE',
-        'PLATFORM_ROLE_VIEW',
-        'PLATFORM_ROLE_CREATE',
-        'PLATFORM_ROLE_UPDATE',
-        'PLATFORM_ROLE_DELETE',
-        'PLATFORM_ROLE_PERMISSION_MANAGE',
-        'PLATFORM_USER_ROLE_VIEW',
-        'PLATFORM_USER_ROLE_MANAGE',
-      ]) {
-        expect(keys).toContain(expected);
-      }
+      expect(new Set(keys)).toEqual(new Set(ALL_PLATFORM_PERMISSION_KEYS));
       for (const removed of [
         'USER_VIEW',
         'ROLE_VIEW',
@@ -703,6 +788,133 @@ describe('RBAC HTTP API (roles + permissions + role permissions)', () => {
       await authorizeOnly(VIEWER_KEY);
       const res = await api.get('/v1/roles');
       expect(res.status).toBe(200);
+    });
+  });
+
+  describe('Global Agency roles (scope=AGENCY, agencyId=null)', () => {
+    it('lists only Global Agency roles (never PLATFORM or custom roles)', async () => {
+      const res = await api.get('/v1/agency-roles');
+      expect(res.status).toBe(200);
+      const names = res.body.map((r: RoleRow) => r.name);
+      expect(names).toContain('AGENCY_OP');
+      expect(names).not.toContain('PLATFORM_ADMIN');
+      expect(names).not.toContain('VIEWER');
+      expect(names).not.toContain('CUSTOM_AGENT');
+      expect(
+        res.body.every((r: RoleRow) => r.scope === 'AGENCY' && r.agencyId === null),
+      ).toBe(true);
+    });
+
+    it('creates a Global Agency role and ignores client-supplied scope/agencyId', async () => {
+      const res = await api.post('/v1/agency-roles').send({
+        key: 'AGENCY_BOOKING_AGENT',
+        name: 'Booking Agent',
+        scope: 'PLATFORM',
+        agencyId: '7',
+        description: 'Handles booking operations for agencies',
+      });
+      expect(res.status).toBe(201);
+      expect(res.body).toMatchObject({
+        key: 'AGENCY_BOOKING_AGENT',
+        name: 'Booking Agent',
+        scope: 'AGENCY',
+        agencyId: null,
+      });
+      expect(typeof res.body.id).toBe('string');
+    });
+
+    it('allows the same key and name in a different scope than PLATFORM', async () => {
+      const res = await api
+        .post('/v1/agency-roles')
+        .send({ key: 'VIEWER', name: 'VIEWER' });
+      expect(res.status).toBe(201);
+      expect(res.body.scope).toBe('AGENCY');
+      expect(res.body.key).toBe('VIEWER');
+    });
+
+    it('409 with ROLE_KEY_SCOPE_CONFLICT on a duplicate Agency key', async () => {
+      const res = await api
+        .post('/v1/agency-roles')
+        .send({ key: 'AGENCY_OP', name: 'Duplicate Key' });
+      expect(res.status).toBe(409);
+      expect(res.body.errorCode).toBe('ROLE_KEY_SCOPE_CONFLICT');
+    });
+
+    it('409 with ROLE_NAME_SCOPE_CONFLICT on a duplicate Agency name', async () => {
+      const res = await api
+        .post('/v1/agency-roles')
+        .send({ key: 'AGENCY_DUPLICATE_NAME', name: 'AGENCY_OP' });
+      expect(res.status).toBe(409);
+      expect(res.body.errorCode).toBe('ROLE_NAME_SCOPE_CONFLICT');
+    });
+
+    it('keeps the key immutable and never accepts scope/agencyId on update', async () => {
+      const role = globalAgencyRole('AGENCY_OP');
+      const res = await api
+        .patch(`/v1/agency-roles/${role.id.toString()}`)
+        .send({ name: 'Agency Operator', key: 'AGENCY_HACKED', scope: 'PLATFORM', agencyId: '7' });
+      expect(res.status).toBe(200);
+      expect(res.body.name).toBe('Agency Operator');
+      expect(res.body.key).toBe('AGENCY_OP');
+      expect(res.body.scope).toBe('AGENCY');
+      expect(res.body.agencyId).toBeNull();
+    });
+
+    it('exposes only the AGENCY permission catalog', async () => {
+      const res = await api.get('/v1/agency-roles/available-permissions');
+      expect(res.status).toBe(200);
+      expect(new Set(res.body.map((p: PermissionRow) => p.key))).toEqual(
+        new Set(ALL_AGENCY_PERMISSION_KEYS),
+      );
+      expect(res.body.every((p: PermissionRow) => p.scope === 'AGENCY')).toBe(true);
+    });
+
+    it('rejects cross-scope (PLATFORM) permission keys on an Agency role', async () => {
+      const role = globalAgencyRole('AGENCY_OP');
+      const res = await api
+        .put(`/v1/agency-roles/${role.id.toString()}/permissions`)
+        .send({ permissionKeys: ['PLATFORM_ROLE_VIEW'] });
+      expect(res.status).toBe(400);
+      expect(res.body.errorCode).toBe('CROSS_SCOPE_PERMISSION_KEYS');
+    });
+
+    it('404 for a PLATFORM role on the agency endpoint (scopes never mix)', async () => {
+      const admin = platformRole('PLATFORM_ADMIN');
+      const res = await api.get(`/v1/agency-roles/${admin.id.toString()}`);
+      expect(res.status).toBe(404);
+    });
+
+    it('404 for a custom agency role (Group 2) on the global agency endpoint', async () => {
+      const custom = [...DB.roles.values()].find((r) => r.agencyId !== null)!;
+      const res = await api.get(`/v1/agency-roles/${custom.id.toString()}`);
+      expect(res.status).toBe(404);
+    });
+
+    it('204 deletes a Global Agency role', async () => {
+      const role = globalAgencyRole('AGENCY_OP');
+      const res = await api.delete(`/v1/agency-roles/${role.id.toString()}`);
+      expect(res.status).toBe(204);
+      expect(DB.roles.has(role.id)).toBe(false);
+    });
+
+    it('requires PLATFORM_AGENCY_ROLE_VIEW (not PLATFORM_ROLE_VIEW) to list Global Agency roles', async () => {
+      await authorizeOnly(VIEWER_KEY);
+      const res = await api.get('/v1/agency-roles');
+      expect(res.status).toBe(403);
+    });
+
+    it('allows listing Global Agency roles with PLATFORM_AGENCY_ROLE_VIEW', async () => {
+      await authorizeOnly('PLATFORM_AGENCY_ROLE_VIEW');
+      const res = await api.get('/v1/agency-roles');
+      expect(res.status).toBe(200);
+    });
+
+    it('requires PLATFORM_AGENCY_ROLE_CREATE (not PLATFORM_ROLE_CREATE) to create a Global Agency role', async () => {
+      await authorizeOnly('PLATFORM_ROLE_CREATE');
+      const res = await api
+        .post('/v1/agency-roles')
+        .send({ key: 'AGENCY_NEW', name: 'Agency New' });
+      expect(res.status).toBe(403);
     });
   });
 });

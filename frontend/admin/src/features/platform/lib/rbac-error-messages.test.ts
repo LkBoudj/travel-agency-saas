@@ -18,6 +18,13 @@ describe("rbacErrorMessage", () => {
     )
   })
 
+  it("maps 403 on create to a create-specific message", () => {
+    assert.equal(
+      rbacErrorMessage("create-role", 403, "Forbidden"),
+      "You do not have permission to create this role."
+    )
+  })
+
   it("maps 404 to a missing role message", () => {
     assert.equal(
       rbacErrorMessage("delete-role", 404),
@@ -36,6 +43,22 @@ describe("rbacErrorMessage", () => {
     )
   })
 
+  it("maps key conflicts to a key-specific message", () => {
+    assert.equal(
+      rbacErrorMessage("create-role", 409, "Conflict", "ROLE_KEY_SCOPE_CONFLICT"),
+      "A role with this technical key already exists."
+    )
+    assert.equal(
+      rbacErrorMessage(
+        "create-role",
+        409,
+        "Conflict",
+        "ROLE_NAME_SCOPE_CONFLICT"
+      ),
+      "A role with this name already exists."
+    )
+  })
+
   it("maps assigned-role delete conflicts to the required message", () => {
     assert.equal(
       rbacErrorMessage("delete-role", 409),
@@ -50,7 +73,7 @@ describe("rbacErrorMessage", () => {
     )
     assert.equal(
       rbacErrorMessage("replace-permissions", 400, "   "),
-      "One or more selected permissions are not available for platform roles."
+      "One or more selected permissions are not available for this role scope."
     )
   })
 

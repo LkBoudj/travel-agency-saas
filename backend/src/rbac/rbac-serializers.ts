@@ -10,6 +10,7 @@ export function toRoleResponse(role: Role): RoleResponse {
   return {
     id: role.id.toString(),
     name: role.name,
+    key: role.key,
     scope: role.scope as RoleScope,
     agencyId: role.agencyId === null ? null : role.agencyId.toString(),
     description: role.description,

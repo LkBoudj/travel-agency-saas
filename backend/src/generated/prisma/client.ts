@@ -66,3 +66,23 @@ export type RolePermission = Prisma.RolePermissionModel
  * 
  */
 export type PlatformRoleAssignment = Prisma.PlatformRoleAssignmentModel
+/**
+ * Model Agency
+ * 
+ */
+export type Agency = Prisma.AgencyModel
+/**
+ * Model AgencyApplication
+ * 
+ */
+export type AgencyApplication = Prisma.AgencyApplicationModel
+/**
+ * Model AgencyMembership
+ * 
+ */
+export type AgencyMembership = Prisma.AgencyMembershipModel
+/**
+ * Model AgencyRoleAssignment
+ * 
+ */
+export type AgencyRoleAssignment = Prisma.AgencyRoleAssignmentModel

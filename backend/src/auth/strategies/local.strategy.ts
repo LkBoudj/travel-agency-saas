@@ -3,7 +3,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { verify } from 'argon2';
 import { Strategy as PassportLocalStrategy } from 'passport-local';
 import { PrismaService } from '../../prisma/prisma.service.js';
-import { InternalAuthUser, toInternalAuthUser } from '../auth-user.js';
+import { AppUserAccountStatus, InternalAuthUser, toInternalAuthUser } from '../auth-user.js';
 
 @Injectable()
 export class LocalStrategy extends PassportStrategy(PassportLocalStrategy) {
@@ -27,6 +27,10 @@ export class LocalStrategy extends PassportStrategy(PassportLocalStrategy) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return toInternalAuthUser(appUser);
+    if (appUser.status === 'SUSPENDED') {
+      throw new UnauthorizedException('Account is suspended');
+    }
+
+    return toInternalAuthUser({ ...appUser, status: appUser.status as AppUserAccountStatus });
   }
 }

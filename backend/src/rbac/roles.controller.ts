@@ -53,7 +53,7 @@ export class RolesController {
   @ApiOperation({ summary: 'List all PLATFORM roles' })
   @ApiOkResponse({ description: 'All PLATFORM roles', schema: { type: 'array', items: ROLE_SCHEMA } })
   list(): Promise<RoleResponse[]> {
-    return this.rolesService.list();
+    return this.rolesService.list('PLATFORM');
   }
 
   // Declared before `:id` so "available-permissions" is never captured as an id.
@@ -69,7 +69,7 @@ export class RolesController {
     schema: { type: 'array', items: PERMISSION_SCHEMA },
   })
   listAvailablePermissions(): Promise<PermissionResponse[]> {
-    return this.rolesService.listAvailablePermissions();
+    return this.rolesService.listAvailablePermissions('PLATFORM');
   }
 
   @Get(':id')
@@ -79,37 +79,39 @@ export class RolesController {
   @ApiOkResponse({ description: 'The requested role', schema: ROLE_SCHEMA })
   @ApiNotFoundResponse({ description: 'PLATFORM role not found' })
   getById(@Param('id') id: string): Promise<RoleResponse> {
-    return this.rolesService.getById(id);
+    return this.rolesService.getById('PLATFORM', id);
   }
 
   @Post()
   @RequirePermissions('PLATFORM_ROLE_CREATE')
   @ApiOperation({
     summary: 'Create a PLATFORM role',
-    description: 'The scope is always PLATFORM and cannot be chosen by the request.',
+    description:
+      'The scope is always PLATFORM and cannot be chosen by the request. `key` is the stable technical identifier and is immutable afterwards.',
   })
   @ApiBody({
-    description: 'Role name is unique among PLATFORM roles.',
+    description: 'Role key and name are unique among PLATFORM roles.',
     schema: {
       type: 'object',
-      required: ['name'],
+      required: ['key', 'name'],
       properties: {
-        name: { type: 'string', maxLength: 100, example: 'Content Manager' },
-        description: { type: 'string', nullable: true, example: 'Manages content roles' },
+        key: { type: 'string', maxLength: 64, example: 'PLATFORM_SUPPORT_MANAGER' },
+        name: { type: 'string', maxLength: 100, example: 'Support Manager' },
+        description: { type: 'string', nullable: true, example: 'Manages platform support operations' },
       },
     },
   })
   @ApiCreatedResponse({ description: 'Role created', schema: ROLE_SCHEMA })
-  @ApiConflictResponse({ description: 'A PLATFORM role with this name already exists' })
+  @ApiConflictResponse({ description: 'A PLATFORM role with this key or name already exists' })
   create(@Body({ schema: createRoleSchema }) dto: CreateRoleBody): Promise<RoleResponse> {
-    return this.rolesService.create(dto);
+    return this.rolesService.create('PLATFORM', dto);
   }
 
   @Patch(':id')
   @RequirePermissions('PLATFORM_ROLE_UPDATE')
   @ApiOperation({
     summary: 'Update a PLATFORM role (name or description)',
-    description: 'Scope is immutable and is never accepted by this endpoint.',
+    description: 'Scope and key are immutable and are never accepted by this endpoint.',
   })
   @ApiParam({ name: 'id', description: 'Role id (serialized BigInt)', example: ROLE_EXAMPLE.id })
   @ApiBody({
@@ -129,7 +131,7 @@ export class RolesController {
     @Param('id') id: string,
     @Body({ schema: updateRoleSchema }) dto: UpdateRoleBody,
   ): Promise<RoleResponse> {
-    return this.rolesService.update(id, dto);
+    return this.rolesService.update('PLATFORM', id, dto);
   }
 
   @Delete(':id')
@@ -144,7 +146,7 @@ export class RolesController {
   @ApiNotFoundResponse({ description: 'PLATFORM role not found' })
   @ApiConflictResponse({ description: 'Role still has platform assignments' })
   remove(@Param('id') id: string): Promise<void> {
-    return this.rolesService.remove(id);
+    return this.rolesService.remove('PLATFORM', id);
   }
 
   @Get(':id/permissions')
@@ -152,12 +154,12 @@ export class RolesController {
   @ApiOperation({ summary: 'Get the permission keys assigned to a PLATFORM role' })
   @ApiParam({ name: 'id', description: 'Role id (serialized BigInt)', example: ROLE_EXAMPLE.id })
   @ApiOkResponse({
-    description: 'Permission keys (sorted)',
-    schema: { type: 'object', properties: { permissionKeys: { type: 'array', items: { type: 'string' } } } },
+    description: 'Sorted permission keys assigned to the role',
+    schema: { type: 'array', items: { type: 'string', example: 'PLATFORM_ROLE_VIEW' } },
   })
   @ApiNotFoundResponse({ description: 'PLATFORM role not found' })
   getRolePermissions(@Param('id') id: string): Promise<string[]> {
-    return this.rolesService.getRolePermissionKeys(id);
+    return this.rolesService.getRolePermissionKeys('PLATFORM', id);
   }
 
   @Put(':id/permissions')
@@ -200,6 +202,6 @@ export class RolesController {
     @Param('id') id: string,
     @Body({ schema: replaceRolePermissionsSchema }) dto: { permissionKeys: string[] },
   ): Promise<ReplaceRolePermissionsResponse> {
-    return this.rolesService.replaceRolePermissions(id, dto.permissionKeys);
+    return this.rolesService.replaceRolePermissions('PLATFORM', id, dto.permissionKeys);
   }
 }

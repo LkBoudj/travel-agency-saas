@@ -29,6 +29,7 @@ const row = {
   passwordHash: 'mock-hashed-password',
   firstName: 'Ada',
   lastName: 'Lovelace',
+  status: 'ACTIVE',
   createdAt: new Date(),
   updatedAt: new Date(),
 };

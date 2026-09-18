@@ -7,5 +7,7 @@ export default defineConfig({
     globals: true,
     root: './',
     include: ['prisma/seed.command.ts'],
+    testTimeout: 60_000,
+    hookTimeout: 60_000,
   },
 });

@@ -41,6 +41,7 @@ export type AppUserMinAggregateOutputType = {
   passwordHash: string | null
   firstName: string | null
   lastName: string | null
+  status: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -52,6 +53,7 @@ export type AppUserMaxAggregateOutputType = {
   passwordHash: string | null
   firstName: string | null
   lastName: string | null
+  status: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -63,6 +65,7 @@ export type AppUserCountAggregateOutputType = {
   passwordHash: number
   firstName: number
   lastName: number
+  status: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -84,6 +87,7 @@ export type AppUserMinAggregateInputType = {
   passwordHash?: true
   firstName?: true
   lastName?: true
+  status?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -95,6 +99,7 @@ export type AppUserMaxAggregateInputType = {
   passwordHash?: true
   firstName?: true
   lastName?: true
+  status?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -106,6 +111,7 @@ export type AppUserCountAggregateInputType = {
   passwordHash?: true
   firstName?: true
   lastName?: true
+  status?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -204,6 +210,7 @@ export type AppUserGroupByOutputType = {
   passwordHash: string
   firstName: string | null
   lastName: string | null
+  status: string
   createdAt: Date
   updatedAt: Date
   _count: AppUserCountAggregateOutputType | null
@@ -238,9 +245,13 @@ export type AppUserWhereInput = {
   passwordHash?: Prisma.StringFilter<"AppUser"> | string
   firstName?: Prisma.StringNullableFilter<"AppUser"> | string | null
   lastName?: Prisma.StringNullableFilter<"AppUser"> | string | null
+  status?: Prisma.StringFilter<"AppUser"> | string
   createdAt?: Prisma.DateTimeFilter<"AppUser"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AppUser"> | Date | string
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentListRelationFilter
+  agencyApplications?: Prisma.AgencyApplicationListRelationFilter
+  agencyApplicationReviews?: Prisma.AgencyApplicationListRelationFilter
+  agencyMemberships?: Prisma.AgencyMembershipListRelationFilter
 }
 
 export type AppUserOrderByWithRelationInput = {
@@ -250,9 +261,13 @@ export type AppUserOrderByWithRelationInput = {
   passwordHash?: Prisma.SortOrder
   firstName?: Prisma.SortOrderInput | Prisma.SortOrder
   lastName?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentOrderByRelationAggregateInput
+  agencyApplications?: Prisma.AgencyApplicationOrderByRelationAggregateInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationOrderByRelationAggregateInput
+  agencyMemberships?: Prisma.AgencyMembershipOrderByRelationAggregateInput
 }
 
 export type AppUserWhereUniqueInput = Prisma.AtLeast<{
@@ -265,9 +280,13 @@ export type AppUserWhereUniqueInput = Prisma.AtLeast<{
   passwordHash?: Prisma.StringFilter<"AppUser"> | string
   firstName?: Prisma.StringNullableFilter<"AppUser"> | string | null
   lastName?: Prisma.StringNullableFilter<"AppUser"> | string | null
+  status?: Prisma.StringFilter<"AppUser"> | string
   createdAt?: Prisma.DateTimeFilter<"AppUser"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AppUser"> | Date | string
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentListRelationFilter
+  agencyApplications?: Prisma.AgencyApplicationListRelationFilter
+  agencyApplicationReviews?: Prisma.AgencyApplicationListRelationFilter
+  agencyMemberships?: Prisma.AgencyMembershipListRelationFilter
 }, "id" | "code" | "email">
 
 export type AppUserOrderByWithAggregationInput = {
@@ -277,6 +296,7 @@ export type AppUserOrderByWithAggregationInput = {
   passwordHash?: Prisma.SortOrder
   firstName?: Prisma.SortOrderInput | Prisma.SortOrder
   lastName?: Prisma.SortOrderInput | Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.AppUserCountOrderByAggregateInput
@@ -296,6 +316,7 @@ export type AppUserScalarWhereWithAggregatesInput = {
   passwordHash?: Prisma.StringWithAggregatesFilter<"AppUser"> | string
   firstName?: Prisma.StringNullableWithAggregatesFilter<"AppUser"> | string | null
   lastName?: Prisma.StringNullableWithAggregatesFilter<"AppUser"> | string | null
+  status?: Prisma.StringWithAggregatesFilter<"AppUser"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AppUser"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AppUser"> | Date | string
 }
@@ -307,9 +328,13 @@ export type AppUserCreateInput = {
   passwordHash: string
   firstName?: string | null
   lastName?: string | null
+  status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutAppUserInput
+  agencyApplications?: Prisma.AgencyApplicationCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationCreateNestedManyWithoutReviewedByInput
+  agencyMemberships?: Prisma.AgencyMembershipCreateNestedManyWithoutAppUserInput
 }
 
 export type AppUserUncheckedCreateInput = {
@@ -319,9 +344,13 @@ export type AppUserUncheckedCreateInput = {
   passwordHash: string
   firstName?: string | null
   lastName?: string | null
+  status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutAppUserInput
+  agencyApplications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutReviewedByInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAppUserInput
 }
 
 export type AppUserUpdateInput = {
@@ -331,9 +360,13 @@ export type AppUserUpdateInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutAppUserNestedInput
+  agencyApplications?: Prisma.AgencyApplicationUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUpdateManyWithoutReviewedByNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUpdateManyWithoutAppUserNestedInput
 }
 
 export type AppUserUncheckedUpdateInput = {
@@ -343,9 +376,13 @@ export type AppUserUncheckedUpdateInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyApplications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutReviewedByNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAppUserNestedInput
 }
 
 export type AppUserCreateManyInput = {
@@ -355,6 +392,7 @@ export type AppUserCreateManyInput = {
   passwordHash: string
   firstName?: string | null
   lastName?: string | null
+  status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -366,6 +404,7 @@ export type AppUserUpdateManyMutationInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -377,6 +416,7 @@ export type AppUserUncheckedUpdateManyInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -388,6 +428,7 @@ export type AppUserCountOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -403,6 +444,7 @@ export type AppUserMaxOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -414,6 +456,7 @@ export type AppUserMinOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   firstName?: Prisma.SortOrder
   lastName?: Prisma.SortOrder
+  status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -425,6 +468,11 @@ export type AppUserSumOrderByAggregateInput = {
 export type AppUserScalarRelationFilter = {
   is?: Prisma.AppUserWhereInput
   isNot?: Prisma.AppUserWhereInput
+}
+
+export type AppUserNullableScalarRelationFilter = {
+  is?: Prisma.AppUserWhereInput | null
+  isNot?: Prisma.AppUserWhereInput | null
 }
 
 export type BigIntFieldUpdateOperationsInput = {
@@ -461,6 +509,50 @@ export type AppUserUpdateOneRequiredWithoutPlatformRoleAssignmentsNestedInput = 
   update?: Prisma.XOR<Prisma.XOR<Prisma.AppUserUpdateToOneWithWhereWithoutPlatformRoleAssignmentsInput, Prisma.AppUserUpdateWithoutPlatformRoleAssignmentsInput>, Prisma.AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput>
 }
 
+export type AppUserCreateNestedOneWithoutAgencyApplicationsInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyApplicationsInput, Prisma.AppUserUncheckedCreateWithoutAgencyApplicationsInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutAgencyApplicationsInput
+  connect?: Prisma.AppUserWhereUniqueInput
+}
+
+export type AppUserCreateNestedOneWithoutAgencyApplicationReviewsInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyApplicationReviewsInput, Prisma.AppUserUncheckedCreateWithoutAgencyApplicationReviewsInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutAgencyApplicationReviewsInput
+  connect?: Prisma.AppUserWhereUniqueInput
+}
+
+export type AppUserUpdateOneRequiredWithoutAgencyApplicationsNestedInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyApplicationsInput, Prisma.AppUserUncheckedCreateWithoutAgencyApplicationsInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutAgencyApplicationsInput
+  upsert?: Prisma.AppUserUpsertWithoutAgencyApplicationsInput
+  connect?: Prisma.AppUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppUserUpdateToOneWithWhereWithoutAgencyApplicationsInput, Prisma.AppUserUpdateWithoutAgencyApplicationsInput>, Prisma.AppUserUncheckedUpdateWithoutAgencyApplicationsInput>
+}
+
+export type AppUserUpdateOneWithoutAgencyApplicationReviewsNestedInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyApplicationReviewsInput, Prisma.AppUserUncheckedCreateWithoutAgencyApplicationReviewsInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutAgencyApplicationReviewsInput
+  upsert?: Prisma.AppUserUpsertWithoutAgencyApplicationReviewsInput
+  disconnect?: Prisma.AppUserWhereInput | boolean
+  delete?: Prisma.AppUserWhereInput | boolean
+  connect?: Prisma.AppUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppUserUpdateToOneWithWhereWithoutAgencyApplicationReviewsInput, Prisma.AppUserUpdateWithoutAgencyApplicationReviewsInput>, Prisma.AppUserUncheckedUpdateWithoutAgencyApplicationReviewsInput>
+}
+
+export type AppUserCreateNestedOneWithoutAgencyMembershipsInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyMembershipsInput, Prisma.AppUserUncheckedCreateWithoutAgencyMembershipsInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutAgencyMembershipsInput
+  connect?: Prisma.AppUserWhereUniqueInput
+}
+
+export type AppUserUpdateOneRequiredWithoutAgencyMembershipsNestedInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyMembershipsInput, Prisma.AppUserUncheckedCreateWithoutAgencyMembershipsInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutAgencyMembershipsInput
+  upsert?: Prisma.AppUserUpsertWithoutAgencyMembershipsInput
+  connect?: Prisma.AppUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppUserUpdateToOneWithWhereWithoutAgencyMembershipsInput, Prisma.AppUserUpdateWithoutAgencyMembershipsInput>, Prisma.AppUserUncheckedUpdateWithoutAgencyMembershipsInput>
+}
+
 export type AppUserCreateWithoutPlatformRoleAssignmentsInput = {
   id?: bigint | number
   code: string
@@ -468,8 +560,12 @@ export type AppUserCreateWithoutPlatformRoleAssignmentsInput = {
   passwordHash: string
   firstName?: string | null
   lastName?: string | null
+  status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  agencyApplications?: Prisma.AgencyApplicationCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationCreateNestedManyWithoutReviewedByInput
+  agencyMemberships?: Prisma.AgencyMembershipCreateNestedManyWithoutAppUserInput
 }
 
 export type AppUserUncheckedCreateWithoutPlatformRoleAssignmentsInput = {
@@ -479,8 +575,12 @@ export type AppUserUncheckedCreateWithoutPlatformRoleAssignmentsInput = {
   passwordHash: string
   firstName?: string | null
   lastName?: string | null
+  status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  agencyApplications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutReviewedByInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAppUserInput
 }
 
 export type AppUserCreateOrConnectWithoutPlatformRoleAssignmentsInput = {
@@ -506,8 +606,12 @@ export type AppUserUpdateWithoutPlatformRoleAssignmentsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agencyApplications?: Prisma.AgencyApplicationUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUpdateManyWithoutReviewedByNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUpdateManyWithoutAppUserNestedInput
 }
 
 export type AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput = {
@@ -517,8 +621,240 @@ export type AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  agencyApplications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutReviewedByNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAppUserNestedInput
+}
+
+export type AppUserCreateWithoutAgencyApplicationsInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationCreateNestedManyWithoutReviewedByInput
+  agencyMemberships?: Prisma.AgencyMembershipCreateNestedManyWithoutAppUserInput
+}
+
+export type AppUserUncheckedCreateWithoutAgencyApplicationsInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutReviewedByInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAppUserInput
+}
+
+export type AppUserCreateOrConnectWithoutAgencyApplicationsInput = {
+  where: Prisma.AppUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyApplicationsInput, Prisma.AppUserUncheckedCreateWithoutAgencyApplicationsInput>
+}
+
+export type AppUserCreateWithoutAgencyApplicationReviewsInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutAppUserInput
+  agencyApplications?: Prisma.AgencyApplicationCreateNestedManyWithoutAppUserInput
+  agencyMemberships?: Prisma.AgencyMembershipCreateNestedManyWithoutAppUserInput
+}
+
+export type AppUserUncheckedCreateWithoutAgencyApplicationReviewsInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutAppUserInput
+  agencyApplications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAppUserInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAppUserInput
+}
+
+export type AppUserCreateOrConnectWithoutAgencyApplicationReviewsInput = {
+  where: Prisma.AppUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyApplicationReviewsInput, Prisma.AppUserUncheckedCreateWithoutAgencyApplicationReviewsInput>
+}
+
+export type AppUserUpsertWithoutAgencyApplicationsInput = {
+  update: Prisma.XOR<Prisma.AppUserUpdateWithoutAgencyApplicationsInput, Prisma.AppUserUncheckedUpdateWithoutAgencyApplicationsInput>
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyApplicationsInput, Prisma.AppUserUncheckedCreateWithoutAgencyApplicationsInput>
+  where?: Prisma.AppUserWhereInput
+}
+
+export type AppUserUpdateToOneWithWhereWithoutAgencyApplicationsInput = {
+  where?: Prisma.AppUserWhereInput
+  data: Prisma.XOR<Prisma.AppUserUpdateWithoutAgencyApplicationsInput, Prisma.AppUserUncheckedUpdateWithoutAgencyApplicationsInput>
+}
+
+export type AppUserUpdateWithoutAgencyApplicationsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUpdateManyWithoutReviewedByNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUpdateManyWithoutAppUserNestedInput
+}
+
+export type AppUserUncheckedUpdateWithoutAgencyApplicationsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutReviewedByNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAppUserNestedInput
+}
+
+export type AppUserUpsertWithoutAgencyApplicationReviewsInput = {
+  update: Prisma.XOR<Prisma.AppUserUpdateWithoutAgencyApplicationReviewsInput, Prisma.AppUserUncheckedUpdateWithoutAgencyApplicationReviewsInput>
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyApplicationReviewsInput, Prisma.AppUserUncheckedCreateWithoutAgencyApplicationReviewsInput>
+  where?: Prisma.AppUserWhereInput
+}
+
+export type AppUserUpdateToOneWithWhereWithoutAgencyApplicationReviewsInput = {
+  where?: Prisma.AppUserWhereInput
+  data: Prisma.XOR<Prisma.AppUserUpdateWithoutAgencyApplicationReviewsInput, Prisma.AppUserUncheckedUpdateWithoutAgencyApplicationReviewsInput>
+}
+
+export type AppUserUpdateWithoutAgencyApplicationReviewsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutAppUserNestedInput
+  agencyApplications?: Prisma.AgencyApplicationUpdateManyWithoutAppUserNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUpdateManyWithoutAppUserNestedInput
+}
+
+export type AppUserUncheckedUpdateWithoutAgencyApplicationReviewsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyApplications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAppUserNestedInput
+}
+
+export type AppUserCreateWithoutAgencyMembershipsInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutAppUserInput
+  agencyApplications?: Prisma.AgencyApplicationCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationCreateNestedManyWithoutReviewedByInput
+}
+
+export type AppUserUncheckedCreateWithoutAgencyMembershipsInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutAppUserInput
+  agencyApplications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutReviewedByInput
+}
+
+export type AppUserCreateOrConnectWithoutAgencyMembershipsInput = {
+  where: Prisma.AppUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyMembershipsInput, Prisma.AppUserUncheckedCreateWithoutAgencyMembershipsInput>
+}
+
+export type AppUserUpsertWithoutAgencyMembershipsInput = {
+  update: Prisma.XOR<Prisma.AppUserUpdateWithoutAgencyMembershipsInput, Prisma.AppUserUncheckedUpdateWithoutAgencyMembershipsInput>
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutAgencyMembershipsInput, Prisma.AppUserUncheckedCreateWithoutAgencyMembershipsInput>
+  where?: Prisma.AppUserWhereInput
+}
+
+export type AppUserUpdateToOneWithWhereWithoutAgencyMembershipsInput = {
+  where?: Prisma.AppUserWhereInput
+  data: Prisma.XOR<Prisma.AppUserUpdateWithoutAgencyMembershipsInput, Prisma.AppUserUncheckedUpdateWithoutAgencyMembershipsInput>
+}
+
+export type AppUserUpdateWithoutAgencyMembershipsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutAppUserNestedInput
+  agencyApplications?: Prisma.AgencyApplicationUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUpdateManyWithoutReviewedByNestedInput
+}
+
+export type AppUserUncheckedUpdateWithoutAgencyMembershipsInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyApplications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutReviewedByNestedInput
 }
 
 
@@ -528,10 +864,16 @@ export type AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput = {
 
 export type AppUserCountOutputType = {
   platformRoleAssignments: number
+  agencyApplications: number
+  agencyApplicationReviews: number
+  agencyMemberships: number
 }
 
 export type AppUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   platformRoleAssignments?: boolean | AppUserCountOutputTypeCountPlatformRoleAssignmentsArgs
+  agencyApplications?: boolean | AppUserCountOutputTypeCountAgencyApplicationsArgs
+  agencyApplicationReviews?: boolean | AppUserCountOutputTypeCountAgencyApplicationReviewsArgs
+  agencyMemberships?: boolean | AppUserCountOutputTypeCountAgencyMembershipsArgs
 }
 
 /**
@@ -551,6 +893,27 @@ export type AppUserCountOutputTypeCountPlatformRoleAssignmentsArgs<ExtArgs exten
   where?: Prisma.PlatformRoleAssignmentWhereInput
 }
 
+/**
+ * AppUserCountOutputType without action
+ */
+export type AppUserCountOutputTypeCountAgencyApplicationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgencyApplicationWhereInput
+}
+
+/**
+ * AppUserCountOutputType without action
+ */
+export type AppUserCountOutputTypeCountAgencyApplicationReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgencyApplicationWhereInput
+}
+
+/**
+ * AppUserCountOutputType without action
+ */
+export type AppUserCountOutputTypeCountAgencyMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgencyMembershipWhereInput
+}
+
 
 export type AppUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -559,9 +922,13 @@ export type AppUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   passwordHash?: boolean
   firstName?: boolean
   lastName?: boolean
+  status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   platformRoleAssignments?: boolean | Prisma.AppUser$platformRoleAssignmentsArgs<ExtArgs>
+  agencyApplications?: boolean | Prisma.AppUser$agencyApplicationsArgs<ExtArgs>
+  agencyApplicationReviews?: boolean | Prisma.AppUser$agencyApplicationReviewsArgs<ExtArgs>
+  agencyMemberships?: boolean | Prisma.AppUser$agencyMembershipsArgs<ExtArgs>
   _count?: boolean | Prisma.AppUserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["appUser"]>
 
@@ -572,6 +939,7 @@ export type AppUserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exten
   passwordHash?: boolean
   firstName?: boolean
   lastName?: boolean
+  status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["appUser"]>
@@ -583,6 +951,7 @@ export type AppUserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exten
   passwordHash?: boolean
   firstName?: boolean
   lastName?: boolean
+  status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }, ExtArgs["result"]["appUser"]>
@@ -594,13 +963,17 @@ export type AppUserSelectScalar = {
   passwordHash?: boolean
   firstName?: boolean
   lastName?: boolean
+  status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AppUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "email" | "passwordHash" | "firstName" | "lastName" | "createdAt" | "updatedAt", ExtArgs["result"]["appUser"]>
+export type AppUserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "email" | "passwordHash" | "firstName" | "lastName" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["appUser"]>
 export type AppUserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   platformRoleAssignments?: boolean | Prisma.AppUser$platformRoleAssignmentsArgs<ExtArgs>
+  agencyApplications?: boolean | Prisma.AppUser$agencyApplicationsArgs<ExtArgs>
+  agencyApplicationReviews?: boolean | Prisma.AppUser$agencyApplicationReviewsArgs<ExtArgs>
+  agencyMemberships?: boolean | Prisma.AppUser$agencyMembershipsArgs<ExtArgs>
   _count?: boolean | Prisma.AppUserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AppUserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -610,6 +983,9 @@ export type $AppUserPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "AppUser"
   objects: {
     platformRoleAssignments: Prisma.$PlatformRoleAssignmentPayload<ExtArgs>[]
+    agencyApplications: Prisma.$AgencyApplicationPayload<ExtArgs>[]
+    agencyApplicationReviews: Prisma.$AgencyApplicationPayload<ExtArgs>[]
+    agencyMemberships: Prisma.$AgencyMembershipPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
@@ -618,6 +994,7 @@ export type $AppUserPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     passwordHash: string
     firstName: string | null
     lastName: string | null
+    status: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["appUser"]>
@@ -1015,6 +1392,9 @@ readonly fields: AppUserFieldRefs;
 export interface Prisma__AppUserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   platformRoleAssignments<T extends Prisma.AppUser$platformRoleAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppUser$platformRoleAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PlatformRoleAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agencyApplications<T extends Prisma.AppUser$agencyApplicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppUser$agencyApplicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgencyApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agencyApplicationReviews<T extends Prisma.AppUser$agencyApplicationReviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppUser$agencyApplicationReviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgencyApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  agencyMemberships<T extends Prisma.AppUser$agencyMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppUser$agencyMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgencyMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1050,6 +1430,7 @@ export interface AppUserFieldRefs {
   readonly passwordHash: Prisma.FieldRef<"AppUser", 'String'>
   readonly firstName: Prisma.FieldRef<"AppUser", 'String'>
   readonly lastName: Prisma.FieldRef<"AppUser", 'String'>
+  readonly status: Prisma.FieldRef<"AppUser", 'String'>
   readonly createdAt: Prisma.FieldRef<"AppUser", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"AppUser", 'DateTime'>
 }
@@ -1466,6 +1847,78 @@ export type AppUser$platformRoleAssignmentsArgs<ExtArgs extends runtime.Types.Ex
   take?: number
   skip?: number
   distinct?: Prisma.PlatformRoleAssignmentScalarFieldEnum | Prisma.PlatformRoleAssignmentScalarFieldEnum[]
+}
+
+/**
+ * AppUser.agencyApplications
+ */
+export type AppUser$agencyApplicationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgencyApplication
+   */
+  select?: Prisma.AgencyApplicationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgencyApplication
+   */
+  omit?: Prisma.AgencyApplicationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgencyApplicationInclude<ExtArgs> | null
+  where?: Prisma.AgencyApplicationWhereInput
+  orderBy?: Prisma.AgencyApplicationOrderByWithRelationInput | Prisma.AgencyApplicationOrderByWithRelationInput[]
+  cursor?: Prisma.AgencyApplicationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgencyApplicationScalarFieldEnum | Prisma.AgencyApplicationScalarFieldEnum[]
+}
+
+/**
+ * AppUser.agencyApplicationReviews
+ */
+export type AppUser$agencyApplicationReviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgencyApplication
+   */
+  select?: Prisma.AgencyApplicationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgencyApplication
+   */
+  omit?: Prisma.AgencyApplicationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgencyApplicationInclude<ExtArgs> | null
+  where?: Prisma.AgencyApplicationWhereInput
+  orderBy?: Prisma.AgencyApplicationOrderByWithRelationInput | Prisma.AgencyApplicationOrderByWithRelationInput[]
+  cursor?: Prisma.AgencyApplicationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgencyApplicationScalarFieldEnum | Prisma.AgencyApplicationScalarFieldEnum[]
+}
+
+/**
+ * AppUser.agencyMemberships
+ */
+export type AppUser$agencyMembershipsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgencyMembership
+   */
+  select?: Prisma.AgencyMembershipSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgencyMembership
+   */
+  omit?: Prisma.AgencyMembershipOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgencyMembershipInclude<ExtArgs> | null
+  where?: Prisma.AgencyMembershipWhereInput
+  orderBy?: Prisma.AgencyMembershipOrderByWithRelationInput | Prisma.AgencyMembershipOrderByWithRelationInput[]
+  cursor?: Prisma.AgencyMembershipWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgencyMembershipScalarFieldEnum | Prisma.AgencyMembershipScalarFieldEnum[]
 }
 
 /**

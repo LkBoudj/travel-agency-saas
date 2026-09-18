@@ -5,21 +5,30 @@ export type PermissionResource =
   | "USER_ROLE"
 
 /**
- * Platform role as returned by the RBAC API. `id` is a serialized BigInt and
- * must be treated as an opaque string; the backend owns the role scope.
+ * Role scope owned by the backend. `PLATFORM` roles govern platform users;
+ * `AGENCY` roles govern agency users. The client never sends a scope on role
+ * writes: it selects the correct endpoint instead.
+ */
+export type RoleScope = "PLATFORM" | "AGENCY"
+
+/**
+ * Role as returned by the RBAC API. `id` is a serialized BigInt and must be
+ * treated as an opaque string. `key` is the immutable technical identifier;
+ * `name` is the human-readable display name.
  */
 export type PlatformRole = {
   id: string
   name: string
-  scope: string
+  key: string
+  scope: RoleScope
   description: string | null
   createdAt: string
   updatedAt: string
 }
 
 /**
- * Code-owned platform permission. `key` is the only identifier the client may
- * send back; database ids are never exposed through this surface.
+ * Code-owned permission. `key` is the only identifier the client may send
+ * back; database ids are never exposed through this surface.
  */
 export type PlatformPermission = {
   key: string

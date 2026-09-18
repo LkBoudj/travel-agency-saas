@@ -8,11 +8,23 @@ export const descriptionSchema = z
   .max(5000)
   .nullish();
 
+export const roleKeySchema = z
+  .string()
+  .trim()
+  .min(1, { message: 'Role key is required' })
+  .max(64, { message: 'Role key must be 64 characters or fewer' })
+  .regex(/^[A-Z][A-Z0-9_]*$/, {
+    message: 'Role key must be uppercase letters, digits and underscores, starting with a letter',
+  });
+
 /**
- * Scope is intentionally absent: it is owned by the backend (currently always
- * PLATFORM) and can never be chosen, or changed, by a request.
+ * Scope is intentionally absent: it is owned by the backend (derived from the
+ * endpoint) and can never be chosen, or changed, by a request. `key` is
+ * required on creation and immutable afterwards (it is absent from
+ * `updateRoleSchema`).
  */
 export const createRoleSchema = z.object({
+  key: roleKeySchema,
   name: z.string().trim().min(1).max(100),
   description: descriptionSchema,
 });
