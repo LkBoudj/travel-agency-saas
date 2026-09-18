@@ -1,0 +1,1 @@
+export const AUTH_COOKIE_NAME = 'travel_access_token';

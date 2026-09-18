@@ -12,26 +12,27 @@ travel-saas/
 ├── AGENTS.md               # This file — how to work (repo-wide base)
 ├── opencode.json           # Repo-wide OpenCode config + instructions
 ├── .opencode/skills/       # Repo-wide skills (discovered from anywhere)
+├── backend/                # NestJS API (auth + platform RBAC, Group 1) — exists
 └── frontend/
     ├── dashboard/          # Agency Dashboard (Vite + React SPA) — exists
-    └── storefront/         # Public storefront (Next 16 App Router) — exists
+    ├── storefront/         # Public storefront (Next 16 App Router) — exists
+    └── admin/              # Platform Super Dashboard (Vite + React SPA) — exists
     # marketplace/          # Public marketplace — does NOT exist yet
-    # admin/                # Platform Admin — does NOT exist yet
-# backend/                  # Does NOT exist yet
 ```
 
-`backend/`, `admin/`, and `marketplace/` do **not** exist. Do not create them, reference their files, or fabricate their behavior unless the user explicitly requests the work.
+`marketplace/` does **not** exist. Do not create it, reference its files, or fabricate its behavior unless the user explicitly requests the work. `backend/` is scaffolded (NestJS 12) and Group 1 (authentication + platform RBAC) is implemented; backend features beyond Group 1 are not implemented.
 
 Work only inside the app directory relevant to the task unless the user explicitly requests changes elsewhere.
 
 ## 2. Product Architecture (in brief)
 
-A multi-tenant Travel SaaS platform. Two apps exist:
+A multi-tenant Travel SaaS platform. These frontend apps exist:
 
 - **Dashboard** — per-agency management (auth, trips, bookings, customers, agency profile, website/theme, team, settings).
 - **Storefront** — one Next.js app serving storefronts for **many** agencies. `agency.themeId` selects a theme from a registry; themes are server components rendered with props only. The platform owns tenant resolution, routing (`/[locale]`), SEO, and preview mode (always noindex). See `frontend/storefront/AGENTS.md`.
+- **Admin** — Platform Super Dashboard (Vite + React SPA) for platform operators: authenticated shell + Platform Roles & Permissions + Platform Users management (list/create/edit, platform-role assignment, suspend/reactivate) consuming the real backend RBAC and Platform Users APIs.
 
-The backend is a separate system not present in this repo. Frontend code must **not** invent backend behavior: no fake APIs, no fake auth, no simulated multi-tenancy enforcement in UI logic. Build clean integration boundaries only.
+The backend is a separate system built in this repo under `backend/` (NestJS 12 + Prisma + Neon, REST `/v1`, Swagger at `/docs`). Group 1 (authentication + platform RBAC) and the Platform Users slice (CRUD + platform-role assignment + ACTIVE/SUSPENDED status) are implemented; Agency and agency-side user/membership management are not. Frontend code must **not** invent backend behavior: no fake APIs, no fake auth, no simulated multi-tenancy enforcement in UI logic. Build clean integration boundaries only.
 
 ## 3. Core Invariants
 

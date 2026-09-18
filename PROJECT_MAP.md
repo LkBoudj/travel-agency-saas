@@ -11,11 +11,17 @@ anonymous travelers, platform operators.
 - Owner: user + owner membership; full agency control.
 - Staff: user + staff membership; agency data, owner-gated ops server-side.
 - Traveler: no account; reads Marketplace + Storefronts via public APIs only.
-- Platform operator: future Admin app.
+- Platform operator: Platform Admin app (frontend/admin) — shell + RBAC UI implemented.
 
 ## [SYSTEM_BOUNDARIES]
-- backend/        FUTURE: single NestJS + TypeScript modular monolith; Prisma →
-                  PostgreSQL (hosted via Neon); REST under /v1. Does NOT exist yet.
+- backend/        EXISTS. NestJS 12 runtime application scaffolded and running
+                  locally: single NestJS + TypeScript modular monolith; Prisma 7 →
+                  PostgreSQL (hosted via Neon); REST under /v1; Swagger/OpenAPI
+                  served at /docs + /docs-json. Group 1 (authentication +
+                  platform RBAC) and the Platform Users slice (CRUD +
+                  platform-role assignment + ACTIVE/SUSPENDED status) implemented
+                  — see [PLATFORM_ADMIN]. Agency model and agency-side
+                  user/membership management are NOT implemented.
 - frontend/dashboard/    React SPA — agency management only; does NOT render the
                          public storefront.
 - frontend/storefront/   Next.js 16.3.5 App Router PUBLIC STOREFRONT — one app,
@@ -23,7 +29,9 @@ anonymous travelers, platform operators.
 - frontend/marketplace/  PUBLIC web = Marketplace + Trip Details + Agency
                          Profiles (future; will reuse the storefront renderer
                          for `{slug}.platform.com`). Does NOT exist yet.
-- frontend/admin/        future, undrafted (pattern: Vite+React+shadcn).
+- frontend/admin/        Platform Super Dashboard — authenticated shell +
+                         Roles & Permissions (platform RBAC UI) + Platform Users
+                         management. Overview is an honest placeholder. Exists.
 
 ## [TECH_STACK]
 - dashboard: React19+TS+Vite+RR7+Tailwind4+shadcn(@base-ui)+TSQuery/Table+
@@ -33,10 +41,14 @@ anonymous travelers, platform operators.
               tenant resolution, locale, SEO, preview, not-found; themes are
               server components fed via props only.
 - marketplace: future, undrafted.
-- admin: undecided; lean same-pattern as dashboard.
-- backend: NestJS (TypeScript) modular monolith · Prisma · PostgreSQL · Neon —
-           AGREED architecture, NOT implemented; exact versions pinned when the
-           backend is scaffolded (do not fabricate them today).
+- admin: Vite+React19+TS+RR7+Tailwind4+shadcn(base-nova/@base-ui)+TSQuery+
+         RHF+Zod3+Lucide — CONFIRMED. Consumes the backend RBAC API with cookie
+         sessions.
+- backend: NestJS 12 + TypeScript (ESM, strict) modular monolith · REST /v1 ·
+           Prisma 7 + `@prisma/adapter-neon` · PostgreSQL on Neon · Zod
+           validation · Passport JWT in HttpOnly cookie · CASL permission guard ·
+           Swagger/OpenAPI — IMPLEMENTED (Group 1). Source of truth:
+           `backend/package.json` + `backend/package-lock.json`.
 
 ## [DOMAIN_MODEL]
 Platform-owned: User, Theme{id,nameKey,version,preview,settingsSchema},
@@ -116,6 +128,33 @@ self-declared and clearly not verified. Algeria legal compliance (Loi
 18-05 Art. 8 & 11 tourist-activity licence requirements) is a FUTURE
 backend-enforced gate, not a Dashboard claim.
 
+## [PLATFORM_ADMIN]
+IMPLEMENTED in `frontend/admin/`: authenticated Platform Super Dashboard shell
+(cookie-session login, `RequireAuth`/`GuestOnly` guards, sidebar shell, Overview
+placeholder) plus the Roles & Permissions and Platform Users features. The RBAC UI
+consumes the backend RBAC API only (`GET/POST /v1/roles`, `GET/PATCH/DELETE
+/v1/roles/:id`, `GET /v1/roles/available-permissions`, `GET/PUT
+/v1/roles/:id/permissions`) with `credentials: "include"`; it never decodes the
+JWT, never stores tokens in web storage, never hardcodes a second permission
+catalog, and exposes no Permission CRUD. `scope` is server-owned and never sent
+by the client. Permission grouping and labels derive from backend
+`resource`/`name`; duplicate-name (409), assigned-role delete (409) and rejected
+permission keys (400) surface as explicit messages, and 401 re-validates the
+session so the guard redirects. Pure RBAC helpers are tested with Node's
+built-in `node --test` (no test runner dependency). The Platform Users feature
+is now IMPLEMENTED: list/search, create, edit profile, platform-role assignment
+and ACTIVE/SUSPENDED status management, consuming `/v1/platform-users` (+ the
+existing `/v1/roles` catalog) with `credentials: "include"`; role `key`s come
+from the backend, no second catalog, no token decoding, no web-storage tokens.
+Suspended accounts (and their previously issued JWTs) are rejected by the
+backend; `409 EMAIL_ALREADY_REGISTERED`, unknown/agency role keys (400) and
+self-suspension (400) surface as explicit messages. Platform Users is NOT
+agency-side user/membership management (Group 2+). Group 1 closure was verified
+end-to-end against the live backend (login → HttpOnly cookie → `/me` →
+PLATFORM_ADMIN list → create/edit role → assign/remove permissions → reload
+persistence → assigned-role delete conflict → delete temp role → logout →
+protected-route redirect), with temporary verification data removed.
+
 ## [THEME_SYSTEM]
 Platform-owned presentation system. Explorer (`explorer`) is the current first
 Theme; Luxe / Minimal are future examples only — not implemented.
@@ -164,8 +203,8 @@ a move/copy of the same isolated boundaries.
 ## [ORPHANS & PENDING]
 Open questions: Q3 currency model · Q4 booking/payment sequencing · Q5 team
 roles · Q6 marketplace-visibility toggle · Q7 app hosting + object-storage
-provider · Q8 email provider · Q9 OAuth timing · Admin app + features ·
-contract packaging mechanism · audit/monitoring vendor.
+provider · Q8 email provider · Q9 OAuth timing · contract packaging mechanism ·
+audit/monitoring vendor.
 Resolved (no longer open): backend framework = NestJS · ORM = Prisma · DB =
 PostgreSQL · managed Postgres = Neon (see [DECISIONS]). Preview strategy = one
 shared public/preview renderer (D13); preview plumbing, `/[locale]` Arabic

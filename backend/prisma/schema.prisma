@@ -1,0 +1,200 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model AppUser {
+  id           BigInt   @id @default(autoincrement())
+  code         String   @unique @db.VarChar(24)
+  email        String   @unique @db.Citext
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  firstName    String?  @map("first_name") @db.VarChar(100)
+  lastName     String?  @map("last_name") @db.VarChar(100)
+  // Account lifecycle status. A database CHECK constraint
+  // (`app_user_status_check`) restricts the value to ACTIVE | SUSPENDED.
+  // ACTIVE allows authentication; SUSPENDED denies it. This is an AppUser
+  // identity status (Platform + future Agency contexts), not authorization state.
+  status       String   @default("ACTIVE") @map("status") @db.VarChar(16)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  platformRoleAssignments  PlatformRoleAssignment[]
+  agencyApplications       AgencyApplication[]
+  agencyApplicationReviews AgencyApplication[]      @relation("AgencyApplicationReviews")
+  agencyMemberships        AgencyMembership[]
+
+  @@map("app_user")
+}
+
+model Role {
+  id          BigInt   @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  // Stable, human-meaningful technical identifier (uppercase snake case). Set on
+  // creation and immutable afterwards. Uniqueness is enforced by the partial
+  // unique indexes below (not expressible in Prisma PSL), mirroring `name`:
+  //   role_global_key_key  UNIQUE (scope, key) WHERE agency_id IS NULL
+  //   role_agency_key_key  UNIQUE (agency_id, key) WHERE agency_id IS NOT NULL
+  key         String   @db.VarChar(64)
+  scope       String   @db.VarChar(16)
+  // Ownership discriminator for AGENCY roles. Null means the role is global
+  // (PLATFORM roles, or Platform-Admin-managed global AGENCY roles); a value
+  // means the role is a custom AGENCY role owned by that agency. A DB CHECK
+  // (`role_agency_scope_check`) forbids a non-null agency_id on PLATFORM roles.
+  agencyId    BigInt?  @map("agency_id")
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  permissions           RolePermission[]
+  platformAssignments   PlatformRoleAssignment[]
+  agencyRoleAssignments AgencyRoleAssignment[]
+
+  // Name uniqueness is enforced by two partial unique indexes created in the
+  // `role_agency_ownership` migration (not expressible in Prisma PSL):
+  //   role_global_name_key  UNIQUE (scope, name) WHERE agency_id IS NULL
+  //   role_agency_name_key  UNIQUE (agency_id, name) WHERE agency_id IS NOT NULL
+  // The former `@@unique([scope, name])` was dropped because it also constrained
+  // custom roles, forbidding the same role name in two different agencies.
+  @@index([agencyId])
+  @@map("role")
+}
+
+model Permission {
+  id          BigInt   @id @default(autoincrement())
+  key         String   @unique @db.VarChar(64)
+  name        String   @db.VarChar(100)
+  description String?  @db.Text
+  scope       String   @db.VarChar(16)
+  resource    String   @db.VarChar(64)
+  action      String   @db.VarChar(32)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  roles RolePermission[]
+
+  @@index([scope])
+  @@map("permission")
+}
+
+model RolePermission {
+  roleId       BigInt @map("role_id")
+  permissionId BigInt @map("permission_id")
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+  @@index([permissionId])
+  @@map("role_permission")
+}
+
+model PlatformRoleAssignment {
+  id        BigInt   @id @default(autoincrement())
+  roleId    BigInt   @map("role_id")
+  appUserId BigInt   @map("app_user_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  role    Role    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  appUser AppUser @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+
+  @@unique([appUserId, roleId])
+  @@index([roleId])
+  @@map("platform_role_assignment")
+}
+
+model Agency {
+  id          BigInt   @id @default(autoincrement())
+  code        String   @unique @db.VarChar(24)
+  name        String   @db.VarChar(200)
+  // Agency lifecycle status owned by the platform. The database CHECK
+  // constraint (`agency_status_check`) restricts the value to ACTIVE | SUSPENDED.
+  // SUSPENDED is a platform-side operation state, not an identity status.
+  status      String   @default("ACTIVE") @map("status") @db.VarChar(16)
+  // Optional contact/description fields captured with the agency.
+  country     String?  @db.VarChar(100)
+  website     String?  @db.VarChar(255)
+  description String?  @db.Text
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  members      AgencyMembership[]
+  applications AgencyApplication[]
+
+  @@map("agency")
+}
+
+model AgencyApplication {
+  id                  BigInt    @id @default(autoincrement())
+  // Applicant identity is owned by the backend (JWT); it is never accepted
+  // from a request body.
+  appUserId           BigInt    @map("app_user_id")
+  agencyName          String    @map("agency_name") @db.VarChar(200)
+  country             String?   @db.VarChar(100)
+  website             String?   @db.VarChar(255)
+  description         String?   @db.Text
+  // Application lifecycle. The database CHECK constraint
+  // (`agency_application_status_check`) restricts the value to
+  // PENDING | NEEDS_INFO | APPROVED | REJECTED | WITHDRAWN. An application is a
+  // permanent audit record: it is never converted into an Agency and never
+  // deleted; approval only links it to the created agency.
+  status              String    @default("PENDING") @map("status") @db.VarChar(16)
+  // Free-form platform review note (needs-info request, rejection reason).
+  reviewNote          String?   @map("review_note") @db.Text
+  // Review metadata, set by the platform action that changes the status.
+  reviewedAt          DateTime? @map("reviewed_at") @db.Timestamptz()
+  reviewedByAppUserId BigInt?   @map("reviewed_by_app_user_id")
+  // Set on approval: the agency created from this application. One application
+  // can produce at most one agency (enforced by the partial unique index
+  // `agency_application_created_agency_id_key` WHERE agency_id IS NOT NULL,
+  // not expressible in Prisma PSL).
+  agencyId            BigInt?   @map("agency_id")
+  approvedAt          DateTime? @map("approved_at") @db.Timestamptz()
+  createdAt           DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt           DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  appUser    AppUser  @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+  reviewedBy AppUser? @relation("AgencyApplicationReviews", fields: [reviewedByAppUserId], references: [id])
+  agency     Agency?  @relation(fields: [agencyId], references: [id])
+
+  @@index([appUserId])
+  @@index([status])
+  @@index([agencyId])
+  @@map("agency_application")
+}
+
+model AgencyMembership {
+  id        BigInt   @id @default(autoincrement())
+  agencyId  BigInt   @map("agency_id")
+  appUserId BigInt   @map("app_user_id")
+  // Membership lifecycle. The database CHECK constraint
+  // (`agency_membership_status_check`) restricts the value to ACTIVE | SUSPENDED.
+  // It is a membership status inside one agency, not the AppUser identity
+  // status (`app_user.status`), which stays authoritative for authentication.
+  status    String   @default("ACTIVE") @map("status") @db.VarChar(16)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  agency                Agency                 @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  appUser               AppUser                @relation(fields: [appUserId], references: [id], onDelete: Cascade)
+  agencyRoleAssignments AgencyRoleAssignment[]
+
+  @@unique([agencyId, appUserId])
+  @@index([appUserId])
+  @@map("agency_membership")
+}
+
+model AgencyRoleAssignment {
+  id           BigInt @id @default(autoincrement())
+  membershipId BigInt @map("membership_id")
+  roleId       BigInt @map("role_id")
+
+  membership AgencyMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
+  role       Role             @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([membershipId, roleId])
+  @@index([roleId])
+  @@map("agency_role_assignment")
+}
