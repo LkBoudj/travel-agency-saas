@@ -12,6 +12,7 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetBody,
   SheetFooter,
   SheetHeader,
   SheetTitle,
@@ -124,7 +125,7 @@ function RoleEditor({
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <SheetBody>
         <RoleChecklist
           roles={roles}
           selectedKeys={selectedKeys}
@@ -137,9 +138,9 @@ function RoleEditor({
             )
           }}
         />
-      </div>
+      </SheetBody>
 
-      <SheetFooter className="border-t">
+      <SheetFooter>
         {errorMessage ? (
           <p role="alert" className="text-sm text-destructive">
             {errorMessage}
@@ -192,7 +193,7 @@ export function ManageRolesSheet({
         side="right"
         className="w-full gap-0 p-0 data-[side=right]:sm:max-w-md"
       >
-        <SheetHeader className="border-b">
+        <SheetHeader>
           <SheetTitle>Manage roles</SheetTitle>
           <SheetDescription>
             Choose the platform roles assigned to{" "}
@@ -204,13 +205,13 @@ export function ManageRolesSheet({
         </SheetHeader>
 
         {rolesQuery.isPending ? (
-          <div className="flex-1 overflow-y-auto px-4 py-4">
+          <SheetBody>
             <RolesSkeleton />
-          </div>
+          </SheetBody>
         ) : null}
 
         {!rolesQuery.isPending && rolesQuery.isError ? (
-          <div className="flex flex-1 flex-col items-start gap-3 overflow-y-auto px-4 py-4">
+          <SheetBody className="flex flex-col items-start gap-3">
             <p className="flex items-center gap-2 text-sm text-destructive">
               <CircleAlertIcon className="size-4" />
               Could not load the role catalog.
@@ -223,15 +224,15 @@ export function ManageRolesSheet({
               <RotateCcwIcon />
               Retry
             </Button>
-          </div>
+          </SheetBody>
         ) : null}
 
         {!rolesQuery.isPending && !rolesQuery.isError && roles.length === 0 ? (
-          <div className="flex-1 overflow-y-auto px-4 py-4">
+          <SheetBody>
             <p className="text-sm text-muted-foreground">
               No platform roles are available.
             </p>
-          </div>
+          </SheetBody>
         ) : null}
 
         {!rolesQuery.isPending && !rolesQuery.isError && roles.length > 0 ? (

@@ -42,6 +42,7 @@ export type AgencyMembershipMinAggregateOutputType = {
   id: bigint | null
   agencyId: bigint | null
   appUserId: bigint | null
+  membershipType: string | null
   status: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -51,6 +52,7 @@ export type AgencyMembershipMaxAggregateOutputType = {
   id: bigint | null
   agencyId: bigint | null
   appUserId: bigint | null
+  membershipType: string | null
   status: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -60,6 +62,7 @@ export type AgencyMembershipCountAggregateOutputType = {
   id: number
   agencyId: number
   appUserId: number
+  membershipType: number
   status: number
   createdAt: number
   updatedAt: number
@@ -83,6 +86,7 @@ export type AgencyMembershipMinAggregateInputType = {
   id?: true
   agencyId?: true
   appUserId?: true
+  membershipType?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -92,6 +96,7 @@ export type AgencyMembershipMaxAggregateInputType = {
   id?: true
   agencyId?: true
   appUserId?: true
+  membershipType?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -101,6 +106,7 @@ export type AgencyMembershipCountAggregateInputType = {
   id?: true
   agencyId?: true
   appUserId?: true
+  membershipType?: true
   status?: true
   createdAt?: true
   updatedAt?: true
@@ -197,6 +203,7 @@ export type AgencyMembershipGroupByOutputType = {
   id: bigint
   agencyId: bigint
   appUserId: bigint
+  membershipType: string
   status: string
   createdAt: Date
   updatedAt: Date
@@ -229,6 +236,7 @@ export type AgencyMembershipWhereInput = {
   id?: Prisma.BigIntFilter<"AgencyMembership"> | bigint | number
   agencyId?: Prisma.BigIntFilter<"AgencyMembership"> | bigint | number
   appUserId?: Prisma.BigIntFilter<"AgencyMembership"> | bigint | number
+  membershipType?: Prisma.StringFilter<"AgencyMembership"> | string
   status?: Prisma.StringFilter<"AgencyMembership"> | string
   createdAt?: Prisma.DateTimeFilter<"AgencyMembership"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AgencyMembership"> | Date | string
@@ -241,6 +249,7 @@ export type AgencyMembershipOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   appUserId?: Prisma.SortOrder
+  membershipType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -257,6 +266,7 @@ export type AgencyMembershipWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.AgencyMembershipWhereInput | Prisma.AgencyMembershipWhereInput[]
   agencyId?: Prisma.BigIntFilter<"AgencyMembership"> | bigint | number
   appUserId?: Prisma.BigIntFilter<"AgencyMembership"> | bigint | number
+  membershipType?: Prisma.StringFilter<"AgencyMembership"> | string
   status?: Prisma.StringFilter<"AgencyMembership"> | string
   createdAt?: Prisma.DateTimeFilter<"AgencyMembership"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AgencyMembership"> | Date | string
@@ -269,6 +279,7 @@ export type AgencyMembershipOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   appUserId?: Prisma.SortOrder
+  membershipType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -286,6 +297,7 @@ export type AgencyMembershipScalarWhereWithAggregatesInput = {
   id?: Prisma.BigIntWithAggregatesFilter<"AgencyMembership"> | bigint | number
   agencyId?: Prisma.BigIntWithAggregatesFilter<"AgencyMembership"> | bigint | number
   appUserId?: Prisma.BigIntWithAggregatesFilter<"AgencyMembership"> | bigint | number
+  membershipType?: Prisma.StringWithAggregatesFilter<"AgencyMembership"> | string
   status?: Prisma.StringWithAggregatesFilter<"AgencyMembership"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AgencyMembership"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AgencyMembership"> | Date | string
@@ -293,6 +305,7 @@ export type AgencyMembershipScalarWhereWithAggregatesInput = {
 
 export type AgencyMembershipCreateInput = {
   id?: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -305,6 +318,7 @@ export type AgencyMembershipUncheckedCreateInput = {
   id?: bigint | number
   agencyId: bigint | number
   appUserId: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -313,6 +327,7 @@ export type AgencyMembershipUncheckedCreateInput = {
 
 export type AgencyMembershipUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -325,6 +340,7 @@ export type AgencyMembershipUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   agencyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   appUserId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -335,6 +351,7 @@ export type AgencyMembershipCreateManyInput = {
   id?: bigint | number
   agencyId: bigint | number
   appUserId: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -342,6 +359,7 @@ export type AgencyMembershipCreateManyInput = {
 
 export type AgencyMembershipUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -351,6 +369,7 @@ export type AgencyMembershipUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   agencyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   appUserId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -375,6 +394,7 @@ export type AgencyMembershipCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   appUserId?: Prisma.SortOrder
+  membershipType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -390,6 +410,7 @@ export type AgencyMembershipMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   appUserId?: Prisma.SortOrder
+  membershipType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -399,6 +420,7 @@ export type AgencyMembershipMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   appUserId?: Prisma.SortOrder
+  membershipType?: Prisma.SortOrder
   status?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -515,6 +537,7 @@ export type AgencyMembershipUpdateOneRequiredWithoutAgencyRoleAssignmentsNestedI
 
 export type AgencyMembershipCreateWithoutAppUserInput = {
   id?: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -525,6 +548,7 @@ export type AgencyMembershipCreateWithoutAppUserInput = {
 export type AgencyMembershipUncheckedCreateWithoutAppUserInput = {
   id?: bigint | number
   agencyId: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -564,6 +588,7 @@ export type AgencyMembershipScalarWhereInput = {
   id?: Prisma.BigIntFilter<"AgencyMembership"> | bigint | number
   agencyId?: Prisma.BigIntFilter<"AgencyMembership"> | bigint | number
   appUserId?: Prisma.BigIntFilter<"AgencyMembership"> | bigint | number
+  membershipType?: Prisma.StringFilter<"AgencyMembership"> | string
   status?: Prisma.StringFilter<"AgencyMembership"> | string
   createdAt?: Prisma.DateTimeFilter<"AgencyMembership"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AgencyMembership"> | Date | string
@@ -571,6 +596,7 @@ export type AgencyMembershipScalarWhereInput = {
 
 export type AgencyMembershipCreateWithoutAgencyInput = {
   id?: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -581,6 +607,7 @@ export type AgencyMembershipCreateWithoutAgencyInput = {
 export type AgencyMembershipUncheckedCreateWithoutAgencyInput = {
   id?: bigint | number
   appUserId: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -615,6 +642,7 @@ export type AgencyMembershipUpdateManyWithWhereWithoutAgencyInput = {
 
 export type AgencyMembershipCreateWithoutAgencyRoleAssignmentsInput = {
   id?: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -626,6 +654,7 @@ export type AgencyMembershipUncheckedCreateWithoutAgencyRoleAssignmentsInput = {
   id?: bigint | number
   agencyId: bigint | number
   appUserId: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -649,6 +678,7 @@ export type AgencyMembershipUpdateToOneWithWhereWithoutAgencyRoleAssignmentsInpu
 
 export type AgencyMembershipUpdateWithoutAgencyRoleAssignmentsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -660,6 +690,7 @@ export type AgencyMembershipUncheckedUpdateWithoutAgencyRoleAssignmentsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   agencyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   appUserId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -668,6 +699,7 @@ export type AgencyMembershipUncheckedUpdateWithoutAgencyRoleAssignmentsInput = {
 export type AgencyMembershipCreateManyAppUserInput = {
   id?: bigint | number
   agencyId: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -675,6 +707,7 @@ export type AgencyMembershipCreateManyAppUserInput = {
 
 export type AgencyMembershipUpdateWithoutAppUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -685,6 +718,7 @@ export type AgencyMembershipUpdateWithoutAppUserInput = {
 export type AgencyMembershipUncheckedUpdateWithoutAppUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   agencyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -694,6 +728,7 @@ export type AgencyMembershipUncheckedUpdateWithoutAppUserInput = {
 export type AgencyMembershipUncheckedUpdateManyWithoutAppUserInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   agencyId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -702,6 +737,7 @@ export type AgencyMembershipUncheckedUpdateManyWithoutAppUserInput = {
 export type AgencyMembershipCreateManyAgencyInput = {
   id?: bigint | number
   appUserId: bigint | number
+  membershipType: string
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -709,6 +745,7 @@ export type AgencyMembershipCreateManyAgencyInput = {
 
 export type AgencyMembershipUpdateWithoutAgencyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -719,6 +756,7 @@ export type AgencyMembershipUpdateWithoutAgencyInput = {
 export type AgencyMembershipUncheckedUpdateWithoutAgencyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   appUserId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -728,6 +766,7 @@ export type AgencyMembershipUncheckedUpdateWithoutAgencyInput = {
 export type AgencyMembershipUncheckedUpdateManyWithoutAgencyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   appUserId?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  membershipType?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -768,6 +807,7 @@ export type AgencyMembershipSelect<ExtArgs extends runtime.Types.Extensions.Inte
   id?: boolean
   agencyId?: boolean
   appUserId?: boolean
+  membershipType?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -781,6 +821,7 @@ export type AgencyMembershipSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   id?: boolean
   agencyId?: boolean
   appUserId?: boolean
+  membershipType?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -792,6 +833,7 @@ export type AgencyMembershipSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   id?: boolean
   agencyId?: boolean
   appUserId?: boolean
+  membershipType?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -803,12 +845,13 @@ export type AgencyMembershipSelectScalar = {
   id?: boolean
   agencyId?: boolean
   appUserId?: boolean
+  membershipType?: boolean
   status?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AgencyMembershipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "agencyId" | "appUserId" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["agencyMembership"]>
+export type AgencyMembershipOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "agencyId" | "appUserId" | "membershipType" | "status" | "createdAt" | "updatedAt", ExtArgs["result"]["agencyMembership"]>
 export type AgencyMembershipInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   agency?: boolean | Prisma.AgencyDefaultArgs<ExtArgs>
   appUser?: boolean | Prisma.AppUserDefaultArgs<ExtArgs>
@@ -835,6 +878,7 @@ export type $AgencyMembershipPayload<ExtArgs extends runtime.Types.Extensions.In
     id: bigint
     agencyId: bigint
     appUserId: bigint
+    membershipType: string
     status: string
     createdAt: Date
     updatedAt: Date
@@ -1267,6 +1311,7 @@ export interface AgencyMembershipFieldRefs {
   readonly id: Prisma.FieldRef<"AgencyMembership", 'BigInt'>
   readonly agencyId: Prisma.FieldRef<"AgencyMembership", 'BigInt'>
   readonly appUserId: Prisma.FieldRef<"AgencyMembership", 'BigInt'>
+  readonly membershipType: Prisma.FieldRef<"AgencyMembership", 'String'>
   readonly status: Prisma.FieldRef<"AgencyMembership", 'String'>
   readonly createdAt: Prisma.FieldRef<"AgencyMembership", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"AgencyMembership", 'DateTime'>

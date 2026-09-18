@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { configureApp } from '../setup-app.js';
 import { RbacModule } from './rbac.module.js';
 import {
+  AGENCY_ADMIN_SYSTEM_KEY,
   ALL_AGENCY_PERMISSION_KEYS,
   ALL_PLATFORM_PERMISSION_KEYS,
   RBAC_PERMISSION_CATALOG,
@@ -21,6 +22,7 @@ type RoleRow = {
   scope: string;
   agencyId: bigint | null;
   description: string | null;
+  systemKey: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -87,6 +89,7 @@ function addRole(
   keys: string[] = [],
   agencyId: bigint | null = null,
   key = name,
+  systemKey: string | null = null,
 ): RoleRow {
   const row: RoleRow = {
     id: id(),
@@ -95,6 +98,7 @@ function addRole(
     scope,
     agencyId,
     description: null,
+    systemKey,
     createdAt: NOW,
     updatedAt: NOW,
   };
@@ -215,6 +219,9 @@ const prismaMock = {
           scope: data.scope,
           agencyId: data.agencyId ?? null,
           description: data.description,
+          // The API can never create a system role: `systemKey` is not part of
+          // any request schema.
+          systemKey: null,
           createdAt: NOW,
           updatedAt: NOW,
         };
@@ -915,6 +922,84 @@ describe('RBAC HTTP API (roles + permissions + role permissions)', () => {
         .post('/v1/agency-roles')
         .send({ key: 'AGENCY_NEW', name: 'Agency New' });
       expect(res.status).toBe(403);
+    });
+  });
+
+  describe('Protected system roles', () => {
+    /** The canonical global agency role, as the seed establishes it. */
+    const canonical = (): RoleRow => {
+      const role = addRole(
+        'Agency Owner',
+        'AGENCY',
+        ALL_AGENCY_PERMISSION_KEYS.slice(0, 2),
+        null,
+        'AGENCY_OWNER',
+        AGENCY_ADMIN_SYSTEM_KEY,
+      );
+      return role;
+    };
+
+    it('409 SYSTEM_ROLE_PROTECTED when renaming the canonical role', async () => {
+      const role = canonical();
+      const res = await api
+        .patch(`/v1/agency-roles/${role.id.toString()}`)
+        .send({ name: 'Something Else' });
+
+      expect(res.status).toBe(409);
+      expect(res.body.errorCode).toBe('SYSTEM_ROLE_PROTECTED');
+      expect(DB.roles.get(role.id)!.name).toBe('Agency Owner');
+    });
+
+    it('409 SYSTEM_ROLE_PROTECTED when deleting the canonical role', async () => {
+      const role = canonical();
+      const res = await api.delete(`/v1/agency-roles/${role.id.toString()}`);
+
+      expect(res.status).toBe(409);
+      expect(res.body.errorCode).toBe('SYSTEM_ROLE_PROTECTED');
+      expect(DB.roles.has(role.id)).toBe(true);
+      expect(DB.roles.get(role.id)!.systemKey).toBe(AGENCY_ADMIN_SYSTEM_KEY);
+    });
+
+    it('leaves ordinary global agency roles editable and deletable', async () => {
+      canonical();
+      const ordinary = globalAgencyRole('AGENCY_OP');
+
+      const patched = await api
+        .patch(`/v1/agency-roles/${ordinary.id.toString()}`)
+        .send({ name: 'Renamed Op' });
+      expect(patched.status).toBe(200);
+
+      const deleted = await api.delete(`/v1/agency-roles/${ordinary.id.toString()}`);
+      expect(deleted.status).toBe(204);
+    });
+
+    it('never exposes or accepts systemKey through the role API', async () => {
+      const role = canonical();
+
+      const listed = await api.get('/v1/agency-roles');
+      expect(listed.status).toBe(200);
+      for (const row of listed.body as Array<Record<string, unknown>>) {
+        expect(row).not.toHaveProperty('systemKey');
+      }
+
+      // A client cannot claim a system identity on creation: the field is
+      // stripped by the schema, so the created role stays an ordinary one.
+      const created = await api.post('/v1/agency-roles').send({
+        key: 'AGENCY_IMPOSTOR',
+        name: 'Impostor',
+        systemKey: AGENCY_ADMIN_SYSTEM_KEY,
+      });
+      expect([201, 400]).toContain(created.status);
+      if (created.status === 201) {
+        const impostor = [...DB.roles.values()].find((r) => r.key === 'AGENCY_IMPOSTOR')!;
+        expect(impostor.systemKey).toBeNull();
+      }
+      // Whatever happened, the identity still belongs to exactly one role.
+      const holders = [...DB.roles.values()].filter(
+        (r) => r.systemKey === AGENCY_ADMIN_SYSTEM_KEY,
+      );
+      expect(holders).toHaveLength(1);
+      expect(holders[0]!.id).toBe(role.id);
     });
   });
 });

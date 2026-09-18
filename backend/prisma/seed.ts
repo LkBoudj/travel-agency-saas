@@ -79,9 +79,47 @@ async function upsertSystemRole(tx: SeedClient, preset: RolePreset): Promise<big
       scope: preset.scope,
       agencyId: null,
       description: preset.description,
+      ...(preset.systemKey ? { systemKey: preset.systemKey } : {}),
     },
   });
   return created.id;
+}
+
+/**
+ * Establishes the protected system identity for a preset that declares one.
+ *
+ * Idempotent and non-destructive: the identity is written only when the role
+ * does not carry one yet, so a re-run is a no-op and a role that already holds
+ * the identity is never touched (the database forbids changing or clearing it
+ * anyway). If another role already holds the identity the seed fails loudly
+ * rather than creating a second canonical role.
+ */
+async function ensureSystemRoleIdentity(
+  tx: SeedClient,
+  preset: RolePreset,
+  roleId: bigint,
+): Promise<void> {
+  const systemKey = preset.systemKey;
+  if (!systemKey) {
+    return;
+  }
+
+  const holder = await tx.role.findFirst({
+    where: { systemKey },
+    select: { id: true, key: true },
+  });
+
+  if (holder) {
+    if (holder.id !== roleId) {
+      throw new Error(
+        `[seed] System key "${systemKey}" is already held by role "${holder.key}" (id ${holder.id}); ` +
+          `refusing to create a second canonical role for preset "${preset.key}".`,
+      );
+    }
+    return;
+  }
+
+  await tx.role.update({ where: { id: roleId }, data: { systemKey } });
 }
 
 async function syncRolePermissions(
@@ -162,6 +200,10 @@ export async function seedRbacBootstrap(prisma: PrismaClient): Promise<void> {
           select: { id: true },
         });
         if (existing) {
+          // Never overwrite an existing preset's name/description/permissions,
+          // but do establish a declared system identity it does not carry yet
+          // (an installation seeded before system roles existed).
+          await ensureSystemRoleIdentity(tx, preset, existing.id);
           continue;
         }
         const created = await tx.role.create({
@@ -171,8 +213,10 @@ export async function seedRbacBootstrap(prisma: PrismaClient): Promise<void> {
             scope: preset.scope,
             agencyId: null,
             description: preset.description,
+            ...(preset.systemKey ? { systemKey: preset.systemKey } : {}),
           },
         });
+        await ensureSystemRoleIdentity(tx, preset, created.id);
         await syncRolePermissions(tx, created.id, preset.permissionKeys, permissionIdByKey);
       }
 

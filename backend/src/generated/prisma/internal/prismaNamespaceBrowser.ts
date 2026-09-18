@@ -97,6 +97,7 @@ export const RoleScalarFieldEnum = {
   id: 'id',
   name: 'name',
   key: 'key',
+  systemKey: 'systemKey',
   scope: 'scope',
   agencyId: 'agencyId',
   description: 'description',
@@ -145,7 +146,6 @@ export const AgencyScalarFieldEnum = {
   name: 'name',
   status: 'status',
   country: 'country',
-  website: 'website',
   description: 'description',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -178,6 +178,7 @@ export const AgencyMembershipScalarFieldEnum = {
   id: 'id',
   agencyId: 'agencyId',
   appUserId: 'appUserId',
+  membershipType: 'membershipType',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

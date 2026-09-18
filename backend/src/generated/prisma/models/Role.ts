@@ -40,6 +40,7 @@ export type RoleMinAggregateOutputType = {
   id: bigint | null
   name: string | null
   key: string | null
+  systemKey: string | null
   scope: string | null
   agencyId: bigint | null
   description: string | null
@@ -51,6 +52,7 @@ export type RoleMaxAggregateOutputType = {
   id: bigint | null
   name: string | null
   key: string | null
+  systemKey: string | null
   scope: string | null
   agencyId: bigint | null
   description: string | null
@@ -62,6 +64,7 @@ export type RoleCountAggregateOutputType = {
   id: number
   name: number
   key: number
+  systemKey: number
   scope: number
   agencyId: number
   description: number
@@ -85,6 +88,7 @@ export type RoleMinAggregateInputType = {
   id?: true
   name?: true
   key?: true
+  systemKey?: true
   scope?: true
   agencyId?: true
   description?: true
@@ -96,6 +100,7 @@ export type RoleMaxAggregateInputType = {
   id?: true
   name?: true
   key?: true
+  systemKey?: true
   scope?: true
   agencyId?: true
   description?: true
@@ -107,6 +112,7 @@ export type RoleCountAggregateInputType = {
   id?: true
   name?: true
   key?: true
+  systemKey?: true
   scope?: true
   agencyId?: true
   description?: true
@@ -205,6 +211,7 @@ export type RoleGroupByOutputType = {
   id: bigint
   name: string
   key: string
+  systemKey: string | null
   scope: string
   agencyId: bigint | null
   description: string | null
@@ -239,6 +246,7 @@ export type RoleWhereInput = {
   id?: Prisma.BigIntFilter<"Role"> | bigint | number
   name?: Prisma.StringFilter<"Role"> | string
   key?: Prisma.StringFilter<"Role"> | string
+  systemKey?: Prisma.StringNullableFilter<"Role"> | string | null
   scope?: Prisma.StringFilter<"Role"> | string
   agencyId?: Prisma.BigIntNullableFilter<"Role"> | bigint | number | null
   description?: Prisma.StringNullableFilter<"Role"> | string | null
@@ -253,6 +261,7 @@ export type RoleOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  systemKey?: Prisma.SortOrderInput | Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -270,6 +279,7 @@ export type RoleWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.RoleWhereInput | Prisma.RoleWhereInput[]
   name?: Prisma.StringFilter<"Role"> | string
   key?: Prisma.StringFilter<"Role"> | string
+  systemKey?: Prisma.StringNullableFilter<"Role"> | string | null
   scope?: Prisma.StringFilter<"Role"> | string
   agencyId?: Prisma.BigIntNullableFilter<"Role"> | bigint | number | null
   description?: Prisma.StringNullableFilter<"Role"> | string | null
@@ -284,6 +294,7 @@ export type RoleOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  systemKey?: Prisma.SortOrderInput | Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -303,6 +314,7 @@ export type RoleScalarWhereWithAggregatesInput = {
   id?: Prisma.BigIntWithAggregatesFilter<"Role"> | bigint | number
   name?: Prisma.StringWithAggregatesFilter<"Role"> | string
   key?: Prisma.StringWithAggregatesFilter<"Role"> | string
+  systemKey?: Prisma.StringNullableWithAggregatesFilter<"Role"> | string | null
   scope?: Prisma.StringWithAggregatesFilter<"Role"> | string
   agencyId?: Prisma.BigIntNullableWithAggregatesFilter<"Role"> | bigint | number | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Role"> | string | null
@@ -314,6 +326,7 @@ export type RoleCreateInput = {
   id?: bigint | number
   name: string
   key: string
+  systemKey?: string | null
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -328,6 +341,7 @@ export type RoleUncheckedCreateInput = {
   id?: bigint | number
   name: string
   key: string
+  systemKey?: string | null
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -342,6 +356,7 @@ export type RoleUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -356,6 +371,7 @@ export type RoleUncheckedUpdateInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -370,6 +386,7 @@ export type RoleCreateManyInput = {
   id?: bigint | number
   name: string
   key: string
+  systemKey?: string | null
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -381,6 +398,7 @@ export type RoleUpdateManyMutationInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -392,6 +410,7 @@ export type RoleUncheckedUpdateManyInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -403,6 +422,7 @@ export type RoleCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  systemKey?: Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -419,6 +439,7 @@ export type RoleMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  systemKey?: Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -430,6 +451,7 @@ export type RoleMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrder
   key?: Prisma.SortOrder
+  systemKey?: Prisma.SortOrder
   scope?: Prisma.SortOrder
   agencyId?: Prisma.SortOrder
   description?: Prisma.SortOrder
@@ -501,6 +523,7 @@ export type RoleCreateWithoutPermissionsInput = {
   id?: bigint | number
   name: string
   key: string
+  systemKey?: string | null
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -514,6 +537,7 @@ export type RoleUncheckedCreateWithoutPermissionsInput = {
   id?: bigint | number
   name: string
   key: string
+  systemKey?: string | null
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -543,6 +567,7 @@ export type RoleUpdateWithoutPermissionsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -556,6 +581,7 @@ export type RoleUncheckedUpdateWithoutPermissionsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -569,6 +595,7 @@ export type RoleCreateWithoutPlatformAssignmentsInput = {
   id?: bigint | number
   name: string
   key: string
+  systemKey?: string | null
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -582,6 +609,7 @@ export type RoleUncheckedCreateWithoutPlatformAssignmentsInput = {
   id?: bigint | number
   name: string
   key: string
+  systemKey?: string | null
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -611,6 +639,7 @@ export type RoleUpdateWithoutPlatformAssignmentsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -624,6 +653,7 @@ export type RoleUncheckedUpdateWithoutPlatformAssignmentsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -637,6 +667,7 @@ export type RoleCreateWithoutAgencyRoleAssignmentsInput = {
   id?: bigint | number
   name: string
   key: string
+  systemKey?: string | null
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -650,6 +681,7 @@ export type RoleUncheckedCreateWithoutAgencyRoleAssignmentsInput = {
   id?: bigint | number
   name: string
   key: string
+  systemKey?: string | null
   scope: string
   agencyId?: bigint | number | null
   description?: string | null
@@ -679,6 +711,7 @@ export type RoleUpdateWithoutAgencyRoleAssignmentsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -692,6 +725,7 @@ export type RoleUncheckedUpdateWithoutAgencyRoleAssignmentsInput = {
   id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
   name?: Prisma.StringFieldUpdateOperationsInput | string
   key?: Prisma.StringFieldUpdateOperationsInput | string
+  systemKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   scope?: Prisma.StringFieldUpdateOperationsInput | string
   agencyId?: Prisma.NullableBigIntFieldUpdateOperationsInput | bigint | number | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -754,6 +788,7 @@ export type RoleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   name?: boolean
   key?: boolean
+  systemKey?: boolean
   scope?: boolean
   agencyId?: boolean
   description?: boolean
@@ -769,6 +804,7 @@ export type RoleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   key?: boolean
+  systemKey?: boolean
   scope?: boolean
   agencyId?: boolean
   description?: boolean
@@ -780,6 +816,7 @@ export type RoleSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   id?: boolean
   name?: boolean
   key?: boolean
+  systemKey?: boolean
   scope?: boolean
   agencyId?: boolean
   description?: boolean
@@ -791,6 +828,7 @@ export type RoleSelectScalar = {
   id?: boolean
   name?: boolean
   key?: boolean
+  systemKey?: boolean
   scope?: boolean
   agencyId?: boolean
   description?: boolean
@@ -798,7 +836,7 @@ export type RoleSelectScalar = {
   updatedAt?: boolean
 }
 
-export type RoleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "key" | "scope" | "agencyId" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["role"]>
+export type RoleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "key" | "systemKey" | "scope" | "agencyId" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["role"]>
 export type RoleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   permissions?: boolean | Prisma.Role$permissionsArgs<ExtArgs>
   platformAssignments?: boolean | Prisma.Role$platformAssignmentsArgs<ExtArgs>
@@ -819,6 +857,7 @@ export type $RolePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: bigint
     name: string
     key: string
+    systemKey: string | null
     scope: string
     agencyId: bigint | null
     description: string | null
@@ -1253,6 +1292,7 @@ export interface RoleFieldRefs {
   readonly id: Prisma.FieldRef<"Role", 'BigInt'>
   readonly name: Prisma.FieldRef<"Role", 'String'>
   readonly key: Prisma.FieldRef<"Role", 'String'>
+  readonly systemKey: Prisma.FieldRef<"Role", 'String'>
   readonly scope: Prisma.FieldRef<"Role", 'String'>
   readonly agencyId: Prisma.FieldRef<"Role", 'BigInt'>
   readonly description: Prisma.FieldRef<"Role", 'String'>

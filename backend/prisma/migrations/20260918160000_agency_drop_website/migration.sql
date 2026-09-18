@@ -1,0 +1,11 @@
+-- Drop `agency.website` from the Agency foundation.
+--
+-- Custom domains are a separate product concern and will be implemented later
+-- under Agency Dashboard -> Settings -> Domain, together with DNS verification.
+-- No replacement `domain` column is introduced here on purpose: adding one now
+-- would ask operators for information the product does not use yet.
+--
+-- `agency_application.website` is intentionally KEPT: an application is a
+-- permanent audit record of what the applicant submitted, and it is simply no
+-- longer copied onto the agency at approval time.
+ALTER TABLE "agency" DROP COLUMN IF EXISTS "website";

@@ -1,13 +1,7 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { generateAgencyCode } from './agency-code.js';
-import { AGENCY_OWNER_ROLE_KEY } from '../rbac/rbac.constants.js';
+import { AgencyProvisioningService } from '../agencies/agency-provisioning.service.js';
 import type {
   CreateAgencyApplicationBody,
   ListAgencyApplicationsQuery,
@@ -31,16 +25,20 @@ const REVIEWABLE_STATUSES = ['PENDING', 'NEEDS_INFO'] as const;
  *   Platform Admin requests more information                     -> NEEDS_INFO
  *   Platform Admin rejects                                       -> REJECTED
  *   Platform Admin approves  => one atomic transaction:
- *     verify eligibility -> create Agency -> create AgencyMembership
- *     -> assign global AGENCY_OWNER role -> mark APPROVED
- *     -> store approvedAt / approving admin -> link created Agency
+ *     verify eligibility -> provision Agency (agency + ACTIVE OWNER membership
+ *     + canonical AGENCY_ADMIN assignment, via AgencyProvisioningService)
+ *     -> mark APPROVED -> store approvedAt / approving admin
+ *     -> link created Agency
  *
  * The application row is a permanent audit record: it is never deleted and
  * never converted into an Agency. Approval only links it to the agency.
  */
 @Injectable()
 export class AgencyApplicationsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly agencyProvisioning: AgencyProvisioningService,
+  ) {}
 
   // ---------------------------------------------------------------- applicant
 
@@ -214,42 +212,18 @@ export class AgencyApplicationsService {
         });
       }
 
-      // Resolve the global AGENCY_OWNER role by its stable key. It must be a
-      // Global Agency role: scope = AGENCY and agencyId = null (never a custom
-      // role owned by a specific agency, and never a PLATFORM role).
-      const ownerRole = await tx.role.findFirst({
-        where: { key: AGENCY_OWNER_ROLE_KEY, scope: 'AGENCY', agencyId: null },
-        select: { id: true },
-      });
-      if (!ownerRole) {
-        throw new BadRequestException({
-          statusCode: 400,
-          message: 'The global AGENCY_OWNER role is missing from the RBAC catalog',
-          errorCode: 'AGENCY_OWNER_ROLE_MISSING',
-        });
-      }
-
-      const agency = await tx.agency.create({
-        data: {
-          code: generateAgencyCode(),
-          name: application.agencyName,
-          country: application.country,
-          website: application.website,
-          description: application.description,
-        },
-        select: { id: true },
-      });
-
-      const membership = await tx.agencyMembership.create({
-        data: {
-          agencyId: agency.id,
-          appUserId: application.appUser.id,
-        },
-        select: { id: true },
-      });
-
-      await tx.agencyRoleAssignment.create({
-        data: { membershipId: membership.id, roleId: ownerRole.id },
+      // Approval creates the agency through the shared provisioning service, so
+      // an approved agency gets exactly the same ownership structure as a
+      // platform-created one: ACTIVE OWNER membership + canonical AGENCY_ADMIN
+      // assignment, atomically. There is no second creation path here.
+      const agency = await this.agencyProvisioning.provision(tx, {
+        ownerAppUserId: application.appUser.id,
+        name: application.agencyName,
+        country: application.country,
+        // The applicant's website stays on the application record, which is a
+        // permanent audit trail, and is no longer copied onto the agency:
+        // domains are a separate concern handled later in Agency Settings.
+        description: application.description,
       });
 
       await tx.agencyApplication.update({

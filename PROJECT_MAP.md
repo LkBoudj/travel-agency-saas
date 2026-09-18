@@ -18,10 +18,13 @@ anonymous travelers, platform operators.
                   locally: single NestJS + TypeScript modular monolith; Prisma 7 →
                   PostgreSQL (hosted via Neon); REST under /v1; Swagger/OpenAPI
                   served at /docs + /docs-json. Group 1 (authentication +
-                  platform RBAC) and the Platform Users slice (CRUD +
-                  platform-role assignment + ACTIVE/SUSPENDED status) implemented
-                  — see [PLATFORM_ADMIN]. Agency model and agency-side
-                  user/membership management are NOT implemented.
+                  platform RBAC), the Platform Users slice (CRUD +
+                  platform-role assignment + ACTIVE/SUSPENDED status) and the
+                  Agency Foundation (Agency lifecycle + explicit OWNER/EMPLOYEE
+                  membership + database-enforced ownership invariants)
+                  implemented — see [PLATFORM_ADMIN] and [AGENCY_OWNERSHIP].
+                  Agency-scoped authorization and agency member management are
+                  NOT implemented.
 - frontend/dashboard/    React SPA — agency management only; does NOT render the
                          public storefront.
 - frontend/storefront/   Next.js 16.3.5 App Router PUBLIC STOREFRONT — one app,
@@ -31,7 +34,9 @@ anonymous travelers, platform operators.
                          for `{slug}.platform.com`). Does NOT exist yet.
 - frontend/admin/        Platform Super Dashboard — authenticated shell +
                          Roles & Permissions (platform RBAC UI) + Platform Users
-                         management. Overview is an honest placeholder. Exists.
+                         management + Agencies (list, create, details, edit,
+                         suspend/reactivate). Overview is an honest placeholder.
+                         Exists.
 
 ## [TECH_STACK]
 - dashboard: React19+TS+Vite+RR7+Tailwind4+shadcn(@base-ui)+TSQuery/Table+
@@ -76,6 +81,36 @@ state, visibility, pricing, capacity, booking rules.
 Tenant = Agency. Shared PostgreSQL, app-level tenancy, composite FK super-keys.
 Tenant context from session server-side; client agencyId never trusted. Public
 resolution: hostname/slug → public agency → published data only.
+
+## [AGENCY_OWNERSHIP]
+Backend-implemented foundation (see `backend/backend_PROJECT_MAP.md` for the
+constraint-level detail). Ownership is explicit and separate from authorization:
+
+- Membership carries `membershipType` = OWNER | EMPLOYEE. Ownership is never
+  inferred from a role.
+- Every Agency has EXACTLY ONE OWNER, that OWNER is always ACTIVE, and that
+  OWNER always holds the canonical global agency role, identified by a
+  protected `systemKey` (AGENCY_ADMIN) rather than by editable role key/name.
+- OWNER (who owns the agency) != AGENCY_ADMIN (what the owner may do). An
+  EMPLOYEE may hold AGENCY_ADMIN without owning the agency, and nothing is ever
+  authorized because someone is the owner — authorization stays permission-based.
+- Suspending the BUSINESS is `Agency.status`; an OWNER membership can never be
+  suspended. Suspending the owner as a person requires transferring ownership
+  first (transfer is a later slice).
+- An Agency can never be created orphaned: agency + ACTIVE OWNER membership +
+  canonical role assignment are written in one transaction, by one shared
+  provisioning path used by both platform creation and application approval.
+  When the owner is a brand new account, its identity is created inside that
+  same transaction, so a failure leaves no orphan account either.
+- Owning an agency does not imply platform access: an owner created this way
+  gets no platform role, and an AppUser whose only context is an OWNER
+  membership is a valid state.
+- Derived data (owner, member counts) is always computed from relationships;
+  no denormalized owner or counter columns exist.
+- The Agency profile is intentionally small: code, name, status, country,
+  description, timestamps. There is no `website`/`domain` field - custom domains
+  are deferred to Agency Dashboard -> Settings -> Domain, with their own
+  configuration and DNS verification.
 
 ## [PUBLIC_WEB]
 FUTURE (not implemented): ONE Next.js app. platform.com = Marketplace;
@@ -149,7 +184,25 @@ from the backend, no second catalog, no token decoding, no web-storage tokens.
 Suspended accounts (and their previously issued JWTs) are rejected by the
 backend; `409 EMAIL_ALREADY_REGISTERED`, unknown/agency role keys (400) and
 self-suspension (400) surface as explicit messages. Platform Users is NOT
-agency-side user/membership management (Group 2+). Group 1 closure was verified
+agency-side user/membership management (Group 2+).
+
+The Agencies feature is IMPLEMENTED against the real Agency API
+(`GET/POST /v1/agencies`, `GET/PATCH /v1/agencies/:code`,
+`PATCH /v1/agencies/:code/status`) with `credentials: "include"`: list with
+search + status filter, create, details overview, edit of descriptive fields
+only, and suspend/reactivate with confirmation. Creating an agency also creates
+its owner: the operator either searches and selects an existing account
+(`GET /v1/app-users/search`, which covers accounts with no platform role) or
+fills in a new one, which the backend creates in the same transaction. The
+account code is captured from the selection and is never typed by hand. Derived owner and `membersCount` come from
+the backend and are never stored client-side. The UI never exposes ownership
+internals (membership type, canonical system role, role ids), never edits
+membership state, and shows no customer count — the platform has no customer
+model. Owner click-through is deliberately NOT linked: no AppUser details route
+covers agency owners yet (Platform Users only serves accounts holding a platform
+role), so the owner renders as text with its code and linking is deferred to the
+unified user-details slice. Agency Members / Customers / Application tabs are
+absent rather than rendered empty. Group 1 closure was verified
 end-to-end against the live backend (login → HttpOnly cookie → `/me` →
 PLATFORM_ADMIN list → create/edit role → assign/remove permissions → reload
 persistence → assigned-role delete conflict → delete temp role → logout →

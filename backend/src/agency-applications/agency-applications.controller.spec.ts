@@ -6,7 +6,11 @@ import request from 'supertest';
 import { AuthModule } from '../auth/auth.module.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { configureApp } from '../setup-app.js';
-import { ALL_PLATFORM_PERMISSION_KEYS, RBAC_PERMISSION_CATALOG } from '../rbac/rbac.constants.js';
+import {
+  AGENCY_ADMIN_SYSTEM_KEY,
+  ALL_PLATFORM_PERMISSION_KEYS,
+  RBAC_PERMISSION_CATALOG,
+} from '../rbac/rbac.constants.js';
 import { AgenciesModule } from '../agencies/agencies.module.js';
 import { AgencyApplicationsModule } from './agency-applications.module.js';
 
@@ -16,6 +20,7 @@ type RoleRow = {
   name: string;
   scope: string;
   agencyId: bigint | null;
+  systemKey: string | null;
 };
 
 type PermissionRow = { id: bigint; key: string; scope: string };
@@ -28,6 +33,8 @@ type AppUserRow = {
   id: bigint;
   code: string;
   email: string;
+  firstName: string | null;
+  lastName: string | null;
   status: string;
 };
 
@@ -54,7 +61,7 @@ type AgencyRow = {
   name: string;
   status: string;
   country: string | null;
-  website: string | null;
+  description: string | null;
   createdAt: Date;
 };
 
@@ -62,6 +69,7 @@ type MembershipRow = {
   id: bigint;
   agencyId: bigint;
   appUserId: bigint;
+  membershipType: string;
   status: string;
 };
 
@@ -73,6 +81,8 @@ const applicant = {
   id: 10n,
   code: 'USR-APPLICANT1',
   email: 'applicant@mail.com',
+  firstName: 'Amina',
+  lastName: 'Haddad',
   status: 'ACTIVE',
 };
 
@@ -80,6 +90,8 @@ const secondApplicant = {
   id: 11n,
   code: 'USR-SECOND0001',
   email: 'second@mail.com',
+  firstName: null,
+  lastName: null,
   status: 'ACTIVE',
 };
 
@@ -87,6 +99,8 @@ const admin = {
   id: 1n,
   code: 'USR-ABCDEF123456',
   email: 'super@mail.com',
+  firstName: null,
+  lastName: null,
   status: 'ACTIVE',
 };
 
@@ -109,8 +123,14 @@ function id(): bigint {
   return value;
 }
 
-function addRole(key: string, name: string, scope: string, agencyId: bigint | null = null): RoleRow {
-  const row: RoleRow = { id: id(), key, name, scope, agencyId };
+function addRole(
+  key: string,
+  name: string,
+  scope: string,
+  agencyId: bigint | null = null,
+  systemKey: string | null = null,
+): RoleRow {
+  const row: RoleRow = { id: id(), key, name, scope, agencyId, systemKey };
   DB.roles.set(row.id, row);
   return row;
 }
@@ -135,15 +155,22 @@ const prismaMock = {
     }),
   },
   role: {
-    findFirst: vi.fn(async ({ where }: { where: { key?: string; scope?: string; agencyId?: bigint | null } }) => {
-      for (const role of DB.roles.values()) {
-        if (where.key !== undefined && role.key !== where.key) continue;
-        if (where.scope !== undefined && role.scope !== where.scope) continue;
-        if (where.agencyId !== undefined && role.agencyId !== where.agencyId) continue;
-        return role;
-      }
-      return null;
-    }),
+    findFirst: vi.fn(
+      async ({
+        where,
+      }: {
+        where: { key?: string; scope?: string; agencyId?: bigint | null; systemKey?: string };
+      }) => {
+        for (const role of DB.roles.values()) {
+          if (where.key !== undefined && role.key !== where.key) continue;
+          if (where.scope !== undefined && role.scope !== where.scope) continue;
+          if (where.agencyId !== undefined && role.agencyId !== where.agencyId) continue;
+          if (where.systemKey !== undefined && role.systemKey !== where.systemKey) continue;
+          return role;
+        }
+        return null;
+      },
+    ),
   },
   agencyApplication: {
     findUnique: vi.fn(
@@ -172,8 +199,11 @@ const prismaMock = {
     }),
     findMany: vi.fn(async ({ where }: { where?: Record<string, unknown> } = {}) => {
       const status = where?.status as string | undefined;
+      const appUserId = where?.appUserId as bigint | undefined;
       const rows = [...DB.applications.values()].filter(
-        (application) => !status || application.status === status,
+        (application) =>
+          (!status || application.status === status) &&
+          (appUserId === undefined || application.appUserId === appUserId),
       );
       return rows.map(withRelations);
     }),
@@ -225,24 +255,32 @@ const prismaMock = {
         name: data.name!,
         status: 'ACTIVE',
         country: data.country ?? null,
-        website: data.website ?? null,
+        description: data.description ?? null,
         createdAt: NOW,
       };
       DB.agencies.set(row.id, row);
-      return select ? { id: row.id } : row;
+      return select ? { id: row.id, code: row.code } : row;
     }),
-    findUnique: vi.fn(async ({ where }: { where: { code: string } }) => {
-      for (const agency of DB.agencies.values()) {
-        if (agency.code === where.code) return agency;
-      }
-      return null;
-    }),
+    findUnique: vi.fn(
+      async ({ where, select }: { where: { code: string }; select?: Record<string, unknown> }) => {
+        const agency = [...DB.agencies.values()].find((a) => a.code === where.code);
+        if (!agency) return null;
+        if (select && Object.keys(select).length === 1 && 'id' in select) {
+          return { id: agency.id };
+        }
+        return projectAgency(agency, select !== undefined && 'applications' in select);
+      },
+    ),
     findMany: vi.fn(async () => {
-      return [...DB.agencies.values()].map((agency) => ({
-        ...agency,
-        _count: { members: countMembers(agency.id) },
-      }));
+      return [...DB.agencies.values()].map((agency) => projectAgency(agency, false));
     }),
+    update: vi.fn(
+      async ({ where, data }: { where: { code: string }; data: Partial<AgencyRow> }) => {
+        const agency = [...DB.agencies.values()].find((a) => a.code === where.code)!;
+        Object.assign(agency, data);
+        return agency;
+      },
+    ),
   },
   agencyMembership: {
     create: vi.fn(async ({ data, select }: { data: Partial<MembershipRow>; select?: unknown }) => {
@@ -250,7 +288,8 @@ const prismaMock = {
         id: id(),
         agencyId: data.agencyId!,
         appUserId: data.appUserId!,
-        status: 'ACTIVE',
+        membershipType: data.membershipType!,
+        status: data.status ?? 'ACTIVE',
       };
       DB.memberships.set(row.id, row);
       return select ? { id: row.id } : row;
@@ -291,6 +330,43 @@ function countMembers(agencyId: bigint): number {
     if (membership.agencyId === agencyId) count += 1;
   }
   return count;
+}
+
+/** Mirrors AGENCY_SELECT / AGENCY_DETAILS_SELECT from the agencies feature. */
+function projectAgency(agency: AgencyRow, withApplications: boolean) {
+  const ownerMembership = [...DB.memberships.values()].find(
+    (m) => m.agencyId === agency.id && m.membershipType === 'OWNER',
+  );
+  const ownerUser = ownerMembership
+    ? [...DB.users.values()].find((u) => u.id === ownerMembership.appUserId)
+    : undefined;
+
+  return {
+    ...agency,
+    updatedAt: NOW,
+    members: ownerUser
+      ? [
+          {
+            appUser: {
+              code: ownerUser.code,
+              email: ownerUser.email,
+              firstName: ownerUser.firstName,
+              lastName: ownerUser.lastName,
+              status: ownerUser.status,
+            },
+          },
+        ]
+      : [],
+    _count: { members: countMembers(agency.id) },
+    ...(withApplications
+      ? {
+          applications: [...DB.applications.values()]
+            .filter((a) => a.agencyId === agency.id && a.status === 'APPROVED')
+            .slice(0, 1)
+            .map((a) => ({ id: a.id })),
+        }
+      : {}),
+  };
 }
 
 function withRelations(application: ApplicationRow) {
@@ -338,8 +414,9 @@ function baseline(): void {
   }
   DB.assignments.push({ appUserId: admin.id, roleId: platformAdmin.id });
 
-  // Global Agency roles and a Custom Agency role.
-  addRole('AGENCY_OWNER', 'Agency Owner', 'AGENCY', null);
+  // Global Agency roles and a Custom Agency role. AGENCY_OWNER carries the
+  // protected AGENCY_ADMIN system identity (see DEFAULT_GLOBAL_AGENCY_ROLES).
+  addRole('AGENCY_OWNER', 'Agency Owner', 'AGENCY', null, AGENCY_ADMIN_SYSTEM_KEY);
   addRole('AGENCY_MANAGER', 'Agency Manager', 'AGENCY', null);
   addRole('CUSTOM_AGENT', 'Custom Agent', 'AGENCY', 999n);
 
@@ -497,7 +574,8 @@ describe('Agency Applications API (submit, review, approve)', () => {
     it('withdraws a pending own application but not a decided one', async () => {
       const pending = addApplication({ agencyName: 'Withdrawable' });
       const res = await applicantApi.post(`/v1/agency-applications/${pending.id}/withdraw`);
-      expect(res.status).toBe(200);
+      // POST answers 201 by default in Nest; this endpoint does not override it.
+      expect(res.status).toBe(201);
       expect(res.body.status).toBe('WITHDRAWN');
 
       const approved = addApplication({ status: 'APPROVED' });
@@ -607,7 +685,7 @@ describe('Agency Applications API (submit, review, approve)', () => {
       const application = addApplication({ country: 'Morocco' });
       const res = await adminApi.post(`/v1/admin/agency-applications/${application.id}/approve`);
 
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(201);
       expect(res.body.status).toBe('APPROVED');
       expect(res.body.agency).toMatchObject({ name: 'Sunshine Travels', status: 'ACTIVE' });
       expect(res.body.approvedAt).not.toBeNull();
@@ -628,26 +706,77 @@ describe('Agency Applications API (submit, review, approve)', () => {
       expect(ownerRole.agencyId).toBeNull();
     });
 
-    it('resolves AGENCY_OWNER by key and rejects a Custom Agency role with the same key', async () => {
-      // A custom role owned by agency 999n exists with a different key; the
-      // resolution query requires agencyId = null, so it can never match.
+    it('resolves the canonical role by its protected system identity, not by key', async () => {
       const application = addApplication();
       const res = await adminApi.post(`/v1/admin/agency-applications/${application.id}/approve`);
-      expect(res.status).toBe(200);
-      const call = prismaMock.role.findFirst.mock.calls[0][0];
-      expect(call).toMatchObject({ key: 'AGENCY_OWNER', scope: 'AGENCY', agencyId: null });
+      expect(res.status).toBe(201);
+
+      const call = prismaMock.role.findFirst.mock.calls[0]![0] as {
+        where: Record<string, unknown>;
+      };
+      expect(call.where).toMatchObject({ systemKey: AGENCY_ADMIN_SYSTEM_KEY });
+      // Editable business metadata is never part of the resolution.
+      expect(call.where).not.toHaveProperty('key');
+      expect(call.where).not.toHaveProperty('name');
     });
 
-    it('400 AGENCY_OWNER_ROLE_MISSING when the global role does not exist', async () => {
-      for (const [key, role] of DB.roles) {
-        if (role.key === 'AGENCY_OWNER') DB.roles.delete(key);
+    it('does not accept a look-alike role that merely carries the AGENCY_OWNER key', async () => {
+      // Strip the system identity from the canonical role and add a global role
+      // keyed AGENCY_OWNER plus a custom agency role: none of them may satisfy
+      // the owner invariant.
+      for (const role of DB.roles.values()) {
+        if (role.systemKey === AGENCY_ADMIN_SYSTEM_KEY) role.systemKey = null;
+      }
+      addRole('AGENCY_OWNER_COPY', 'Agency Owner', 'AGENCY', null);
+      addRole('AGENCY_OWNER', 'Agency Owner', 'AGENCY', 999n);
+
+      const application = addApplication();
+      const res = await adminApi.post(`/v1/admin/agency-applications/${application.id}/approve`);
+      expect(res.status).toBe(400);
+      expect(res.body.errorCode).toBe('AGENCY_ADMIN_ROLE_MISSING');
+      expect(DB.agencies.size).toBe(0);
+      expect(DB.memberships.size).toBe(0);
+    });
+
+    it('400 AGENCY_ADMIN_ROLE_MISSING when the canonical system role does not exist', async () => {
+      for (const [id, role] of DB.roles) {
+        if (role.systemKey === AGENCY_ADMIN_SYSTEM_KEY) DB.roles.delete(id);
       }
       const application = addApplication();
       const res = await adminApi.post(`/v1/admin/agency-applications/${application.id}/approve`);
       expect(res.status).toBe(400);
-      expect(res.body.errorCode).toBe('AGENCY_OWNER_ROLE_MISSING');
+      expect(res.body.errorCode).toBe('AGENCY_ADMIN_ROLE_MISSING');
       expect(DB.agencies.size).toBe(0);
       expect(DB.memberships.size).toBe(0);
+    });
+
+    it('gives the applicant an ACTIVE OWNER membership holding the canonical role', async () => {
+      const application = addApplication();
+      const res = await adminApi.post(`/v1/admin/agency-applications/${application.id}/approve`);
+      expect(res.status).toBe(201);
+
+      const memberships = [...DB.memberships.values()];
+      expect(memberships).toHaveLength(1);
+      expect(memberships[0]).toMatchObject({
+        appUserId: applicant.id,
+        membershipType: 'OWNER',
+        status: 'ACTIVE',
+      });
+
+      // Exactly one OWNER for the created agency.
+      const owners = memberships.filter(
+        (m) => m.agencyId === memberships[0]!.agencyId && m.membershipType === 'OWNER',
+      );
+      expect(owners).toHaveLength(1);
+
+      // ...holding the canonical system role, resolved by systemKey.
+      const canonical = [...DB.roles.values()].find(
+        (role) => role.systemKey === AGENCY_ADMIN_SYSTEM_KEY,
+      )!;
+      expect(DB.agencyRoleAssignments).toContainEqual({
+        membershipId: memberships[0]!.id,
+        roleId: canonical.id,
+      });
     });
 
     it('rolls back completely when the agency creation fails', async () => {
@@ -669,7 +798,7 @@ describe('Agency Applications API (submit, review, approve)', () => {
     it('never approves the same application twice (no duplicate agency)', async () => {
       const application = addApplication();
       const first = await adminApi.post(`/v1/admin/agency-applications/${application.id}/approve`);
-      expect(first.status).toBe(200);
+      expect(first.status).toBe(201);
       const agenciesAfterFirst = DB.agencies.size;
 
       const second = await adminApi.post(`/v1/admin/agency-applications/${application.id}/approve`);
@@ -698,7 +827,7 @@ describe('Agency Applications API (submit, review, approve)', () => {
     it('can approve a NEEDS_INFO application (still reviewable)', async () => {
       const application = addApplication({ status: 'NEEDS_INFO', reviewNote: 'docs added' });
       const res = await adminApi.post(`/v1/admin/agency-applications/${application.id}/approve`);
-      expect(res.status).toBe(200);
+      expect(res.status).toBe(201);
       expect(res.body.status).toBe('APPROVED');
     });
   });
@@ -710,7 +839,7 @@ describe('Agency Applications API (submit, review, approve)', () => {
       expect(res.status).toBe(403);
     });
 
-    it('lists approved agencies with member counts', async () => {
+    it('lists approved agencies with their derived owner and member count', async () => {
       const application = addApplication();
       await adminApi.post(`/v1/admin/agency-applications/${application.id}/approve`);
 
@@ -720,9 +849,16 @@ describe('Agency Applications API (submit, review, approve)', () => {
       expect(res.body[0]).toMatchObject({
         name: 'Sunshine Travels',
         status: 'ACTIVE',
-        memberCount: 1,
+        membersCount: 1,
+        owner: {
+          code: applicant.code,
+          email: applicant.email,
+          firstName: 'Amina',
+          lastName: 'Haddad',
+        },
       });
       expect(res.body[0]).not.toHaveProperty('id');
+      expect(res.body[0].owner).not.toHaveProperty('id');
     });
   });
 });

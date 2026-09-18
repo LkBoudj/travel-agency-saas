@@ -77,12 +77,17 @@ export function UsersPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-6">
-      <header className="space-y-1">
-        <h1 className="text-2xl font-semibold tracking-tight">Users</h1>
-        <p className="text-sm text-muted-foreground">
-          Manage the accounts that can sign in to the Super Dashboard and the
-          platform roles assigned to them.
-        </p>
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight">Users</h1>
+          <p className="text-sm text-muted-foreground">
+            Accounts that can sign in to the Super Dashboard, and their roles.
+          </p>
+        </div>
+        <Button onClick={() => setCreateOpen(true)}>
+          <PlusIcon />
+          Create user
+        </Button>
       </header>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -100,10 +105,6 @@ export function UsersPage() {
             onChange={(event) => setSearchInput(event.target.value)}
           />
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <PlusIcon />
-          Create user
-        </Button>
       </div>
 
       {usersQuery.isPending ? <UsersLoading /> : null}

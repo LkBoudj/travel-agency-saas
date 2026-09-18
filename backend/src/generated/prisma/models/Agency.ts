@@ -40,7 +40,6 @@ export type AgencyMinAggregateOutputType = {
   name: string | null
   status: string | null
   country: string | null
-  website: string | null
   description: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -52,7 +51,6 @@ export type AgencyMaxAggregateOutputType = {
   name: string | null
   status: string | null
   country: string | null
-  website: string | null
   description: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -64,7 +62,6 @@ export type AgencyCountAggregateOutputType = {
   name: number
   status: number
   country: number
-  website: number
   description: number
   createdAt: number
   updatedAt: number
@@ -86,7 +83,6 @@ export type AgencyMinAggregateInputType = {
   name?: true
   status?: true
   country?: true
-  website?: true
   description?: true
   createdAt?: true
   updatedAt?: true
@@ -98,7 +94,6 @@ export type AgencyMaxAggregateInputType = {
   name?: true
   status?: true
   country?: true
-  website?: true
   description?: true
   createdAt?: true
   updatedAt?: true
@@ -110,7 +105,6 @@ export type AgencyCountAggregateInputType = {
   name?: true
   status?: true
   country?: true
-  website?: true
   description?: true
   createdAt?: true
   updatedAt?: true
@@ -209,7 +203,6 @@ export type AgencyGroupByOutputType = {
   name: string
   status: string
   country: string | null
-  website: string | null
   description: string | null
   createdAt: Date
   updatedAt: Date
@@ -244,7 +237,6 @@ export type AgencyWhereInput = {
   name?: Prisma.StringFilter<"Agency"> | string
   status?: Prisma.StringFilter<"Agency"> | string
   country?: Prisma.StringNullableFilter<"Agency"> | string | null
-  website?: Prisma.StringNullableFilter<"Agency"> | string | null
   description?: Prisma.StringNullableFilter<"Agency"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
@@ -258,7 +250,6 @@ export type AgencyOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
   country?: Prisma.SortOrderInput | Prisma.SortOrder
-  website?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -275,7 +266,6 @@ export type AgencyWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Agency"> | string
   status?: Prisma.StringFilter<"Agency"> | string
   country?: Prisma.StringNullableFilter<"Agency"> | string | null
-  website?: Prisma.StringNullableFilter<"Agency"> | string | null
   description?: Prisma.StringNullableFilter<"Agency"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Agency"> | Date | string
@@ -289,7 +279,6 @@ export type AgencyOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
   country?: Prisma.SortOrderInput | Prisma.SortOrder
-  website?: Prisma.SortOrderInput | Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -309,7 +298,6 @@ export type AgencyScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Agency"> | string
   status?: Prisma.StringWithAggregatesFilter<"Agency"> | string
   country?: Prisma.StringNullableWithAggregatesFilter<"Agency"> | string | null
-  website?: Prisma.StringNullableWithAggregatesFilter<"Agency"> | string | null
   description?: Prisma.StringNullableWithAggregatesFilter<"Agency"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Agency"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Agency"> | Date | string
@@ -321,7 +309,6 @@ export type AgencyCreateInput = {
   name: string
   status?: string
   country?: string | null
-  website?: string | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -335,7 +322,6 @@ export type AgencyUncheckedCreateInput = {
   name: string
   status?: string
   country?: string | null
-  website?: string | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -349,7 +335,6 @@ export type AgencyUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -363,7 +348,6 @@ export type AgencyUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -377,7 +361,6 @@ export type AgencyCreateManyInput = {
   name: string
   status?: string
   country?: string | null
-  website?: string | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -389,7 +372,6 @@ export type AgencyUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -401,7 +383,6 @@ export type AgencyUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -413,7 +394,6 @@ export type AgencyCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
   country?: Prisma.SortOrder
-  website?: Prisma.SortOrder
   description?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -429,7 +409,6 @@ export type AgencyMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
   country?: Prisma.SortOrder
-  website?: Prisma.SortOrder
   description?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -441,7 +420,6 @@ export type AgencyMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   status?: Prisma.SortOrder
   country?: Prisma.SortOrder
-  website?: Prisma.SortOrder
   description?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -497,7 +475,6 @@ export type AgencyCreateWithoutApplicationsInput = {
   name: string
   status?: string
   country?: string | null
-  website?: string | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -510,7 +487,6 @@ export type AgencyUncheckedCreateWithoutApplicationsInput = {
   name: string
   status?: string
   country?: string | null
-  website?: string | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -539,7 +515,6 @@ export type AgencyUpdateWithoutApplicationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -552,7 +527,6 @@ export type AgencyUncheckedUpdateWithoutApplicationsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -565,7 +539,6 @@ export type AgencyCreateWithoutMembersInput = {
   name: string
   status?: string
   country?: string | null
-  website?: string | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -578,7 +551,6 @@ export type AgencyUncheckedCreateWithoutMembersInput = {
   name: string
   status?: string
   country?: string | null
-  website?: string | null
   description?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -607,7 +579,6 @@ export type AgencyUpdateWithoutMembersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -620,7 +591,6 @@ export type AgencyUncheckedUpdateWithoutMembersInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  website?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -673,7 +643,6 @@ export type AgencySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   name?: boolean
   status?: boolean
   country?: boolean
-  website?: boolean
   description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -688,7 +657,6 @@ export type AgencySelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   name?: boolean
   status?: boolean
   country?: boolean
-  website?: boolean
   description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -700,7 +668,6 @@ export type AgencySelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   name?: boolean
   status?: boolean
   country?: boolean
-  website?: boolean
   description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -712,13 +679,12 @@ export type AgencySelectScalar = {
   name?: boolean
   status?: boolean
   country?: boolean
-  website?: boolean
   description?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AgencyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "status" | "country" | "website" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["agency"]>
+export type AgencyOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "code" | "name" | "status" | "country" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["agency"]>
 export type AgencyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   members?: boolean | Prisma.Agency$membersArgs<ExtArgs>
   applications?: boolean | Prisma.Agency$applicationsArgs<ExtArgs>
@@ -739,7 +705,6 @@ export type $AgencyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     name: string
     status: string
     country: string | null
-    website: string | null
     description: string | null
     createdAt: Date
     updatedAt: Date
@@ -1173,7 +1138,6 @@ export interface AgencyFieldRefs {
   readonly name: Prisma.FieldRef<"Agency", 'String'>
   readonly status: Prisma.FieldRef<"Agency", 'String'>
   readonly country: Prisma.FieldRef<"Agency", 'String'>
-  readonly website: Prisma.FieldRef<"Agency", 'String'>
   readonly description: Prisma.FieldRef<"Agency", 'String'>
   readonly createdAt: Prisma.FieldRef<"Agency", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Agency", 'DateTime'>

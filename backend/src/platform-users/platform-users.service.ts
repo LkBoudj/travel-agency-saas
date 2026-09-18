@@ -1,13 +1,7 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { hash } from 'argon2';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { generateAppUserCode } from '../auth/app-user-code.js';
+import { AppUserIdentityService } from '../auth/app-user-identity.service.js';
 import type {
   CreatePlatformUserBody,
   ListPlatformUsersQuery,
@@ -31,7 +25,10 @@ import { PLATFORM_USER_SELECT, type PlatformUserResponse, type PlatformUserRoleR
  */
 @Injectable()
 export class PlatformUsersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly identity: AppUserIdentityService,
+  ) {}
 
   async list(query: ListPlatformUsersQuery): Promise<PlatformUserResponse[]> {
     const search = query.search?.trim();
@@ -65,34 +62,26 @@ export class PlatformUsersService {
 
   async create(input: CreatePlatformUserBody): Promise<PlatformUserResponse> {
     const roleKeys = [...new Set(input.roleKeys)];
-    const code = generateAppUserCode();
-    const passwordHash = await hash(input.password);
+    // Code generation and hashing happen before the transaction opens.
+    const identity = await this.identity.prepare(input);
 
     try {
       await this.prisma.$transaction(async (tx) => {
         const roles = await this.resolvePlatformRoles(tx, roleKeys);
-
-        const appUser = await tx.appUser.create({
-          data: {
-            code,
-            email: input.email,
-            passwordHash,
-            firstName: input.firstName ?? null,
-            lastName: input.lastName ?? null,
-          },
-          select: { id: true },
-        });
+        const appUser = await this.identity.create(tx, identity);
 
         await tx.platformRoleAssignment.createMany({
           data: roles.map((role) => ({ appUserId: appUser.id, roleId: role.id })),
           skipDuplicates: true,
         });
-});
+      });
     } catch (error) {
-      await this.throwUniqueConflict(error, input.email);
+      await this.identity.rethrowAsIdentityConflict(error, identity.email, (email) =>
+        this.identity.emailExists(this.prisma, email),
+      );
     }
 
-    return this.getByCode(code);
+    return this.getByCode(identity.code);
   }
 
   async update(code: string, input: UpdatePlatformUserBody): Promise<PlatformUserResponse> {
@@ -106,7 +95,11 @@ export class PlatformUsersService {
     try {
       await this.prisma.appUser.update({ where: { id: user.id }, data });
     } catch (error) {
-      await this.throwUniqueConflict(error, input.email ?? user.email);
+      await this.identity.rethrowAsIdentityConflict(
+        error,
+        input.email ?? user.email,
+        (email) => this.identity.emailExists(this.prisma, email),
+      );
     }
 
     return this.getByCode(code);
@@ -224,44 +217,4 @@ export class PlatformUsersService {
     return user;
   }
 
-  private async throwUniqueConflict(error: unknown, submittedEmail: string): Promise<never> {
-    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-      const rawTarget = error.meta?.target;
-      const target = Array.isArray(rawTarget)
-        ? (rawTarget as unknown[]).join(',')
-        : typeof rawTarget === 'string'
-          ? rawTarget
-          : '';
-
-      if (target.includes('email')) {
-        throw this.emailConflict();
-      }
-
-      // Neon's driver omits `meta.target` for some P2002 responses. The only
-      // business-unique field the client can submit is `email`, so confirm the
-      // collision by re-checking the submitted address instead of guessing.
-      const existing = await this.prisma.appUser.findUnique({
-        where: { email: submittedEmail },
-        select: { id: true },
-      });
-      if (existing) {
-        throw this.emailConflict();
-      }
-
-      throw new ConflictException({
-        statusCode: 409,
-        message: 'Could not create user',
-        errorCode: 'USER_CREATE_CONFLICT',
-      });
-    }
-    throw error;
-  }
-
-  private emailConflict(): ConflictException {
-    return new ConflictException({
-      statusCode: 409,
-      message: 'Email is already registered',
-      errorCode: 'EMAIL_ALREADY_REGISTERED',
-    });
-  }
 }

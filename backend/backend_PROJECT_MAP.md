@@ -15,6 +15,12 @@ PENDING for the backend.
 - Version source of truth: installed `backend/package.json` + `package-lock.json`.
 - `prisma/` (schema + `prisma.config.ts`), `.env.example` (tracked), `.env`
   (gitignored) now exist.
+- Agency Foundation (backend) complete: explicit ownership
+  (`agency_membership.membership_type` = OWNER | EMPLOYEE), the protected
+  `role.system_key` system identity (`AGENCY_ADMIN`), database-enforced
+  ownership invariants, one shared agency provisioning path, and the platform
+  Agency lifecycle API (list/details/create/update/suspend/reactivate).
+  See [AGENCY_OWNERSHIP].
 - Current phase = Group 1 backend RBAC + Platform Users slice complete:
   canonical scoped permission catalog (31 PLATFORM + 38 AGENCY = 69
   code-owned permissions), 11 default role presets (5 PLATFORM + 6 Global
@@ -29,14 +35,24 @@ PENDING for the backend.
 The former M1 baseline checks are now executed and passing:
 
 - build verification (`npm run build`) — passes
-- lint verification (`npm run lint`) — 0 warnings / 0 errors
-- unit/HTTP tests (`npm test`) — 168 tests pass (12 files)
+- lint verification (`npm run lint`) — passes with 3 pre-existing
+  `no-unused-vars` warnings in the agency-applications module
+- unit/HTTP tests (`npm test`) — 252 tests pass (14 files)
 - e2e verification (`npm run test:e2e`) — 2 tests pass against the
   `configureApp`-configured app (versioned `GET /v1` serves, unversioned `/`
   is 404)
 - seed idempotency — `npx prisma db seed` run twice, both succeed
 - migration status — `npx prisma migrate status` reports "Database schema is
-  up to date!" (9 migrations)
+  up to date!" (11 migrations); `prisma migrate diff` schema vs database
+  reports "No difference detected."
+- ownership invariants verified directly against the Neon dev database: 19/19
+  checks, every scenario inside a rolled-back transaction with
+  `SET CONSTRAINTS ALL IMMEDIATE` so the deferred triggers really run
+  (valid provisioning accepted; zero-owner, second-owner, suspended-owner,
+  owner-without-AGENCY_ADMIN, role-removed-from-owner, custom-role and
+  look-alike-key cases all rejected; system role undeletable, its identity
+  unclearable and unconvertible; agency suspension leaves the OWNER ACTIVE;
+  demote-then-promote in one transaction commits). No probe data persisted.
 - runtime boot + HTTP — backend boots on `:3000`; Swagger UI `/docs` and
   `/docs-json` return 200
 - live end-to-end — login, HttpOnly cookie, `/me`, PLATFORM role CRUD, role↔
@@ -261,6 +277,104 @@ IMPLEMENTED (Group 1) — database foundation:
   the two baseline sets at startup (`RbacModule.onModuleInit`), at seed time and
   in tests. The catalog is code-owned — there is no Permission CRUD API.
 
+## [AGENCY_OWNERSHIP]
+
+IMPLEMENTED (Agency Foundation backend slice). Ownership is explicit and is
+kept strictly separate from authorization.
+
+- `agency_membership.membership_type` = `OWNER` | `EMPLOYEE` (DB CHECK
+  `agency_membership_type_check`). Ownership is NEVER inferred from a role key,
+  and holding the canonical role never makes a member the owner.
+- The canonical global agency role is identified by `role.system_key`
+  (`AGENCY_ADMIN`), not by `key`/`name`, which stay editable business metadata.
+  It is carried by the existing `AGENCY_OWNER` preset
+  (`DEFAULT_GLOBAL_AGENCY_ROLES`) — no second full-permission agency role was
+  introduced. `SYSTEM_ROLE_KEYS` / `SYSTEM_ROLE_SHAPES` in `rbac.types.ts` keep
+  the concept deliberately minimal (one identity today).
+- `system_key` is NOT an authorization mechanism. Authorization stays
+  `permission.key` only; nothing is ever granted because a role carries a
+  system identity.
+
+Database invariants (migration `20260918120000_agency_ownership_foundation`),
+all live-verified against the Neon dev database:
+
+- `role_system_key_key` UNIQUE (`system_key`) WHERE NOT NULL — one role per
+  identity.
+- `role_system_key_shape_check` — a non-null `system_key` must be a known
+  identity AND satisfy its shape (`AGENCY_ADMIN` => `scope = 'AGENCY'` AND
+  `agency_id IS NULL`). This is what forbids converting the canonical role into
+  a custom agency role.
+- `role_protect_system_identity` BEFORE UPDATE/DELETE trigger — a non-null
+  `system_key` can never be changed or cleared, and such a role can never be
+  deleted.
+- `agency_membership_owner_key` UNIQUE (`agency_id`) WHERE
+  `membership_type = 'OWNER'` — at most one OWNER. A partial unique index is
+  always immediate and can never be DEFERRABLE, which is why "at least one" is
+  a separate deferred check.
+- `agency_membership_owner_active_check` — an OWNER row must be `ACTIVE`. An
+  OWNER membership can therefore never be SUSPENDED; suspending the BUSINESS is
+  `agency.status`.
+- `agency_ownership_invariants` DEFERRED constraint triggers on `agency`,
+  `agency_membership` and `agency_role_assignment` — at COMMIT every agency has
+  exactly one OWNER, that OWNER is ACTIVE, and that OWNER holds the role whose
+  `system_key = 'AGENCY_ADMIN'`. Deferral is what allows
+  create-agency -> create-membership -> assign-role in one transaction, and
+  keeps a future ownership transfer (demote -> promote -> COMMIT) possible
+  without loosening the invariant.
+
+Service layer (`AgencyProvisioningService`, `AgenciesService`) rejects the same
+states early with explicit `errorCode`s (`AGENCY_ADMIN_ROLE_MISSING`,
+`AGENCY_ADMIN_ROLE_INVALID`, `OWNER_APP_USER_NOT_FOUND`,
+`OWNER_APP_USER_NOT_ACTIVE`, `AGENCY_NOT_FOUND`, `SYSTEM_ROLE_PROTECTED`);
+`mapOwnershipError` translates a trigger that still fires at COMMIT
+(`AGENCY_REQUIRES_OWNER`, `OWNER_CANNOT_BE_SUSPENDED`,
+`OWNER_REQUIRES_AGENCY_ADMIN`, ...) into the same contract, so a raw PostgreSQL
+error is never returned.
+
+`AgencyProvisioningService.provision()` is the single way an Agency is created.
+Platform creation (`POST /v1/agencies`) and agency application approval both call
+it, so an approved agency and a platform-created one get an identical structure.
+An agency is never created orphaned; any failure rolls the whole transaction
+back.
+
+`POST /v1/agencies` takes a discriminated `owner`:
+
+- `{ type: 'EXISTING', appUserCode }` - an account already on the platform. It
+  must exist and be ACTIVE (`OWNER_APP_USER_NOT_FOUND` / `OWNER_APP_USER_NOT_ACTIVE`).
+- `{ type: 'NEW', email, password, firstName?, lastName? }` - the account is
+  created in the SAME transaction as the agency, through
+  `AppUserIdentityService`. A duplicate address is rejected with
+  `EMAIL_ALREADY_REGISTERED` and creates neither a second account nor a partial
+  agency. A NEW owner receives NO `PlatformRoleAssignment`: an AppUser whose only
+  context is an OWNER membership is a valid, fully supported state.
+
+`AppUserIdentityService` (`src/auth/`) owns generic identity creation - code
+generation, argon2id hashing and the unique-email conflict contract - and is
+shared by self-registration, Platform User administration and agency creation.
+It knows nothing about roles or memberships, so nothing about it grants access.
+
+The Agency profile is deliberately minimal: `code` (backend-generated,
+immutable), `name`, `status`, `country`, `description`, `createdAt`,
+`updatedAt`. `website` was DROPPED by migration
+`20260918160000_agency_drop_website` and no `domain` replacement was added:
+custom domains belong to the future Agency Dashboard -> Settings -> Domain
+feature (configuration + DNS verification). `agency_application.website` is kept
+- an application is a permanent record of what the applicant submitted - but it
+is no longer copied onto the agency at approval time.
+
+`GET /v1/app-users/search?search=` (`AppUserLookupController`,
+`PLATFORM_AGENCY_CREATE`) backs the owner picker. It searches EVERY AppUser by
+name, email or code - `/v1/platform-users` cannot serve this, because it only
+returns accounts holding a platform role and an agency owner normally holds
+none. It is deliberately not a directory: `search` is required (>= 2 characters)
+and results are capped at `APP_USER_LOOKUP_LIMIT`. The response carries only
+`{ code, firstName, lastName, email, status }`.
+
+NOT in this slice (deferred): AgencyPermissionsService / AgencyPermissionGuard /
+agency CASL / agency-scoped request authorization, member management (invite,
+add, remove, suspend employee, change membershipType), transfer ownership,
+customer model and customer counts.
+
 ## [PLATFORM_AUTHORIZATION]
 
 IMPLEMENTED (Group 1 backend only):
@@ -273,6 +387,14 @@ IMPLEMENTED (Group 1 backend only):
     `scope = PLATFORM` (a client-supplied `scope` is stripped by Zod).
     Existing permission keys: `PLATFORM_ROLE_VIEW`, `PLATFORM_ROLE_CREATE`,
     `PLATFORM_ROLE_UPDATE`, `PLATFORM_ROLE_DELETE`.
+  - `/v1/agencies` is the platform Agency lifecycle surface: `GET /v1/agencies`
+    (list; owner + `membersCount` derived from `AgencyMembership`, never stored),
+    `GET /v1/agencies/:code` (details + linked `applicationId`),
+    `POST /v1/agencies` (`PLATFORM_AGENCY_CREATE`),
+    `PATCH /v1/agencies/:code` (`PLATFORM_AGENCY_UPDATE`, descriptive fields
+    only) and `PATCH /v1/agencies/:code/status`
+    (`PLATFORM_AGENCY_STATUS_MANAGE`, suspend/reactivate the BUSINESS —
+    membership rows are never touched). No new permission was introduced.
   - `/v1/agency-roles` mirrors the CRUD/available-permissions/permission-set
     surface for Global Agency roles (`scope = AGENCY`, `agencyId = null`),
     authorized by the dedicated `PLATFORM_AGENCY_ROLE_VIEW`,

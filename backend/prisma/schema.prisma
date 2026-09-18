@@ -39,6 +39,20 @@ model Role {
   //   role_global_key_key  UNIQUE (scope, key) WHERE agency_id IS NULL
   //   role_agency_key_key  UNIQUE (agency_id, key) WHERE agency_id IS NOT NULL
   key         String   @db.VarChar(64)
+  // Stable PROTECTED system identity. Null for every normal/custom role; a
+  // value marks a canonical role the platform itself depends on. It is not an
+  // authorization mechanism (authorization stays on `permission.key`) — it is
+  // the immutable handle domain invariants are allowed to reason about, because
+  // `key` and `name` are editable business metadata.
+  //
+  // Database guarantees (see the `agency_ownership_foundation` migration):
+  //   role_system_key_key  UNIQUE (system_key) WHERE system_key IS NOT NULL
+  //   role_system_key_shape_check  a non-null system_key must be a known system
+  //     identity AND satisfy that identity's required shape
+  //     (`AGENCY_ADMIN` => scope = 'AGENCY' AND agency_id IS NULL)
+  //   role_protect_system_identity  trigger: a non-null system_key can never be
+  //     changed or cleared, and such a role can never be deleted
+  systemKey   String?  @map("system_key") @db.VarChar(64)
   scope       String   @db.VarChar(16)
   // Ownership discriminator for AGENCY roles. Null means the role is global
   // (PLATFORM roles, or Platform-Admin-managed global AGENCY roles); a value
@@ -113,9 +127,13 @@ model Agency {
   // constraint (`agency_status_check`) restricts the value to ACTIVE | SUSPENDED.
   // SUSPENDED is a platform-side operation state, not an identity status.
   status      String   @default("ACTIVE") @map("status") @db.VarChar(16)
-  // Optional contact/description fields captured with the agency.
+  // Optional descriptive fields captured with the agency. `country` is free
+  // text for now and may later reference a Country entity.
+  //
+  // There is deliberately no `website`/`domain` field: custom domains are a
+  // separate concern that belongs to the future Agency Dashboard -> Settings ->
+  // Domain feature (configuration + DNS verification), not to this foundation.
   country     String?  @db.VarChar(100)
-  website     String?  @db.VarChar(255)
   description String?  @db.Text
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
@@ -166,14 +184,32 @@ model AgencyApplication {
 }
 
 model AgencyMembership {
-  id        BigInt   @id @default(autoincrement())
-  agencyId  BigInt   @map("agency_id")
-  appUserId BigInt   @map("app_user_id")
+  id             BigInt @id @default(autoincrement())
+  agencyId       BigInt @map("agency_id")
+  appUserId      BigInt @map("app_user_id")
+  // Ownership of the agency, kept explicit and separate from authorization.
+  // A database CHECK (`agency_membership_type_check`) restricts the value to
+  // OWNER | EMPLOYEE. Ownership is NEVER inferred from a role key, and holding
+  // the canonical AGENCY_ADMIN role does NOT make a member the owner: an
+  // EMPLOYEE may hold AGENCY_ADMIN too.
+  //
+  // Database guarantees (see the `agency_ownership_foundation` migration):
+  //   agency_membership_owner_key  UNIQUE (agency_id) WHERE type = 'OWNER'
+  //     — at most one OWNER (immediate; a partial unique index is never
+  //       deferrable)
+  //   agency_membership_owner_active_check  an OWNER row must be ACTIVE
+  //   agency_ownership_invariants  DEFERRED constraint trigger — after COMMIT
+  //     every agency has exactly one OWNER, that OWNER is ACTIVE, and that
+  //     OWNER holds the canonical AGENCY_ADMIN system role
+  membershipType String @map("membership_type") @db.VarChar(16)
   // Membership lifecycle. The database CHECK constraint
   // (`agency_membership_status_check`) restricts the value to ACTIVE | SUSPENDED.
   // It is a membership status inside one agency, not the AppUser identity
-  // status (`app_user.status`), which stays authoritative for authentication.
-  status    String   @default("ACTIVE") @map("status") @db.VarChar(16)
+  // status (`app_user.status`), which stays authoritative for authentication,
+  // and not the agency's own business status (`agency.status`). Suspending the
+  // business is `agency.status`; an OWNER membership can never be SUSPENDED.
+  status         String @default("ACTIVE") @map("status") @db.VarChar(16)
+
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -183,6 +219,10 @@ model AgencyMembership {
 
   @@unique([agencyId, appUserId])
   @@index([appUserId])
+  // Supports the ownership lookups the invariant trigger and the agency list
+  // perform. "At most one OWNER" itself is the partial unique index
+  // `agency_membership_owner_key`, which Prisma PSL cannot express.
+  @@index([agencyId, membershipType], map: "agency_membership_type_idx")
   @@map("agency_membership")
 }
 

@@ -1,6 +1,7 @@
 import { ConflictException } from '@nestjs/common';
 import { hash } from 'argon2';
 import { Prisma } from '../generated/prisma/client.js';
+import { AppUserIdentityService } from './app-user-identity.service.js';
 import { AuthService } from './auth.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { JwtService } from '@nestjs/jwt';
@@ -42,6 +43,7 @@ describe('AuthService', () => {
     service = new AuthService(
       prismaMock as unknown as PrismaService,
       jwtMock as unknown as JwtService,
+      new AppUserIdentityService(),
     );
   });
 
@@ -90,7 +92,7 @@ describe('AuthService', () => {
       ).rejects.toMatchObject({
         response: {
           statusCode: 409,
-          message: 'Email is already registered',
+          message: 'An account with this email address already exists',
           errorCode: 'EMAIL_ALREADY_REGISTERED',
         },
       });

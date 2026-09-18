@@ -62,6 +62,7 @@ export class RolesService {
 
   async update(scope: RoleScope, rawId: string, input: UpdateRoleBody): Promise<RoleResponse> {
     const id = await this.requireRoleId(scope, rawId);
+    await this.assertNotSystemRole(id);
 
     if (input.name !== undefined) {
       await this.assertNameAvailable(scope, input.name, id);
@@ -81,6 +82,7 @@ export class RolesService {
 
   async remove(scope: RoleScope, rawId: string): Promise<void> {
     const id = await this.requireRoleId(scope, rawId);
+    await this.assertNotSystemRole(id);
 
     if (scope === 'PLATFORM') {
       const assignmentCount = await this.prisma.platformRoleAssignment.count({
@@ -193,6 +195,27 @@ export class RolesService {
       throw new NotFoundException('Role not found');
     }
     return id;
+  }
+
+  /**
+   * Roles carrying a protected system identity (`systemKey`) are platform
+   * infrastructure that domain invariants point at, so they are never renamed,
+   * re-described or deleted through the CRUD API. The database enforces this
+   * too (`role_protect_system_identity`); this check exists so the API answers
+   * with a domain error instead of a constraint violation.
+   */
+  private async assertNotSystemRole(id: bigint): Promise<void> {
+    const role = await this.prisma.role.findUnique({
+      where: { id },
+      select: { systemKey: true },
+    });
+    if (role?.systemKey) {
+      throw new ConflictException({
+        statusCode: 409,
+        message: 'This role carries a protected system identity and cannot be modified or deleted',
+        errorCode: 'SYSTEM_ROLE_PROTECTED',
+      });
+    }
   }
 
   private parseRoleId(rawId: string): bigint {

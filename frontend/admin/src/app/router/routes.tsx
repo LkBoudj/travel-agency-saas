@@ -1,6 +1,8 @@
 import { createBrowserRouter, Navigate } from "react-router-dom"
 
 import { LoginPage } from "@/features/auth/pages/login-page"
+import { AgenciesPage } from "@/features/platform/pages/agencies-page"
+import { AgencyDetailsPage } from "@/features/platform/pages/agency-details-page"
 import { OverviewPage } from "@/features/platform/pages/overview-page"
 import { UsersPage } from "@/features/platform/pages/users-page"
 import { RolesPermissionsPage } from "@/features/platform/pages/roles-permissions-page"
@@ -33,6 +35,8 @@ export function createAppRouter() {
               element: <Navigate to={ROUTES.platformUsers} replace />,
             },
             { path: ROUTES.platformUsers, element: <UsersPage /> },
+            { path: ROUTES.agencies, element: <AgenciesPage /> },
+            { path: ROUTES.agencyDetails, element: <AgencyDetailsPage /> },
             { path: ROUTES.rolesAndPermissions, element: <RolesPermissionsPage /> },
           ],
         },

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -135,144 +136,146 @@ export function CreateUserDialog({
         <DialogHeader>
           <DialogTitle>Create user</DialogTitle>
           <DialogDescription>
-            Create a Super Dashboard account and assign its platform roles.
+            Create a Super Dashboard account and assign its roles.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} noValidate>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="create-user-email">Email</FieldLabel>
-              <Input
-                id="create-user-email"
-                type="email"
-                autoComplete="off"
-                autoFocus
-                placeholder="you@example.com"
-                aria-invalid={!!formState.errors.email}
-                {...register("email")}
-              />
-              <FieldError errors={[{ message: formState.errors.email?.message }]} />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="create-user-password">Password</FieldLabel>
-              <Input
-                id="create-user-password"
-                type="password"
-                autoComplete="new-password"
-                aria-invalid={!!formState.errors.password}
-                {...register("password")}
-              />
-              <FieldError
-                errors={[{ message: formState.errors.password?.message }]}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="create-user-confirm-password">
-                Confirm password
-              </FieldLabel>
-              <Input
-                id="create-user-confirm-password"
-                type="password"
-                autoComplete="new-password"
-                aria-invalid={!!formState.errors.confirmPassword}
-                {...register("confirmPassword")}
-              />
-              <FieldError
-                errors={[{ message: formState.errors.confirmPassword?.message }]}
-              />
-            </Field>
-            <div className="grid gap-5 @md/field-group:grid-cols-2">
+        <form onSubmit={onSubmit} noValidate className="flex min-h-0 flex-1 flex-col gap-4">
+          <DialogBody>
+            <FieldGroup className="gap-4">
+              <div className="grid gap-4 @md/field-group:grid-cols-2">
+                <Field>
+                  <FieldLabel htmlFor="create-user-first-name">First name</FieldLabel>
+                  <Input
+                    id="create-user-first-name"
+                    autoComplete="off"
+                    autoFocus
+                    aria-invalid={!!formState.errors.firstName}
+                    {...register("firstName")}
+                  />
+                  <FieldError
+                    errors={[{ message: formState.errors.firstName?.message }]}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="create-user-last-name">Last name</FieldLabel>
+                  <Input
+                    id="create-user-last-name"
+                    autoComplete="off"
+                    aria-invalid={!!formState.errors.lastName}
+                    {...register("lastName")}
+                  />
+                  <FieldError
+                    errors={[{ message: formState.errors.lastName?.message }]}
+                  />
+                </Field>
+              </div>
+
               <Field>
-                <FieldLabel htmlFor="create-user-first-name">First name</FieldLabel>
+                <FieldLabel htmlFor="create-user-email">Email</FieldLabel>
                 <Input
-                  id="create-user-first-name"
+                  id="create-user-email"
+                  type="email"
                   autoComplete="off"
-                  aria-invalid={!!formState.errors.firstName}
-                  {...register("firstName")}
+                  placeholder="you@example.com"
+                  aria-invalid={!!formState.errors.email}
+                  {...register("email")}
                 />
-                <FieldError
-                  errors={[{ message: formState.errors.firstName?.message }]}
-                />
+                <FieldError errors={[{ message: formState.errors.email?.message }]} />
               </Field>
+
+              <div className="grid gap-4 @md/field-group:grid-cols-2">
+                <Field>
+                  <FieldLabel htmlFor="create-user-password">Password</FieldLabel>
+                  <Input
+                    id="create-user-password"
+                    type="password"
+                    autoComplete="new-password"
+                    aria-invalid={!!formState.errors.password}
+                    {...register("password")}
+                  />
+                  <FieldError
+                    errors={[{ message: formState.errors.password?.message }]}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="create-user-confirm-password">
+                    Confirm password
+                  </FieldLabel>
+                  <Input
+                    id="create-user-confirm-password"
+                    type="password"
+                    autoComplete="new-password"
+                    aria-invalid={!!formState.errors.confirmPassword}
+                    {...register("confirmPassword")}
+                  />
+                  <FieldError
+                    errors={[{ message: formState.errors.confirmPassword?.message }]}
+                  />
+                </Field>
+              </div>
               <Field>
-                <FieldLabel htmlFor="create-user-last-name">Last name</FieldLabel>
-                <Input
-                  id="create-user-last-name"
-                  autoComplete="off"
-                  aria-invalid={!!formState.errors.lastName}
-                  {...register("lastName")}
-                />
-                <FieldError
-                  errors={[{ message: formState.errors.lastName?.message }]}
-                />
-              </Field>
-            </div>
-            <Field>
-              <FieldLabel htmlFor="create-user-roles">
-                Platform roles
-              </FieldLabel>
-              <FieldDescription>
-                Choose one or more roles that define what this user can do.
-              </FieldDescription>
-              {rolesQuery.isPending ? <RoleChecklistSkeleton /> : null}
-              {!rolesQuery.isPending && rolesQuery.isError ? (
-                <div className="flex items-center gap-2 rounded-lg border border-destructive/50 px-3 py-2">
-                  <p className="flex-1 text-sm text-destructive">
-                    Could not load the role catalog.
+                <FieldLabel htmlFor="create-user-roles">Platform roles</FieldLabel>
+                <FieldDescription>Choose at least one role.</FieldDescription>
+                {rolesQuery.isPending ? <RoleChecklistSkeleton /> : null}
+                {!rolesQuery.isPending && rolesQuery.isError ? (
+                  <div className="flex items-center gap-2 rounded-lg border border-destructive/50 px-3 py-2">
+                    <p className="flex-1 text-sm text-destructive">
+                      Could not load the role catalog.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => void rolesQuery.refetch()}
+                    >
+                      <RotateCcwIcon />
+                      Retry
+                    </Button>
+                  </div>
+                ) : null}
+                {!rolesQuery.isPending && !rolesQuery.isError && roles.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    No platform roles are available yet. Create a platform role
+                    before inviting a user.
                   </p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => void rolesQuery.refetch()}
-                  >
-                    <RotateCcwIcon />
-                    Retry
-                  </Button>
-                </div>
+                ) : null}
+                {!rolesQuery.isPending && !rolesQuery.isError && roles.length > 0 ? (
+                  <ul className="flex max-h-52 flex-col gap-3 overflow-y-auto pr-1">
+                    {roles.map((role) => {
+                      const checkboxId = `create-user-role-${role.key}`
+                      const checked = selectedRoleKeys.includes(role.key)
+                      return (
+                        <li key={role.id} className="flex items-start gap-3">
+                          <Checkbox
+                            id={checkboxId}
+                            className="mt-0.5"
+                            checked={checked}
+                            onCheckedChange={(value) =>
+                              handleToggleRole(role.key, value === true)
+                            }
+                          />
+                          <div className="grid gap-0.5">
+                            <Label htmlFor={checkboxId} className="font-medium">
+                              {role.name}
+                            </Label>
+                            <p className="font-mono text-xs text-muted-foreground">
+                              {role.key}
+                            </p>
+                          </div>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                ) : null}
+                <FieldError
+                  errors={[{ message: formState.errors.roleKeys?.message }]}
+                />
+              </Field>
+              {serverErrorMessage ? (
+                <FieldError>{serverErrorMessage}</FieldError>
               ) : null}
-              {!rolesQuery.isPending && !rolesQuery.isError && roles.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No platform roles are available yet. Create a platform role
-                  before inviting a user.
-                </p>
-              ) : null}
-              {!rolesQuery.isPending && !rolesQuery.isError && roles.length > 0 ? (
-                <ul className="flex flex-col gap-3">
-                  {roles.map((role) => {
-                    const checkboxId = `create-user-role-${role.key}`
-                    const checked = selectedRoleKeys.includes(role.key)
-                    return (
-                      <li key={role.id} className="flex items-start gap-3">
-                        <Checkbox
-                          id={checkboxId}
-                          className="mt-0.5"
-                          checked={checked}
-                          onCheckedChange={(value) =>
-                            handleToggleRole(role.key, value === true)
-                          }
-                        />
-                        <div className="grid gap-0.5">
-                          <Label htmlFor={checkboxId} className="font-medium">
-                            {role.name}
-                          </Label>
-                          <p className="font-mono text-xs text-muted-foreground">
-                            {role.key}
-                          </p>
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ul>
-              ) : null}
-              <FieldError
-                errors={[{ message: formState.errors.roleKeys?.message }]}
-              />
-            </Field>
-            {serverErrorMessage ? (
-              <FieldError>{serverErrorMessage}</FieldError>
-            ) : null}
-          </FieldGroup>
+            </FieldGroup>
+          </DialogBody>
           <DialogFooter className="mt-4">
             <Button
               type="button"
