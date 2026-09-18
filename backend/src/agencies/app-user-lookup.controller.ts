@@ -14,6 +14,10 @@ import { AUTH_COOKIE_NAME } from '../auth/auth.constants.js';
 import { PermissionGuard } from '../authorization/permission.guard.js';
 import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
 import { AppUserLookupService } from './app-user-lookup.service.js';
+import { RateLimit, RateLimitGuard } from '../security/rate-limit.guard.js';
+import { AUDIT_ACTIONS, AuditService } from '../security/audit.service.js';
+import { CurrentUser } from '../auth/decorators/current-user.decorator.js';
+import type { InternalAuthUser } from '../auth/auth-user.js';
 import { APP_USER_OPTION_SCHEMA } from './agencies.swagger.js';
 import type { AppUserOption } from './app-user-lookup.service.js';
 
@@ -41,15 +45,26 @@ export type AppUserLookupQuery = z.infer<typeof appUserLookupQuerySchema>;
  */
 @ApiTags('agencies')
 @Controller('app-users')
-@UseGuards(JwtAuthGuard, PermissionGuard)
+@UseGuards(JwtAuthGuard, PermissionGuard, RateLimitGuard)
 @ApiCookieAuth(AUTH_COOKIE_NAME)
 @ApiUnauthorizedResponse({ description: 'Missing, invalid or expired auth cookie' })
 @ApiForbiddenResponse({ description: 'Authenticated but missing the required permission' })
 export class AppUserLookupController {
-  constructor(private readonly lookup: AppUserLookupService) {}
+  constructor(
+    private readonly lookup: AppUserLookupService,
+    private readonly audit: AuditService,
+  ) {}
 
   @Get('search')
   @RequirePermissions('PLATFORM_AGENCY_CREATE')
+  // This is the one remaining global identity search in the product, so it
+  // is both throttled and audited. The searched term is hashed, never stored.
+  @RateLimit({
+    scope: 'APP_USER_SEARCH',
+    defaultLimit: 60,
+    defaultWindowSeconds: 3600,
+    dimensions: ['actor', 'ip'],
+  })
   @ApiOperation({
     summary: 'Search accounts to select an agency owner',
     description:
@@ -66,9 +81,20 @@ export class AppUserLookupController {
     description: 'Matching accounts, active first, then by name',
     schema: { type: 'array', items: APP_USER_OPTION_SCHEMA },
   })
-  search(
+  async search(
+    @CurrentUser() actor: InternalAuthUser,
     @Query({ schema: appUserLookupQuerySchema }) query: AppUserLookupQuery,
   ): Promise<AppUserOption[]> {
-    return this.lookup.search(query.search);
+    const results = await this.lookup.search(query.search);
+
+    await this.audit.record({
+      action: AUDIT_ACTIONS.platformAppUserSearch,
+      outcome: 'SUCCESS',
+      actorCode: actor.code,
+      sensitiveTarget: query.search,
+      metadata: { resultCount: results.length },
+    });
+
+    return results;
   }
 }

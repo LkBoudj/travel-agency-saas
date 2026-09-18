@@ -37,7 +37,7 @@ The former M1 baseline checks are now executed and passing:
 - build verification (`npm run build`) — passes
 - lint verification (`npm run lint`) — passes with 3 pre-existing
   `no-unused-vars` warnings in the agency-applications module
-- unit/HTTP tests (`npm test`) — 252 tests pass (14 files)
+- unit/HTTP tests (`npm test`) — 330 tests pass (18 files)
 - e2e verification (`npm run test:e2e`) — 2 tests pass against the
   `configureApp`-configured app (versioned `GET /v1` serves, unversioned `/`
   is 404)
@@ -374,6 +374,110 @@ NOT in this slice (deferred): AgencyPermissionsService / AgencyPermissionGuard /
 agency CASL / agency-scoped request authorization, member management (invite,
 add, remove, suspend employee, change membershipType), transfer ownership,
 customer model and customer counts.
+
+## [AGENCY_MEMBERS]
+
+IMPLEMENTED (backend only). Agency-side member administration, entirely inside
+one agency and authorized by AGENCY `Permission.key` through the existing
+`AgencyPermissionGuard`.
+
+Routes, all under `/v1/agencies/:agencyCode`:
+
+- `GET  members` (`AGENCY_MEMBER_VIEW`) - owner and employees in one list, one
+  row per person however many roles they hold; search by name/email/code
+- `GET  members/:userCode` (`AGENCY_MEMBER_VIEW`)
+- `POST members` (`AGENCY_MEMBER_INVITE`) - discriminated `member`:
+  `{ type: EXISTING, appUserCode }` or `{ type: NEW, email, password, ... }`
+- `PUT  members/:userCode/roles` (`AGENCY_MEMBER_ROLE_MANAGE`) - atomic full
+  replacement
+- `PATCH members/:userCode/status` (`AGENCY_MEMBER_UPDATE`)
+- `DELETE members/:userCode` (`AGENCY_MEMBER_REMOVE`) - 204
+- `GET  available-roles` (`AGENCY_MEMBER_ROLE_MANAGE`) - global agency roles plus
+  THIS agency's custom ones; never PLATFORM or another agency's
+- `GET  member-candidates?search=` (`AGENCY_MEMBER_INVITE`) - agency-authorized
+  account lookup, required search term and capped results. `/v1/app-users/search`
+  was NOT reused: it is guarded by `PLATFORM_AGENCY_CREATE` and must not be
+  reachable from an agency dashboard.
+
+Domain rules:
+
+- The server always creates `membershipType = EMPLOYEE`, `status = ACTIVE`.
+  `membershipType`, `agencyId`, role ids, `systemKey`, account status and OWNER
+  are rejected outright (`.strict()`).
+- Roles are OPTIONAL and an empty set is valid: `membershipType = EMPLOYEE`
+  already classifies the person, so no placeholder "Employee" role is invented.
+  An ACTIVE employee with zero roles is a valid member with zero business
+  permissions.
+- OWNER is readable but never managed here: suspend, remove and role replacement
+  all return 409 (`OWNER_CANNOT_BE_SUSPENDED`, `OWNER_CANNOT_BE_REMOVED`,
+  `OWNER_ROLES_IMMUTABLE`). Ownership transfer stays a separate future operation.
+- Membership status is access to ONE agency. It never touches `AppUser.status`,
+  memberships in other agencies, or platform access.
+- Removing a member removes the membership and its role assignments from THIS
+  agency only; the account and its other memberships survive.
+- A NEW member's identity is created through `AppUserIdentityService` in the same
+  transaction as the membership (no orphan account on failure) and receives NO
+  `PlatformRoleAssignment`.
+- Role assignment accepts only roles valid for this agency
+  (`isRoleValidForAgency`), with the `agency_role_assignment_scope` trigger as
+  the final protection.
+
+NOT in this slice: invitations/tokens/emails, custom role CRUD, ownership
+transfer, and any frontend.
+
+## [AGENCY_AUTHORIZATION]
+
+IMPLEMENTED. Makes AGENCY permissions enforceable inside one specific agency,
+mirroring the platform side without touching it.
+
+Resolution chain, walked in full from the database on every agency-scoped
+request (nothing about agency access is in the JWT, which stays identity-only):
+
+    AppUser -> AgencyMembership -> AgencyRoleAssignment -> Role
+            -> RolePermission -> Permission.key
+
+- `AgencyPermissionsService.resolveAccess(appUserId, agencyCode)` does it in ONE
+  query (agency + this user's membership + its assignments + each role's AGENCY
+  permissions), so there is no N+1 and no second source of truth.
+- `AgencyPermissionGuard` composes with `JwtAuthGuard`: resolve `:agencyCode`,
+  404 if unknown, 403 `AGENCY_SUSPENDED` if not operational, 403
+  `AGENCY_MEMBERSHIP_REQUIRED` / `AGENCY_MEMBERSHIP_INACTIVE` without an ACTIVE
+  membership, then CASL over the effective keys, else 403
+  `AGENCY_PERMISSION_DENIED`. The resolved context is attached to the request
+  (`@CurrentAgency`) so handlers never re-resolve it.
+- `@RequireAgencyPermissions(...)` is separate from the PLATFORM
+  `@RequirePermissions`, and validates its keys against the AGENCY catalog at
+  decoration time: a typo or a PLATFORM key fails the app at boot.
+- `@RequireAgencyMembership()` marks a route agency-scoped without a specific
+  permission (agency existence, status and ACTIVE membership are still enforced).
+
+Agency context comes from the ROUTE (`/v1/agencies/:agencyCode/...`), never from
+a request body, and there is no ambient "active agency" on the AppUser: one
+AppUser may hold different roles in several agencies and each is resolved
+independently.
+
+Tenant isolation is enforced twice, and both fail closed:
+
+- a role counts only when `scope = AGENCY` AND it is global (`agencyId = null`)
+  or owned by THIS agency (`isRoleValidForAgency`);
+- a permission counts only when `permission.scope = AGENCY`, so a PLATFORM
+  permission can never grant agency-side access.
+
+OWNER has NO authorization branch. `membershipType` is never read by the guard
+or the service: the owner has access purely because the ownership invariant
+guarantees their membership holds the canonical AGENCY_ADMIN role, whose
+RolePermissions grant the AGENCY catalog. Removing a permission from that role
+removes it from the owner, on the next request, without a new JWT. `systemKey`
+identifies the protected role; it is never an authorization input.
+
+`GET /v1/agencies/:agencyCode/me` returns the caller's context in one agency:
+agency (code/name/status), membership (type/status), the valid AGENCY roles and
+the effective permission keys. It exists so a future Agency Dashboard can adapt
+its UI; every route stays enforced server-side. Database ids, `systemKey` and
+role-permission internals are not exposed.
+
+NOT in this slice: agency member management, invitations, custom role CRUD,
+ownership transfer, and any agency business feature.
 
 ## [PLATFORM_AUTHORIZATION]
 

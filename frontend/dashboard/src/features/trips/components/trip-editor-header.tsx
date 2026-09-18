@@ -2,7 +2,8 @@ import { ArrowLeft, ArrowRight } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { useWatch } from "react-hook-form"
 import { Link } from "react-router-dom"
-import { ROUTES } from "@/app/router/route-paths"
+import { AGENCY_SECTIONS, agencyPath } from "@/features/agency-context/lib/agency-paths"
+import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
 import { useIsRtl } from "@/i18n"
 import type { TripEditor } from "../hooks/use-trip-editor"
 import type { TripStatus } from "../types/trip.types"
@@ -18,6 +19,8 @@ export function TripEditorHeader({
 }: {
   editor: TripEditor
 }) {
+  const { agency } = useAgencyContext()
+  const tripsPath = agencyPath(agency.code, AGENCY_SECTIONS.trips)
   const { t } = useTranslation()
   const isRtl = useIsRtl()
   const { register, formState } = editor.form
@@ -30,7 +33,7 @@ export function TripEditorHeader({
   return (
     <header className="flex items-center gap-3 py-1">
       <Link
-        to={ROUTES.trips}
+        to={tripsPath}
         aria-label={t("trips:editor.header.backAria")}
         className="flex size-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
       >
@@ -40,7 +43,7 @@ export function TripEditorHeader({
       <div className="min-w-0 flex-1">
         <p className="truncate text-xs text-muted-foreground">
           <Link
-            to={ROUTES.trips}
+            to={tripsPath}
             className="transition-colors hover:text-foreground"
           >
             {t("trips:editor.header.tripsCrumb")}

@@ -105,6 +105,13 @@ constraint-level detail). Ownership is explicit and separate from authorization:
 - Owning an agency does not imply platform access: an owner created this way
   gets no platform role, and an AppUser whose only context is an OWNER
   membership is a valid state.
+- Agency-side authorization is IMPLEMENTED and permission-based: an agency-scoped
+  route resolves `:agencyCode` from the URL, requires an ACTIVE membership in an
+  operational agency, and evaluates AGENCY `Permission.key`s resolved from the
+  database on every request. OWNER gets no bypass - the owner is allowed because
+  their membership holds the canonical agency admin role. Cross-tenant leakage is
+  blocked in the service and in PostgreSQL. `GET /v1/agencies/:agencyCode/me`
+  returns the caller's context in one agency.
 - Derived data (owner, member counts) is always computed from relationships;
   no denormalized owner or counter columns exist.
 - The Agency profile is intentionally small: code, name, status, country,

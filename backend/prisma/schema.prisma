@@ -231,10 +231,61 @@ model AgencyRoleAssignment {
   membershipId BigInt @map("membership_id")
   roleId       BigInt @map("role_id")
 
+  // Tenant isolation (see the `agency_role_assignment_scope` migration). Two
+  // BEFORE triggers keep an assignment inside one tenant, because the rule spans
+  // three tables and a CHECK cannot read other tables:
+  //   agency_role_assignment_scope  the role must be scope = AGENCY, and either
+  //     global (agency_id IS NULL) or owned by the membership's own agency
+  //   role_protect_assigned_scope   a role's scope/owning agency cannot change
+  //     while it is assigned, so a valid assignment cannot later become a
+  //     cross-tenant grant
+  // AgencyPermissionsService applies the same rule again when computing
+  // permissions, so a row that somehow bypassed the database grants nothing.
+
   membership AgencyMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
   role       Role             @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([membershipId, roleId])
   @@index([roleId])
   @@map("agency_role_assignment")
+}
+
+/**
+ * Security-relevant events, append-only.
+ *
+ * It exists so questions like "has the directory been probed?" or "who removed
+ * that member?" have an answer. Rows are never updated or deleted by
+ * application code.
+ *
+ * Deliberately NOT a foreign key to AppUser or Agency: an audit record must
+ * survive the deletion of whatever it describes, and a cascade would erase
+ * exactly the history an investigation needs. Actors and agencies are recorded
+ * by their stable public `code`.
+ *
+ * `targetHash` carries a SHA-256 of a sensitive lookup term (for example a
+ * searched email) so repeated probing is still correlatable without the log
+ * itself becoming a second copy of the data being protected.
+ */
+model AuditLog {
+  id        BigInt   @id @default(autoincrement())
+  /** Stable event name, e.g. PLATFORM_APP_USER_SEARCH, AGENCY_MEMBER_REMOVE. */
+  action    String   @db.VarChar(64)
+  /** SUCCESS | DENIED | FAILURE. */
+  outcome   String   @db.VarChar(16)
+  /** The acting AppUser's public code; null for an unauthenticated attempt. */
+  actorCode String?  @map("actor_code") @db.VarChar(24)
+  /** The agency the action happened in, when it was agency-scoped. */
+  agencyCode String? @map("agency_code") @db.VarChar(24)
+  /** The subject's public code, when the action names one. */
+  targetCode String? @map("target_code") @db.VarChar(24)
+  /** SHA-256 of a sensitive term, never the term itself. */
+  targetHash String? @map("target_hash") @db.VarChar(64)
+  /** Small non-sensitive context (result counts, error codes). */
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@index([action, createdAt])
+  @@index([actorCode, createdAt])
+  @@index([agencyCode, createdAt])
+  @@map("audit_log")
 }

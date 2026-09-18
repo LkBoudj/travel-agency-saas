@@ -9,7 +9,8 @@ import {
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { NavLink } from "react-router-dom"
-import { ROUTES } from "@/app/router/route-paths"
+import { AGENCY_SECTIONS, agencyPath } from "@/features/agency-context/lib/agency-paths"
+import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
 import { cn } from "@/lib/utils"
 import { useSidebarStore } from "@/stores/sidebar.store"
 
@@ -25,15 +26,19 @@ export function DashboardSidebar() {
   const isOpen = useSidebarStore((state) => state.isOpen)
   const close = useSidebarStore((state) => state.close)
   const { t } = useTranslation()
+  const { agency } = useAgencyContext()
+  // Every link keeps the agency from the URL, so navigating never
+  // silently drops back to a pre-agency-scoped path.
+  const path = (section: string) => agencyPath(agency.code, section)
 
   const navItems = [
-    { to: ROUTES.dashboard, label: t("nav.overview"), icon: LayoutDashboard },
-    { to: ROUTES.trips, label: t("nav.trips"), icon: Plane },
-    { to: ROUTES.bookings, label: t("nav.bookings"), icon: CalendarCheck },
-    { to: ROUTES.customers, label: t("nav.customers"), icon: Users },
-    { to: ROUTES.agency, label: t("nav.agencyProfile"), icon: Building },
-    { to: ROUTES.team, label: t("nav.team"), icon: UserCog },
-    { to: ROUTES.settings, label: t("nav.settings"), icon: Settings },
+    { to: path(AGENCY_SECTIONS.dashboard), label: t("nav.overview"), icon: LayoutDashboard },
+    { to: path(AGENCY_SECTIONS.trips), label: t("nav.trips"), icon: Plane },
+    { to: path(AGENCY_SECTIONS.bookings), label: t("nav.bookings"), icon: CalendarCheck },
+    { to: path(AGENCY_SECTIONS.customers), label: t("nav.customers"), icon: Users },
+    { to: path(AGENCY_SECTIONS.agency), label: t("nav.agencyProfile"), icon: Building },
+    { to: path(AGENCY_SECTIONS.team), label: t("nav.team"), icon: UserCog },
+    { to: path(AGENCY_SECTIONS.settings), label: t("nav.settings"), icon: Settings },
   ]
 
   return (

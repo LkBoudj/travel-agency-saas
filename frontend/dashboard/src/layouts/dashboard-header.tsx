@@ -1,7 +1,8 @@
 import { Menu, Plane } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
-import { ROUTES } from "@/app/router/route-paths"
+import { AGENCY_SECTIONS, agencyPath } from "@/features/agency-context/lib/agency-paths"
+import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
 import { Button } from "@/components/ui/button"
 import { useSidebarStore } from "@/stores/sidebar.store"
 import { UserMenu } from "./user-menu"
@@ -15,6 +16,7 @@ export function DashboardHeader() {
   const isOpen = useSidebarStore((state) => state.isOpen)
   const toggle = useSidebarStore((state) => state.toggle)
   const { t } = useTranslation()
+  const { agency } = useAgencyContext()
 
   return (
     <header className="sticky top-0 z-40 flex h-12 shrink-0 items-center gap-2 bg-foreground px-3 text-background md:px-4 dark:bg-background dark:text-foreground">
@@ -29,7 +31,7 @@ export function DashboardHeader() {
         <Menu className="size-5" />
       </Button>
       <Link
-        to={ROUTES.dashboard}
+        to={agencyPath(agency.code, AGENCY_SECTIONS.dashboard)}
         className="flex items-center gap-2 text-sm font-semibold tracking-tight"
       >
         <span className="flex size-6 items-center justify-center rounded-md bg-white/10">

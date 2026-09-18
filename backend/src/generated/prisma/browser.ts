@@ -62,3 +62,22 @@ export type AgencyMembership = Prisma.AgencyMembershipModel
  * 
  */
 export type AgencyRoleAssignment = Prisma.AgencyRoleAssignmentModel
+/**
+ * Model AuditLog
+ * *
+ *  * Security-relevant events, append-only.
+ *  *
+ *  * It exists so questions like "has the directory been probed?" or "who removed
+ *  * that member?" have an answer. Rows are never updated or deleted by
+ *  * application code.
+ *  *
+ *  * Deliberately NOT a foreign key to AppUser or Agency: an audit record must
+ *  * survive the deletion of whatever it describes, and a cascade would erase
+ *  * exactly the history an investigation needs. Actors and agencies are recorded
+ *  * by their stable public `code`.
+ *  *
+ *  * `targetHash` carries a SHA-256 of a sensitive lookup term (for example a
+ *  * searched email) so repeated probing is still correlatable without the log
+ *  * itself becoming a second copy of the data being protected.
+ */
+export type AuditLog = Prisma.AuditLogModel

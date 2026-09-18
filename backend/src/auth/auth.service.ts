@@ -13,19 +13,6 @@ export class AuthService {
     private readonly identity: AppUserIdentityService,
   ) {}
 
-  async register(input: RegisterBody): Promise<AuthUser> {
-    const prepared = await this.identity.prepare(input);
-
-    try {
-      const appUser = await this.identity.create(this.prisma, prepared);
-      return toAuthUser({ ...prepared, code: appUser.code });
-    } catch (error) {
-      return this.identity.rethrowAsIdentityConflict(error, prepared.email, (email) =>
-        this.identity.emailExists(this.prisma, email),
-      );
-    }
-  }
-
   login(user: InternalAuthUser): { accessToken: string } {
     const payload: JwtPayload = { sub: user.id };
     return { accessToken: this.jwt.sign(payload) };

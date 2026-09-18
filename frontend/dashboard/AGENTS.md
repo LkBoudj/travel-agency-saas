@@ -4,7 +4,7 @@ App-local rules for the **Agency Dashboard**. Repo-wide policy (topology, invari
 
 ## 1. Scope
 
-`frontend/dashboard/` is the per-agency management app (Vite + React + TypeScript SPA) of the multi-tenant Travel SaaS platform. Sibling apps: `frontend/storefront/` (Next 16). `backend/`, `marketplace/`, `admin/` do not exist — do not modify, reference, or fabricate them.
+`frontend/dashboard/` is the per-agency management app (Vite + React + TypeScript SPA) of the multi-tenant Travel SaaS platform. Sibling apps: `frontend/storefront/` (Next 16) and `frontend/admin/` (Platform Super Dashboard). **`backend/` exists** (NestJS, REST under `/v1`, Swagger at `/docs`) and this app talks to it for real. `marketplace/` does not exist — do not reference or fabricate it.
 
 Work only inside this app unless the user explicitly asks elsewhere.
 
@@ -89,13 +89,13 @@ Do not co-locate schemas in component files. Do not fake server validation (emai
 - Use TanStack Query for fetching/caching/mutations. Never call `fetch` directly inside a page/component when an api/query boundary exists.
 - API functions in `features/<feature>/api/*.api.ts`; hooks/query keys in `features/<feature>/queries/*.queries.ts`.
 - Layout: `Component → feature hook → useQuery/useMutation → api layer`.
-- Uses **session cookies** (`credentials: "include"`) — no axios, no Bearer tokens, no localStorage auth headers. The backend is not in this repo; build clean boundaries only.
+- Uses **session cookies** (`credentials: "include"`) — no axios, no Bearer tokens, nothing auth-related in localStorage. All requests go through `src/lib/api.ts`, which throws `ApiError { status, code, message }`; do not add a second networking layer.
 - Normalize server errors to `{ status, message, fields? }` in the api layer; keep hooks/UI agnostic of transport details.
 - InvalidatE the related query key after mutations; do not mirror server state in Zustand.
 
 ## 8. Client State
 
-Zustand only for meaningful cross-component client/UI state (sidebar open, selected agency context, UI prefs). Use local React state for small interactions. Never use Zustand for server state.
+Zustand only for meaningful cross-component client/UI state (sidebar open, UI prefs). **Never store a "current agency"** — see Routing. Use local React state for small interactions. Never use Zustand for server state.
 
 Files: `src/stores/<name>.store.ts` (kebab-case), exporting `use<Name>Store`.
 
@@ -111,10 +111,13 @@ src/app/router/
 
 Features own their routes: `features/<feature>/routes/*.routes.tsx`. Guest and authenticated areas stay structurally separated. Do not redesign the router outside the current task.
 
+**Agency context comes from the URL.** Every authenticated route lives under `/agencies/:agencyCode/...`, and `AgencyContextProvider` resolves it from `GET /v1/agencies/:agencyCode/me`. There is no global "active agency" anywhere — that is what lets two browser tabs sit in two different agencies at once. Build links with `agencyPath()` from `features/agency-context/lib/agency-paths.ts`; never hardcode a flat path.
+
 ## 10. Boundaries
 
-- **Auth:** guest vs authenticated. Never simulate: no hardcoded `authenticated = true`, fake JWTs, localStorage login, fake sessions/OAuth.
-- **Backend:** do not create fake APIs or fake endpoints; multi-tenancy and security belong to the backend. Prepare clean integration boundaries only.
+- **Auth:** real, against `POST /v1/auth/login`, `GET /v1/auth/me`, `POST /v1/auth/logout`, with an HttpOnly cookie. Never simulate: no hardcoded `authenticated = true`, no fake JWT, no localStorage login, no demo bypass. (One existed and was deliberately removed — do not reintroduce it.)
+- **Authorization:** the UI may hide a control the member cannot use, via `useAgencyPermission("AGENCY_...")` over effective `Permission.key` values. That is UX only: **the backend guards are authoritative**, and a hidden control is never a substitute for one. Never authorize by role name, `membershipType` or `systemKey`.
+- **Backend:** do not create fake APIs, fake endpoints or placeholder data. If an endpoint does not exist yet, say so in the UI rather than faking success. Several guest screens (register, forgot/reset password, self-service agency creation) have no backend and say so explicitly — keep them honest.
 
 ## 11. UI Standards
 
@@ -142,3 +145,15 @@ Read only the skills relevant to the task. Repo-wide skills (e.g. `project-comme
 ## 14. Verification
 
 Run inside this directory. Scripts: `npm run lint`, `npm run typecheck`, `npm run build`. Lightweight targeted verification by default; full verification only when the risk warrants it.
+
+`typecheck` runs `tsc -b --force`, not `tsc --noEmit`. The root `tsconfig.json` is solution-style (`"files": []` plus `references`), and plain `tsc --noEmit` does not follow project references — it compiled zero files and passed unconditionally. Keep it in build mode, and do not "simplify" it back.
+
+**Tests:** there is no test runner and none may be installed without approval. Pure logic is tested with Node's built-in runner:
+
+```bash
+node --test --experimental-strip-types src/**/*.test.ts
+```
+
+It does not resolve the `@/` path alias, so a module under test must not import through it — keep the pure function free of aliased imports and put any adapter beside it. There are no render tests; do not claim any.
+
+**Dependencies:** never run `npm install`/`npm i`, and never add, remove or change a dependency in `package.json`. Report the exact command the user must run instead. (Fixing a `scripts` entry is not a dependency change.)

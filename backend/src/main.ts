@@ -18,21 +18,33 @@ async function bootstrap() {
   const devOrigins =
     config.get<string>('NODE_ENV') === 'production'
       ? undefined
-      : ['http://localhost:5173', 'http://127.0.0.1:5173'];
+      : [
+          // frontend/dashboard
+          'http://localhost:5173',
+          'http://127.0.0.1:5173',
+          // frontend/admin
+          'http://localhost:5174',
+          'http://127.0.0.1:5174',
+        ];
   app.enableCors({
     origin: configuredOrigins ?? devOrigins ?? false,
     credentials: true,
   });
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Travel SaaS API')
-    .setDescription('Travel SaaS backend API contract')
-    .setVersion('0.0.1')
-    .addCookieAuth(AUTH_COOKIE_NAME)
-    .addTag('auth')
-    .build();
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('docs', app, document);
+  // Swagger publishes every route, parameter and error code. That is a map for
+  // an attacker, so it is a development aid only and never served in production.
+  const isProduction = config.get<string>('NODE_ENV') === 'production';
+  if (!isProduction) {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('Travel SaaS API')
+      .setDescription('Travel SaaS backend API contract')
+      .setVersion('0.0.1')
+      .addCookieAuth(AUTH_COOKIE_NAME)
+      .addTag('auth')
+      .build();
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('docs', app, document);
+  }
 
   await app.listen(config.getOrThrow<number>('PORT'));
 }

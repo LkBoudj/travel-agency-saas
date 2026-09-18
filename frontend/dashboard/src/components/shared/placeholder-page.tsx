@@ -23,7 +23,7 @@ export function PlaceholderPage({ title, description }: PlaceholderPageProps) {
           {description ?? t("common:placeholder.defaultDescription")}
         </p>
       </div>
-      <Link to={ROUTES.dashboard} className={buttonVariants({ variant: "outline", size: "sm" })}>
+      <Link to={ROUTES.agencies} className={buttonVariants({ variant: "outline", size: "sm" })}>
         {t("common:placeholder.backToOverview")}
       </Link>
     </div>

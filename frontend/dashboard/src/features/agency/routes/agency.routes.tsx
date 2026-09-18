@@ -1,5 +1,5 @@
 import type { RouteObject } from "react-router-dom"
-import { ROUTES } from "@/app/router/route-paths"
+import { AGENCY_ROUTES } from "@/app/router/route-paths"
 import { AgencySettingsPage } from "../pages/agency-settings-page"
 
 /**
@@ -7,5 +7,5 @@ import { AgencySettingsPage } from "../pages/agency-settings-page"
  * Milestone A: single settings surface under /agency.
  */
 export const agencyRoutes: RouteObject[] = [
-  { path: ROUTES.agency, element: <AgencySettingsPage /> },
+  { path: AGENCY_ROUTES.agency, element: <AgencySettingsPage /> },
 ]

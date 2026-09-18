@@ -1,5 +1,5 @@
 import type { RouteObject } from "react-router-dom"
-import { ROUTES } from "@/app/router/route-paths"
+import { AGENCY_ROUTES } from "@/app/router/route-paths"
 import { TripEditorPage } from "../pages/trip-editor-page"
 import { TripsPage } from "../pages/trips-page"
 
@@ -10,6 +10,6 @@ import { TripsPage } from "../pages/trips-page"
  * `/trips/new` route. `/trips/:tripId` hosts the full trip editor.
  */
 export const tripRoutes: RouteObject[] = [
-  { path: ROUTES.trips, element: <TripsPage /> },
-  { path: ROUTES.tripDetails, element: <TripEditorPage /> },
+  { path: AGENCY_ROUTES.trips, element: <TripsPage /> },
+  { path: AGENCY_ROUTES.tripDetails, element: <TripEditorPage /> },
 ]

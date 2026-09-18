@@ -11,7 +11,9 @@ import {
 import type { LucideIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
-import { ROUTES } from "@/app/router/route-paths"
+import { AGENCY_SECTIONS, agencyPath } from "@/features/agency-context/lib/agency-paths"
+import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
+import { useLogout } from "@/features/auth/hooks/use-logout"
 import { Button } from "@/components/ui/button"
 import { setLocale, type AppLocale } from "@/i18n"
 import { cn } from "@/lib/utils"
@@ -35,12 +37,37 @@ function NavMenuItem({ to, icon: Icon, children }: NavMenuItemProps) {
   )
 }
 
+type NavMenuActionProps = {
+  icon: LucideIcon
+  disabled?: boolean
+  onClick: () => void
+  children: ReactNode
+}
+
+/** Same look as NavMenuItem, but it performs an action instead of navigating. */
+function NavMenuAction({ icon: Icon, disabled, onClick, children }: NavMenuActionProps) {
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      disabled={disabled}
+      onClick={onClick}
+      className="flex w-full items-center gap-2.5 rounded-md px-2.5 py-2 text-left text-sm text-foreground transition-colors hover:bg-muted disabled:pointer-events-none disabled:opacity-50"
+    >
+      <Icon className="size-4 text-muted-foreground" />
+      {children}
+    </button>
+  )
+}
+
 const LOCALE_OPTIONS: { value: AppLocale; labelKey: string }[] = [
   { value: "en", labelKey: "locale.english" },
   { value: "ar", labelKey: "locale.arabic" },
 ]
 
 export function UserMenu() {
+  const { agency } = useAgencyContext()
+  const logout = useLogout()
   const [open, setOpen] = useState(false)
   const { t, i18n } = useTranslation()
   const currentLocale = i18n.language as AppLocale
@@ -90,16 +117,20 @@ export function UserMenu() {
               </p>
             </div>
             <div className="my-1 h-px bg-border" />
-            <NavMenuItem to={ROUTES.agency} icon={Building}>
+            <NavMenuItem to={agencyPath(agency.code, AGENCY_SECTIONS.agency)} icon={Building}>
               {t("userMenu.agencyProfile")}
             </NavMenuItem>
-            <NavMenuItem to={ROUTES.settings} icon={Settings}>
+            <NavMenuItem to={agencyPath(agency.code, AGENCY_SECTIONS.settings)} icon={Settings}>
               {t("userMenu.settings")}
             </NavMenuItem>
             <div className="my-1 h-px bg-border" />
-            <NavMenuItem to={ROUTES.login} icon={LogOut}>
+            <NavMenuAction
+              icon={LogOut}
+              disabled={logout.isPending}
+              onClick={() => logout.mutate()}
+            >
               {t("userMenu.signOut")}
-            </NavMenuItem>
+            </NavMenuAction>
 
             <div className="my-1 h-px bg-border" />
             <div className="px-2.5 pb-1 pt-2">

@@ -4,7 +4,8 @@ import { useTranslation } from "react-i18next"
 import { useEffect } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
-import { ROUTES } from "@/app/router/route-paths"
+import { AGENCY_SECTIONS, agencyPath } from "@/features/agency-context/lib/agency-paths"
+import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
 import { appToastManager } from "@/components/ui/toast"
 import {
   createCreateTripSchema,
@@ -26,6 +27,7 @@ type UseCreateTripOptions = {
 export function useCreateTrip({ onOpenChange }: UseCreateTripOptions) {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { agency } = useAgencyContext()
 
   const resolver = useMemo(() => zodResolver(createCreateTripSchema(t)), [t])
 
@@ -74,7 +76,7 @@ export function useCreateTrip({ onOpenChange }: UseCreateTripOptions) {
       description: t("trips:create.successDescription"),
     })
 
-    navigate(ROUTES.tripDetails.replace(":tripId", id))
+    navigate(`${agencyPath(agency.code, AGENCY_SECTIONS.trips)}/${id}`)
   })
 
   return {

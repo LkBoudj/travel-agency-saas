@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { ROUTES } from "@/app/router/route-paths"
 import { AuthCard } from "@/features/auth/components/auth-card"
+import { UnsupportedActionNotice } from "@/features/auth/components/unsupported-action-notice"
 import { AuthHeader } from "@/features/auth/components/auth-header"
 
 /**
@@ -20,6 +21,10 @@ export function VerifyEmailPage() {
           title={t("auth:verifyEmail.title")}
           description={t("auth:verifyEmail.description")}
         />
+
+<UnsupportedActionNotice>
+  Email verification is not part of sign-in yet. You can sign in with the credentials you were given.
+</UnsupportedActionNotice>
 
         <div className="mt-6">
           <Button

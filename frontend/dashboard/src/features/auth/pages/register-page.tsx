@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 import { Link } from "react-router-dom"
 import { ROUTES } from "@/app/router/route-paths"
 import { AuthCard } from "@/features/auth/components/auth-card"
+import { UnsupportedActionNotice } from "@/features/auth/components/unsupported-action-notice"
 import { AuthHeader } from "@/features/auth/components/auth-header"
 import { GoogleAuthButton } from "@/features/auth/components/google-auth-button"
 import { RegisterForm } from "@/features/auth/components/register-form"
@@ -19,6 +20,10 @@ export function RegisterPage() {
           title={t("auth:register.title")}
           description={t("auth:register.description")}
         />
+
+<UnsupportedActionNotice>
+  Self-service sign-up is not available yet. Your account is created by an agency owner, who then adds you to their team.
+</UnsupportedActionNotice>
 
         <div className="mt-6 space-y-4">
           <GoogleAuthButton />
