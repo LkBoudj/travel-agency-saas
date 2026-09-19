@@ -5,7 +5,6 @@ import { isOwner } from "./member-display.ts"
 
 export const MEMBER_PERMISSIONS = {
   view: "AGENCY_MEMBER_VIEW",
-  invite: "AGENCY_MEMBER_INVITE",
   roleManage: "AGENCY_MEMBER_ROLE_MANAGE",
   update: "AGENCY_MEMBER_UPDATE",
   remove: "AGENCY_MEMBER_REMOVE",
@@ -14,7 +13,6 @@ export const MEMBER_PERMISSIONS = {
 /** What the signed-in member is permitted to do, as far as the UI can tell. */
 export type MemberCapabilities = {
   canView: boolean
-  canInvite: boolean
   canManageRoles: boolean
   canUpdate: boolean
   canRemove: boolean

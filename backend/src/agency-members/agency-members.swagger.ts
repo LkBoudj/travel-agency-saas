@@ -54,73 +54,12 @@ export const ASSIGNABLE_ROLE_SCHEMA = {
   },
 };
 
-export const MEMBER_CANDIDATE_SCHEMA = {
-  type: 'object',
-  properties: {
-    code: { type: 'string', example: 'USR-3F2A91C7B4D0' },
-    firstName: { type: 'string', nullable: true, example: 'Ahmed' },
-    lastName: { type: 'string', nullable: true, example: 'Ali' },
-    email: { type: 'string', example: 'ahmed@example.com' },
-    status: { type: 'string', enum: ['ACTIVE', 'SUSPENDED'], example: 'ACTIVE' },
-    alreadyMember: {
-      type: 'boolean',
-      description: 'Whether this account is already a member of THIS agency.',
-      example: false,
-    },
-  },
-};
-
-const EXISTING_MEMBER_SCHEMA = {
-  type: 'object',
-  required: ['type', 'appUserCode'],
-  description: 'An account that already exists becomes an employee.',
-  properties: {
-    type: { type: 'string', enum: ['EXISTING'], example: 'EXISTING' },
-    appUserCode: {
-      type: 'string',
-      maxLength: 24,
-      example: 'USR-3F2A91C7B4D0',
-      description:
-        'Code of an existing ACTIVE account, obtained from member-candidates. Membership in ' +
-        'another agency is not a conflict.',
-    },
-  },
-};
-
-const NEW_MEMBER_SCHEMA = {
-  type: 'object',
-  required: ['type', 'email', 'password'],
-  description:
-    'The account is created in the same transaction as the membership and receives NO platform ' +
-    'role: its only context is this agency.',
-  properties: {
-    type: { type: 'string', enum: ['NEW'], example: 'NEW' },
-    email: { type: 'string', format: 'email', example: 'ahmed@example.com' },
-    password: { type: 'string', minLength: 8, maxLength: 72, example: 'a-strong-password' },
-    firstName: { type: 'string', nullable: true, example: 'Ahmed' },
-    lastName: { type: 'string', nullable: true, example: 'Ali' },
-  },
-};
-
 const ROLE_KEYS_SCHEMA = {
   type: 'array',
   description:
     'Agency role keys to assign. Optional and may be empty: `membershipType = EMPLOYEE` already ' +
     'classifies the person, so no placeholder role is invented.',
   items: { type: 'string', example: 'AGENCY_BOOKING_AGENT' },
-};
-
-export const ADD_MEMBER_BODY_SCHEMA = {
-  type: 'object',
-  required: ['member'],
-  properties: {
-    member: {
-      description: 'Discriminated on `type`.',
-      oneOf: [EXISTING_MEMBER_SCHEMA, NEW_MEMBER_SCHEMA],
-      discriminator: { propertyName: 'type' },
-    },
-    roleKeys: ROLE_KEYS_SCHEMA,
-  },
 };
 
 export const REPLACE_ROLES_BODY_SCHEMA = {

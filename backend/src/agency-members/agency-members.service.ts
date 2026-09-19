@@ -9,7 +9,6 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { AppUserIdentityService } from '../auth/app-user-identity.service.js';
 import { isRoleValidForAgency } from '../authorization/agency-permissions.service.js';
 import type {
-  AddAgencyMemberBody,
   ListAgencyMembersQuery,
   ReplaceAgencyMemberRolesBody,
   SetAgencyMemberStatusBody,
@@ -19,16 +18,10 @@ import {
   type AgencyMemberResponse,
   type AgencyMemberRow,
   type AssignableAgencyRoleResponse,
-  type MemberCandidateResponse,
 } from './agency-members.types.js';
 
-/** Members are created as employees; ownership is never touched here. */
-const EMPLOYEE = 'EMPLOYEE';
+/** Ownership is never touched here. */
 const OWNER = 'OWNER';
-const ACTIVE = 'ACTIVE';
-
-/** A lookup answers a picker, never a directory. */
-const CANDIDATE_LIMIT = 20;
 
 /**
  * Agency member administration, scoped to ONE agency.
@@ -112,17 +105,6 @@ export class AgencyMembersService {
     }));
   }
 
-  /**
-   * Accounts that could become a member here. Requires a search term and caps
-   * the result, so it can never act as a global user directory.
-   */
-  /**
-   * Adds a member as an ACTIVE EMPLOYEE, with the requested roles, atomically.
-   *
-   * For a NEW account the AppUser is created in the same transaction, so a
-   * failure anywhere leaves no orphan account. The new account receives NO
-   * platform role: its only context is this membership.
-   */
   /**
    * Replaces an employee's complete role set in one transaction.
    *

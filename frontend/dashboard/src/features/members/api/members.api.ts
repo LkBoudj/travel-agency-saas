@@ -1,9 +1,7 @@
 import { apiRequest } from "@/lib/api"
 import type {
-  AddMemberPayload,
   AgencyMember,
   AssignableRole,
-  MemberCandidate,
   ReplaceRolesPayload,
   SetMemberStatusPayload,
 } from "../types/members.types"
@@ -20,8 +18,6 @@ export const membersQueryKeys = {
     ["agency", agencyCode, "members", "list", search] as const,
   detail: (agencyCode: string, userCode: string) =>
     ["agency", agencyCode, "members", "detail", userCode] as const,
-  candidates: (agencyCode: string, search: string) =>
-    ["agency", agencyCode, "member-candidates", search] as const,
   assignableRoles: (agencyCode: string) =>
     ["agency", agencyCode, "available-roles"] as const,
 }
@@ -47,31 +43,11 @@ export function getMember(
   )
 }
 
-/** Requires AGENCY_MEMBER_INVITE, and a search term of at least 2 characters. */
-export function listMemberCandidates(
-  agencyCode: string,
-  search: string
-): Promise<MemberCandidate[]> {
-  return apiRequest<MemberCandidate[]>(
-    `${base(agencyCode)}/member-candidates?search=${encodeURIComponent(search.trim())}`
-  )
-}
-
 /** Requires AGENCY_MEMBER_ROLE_MANAGE. */
 export function listAssignableRoles(
   agencyCode: string
 ): Promise<AssignableRole[]> {
   return apiRequest<AssignableRole[]>(`${base(agencyCode)}/available-roles`)
-}
-
-export function addMember(
-  agencyCode: string,
-  payload: AddMemberPayload
-): Promise<AgencyMember> {
-  return apiRequest<AgencyMember>(`${base(agencyCode)}/members`, {
-    method: "POST",
-    body: JSON.stringify(payload),
-  })
 }
 
 /** Complete replacement of the member's roles. */

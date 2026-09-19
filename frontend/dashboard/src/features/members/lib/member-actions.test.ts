@@ -9,7 +9,6 @@ import {
 
 const ALL: MemberCapabilities = {
   canView: true,
-  canInvite: true,
   canManageRoles: true,
   canUpdate: true,
   canRemove: true,
@@ -17,7 +16,6 @@ const ALL: MemberCapabilities = {
 
 const NONE: MemberCapabilities = {
   canView: false,
-  canInvite: false,
   canManageRoles: false,
   canUpdate: false,
   canRemove: false,

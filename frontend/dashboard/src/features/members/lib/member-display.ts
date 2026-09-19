@@ -1,4 +1,4 @@
-import type { AgencyMember, MemberCandidate } from "../types/members.types"
+import type { AgencyMember } from "../types/members.types"
 
 export const OWNER = "OWNER"
 export const EMPLOYEE = "EMPLOYEE"
@@ -86,24 +86,6 @@ export function formatJoinedAt(joinedAt: string, locale = "en-GB"): string {
     month: "short",
     year: "numeric",
   })
-}
-
-/**
- * Why a candidate cannot be picked, or null when they can be.
- *
- * The backend rejects both cases anyway; surfacing the reason up front turns a
- * failed submit into an explanation shown before the operator commits.
- */
-export function candidateBlockedReason(
-  candidate: MemberCandidate
-): string | null {
-  if (candidate.alreadyMember) return "Already a member of this agency"
-  if (candidate.status !== "ACTIVE") return "This account is not active"
-  return null
-}
-
-export function isCandidateSelectable(candidate: MemberCandidate): boolean {
-  return candidateBlockedReason(candidate) === null
 }
 
 /** The note shown when an add/role form has no roles selected. */

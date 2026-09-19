@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AuthModule } from '../auth/auth.module.js';
+import { SecurityModule } from '../security/security.module.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { configureApp } from '../setup-app.js';
 import { MeModule } from './me.module.js';
@@ -74,7 +75,7 @@ describe('GET /v1/me/agencies', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, MeModule],
+      imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, SecurityModule, MeModule],
     })
       .overrideProvider(PrismaService)
       .useValue(prismaMock)

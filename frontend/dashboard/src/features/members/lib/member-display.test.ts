@@ -2,10 +2,8 @@ import assert from "node:assert/strict"
 import { describe, it } from "node:test"
 
 import {
-  candidateBlockedReason,
   formatJoinedAt,
   hasNoRoles,
-  isCandidateSelectable,
   isOwner,
   isSuspendedMember,
   memberDisplayName,
@@ -14,7 +12,7 @@ import {
   membershipStatusLabel,
   membershipTypeLabel,
 } from "./member-display.ts"
-import type { AgencyMember, MemberCandidate } from "../types/members.types.ts"
+import type { AgencyMember } from "../types/members.types.ts"
 
 function member(overrides: Partial<AgencyMember> = {}): AgencyMember {
   return {
@@ -27,18 +25,6 @@ function member(overrides: Partial<AgencyMember> = {}): AgencyMember {
     membershipStatus: "ACTIVE",
     roles: [{ key: "AGENCY_BOOKING_AGENT", name: "Booking Agent" }],
     joinedAt: "2026-03-04T10:00:00.000Z",
-    ...overrides,
-  }
-}
-
-function candidate(overrides: Partial<MemberCandidate> = {}): MemberCandidate {
-  return {
-    code: "USR-0000000000B2",
-    firstName: "Sara",
-    lastName: null,
-    email: "sara@agency.example",
-    status: "ACTIVE",
-    alreadyMember: false,
     ...overrides,
   }
 }
@@ -143,24 +129,5 @@ describe("formatJoinedAt", () => {
   it("degrades to a dash rather than Invalid Date", () => {
     assert.equal(formatJoinedAt("not-a-date"), "—")
     assert.equal(formatJoinedAt(""), "—")
-  })
-})
-
-describe("candidate selectability", () => {
-  it("allows an active non-member", () => {
-    assert.equal(candidateBlockedReason(candidate()), null)
-    assert.equal(isCandidateSelectable(candidate()), true)
-  })
-
-  it("blocks and explains an existing member", () => {
-    const blocked = candidate({ alreadyMember: true })
-    assert.match(candidateBlockedReason(blocked)!, /already a member/i)
-    assert.equal(isCandidateSelectable(blocked), false)
-  })
-
-  it("blocks and explains an inactive account", () => {
-    const blocked = candidate({ status: "SUSPENDED" })
-    assert.match(candidateBlockedReason(blocked)!, /not active/i)
-    assert.equal(isCandidateSelectable(blocked), false)
   })
 })

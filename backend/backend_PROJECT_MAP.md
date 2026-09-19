@@ -371,8 +371,8 @@ and results are capped at `APP_USER_LOOKUP_LIMIT`. The response carries only
 `{ code, firstName, lastName, email, status }`.
 
 NOT in this slice (deferred): AgencyPermissionsService / AgencyPermissionGuard /
-agency CASL / agency-scoped request authorization, member management (invite,
-add, remove, suspend employee, change membershipType), transfer ownership,
+agency CASL / agency-scoped request authorization, member management (add,
+remove, suspend employee, change membershipType), transfer ownership,
 customer model and customer counts.
 
 ## [AGENCY_MEMBERS]
@@ -386,18 +386,22 @@ Routes, all under `/v1/agencies/:agencyCode`:
 - `GET  members` (`AGENCY_MEMBER_VIEW`) - owner and employees in one list, one
   row per person however many roles they hold; search by name/email/code
 - `GET  members/:userCode` (`AGENCY_MEMBER_VIEW`)
-- `POST members` (`AGENCY_MEMBER_INVITE`) - discriminated `member`:
-  `{ type: EXISTING, appUserCode }` or `{ type: NEW, email, password, ... }`
 - `PUT  members/:userCode/roles` (`AGENCY_MEMBER_ROLE_MANAGE`) - atomic full
   replacement
 - `PATCH members/:userCode/status` (`AGENCY_MEMBER_UPDATE`)
 - `DELETE members/:userCode` (`AGENCY_MEMBER_REMOVE`) - 204
 - `GET  available-roles` (`AGENCY_MEMBER_ROLE_MANAGE`) - global agency roles plus
   THIS agency's custom ones; never PLATFORM or another agency's
-- `GET  member-candidates?search=` (`AGENCY_MEMBER_INVITE`) - agency-authorized
-  account lookup, required search term and capped results. `/v1/app-users/search`
-  was NOT reused: it is guarded by `PLATFORM_AGENCY_CREATE` and must not be
-  reachable from an agency dashboard.
+
+Deliberately NOT implemented (identity-enumeration exposure): `POST members`
+(adding a person by picking an existing account) and `GET member-candidates`
+(the account lookup behind it). Both were built, then removed: a lookup over
+`/v1/app-users/search` semantics from an agency dashboard would hand a business
+operator a searchable directory of accounts outside their agency. Replacement
+is the upcoming Member Invitations flow (email → pending invite → acceptance →
+membership). `AGENCY_MEMBER_INVITE` stays in the permission catalog, reserved
+for that flow: no route consumes it today, but seeding roles early avoids a
+later migration.
 
 Domain rules:
 
@@ -415,9 +419,6 @@ Domain rules:
   memberships in other agencies, or platform access.
 - Removing a member removes the membership and its role assignments from THIS
   agency only; the account and its other memberships survive.
-- A NEW member's identity is created through `AppUserIdentityService` in the same
-  transaction as the membership (no orphan account on failure) and receives NO
-  `PlatformRoleAssignment`.
 - Role assignment accepts only roles valid for this agency
   (`isRoleValidForAgency`), with the `agency_role_assignment_scope` trigger as
   the final protection.
@@ -534,13 +535,6 @@ IMPLEMENTED (authentication vertical slice, Group 1 scope):
   → argon2id verify → `JwtService.sign({ sub })` → HttpOnly cookie →
   Passport JWT (cookie extractor) → `JwtAuthGuard` → `request.user`.
 - Endpoints under `/v1/auth/*`:
-  - `POST /v1/auth/register` — Zod/Standard-Schema validated
-    (`z.email()`, password 8–72), argon2id-hashed via service, `app_user.code`
-    generated as `USR-<12 uppercase hex>` (project `USR-…` convention, fits
-    `VARCHAR(24)`); client-supplied `code`/`id`/`passwordHash` are never
-    accepted (Zod object strips unknown fields); duplicate CITEXT email →
-    409 `EMAIL_ALREADY_REGISTERED` (Prisma P2002 handled via
-    `Prisma.PrismaClientKnownRequestError`); returns the safe user only.
   - `POST /v1/auth/login` — Passport Local (`usernameField: 'email'`);
     JWT payload = `{ sub: <appUser.id> }` only (no roles/permissions/password/
     email); JWT written to the HttpOnly cookie, never included in response
@@ -575,11 +569,11 @@ IMPLEMENTED (authentication vertical slice, Group 1 scope):
 - Zod 4 + Standard Schema (`StandardSchemaValidationPipe` where appropriate;
   Standard-Schema response serialization where appropriate).
 - IMPLEMENTED (auth): global `StandardSchemaValidationPipe` registered in
-  `configureApp` (`src/setup-app.ts`) + per-parameter schemas
-  (`@Body({ schema })`) for `/v1/auth/register` and `/v1/auth/login`
-  (`src/auth/schemas.ts`). Unknown body fields are stripped by the Zod
-  objects (client-supplied `code`/`id`/`passwordHash` can never reach
-  persistence).
+  `configureApp` (`src/setup-app.ts`) + the login body schema
+  (`@Body({ schema: loginSchema })`) in `src/auth/schemas.ts`;
+  `/v1/auth/register` was removed (see `[AUTH]`). Unknown body fields are
+  stripped by the Zod objects (client-supplied `code`/`id`/`passwordHash` can
+  never reach persistence).
 
 ## [ERROR_CONTRACT]
 
@@ -680,7 +674,7 @@ Only what actually exists now:
     `code` removal, scope constraint name (`role_scope_check` confirmed)
 - authentication vertical slice (see [AUTH]): Nest URI versioning `/v1`
   (default version), global `StandardSchemaValidationPipe`, `AuthModule`
-  (Passport Local + JWT-in-cookie), `/v1/auth/{register,login,logout,me}`,
+  (Passport Local + JWT-in-cookie), `/v1/auth/{login,logout,me}`,
   argon2id hashing, `USR-` code generation, HttpOnly `travel_access_token`
   cookie (Secure in production, SameSite=Lax), minimal `{ sub }` JWT,
   `JwtAuthGuard`, `@CurrentUser`; auth unit + HTTP integration specs

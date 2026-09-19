@@ -11,7 +11,6 @@ import type { MemberCapabilities } from "../lib/member-actions"
 export function useMemberCapabilities(): MemberCapabilities {
   return {
     canView: useAgencyPermission(MEMBER_PERMISSIONS.view),
-    canInvite: useAgencyPermission(MEMBER_PERMISSIONS.invite),
     canManageRoles: useAgencyPermission(MEMBER_PERMISSIONS.roleManage),
     canUpdate: useAgencyPermission(MEMBER_PERMISSIONS.update),
     canRemove: useAgencyPermission(MEMBER_PERMISSIONS.remove),

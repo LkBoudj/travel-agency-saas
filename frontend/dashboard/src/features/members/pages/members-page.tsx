@@ -1,12 +1,11 @@
 import { useState } from "react"
-import { SearchIcon, UserPlusIcon } from "lucide-react"
+import { SearchIcon } from "lucide-react"
 import { PageHeader } from "@/components/shared/page-header"
 import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { appToastManager } from "@/components/ui/toast"
 import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
-import { AddMemberDialog } from "../components/add-member-dialog"
 import { ManageRolesDialog } from "../components/manage-roles-dialog"
 import { MemberDetailsDialog } from "../components/member-details-dialog"
 import { MembersTable } from "../components/members-table"
@@ -39,7 +38,6 @@ export function MembersPage() {
   const [search, setSearch] = useState("")
   const debouncedSearch = useDebouncedValue(search, 300)
 
-  const [addOpen, setAddOpen] = useState(false)
   const [detailsFor, setDetailsFor] = useState<AgencyMember | null>(null)
   const [rolesFor, setRolesFor] = useState<AgencyMember | null>(null)
   const [suspendTarget, setSuspendTarget] = useState<AgencyMember | null>(null)
@@ -114,14 +112,6 @@ export function MembersPage() {
       <PageHeader
         title="Members"
         description="Manage the people who have access to this agency."
-        actions={
-          capabilities.canInvite ? (
-            <Button size="sm" onClick={() => setAddOpen(true)}>
-              <UserPlusIcon />
-              Add member
-            </Button>
-          ) : undefined
-        }
       />
 
       <div className="relative max-w-sm">
@@ -177,13 +167,6 @@ export function MembersPage() {
           />
         </div>
       )}
-
-      <AddMemberDialog
-        agencyCode={agency.code}
-        canManageRoles={capabilities.canManageRoles}
-        open={addOpen}
-        onOpenChange={setAddOpen}
-      />
 
       <MemberDetailsDialog
         member={detailsFor}

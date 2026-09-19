@@ -18,8 +18,8 @@ import { clearAuthCookie, setAuthCookie } from './auth.cookie.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { RateLimit, RateLimitGuard } from '../security/rate-limit.guard.js';
-import type { LoginBody, RegisterBody } from './schemas.js';
-import { loginSchema, registerSchema } from './schemas.js';
+import type { LoginBody } from './schemas.js';
+import { loginSchema } from './schemas.js';
 
 const SAFE_USER_EXAMPLE: AuthUser = {
   code: 'USR-ABCDEF123456',

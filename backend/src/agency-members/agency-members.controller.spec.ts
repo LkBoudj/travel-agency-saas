@@ -4,8 +4,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AuthModule } from '../auth/auth.module.js';
-import { Prisma } from '../generated/prisma/client.js';
 import { AuthorizationModule } from '../authorization/authorization.module.js';
+import { SecurityModule } from '../security/security.module.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { configureApp } from '../setup-app.js';
 import { AgencyMembersModule } from './agency-members.module.js';
@@ -59,7 +59,6 @@ const ATLAS = { id: 20n, code: 'AGY-ATLAS000001', name: 'Atlas Tours', status: '
 const admin = { id: 1n, code: 'USR-ADMIN0000001', email: 'admin@mail.com' };
 const employee = { id: 2n, code: 'USR-EMPLOYEE0001', email: 'employee@mail.com' };
 const outsider = { id: 3n, code: 'USR-OUTSIDER0001', email: 'outsider@mail.com' };
-const suspendedAccount = { id: 4n, code: 'USR-SUSPENDED001', email: 'suspended@mail.com' };
 const atlasOwner = { id: 5n, code: 'USR-ATLASOWNER01', email: 'atlas@mail.com' };
 
 const DB = {
@@ -167,9 +166,6 @@ function projectMember(m: MembershipRow) {
   };
 }
 
-/** Simulates a failure after the identity is created, to prove rollback. */
-let failMembershipCreate = false;
-
 const prismaMock = {
   appUser: {
     findUnique: vi.fn(
@@ -190,41 +186,6 @@ const prismaMock = {
         return select ? { ...user } : user;
       },
     ),
-    findMany: vi.fn(
-      async ({ where, take }: { where: unknown; take?: number }) => {
-        const term = containsOf(where) ?? '';
-        const agencyId = (
-          where as { OR?: unknown } & Record<string, unknown>
-        ) as unknown as Record<string, never>;
-        void agencyId;
-        return [...DB.users.values()]
-          .filter((u) => matches(u, term))
-          .slice(0, take ?? undefined)
-          .map((u) => ({ ...u, agencyMemberships: [] as Array<{ id: bigint }> }));
-      },
-    ),
-    create: vi.fn(async ({ data }: { data: Record<string, string> }) => {
-      for (const existing of DB.users.values()) {
-        if (existing.email === data.email) {
-          throw new Prisma.PrismaClientKnownRequestError('Unique constraint failed', {
-            code: 'P2002',
-            clientVersion: 'test',
-            meta: { target: ['email'] },
-          });
-        }
-      }
-      const row: UserRow = {
-        id: id(),
-        code: data.code!,
-        email: data.email!,
-        firstName: data.firstName ?? null,
-        lastName: data.lastName ?? null,
-        status: 'ACTIVE',
-        passwordHash: data.passwordHash!,
-      };
-      DB.users.set(row.id, row);
-      return { id: row.id, code: row.code };
-    }),
   },
   role: {
     findMany: vi.fn(
@@ -304,28 +265,6 @@ const prismaMock = {
         return m ? projectMember(m) : null;
       },
     ),
-    findUnique: vi.fn(
-      async ({
-        where,
-      }: {
-        where: { agencyId_appUserId: { agencyId: bigint; appUserId: bigint } };
-      }) => {
-        const { agencyId, appUserId } = where.agencyId_appUserId;
-        const m = DB.memberships.find((r) => r.agencyId === agencyId && r.appUserId === appUserId);
-        return m ? { id: m.id } : null;
-      },
-    ),
-    create: vi.fn(async ({ data }: { data: Record<string, string | bigint> }) => {
-      if (failMembershipCreate) {
-        failMembershipCreate = false;
-        throw new Error('simulated membership failure');
-      }
-      const row = addMembership(data.agencyId as bigint, data.appUserId as bigint, [], {
-        membershipType: data.membershipType as string,
-        status: data.status as string,
-      });
-      return { id: row.id };
-    }),
     update: vi.fn(
       async ({ where, data }: { where: { id: bigint }; data: { status: string } }) => {
         const m = DB.memberships.find((r) => r.id === where.id)!;
@@ -356,12 +295,6 @@ const prismaMock = {
       return { count };
     }),
   },
-  platformRoleAssignment: {
-    findMany: vi.fn(async () => []),
-    create: vi.fn(async () => {
-      throw new Error('agency member creation must never touch platform roles');
-    }),
-  },
   $transaction: vi.fn(async (arg: unknown) => {
     if (typeof arg !== 'function') return arg;
     const snapshot = {
@@ -385,18 +318,15 @@ function baseline(): void {
   DB.agencies.clear();
   DB.platformAssignments = [];
   nextId = 100n;
-  failMembershipCreate = false;
 
   DB.agencies.set(SAHARA.id, { ...SAHARA });
   DB.agencies.set(ATLAS.id, { ...ATLAS });
   for (const seed of [admin, employee, outsider, atlasOwner]) addUser(seed);
-  addUser(suspendedAccount, 'SUSPENDED');
 }
 
 /** Every member permission, so authorization is never the thing under test. */
 const ALL_MEMBER_PERMISSIONS = [
   'AGENCY_MEMBER_VIEW',
-  'AGENCY_MEMBER_INVITE',
   'AGENCY_MEMBER_UPDATE',
   'AGENCY_MEMBER_REMOVE',
   'AGENCY_MEMBER_ROLE_MANAGE',
@@ -413,6 +343,7 @@ describe('Agency members API', () => {
         ConfigModule.forRoot({ isGlobal: true }),
         AuthModule,
         AuthorizationModule,
+        SecurityModule,
         AgencyMembersModule,
       ],
     })
@@ -554,225 +485,6 @@ describe('Agency members API', () => {
     const res = await as(adminToken).get(`${base()}/members/${outsider.code}`);
     expect(res.status).toBe(404);
     expect(res.body.errorCode).toBe('AGENCY_MEMBER_NOT_FOUND');
-  });
-
-  // ------------------------------------------------------- add existing user
-
-  it('adds an existing account as an ACTIVE EMPLOYEE', async () => {
-    seedAdminOwner();
-    const role = addRole('AGENCY_BOOKING_AGENT', 'AGENCY', null, []);
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({
-        member: { type: 'EXISTING', appUserCode: employee.code },
-        roleKeys: ['AGENCY_BOOKING_AGENT'],
-      });
-
-    expect(res.status).toBe(201);
-    expect(res.body).toMatchObject({
-      code: employee.code,
-      membershipType: 'EMPLOYEE',
-      membershipStatus: 'ACTIVE',
-    });
-    expect(res.body.roles.map((r: { key: string }) => r.key)).toEqual([role.key]);
-  });
-
-  it('allows adding with no roles at all', async () => {
-    seedAdminOwner();
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({ member: { type: 'EXISTING', appUserCode: employee.code } });
-
-    expect(res.status).toBe(201);
-    expect(res.body.roles).toEqual([]);
-  });
-
-  it('accepts several roles and deduplicates the keys', async () => {
-    seedAdminOwner();
-    addRole('AGENCY_BOOKING_AGENT', 'AGENCY', null, []);
-    addRole('AGENCY_TOUR_MANAGER', 'AGENCY', null, []);
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({
-        member: { type: 'EXISTING', appUserCode: employee.code },
-        roleKeys: ['AGENCY_BOOKING_AGENT', 'AGENCY_TOUR_MANAGER', 'AGENCY_BOOKING_AGENT'],
-      });
-
-    expect(res.status).toBe(201);
-    expect(res.body.roles).toHaveLength(2);
-  });
-
-  it('409 when the account is already a member here', async () => {
-    seedAdminOwner();
-    addMembership(SAHARA.id, employee.id, []);
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({ member: { type: 'EXISTING', appUserCode: employee.code } });
-
-    expect(res.status).toBe(409);
-    expect(res.body.errorCode).toBe('ALREADY_AGENCY_MEMBER');
-  });
-
-  it('membership in ANOTHER agency is not a conflict', async () => {
-    seedAdminOwner();
-    addMembership(ATLAS.id, employee.id, []);
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({ member: { type: 'EXISTING', appUserCode: employee.code } });
-
-    expect(res.status).toBe(201);
-    // The Atlas membership is untouched.
-    expect(DB.memberships.filter((m) => m.appUserId === employee.id)).toHaveLength(2);
-  });
-
-  it('404 for an unknown account, 409 for a suspended one', async () => {
-    seedAdminOwner();
-
-    const unknown = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({ member: { type: 'EXISTING', appUserCode: 'USR-NOPE' } });
-    expect(unknown.status).toBe(404);
-    expect(unknown.body.errorCode).toBe('MEMBER_APP_USER_NOT_FOUND');
-
-    const suspended = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({ member: { type: 'EXISTING', appUserCode: suspendedAccount.code } });
-    expect(suspended.status).toBe(409);
-    expect(suspended.body.errorCode).toBe('MEMBER_APP_USER_NOT_ACTIVE');
-  });
-
-  // ------------------------------------------------------------ add new user
-
-  it('creates a new account and its membership atomically', async () => {
-    seedAdminOwner();
-    addRole('AGENCY_BOOKING_AGENT', 'AGENCY', null, []);
-    const usersBefore = DB.users.size;
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({
-        member: {
-          type: 'NEW',
-          email: 'new-employee@mail.com',
-          password: 'a-strong-password',
-          firstName: 'Nadia',
-          lastName: 'Bekkai',
-        },
-        roleKeys: ['AGENCY_BOOKING_AGENT'],
-      });
-
-    expect(res.status).toBe(201);
-    expect(res.body.code).toMatch(/^USR-[0-9A-F]{12}$/);
-    expect(res.body.membershipType).toBe('EMPLOYEE');
-    expect(DB.users.size).toBe(usersBefore + 1);
-
-    const created = [...DB.users.values()].find((u) => u.email === 'new-employee@mail.com')!;
-    expect(created.passwordHash.startsWith('$argon2')).toBe(true);
-    expect(created.passwordHash).not.toBe('a-strong-password');
-    expect(JSON.stringify(res.body)).not.toContain('a-strong-password');
-  });
-
-  it('gives a new member no platform role', async () => {
-    seedAdminOwner();
-
-    await as(adminToken)
-      .post(`${base()}/members`)
-      .send({
-        member: { type: 'NEW', email: 'new2@mail.com', password: 'a-strong-password' },
-      });
-
-    expect(prismaMock.platformRoleAssignment.create).not.toHaveBeenCalled();
-    expect(DB.platformAssignments).toHaveLength(0);
-  });
-
-  it('rolls back the new account when the membership fails', async () => {
-    seedAdminOwner();
-    const usersBefore = DB.users.size;
-    failMembershipCreate = true;
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({
-        member: { type: 'NEW', email: 'orphan@mail.com', password: 'a-strong-password' },
-      });
-
-    expect(res.status).toBe(500);
-    expect(DB.users.size).toBe(usersBefore);
-  });
-
-  it('409 for a duplicate email', async () => {
-    seedAdminOwner();
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({
-        member: { type: 'NEW', email: employee.email, password: 'a-strong-password' },
-      });
-
-    expect(res.status).toBe(409);
-    expect(res.body.errorCode).toBe('EMAIL_ALREADY_REGISTERED');
-  });
-
-  it('rejects privilege and ownership fields in the body', async () => {
-    seedAdminOwner();
-
-    for (const member of [
-      { type: 'EXISTING', appUserCode: employee.code, membershipType: 'OWNER' },
-      { type: 'EXISTING', appUserCode: employee.code, agencyId: '1' },
-      { type: 'EXISTING', appUserCode: employee.code, status: 'ACTIVE' },
-      { type: 'NEW', email: 'x@mail.com', password: 'a-strong-password', systemKey: 'AGENCY_ADMIN' },
-      { type: 'OWNER', appUserCode: employee.code },
-    ]) {
-      const res = await as(adminToken).post(`${base()}/members`).send({ member });
-      expect(res.status).toBe(400);
-    }
-  });
-
-  // ------------------------------------------------------------ role scoping
-
-  it('rejects a PLATFORM role and a foreign custom role', async () => {
-    seedAdminOwner();
-    addRole('PLATFORM_ADMIN', 'PLATFORM', null, []);
-    addRole('ATLAS_CUSTOM', 'AGENCY', ATLAS.id, []);
-
-    for (const key of ['PLATFORM_ADMIN', 'ATLAS_CUSTOM']) {
-      const res = await as(adminToken)
-        .post(`${base()}/members`)
-        .send({ member: { type: 'EXISTING', appUserCode: employee.code }, roleKeys: [key] });
-      expect(res.status).toBe(400);
-      expect(res.body.errorCode).toBe('ROLE_NOT_ASSIGNABLE_IN_AGENCY');
-    }
-  });
-
-  it('accepts this agency own custom role', async () => {
-    seedAdminOwner();
-    addRole('SAHARA_NIGHT_DESK', 'AGENCY', SAHARA.id, []);
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({
-        member: { type: 'EXISTING', appUserCode: employee.code },
-        roleKeys: ['SAHARA_NIGHT_DESK'],
-      });
-
-    expect(res.status).toBe(201);
-    expect(res.body.roles.map((r: { key: string }) => r.key)).toEqual(['SAHARA_NIGHT_DESK']);
-  });
-
-  it('400 for an unknown role key', async () => {
-    seedAdminOwner();
-
-    const res = await as(adminToken)
-      .post(`${base()}/members`)
-      .send({ member: { type: 'EXISTING', appUserCode: employee.code }, roleKeys: ['NOPE'] });
-
-    expect(res.status).toBe(400);
-    expect(res.body.errorCode).toBe('UNKNOWN_AGENCY_ROLE_KEYS');
   });
 
   // ---------------------------------------------------------- replace roles
@@ -957,21 +669,4 @@ describe('Agency members API', () => {
     expect(Object.keys(res.body[0]).sort()).toEqual(['description', 'key', 'name']);
   });
 
-  it('requires a search term for member candidates', async () => {
-    seedAdminOwner();
-
-    expect((await as(adminToken).get(`${base()}/member-candidates`)).status).toBe(400);
-    expect((await as(adminToken).get(`${base()}/member-candidates?search=a`)).status).toBe(400);
-
-    const ok = await as(adminToken).get(`${base()}/member-candidates?search=employee`);
-    expect(ok.status).toBe(200);
-    expect(Object.keys(ok.body[0]).sort()).toEqual([
-      'alreadyMember',
-      'code',
-      'email',
-      'firstName',
-      'lastName',
-      'status',
-    ]);
-  });
 });

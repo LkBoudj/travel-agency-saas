@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AuthModule } from '../auth/auth.module.js';
+import { SecurityModule } from '../security/security.module.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { AuthorizationModule } from '../authorization/authorization.module.js';
 import {
@@ -202,6 +203,7 @@ describe('Agency authorization (context + guard)', () => {
       imports: [
         ConfigModule.forRoot({ isGlobal: true }),
         AuthModule,
+        SecurityModule,
         AuthorizationModule,
         AgencyAccessModule,
       ],

@@ -24,17 +24,6 @@ export type AgencyMember = {
   joinedAt: string
 }
 
-/** A person who could be added, from `GET .../member-candidates?search=`. */
-export type MemberCandidate = {
-  code: string
-  firstName: string | null
-  lastName: string | null
-  email: string
-  status: string
-  /** Membership in THIS agency only — never where else they work. */
-  alreadyMember: boolean
-}
-
 /** An assignable role, from `GET .../available-roles`. */
 export type AssignableRole = {
   key: string
@@ -44,22 +33,6 @@ export type AssignableRole = {
 
 /** Membership status this UI can set. */
 export type MembershipStatus = "ACTIVE" | "SUSPENDED"
-
-/** Who becomes the member — the backend's discriminated union, mirrored. */
-export type AddMemberInput =
-  | { type: "EXISTING"; appUserCode: string }
-  | {
-      type: "NEW"
-      email: string
-      password: string
-      firstName?: string | null
-      lastName?: string | null
-    }
-
-export type AddMemberPayload = {
-  member: AddMemberInput
-  roleKeys: string[]
-}
 
 export type ReplaceRolesPayload = { roleKeys: string[] }
 

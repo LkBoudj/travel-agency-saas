@@ -1,16 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import {
-  addMember,
   membersQueryKeys,
   removeMember,
   replaceMemberRoles,
   setMemberStatus,
 } from "../api/members.api"
-import type {
-  AddMemberPayload,
-  ReplaceRolesPayload,
-  SetMemberStatusPayload,
-} from "../types/members.types"
+import type { ReplaceRolesPayload, SetMemberStatusPayload } from "../types/members.types"
 
 /**
  * Every member mutation invalidates the same narrow slice: this agency's member
@@ -23,14 +18,6 @@ function useInvalidateMembers(agencyCode: string) {
   const queryClient = useQueryClient()
   return () =>
     queryClient.invalidateQueries({ queryKey: membersQueryKeys.all(agencyCode) })
-}
-
-export function useAddMember(agencyCode: string) {
-  const invalidate = useInvalidateMembers(agencyCode)
-  return useMutation({
-    mutationFn: (payload: AddMemberPayload) => addMember(agencyCode, payload),
-    onSuccess: invalidate,
-  })
 }
 
 export function useReplaceMemberRoles(agencyCode: string) {

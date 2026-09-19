@@ -220,6 +220,10 @@ export const RBAC_PERMISSION_CATALOG: ReadonlyArray<PermissionCatalogEntry> = [
 
   // AGENCY — agency members.
   permission('AGENCY_MEMBER_VIEW', 'View agency members', 'AGENCY', 'MEMBER', 'VIEW'),
+  // RESERVED: no endpoint consumes it yet. It backs the upcoming Member
+  // Invitations flow (email → pending invite → acceptance → membership), which
+  // will replace direct provisioning. Kept in the catalog so roles can be
+  // pre-granted without a migration.
   permission('AGENCY_MEMBER_INVITE', 'Invite agency members', 'AGENCY', 'MEMBER', 'INVITE'),
   permission('AGENCY_MEMBER_UPDATE', 'Update agency members', 'AGENCY', 'MEMBER', 'UPDATE'),
   permission('AGENCY_MEMBER_REMOVE', 'Remove agency members', 'AGENCY', 'MEMBER', 'REMOVE'),

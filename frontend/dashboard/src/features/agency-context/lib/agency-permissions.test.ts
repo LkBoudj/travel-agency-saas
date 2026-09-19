@@ -4,7 +4,7 @@ import { describe, it } from "node:test"
 import { hasAgencyPermissions } from "./agency-permissions.ts"
 
 describe("hasAgencyPermissions", () => {
-  const granted = ["AGENCY_MEMBER_VIEW", "AGENCY_MEMBER_INVITE"]
+  const granted = ["AGENCY_MEMBER_VIEW", "AGENCY_MEMBER_UPDATE"]
 
   it("is true when the single required key is granted", () => {
     assert.equal(hasAgencyPermissions(granted, ["AGENCY_MEMBER_VIEW"]), true)
@@ -16,7 +16,7 @@ describe("hasAgencyPermissions", () => {
 
   it("requires ALL keys, matching how the backend guard evaluates them", () => {
     assert.equal(
-      hasAgencyPermissions(granted, ["AGENCY_MEMBER_VIEW", "AGENCY_MEMBER_INVITE"]),
+      hasAgencyPermissions(granted, ["AGENCY_MEMBER_VIEW", "AGENCY_MEMBER_UPDATE"]),
       true
     )
     assert.equal(
