@@ -252,6 +252,7 @@ export type AppUserWhereInput = {
   agencyApplications?: Prisma.AgencyApplicationListRelationFilter
   agencyApplicationReviews?: Prisma.AgencyApplicationListRelationFilter
   agencyMemberships?: Prisma.AgencyMembershipListRelationFilter
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationListRelationFilter
 }
 
 export type AppUserOrderByWithRelationInput = {
@@ -268,6 +269,7 @@ export type AppUserOrderByWithRelationInput = {
   agencyApplications?: Prisma.AgencyApplicationOrderByRelationAggregateInput
   agencyApplicationReviews?: Prisma.AgencyApplicationOrderByRelationAggregateInput
   agencyMemberships?: Prisma.AgencyMembershipOrderByRelationAggregateInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationOrderByRelationAggregateInput
 }
 
 export type AppUserWhereUniqueInput = Prisma.AtLeast<{
@@ -287,6 +289,7 @@ export type AppUserWhereUniqueInput = Prisma.AtLeast<{
   agencyApplications?: Prisma.AgencyApplicationListRelationFilter
   agencyApplicationReviews?: Prisma.AgencyApplicationListRelationFilter
   agencyMemberships?: Prisma.AgencyMembershipListRelationFilter
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationListRelationFilter
 }, "id" | "code" | "email">
 
 export type AppUserOrderByWithAggregationInput = {
@@ -335,6 +338,7 @@ export type AppUserCreateInput = {
   agencyApplications?: Prisma.AgencyApplicationCreateNestedManyWithoutAppUserInput
   agencyApplicationReviews?: Prisma.AgencyApplicationCreateNestedManyWithoutReviewedByInput
   agencyMemberships?: Prisma.AgencyMembershipCreateNestedManyWithoutAppUserInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserUncheckedCreateInput = {
@@ -351,6 +355,7 @@ export type AppUserUncheckedCreateInput = {
   agencyApplications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAppUserInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutReviewedByInput
   agencyMemberships?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAppUserInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserUpdateInput = {
@@ -367,6 +372,7 @@ export type AppUserUpdateInput = {
   agencyApplications?: Prisma.AgencyApplicationUpdateManyWithoutAppUserNestedInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUpdateManyWithoutReviewedByNestedInput
   agencyMemberships?: Prisma.AgencyMembershipUpdateManyWithoutAppUserNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUpdateManyWithoutCreatedByNestedInput
 }
 
 export type AppUserUncheckedUpdateInput = {
@@ -383,6 +389,7 @@ export type AppUserUncheckedUpdateInput = {
   agencyApplications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAppUserNestedInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutReviewedByNestedInput
   agencyMemberships?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAppUserNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type AppUserCreateManyInput = {
@@ -553,6 +560,20 @@ export type AppUserUpdateOneRequiredWithoutAgencyMembershipsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AppUserUpdateToOneWithWhereWithoutAgencyMembershipsInput, Prisma.AppUserUpdateWithoutAgencyMembershipsInput>, Prisma.AppUserUncheckedUpdateWithoutAgencyMembershipsInput>
 }
 
+export type AppUserCreateNestedOneWithoutMemberInvitationsCreatedInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutMemberInvitationsCreatedInput, Prisma.AppUserUncheckedCreateWithoutMemberInvitationsCreatedInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutMemberInvitationsCreatedInput
+  connect?: Prisma.AppUserWhereUniqueInput
+}
+
+export type AppUserUpdateOneRequiredWithoutMemberInvitationsCreatedNestedInput = {
+  create?: Prisma.XOR<Prisma.AppUserCreateWithoutMemberInvitationsCreatedInput, Prisma.AppUserUncheckedCreateWithoutMemberInvitationsCreatedInput>
+  connectOrCreate?: Prisma.AppUserCreateOrConnectWithoutMemberInvitationsCreatedInput
+  upsert?: Prisma.AppUserUpsertWithoutMemberInvitationsCreatedInput
+  connect?: Prisma.AppUserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AppUserUpdateToOneWithWhereWithoutMemberInvitationsCreatedInput, Prisma.AppUserUpdateWithoutMemberInvitationsCreatedInput>, Prisma.AppUserUncheckedUpdateWithoutMemberInvitationsCreatedInput>
+}
+
 export type AppUserCreateWithoutPlatformRoleAssignmentsInput = {
   id?: bigint | number
   code: string
@@ -566,6 +587,7 @@ export type AppUserCreateWithoutPlatformRoleAssignmentsInput = {
   agencyApplications?: Prisma.AgencyApplicationCreateNestedManyWithoutAppUserInput
   agencyApplicationReviews?: Prisma.AgencyApplicationCreateNestedManyWithoutReviewedByInput
   agencyMemberships?: Prisma.AgencyMembershipCreateNestedManyWithoutAppUserInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserUncheckedCreateWithoutPlatformRoleAssignmentsInput = {
@@ -581,6 +603,7 @@ export type AppUserUncheckedCreateWithoutPlatformRoleAssignmentsInput = {
   agencyApplications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAppUserInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutReviewedByInput
   agencyMemberships?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAppUserInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserCreateOrConnectWithoutPlatformRoleAssignmentsInput = {
@@ -612,6 +635,7 @@ export type AppUserUpdateWithoutPlatformRoleAssignmentsInput = {
   agencyApplications?: Prisma.AgencyApplicationUpdateManyWithoutAppUserNestedInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUpdateManyWithoutReviewedByNestedInput
   agencyMemberships?: Prisma.AgencyMembershipUpdateManyWithoutAppUserNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUpdateManyWithoutCreatedByNestedInput
 }
 
 export type AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput = {
@@ -627,6 +651,7 @@ export type AppUserUncheckedUpdateWithoutPlatformRoleAssignmentsInput = {
   agencyApplications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAppUserNestedInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutReviewedByNestedInput
   agencyMemberships?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAppUserNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type AppUserCreateWithoutAgencyApplicationsInput = {
@@ -642,6 +667,7 @@ export type AppUserCreateWithoutAgencyApplicationsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutAppUserInput
   agencyApplicationReviews?: Prisma.AgencyApplicationCreateNestedManyWithoutReviewedByInput
   agencyMemberships?: Prisma.AgencyMembershipCreateNestedManyWithoutAppUserInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserUncheckedCreateWithoutAgencyApplicationsInput = {
@@ -657,6 +683,7 @@ export type AppUserUncheckedCreateWithoutAgencyApplicationsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutAppUserInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutReviewedByInput
   agencyMemberships?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAppUserInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserCreateOrConnectWithoutAgencyApplicationsInput = {
@@ -677,6 +704,7 @@ export type AppUserCreateWithoutAgencyApplicationReviewsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutAppUserInput
   agencyApplications?: Prisma.AgencyApplicationCreateNestedManyWithoutAppUserInput
   agencyMemberships?: Prisma.AgencyMembershipCreateNestedManyWithoutAppUserInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserUncheckedCreateWithoutAgencyApplicationReviewsInput = {
@@ -692,6 +720,7 @@ export type AppUserUncheckedCreateWithoutAgencyApplicationReviewsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutAppUserInput
   agencyApplications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAppUserInput
   agencyMemberships?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAppUserInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserCreateOrConnectWithoutAgencyApplicationReviewsInput = {
@@ -723,6 +752,7 @@ export type AppUserUpdateWithoutAgencyApplicationsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutAppUserNestedInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUpdateManyWithoutReviewedByNestedInput
   agencyMemberships?: Prisma.AgencyMembershipUpdateManyWithoutAppUserNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUpdateManyWithoutCreatedByNestedInput
 }
 
 export type AppUserUncheckedUpdateWithoutAgencyApplicationsInput = {
@@ -738,6 +768,7 @@ export type AppUserUncheckedUpdateWithoutAgencyApplicationsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutAppUserNestedInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutReviewedByNestedInput
   agencyMemberships?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAppUserNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type AppUserUpsertWithoutAgencyApplicationReviewsInput = {
@@ -764,6 +795,7 @@ export type AppUserUpdateWithoutAgencyApplicationReviewsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutAppUserNestedInput
   agencyApplications?: Prisma.AgencyApplicationUpdateManyWithoutAppUserNestedInput
   agencyMemberships?: Prisma.AgencyMembershipUpdateManyWithoutAppUserNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUpdateManyWithoutCreatedByNestedInput
 }
 
 export type AppUserUncheckedUpdateWithoutAgencyApplicationReviewsInput = {
@@ -779,6 +811,7 @@ export type AppUserUncheckedUpdateWithoutAgencyApplicationReviewsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutAppUserNestedInput
   agencyApplications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAppUserNestedInput
   agencyMemberships?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAppUserNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutCreatedByNestedInput
 }
 
 export type AppUserCreateWithoutAgencyMembershipsInput = {
@@ -794,6 +827,7 @@ export type AppUserCreateWithoutAgencyMembershipsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutAppUserInput
   agencyApplications?: Prisma.AgencyApplicationCreateNestedManyWithoutAppUserInput
   agencyApplicationReviews?: Prisma.AgencyApplicationCreateNestedManyWithoutReviewedByInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserUncheckedCreateWithoutAgencyMembershipsInput = {
@@ -809,6 +843,7 @@ export type AppUserUncheckedCreateWithoutAgencyMembershipsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutAppUserInput
   agencyApplications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAppUserInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutReviewedByInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutCreatedByInput
 }
 
 export type AppUserCreateOrConnectWithoutAgencyMembershipsInput = {
@@ -840,6 +875,7 @@ export type AppUserUpdateWithoutAgencyMembershipsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutAppUserNestedInput
   agencyApplications?: Prisma.AgencyApplicationUpdateManyWithoutAppUserNestedInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUpdateManyWithoutReviewedByNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUpdateManyWithoutCreatedByNestedInput
 }
 
 export type AppUserUncheckedUpdateWithoutAgencyMembershipsInput = {
@@ -855,6 +891,87 @@ export type AppUserUncheckedUpdateWithoutAgencyMembershipsInput = {
   platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutAppUserNestedInput
   agencyApplications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAppUserNestedInput
   agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutReviewedByNestedInput
+  memberInvitationsCreated?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutCreatedByNestedInput
+}
+
+export type AppUserCreateWithoutMemberInvitationsCreatedInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentCreateNestedManyWithoutAppUserInput
+  agencyApplications?: Prisma.AgencyApplicationCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationCreateNestedManyWithoutReviewedByInput
+  agencyMemberships?: Prisma.AgencyMembershipCreateNestedManyWithoutAppUserInput
+}
+
+export type AppUserUncheckedCreateWithoutMemberInvitationsCreatedInput = {
+  id?: bigint | number
+  code: string
+  email: string
+  passwordHash: string
+  firstName?: string | null
+  lastName?: string | null
+  status?: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedCreateNestedManyWithoutAppUserInput
+  agencyApplications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAppUserInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutReviewedByInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAppUserInput
+}
+
+export type AppUserCreateOrConnectWithoutMemberInvitationsCreatedInput = {
+  where: Prisma.AppUserWhereUniqueInput
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutMemberInvitationsCreatedInput, Prisma.AppUserUncheckedCreateWithoutMemberInvitationsCreatedInput>
+}
+
+export type AppUserUpsertWithoutMemberInvitationsCreatedInput = {
+  update: Prisma.XOR<Prisma.AppUserUpdateWithoutMemberInvitationsCreatedInput, Prisma.AppUserUncheckedUpdateWithoutMemberInvitationsCreatedInput>
+  create: Prisma.XOR<Prisma.AppUserCreateWithoutMemberInvitationsCreatedInput, Prisma.AppUserUncheckedCreateWithoutMemberInvitationsCreatedInput>
+  where?: Prisma.AppUserWhereInput
+}
+
+export type AppUserUpdateToOneWithWhereWithoutMemberInvitationsCreatedInput = {
+  where?: Prisma.AppUserWhereInput
+  data: Prisma.XOR<Prisma.AppUserUpdateWithoutMemberInvitationsCreatedInput, Prisma.AppUserUncheckedUpdateWithoutMemberInvitationsCreatedInput>
+}
+
+export type AppUserUpdateWithoutMemberInvitationsCreatedInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUpdateManyWithoutAppUserNestedInput
+  agencyApplications?: Prisma.AgencyApplicationUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUpdateManyWithoutReviewedByNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUpdateManyWithoutAppUserNestedInput
+}
+
+export type AppUserUncheckedUpdateWithoutMemberInvitationsCreatedInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  lastName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  platformRoleAssignments?: Prisma.PlatformRoleAssignmentUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyApplications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAppUserNestedInput
+  agencyApplicationReviews?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutReviewedByNestedInput
+  agencyMemberships?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAppUserNestedInput
 }
 
 
@@ -867,6 +984,7 @@ export type AppUserCountOutputType = {
   agencyApplications: number
   agencyApplicationReviews: number
   agencyMemberships: number
+  memberInvitationsCreated: number
 }
 
 export type AppUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -874,6 +992,7 @@ export type AppUserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extension
   agencyApplications?: boolean | AppUserCountOutputTypeCountAgencyApplicationsArgs
   agencyApplicationReviews?: boolean | AppUserCountOutputTypeCountAgencyApplicationReviewsArgs
   agencyMemberships?: boolean | AppUserCountOutputTypeCountAgencyMembershipsArgs
+  memberInvitationsCreated?: boolean | AppUserCountOutputTypeCountMemberInvitationsCreatedArgs
 }
 
 /**
@@ -914,6 +1033,13 @@ export type AppUserCountOutputTypeCountAgencyMembershipsArgs<ExtArgs extends run
   where?: Prisma.AgencyMembershipWhereInput
 }
 
+/**
+ * AppUserCountOutputType without action
+ */
+export type AppUserCountOutputTypeCountMemberInvitationsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgencyMemberInvitationWhereInput
+}
+
 
 export type AppUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -929,6 +1055,7 @@ export type AppUserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   agencyApplications?: boolean | Prisma.AppUser$agencyApplicationsArgs<ExtArgs>
   agencyApplicationReviews?: boolean | Prisma.AppUser$agencyApplicationReviewsArgs<ExtArgs>
   agencyMemberships?: boolean | Prisma.AppUser$agencyMembershipsArgs<ExtArgs>
+  memberInvitationsCreated?: boolean | Prisma.AppUser$memberInvitationsCreatedArgs<ExtArgs>
   _count?: boolean | Prisma.AppUserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["appUser"]>
 
@@ -974,6 +1101,7 @@ export type AppUserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs
   agencyApplications?: boolean | Prisma.AppUser$agencyApplicationsArgs<ExtArgs>
   agencyApplicationReviews?: boolean | Prisma.AppUser$agencyApplicationReviewsArgs<ExtArgs>
   agencyMemberships?: boolean | Prisma.AppUser$agencyMembershipsArgs<ExtArgs>
+  memberInvitationsCreated?: boolean | Prisma.AppUser$memberInvitationsCreatedArgs<ExtArgs>
   _count?: boolean | Prisma.AppUserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AppUserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -986,6 +1114,7 @@ export type $AppUserPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     agencyApplications: Prisma.$AgencyApplicationPayload<ExtArgs>[]
     agencyApplicationReviews: Prisma.$AgencyApplicationPayload<ExtArgs>[]
     agencyMemberships: Prisma.$AgencyMembershipPayload<ExtArgs>[]
+    memberInvitationsCreated: Prisma.$AgencyMemberInvitationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
@@ -1395,6 +1524,7 @@ export interface Prisma__AppUserClient<T, Null = never, ExtArgs extends runtime.
   agencyApplications<T extends Prisma.AppUser$agencyApplicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppUser$agencyApplicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgencyApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   agencyApplicationReviews<T extends Prisma.AppUser$agencyApplicationReviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppUser$agencyApplicationReviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgencyApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   agencyMemberships<T extends Prisma.AppUser$agencyMembershipsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppUser$agencyMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgencyMembershipPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  memberInvitationsCreated<T extends Prisma.AppUser$memberInvitationsCreatedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AppUser$memberInvitationsCreatedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgencyMemberInvitationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1919,6 +2049,30 @@ export type AppUser$agencyMembershipsArgs<ExtArgs extends runtime.Types.Extensio
   take?: number
   skip?: number
   distinct?: Prisma.AgencyMembershipScalarFieldEnum | Prisma.AgencyMembershipScalarFieldEnum[]
+}
+
+/**
+ * AppUser.memberInvitationsCreated
+ */
+export type AppUser$memberInvitationsCreatedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgencyMemberInvitation
+   */
+  select?: Prisma.AgencyMemberInvitationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgencyMemberInvitation
+   */
+  omit?: Prisma.AgencyMemberInvitationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgencyMemberInvitationInclude<ExtArgs> | null
+  where?: Prisma.AgencyMemberInvitationWhereInput
+  orderBy?: Prisma.AgencyMemberInvitationOrderByWithRelationInput | Prisma.AgencyMemberInvitationOrderByWithRelationInput[]
+  cursor?: Prisma.AgencyMemberInvitationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgencyMemberInvitationScalarFieldEnum | Prisma.AgencyMemberInvitationScalarFieldEnum[]
 }
 
 /**

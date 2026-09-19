@@ -9,6 +9,9 @@ export const AUDIT_ACTIONS = {
   agencyMemberSuspended: 'AGENCY_MEMBER_SUSPENDED',
   agencyMemberReactivated: 'AGENCY_MEMBER_REACTIVATED',
   agencyMemberRemoved: 'AGENCY_MEMBER_REMOVED',
+  agencyMemberInvitationCreated: 'AGENCY_MEMBER_INVITATION_CREATED',
+  agencyMemberInvitationRevoked: 'AGENCY_MEMBER_INVITATION_REVOKED',
+  agencyMemberInvitationAccepted: 'AGENCY_MEMBER_INVITATION_ACCEPTED',
   agencyPermissionDenied: 'AGENCY_PERMISSION_DENIED',
 } as const;
 

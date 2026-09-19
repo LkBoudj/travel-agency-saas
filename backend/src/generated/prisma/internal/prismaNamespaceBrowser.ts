@@ -60,6 +60,8 @@ export const ModelName = {
   AgencyApplication: 'AgencyApplication',
   AgencyMembership: 'AgencyMembership',
   AgencyRoleAssignment: 'AgencyRoleAssignment',
+  AgencyMemberInvitation: 'AgencyMemberInvitation',
+  AgencyMemberInvitationRole: 'AgencyMemberInvitationRole',
   AuditLog: 'AuditLog'
 } as const
 
@@ -195,6 +197,32 @@ export const AgencyRoleAssignmentScalarFieldEnum = {
 } as const
 
 export type AgencyRoleAssignmentScalarFieldEnum = (typeof AgencyRoleAssignmentScalarFieldEnum)[keyof typeof AgencyRoleAssignmentScalarFieldEnum]
+
+
+export const AgencyMemberInvitationScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  agencyId: 'agencyId',
+  email: 'email',
+  status: 'status',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  revokedAt: 'revokedAt',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyMemberInvitationScalarFieldEnum = (typeof AgencyMemberInvitationScalarFieldEnum)[keyof typeof AgencyMemberInvitationScalarFieldEnum]
+
+
+export const AgencyMemberInvitationRoleScalarFieldEnum = {
+  invitationId: 'invitationId',
+  roleId: 'roleId'
+} as const
+
+export type AgencyMemberInvitationRoleScalarFieldEnum = (typeof AgencyMemberInvitationRoleScalarFieldEnum)[keyof typeof AgencyMemberInvitationRoleScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {

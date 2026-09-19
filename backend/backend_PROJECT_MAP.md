@@ -397,11 +397,10 @@ Deliberately NOT implemented (identity-enumeration exposure): `POST members`
 (adding a person by picking an existing account) and `GET member-candidates`
 (the account lookup behind it). Both were built, then removed: a lookup over
 `/v1/app-users/search` semantics from an agency dashboard would hand a business
-operator a searchable directory of accounts outside their agency. Replacement
-is the upcoming Member Invitations flow (email → pending invite → acceptance →
-membership). `AGENCY_MEMBER_INVITE` stays in the permission catalog, reserved
-for that flow: no route consumes it today, but seeding roles early avoids a
-later migration.
+operator a searchable directory of accounts outside their agency. The
+replacement IS the Member Invitations flow — email → pending invite →
+acceptance → membership — implemented and live under [MEMBER_INVITATIONS].
+`AGENCY_MEMBER_INVITE` is the permission consumed by that flow.
 
 Domain rules:
 
@@ -423,8 +422,68 @@ Domain rules:
   (`isRoleValidForAgency`), with the `agency_role_assignment_scope` trigger as
   the final protection.
 
-NOT in this slice: invitations/tokens/emails, custom role CRUD, ownership
-transfer, and any frontend.
+NOT in this slice: custom role CRUD (backend), ownership transfer, and any
+frontend. (Member invitations and their tokens/emails are implemented — see
+[MEMBER_INVITATIONS].)
+
+## [MEMBER_INVITATIONS]
+
+IMPLEMENTED (backend only). Consent-based membership joining for one agency:
+an invited EMAIL accepts a one-time token and becomes an EMPLOYEE member with
+the roles the invitation offered. Authorized by `AGENCY_MEMBER_INVITE` through
+the existing `AgencyPermissionGuard`; acceptance is anonymous (token-only) for
+a new account or signed-in (identity matching) for an existing account.
+
+Routes:
+
+- `POST   /v1/agencies/:agencyCode/member-invitations`
+  (`AGENCY_MEMBER_INVITE`) - create a PENDING invitation for an EMAIL (NOT an
+  account) with optional `roleKeys` (1..50). Response is the public invitation
+  (code, email, status PENDING, offered roles, expiry) — never the token.
+  Idempotent: an outstanding PENDING invitation for the same email/agency is
+  returned as-is, no second delivery. `roleKeys` accept global AGENCY roles and
+  THIS agency's custom roles; PLATFORM roles, unknown keys and another agency's
+  custom roles are rejected.
+- `GET    /v1/agencies/:agencyCode/member-invitations`
+  (`AGENCY_MEMBER_VIEW`) - pending and lately-accepted invitations of THIS
+  agency only, newest first.
+- `DELETE /v1/agencies/:agencyCode/member-invitations/:code`
+  (`AGENCY_MEMBER_INVITE`) - revoke a still-PENDING invitation (204).
+- `GET    /v1/member-invitations/:token` - inspect before accepting (public,
+  rate-limited per IP, no session needed). 404 for unknown/revoked/expired.
+- `POST   /v1/member-invitations/:token/accept` - consume the one-time token:
+  - existing account → requires the matching signed-in account
+    (`INVITATION_AUTH_REQUIRED`/`INVITATION_EMAIL_MISMATCH`);
+  - no account yet → requires `{ password }` and an interactive email-race
+    guard (the email comes from the invitation, never from the body);
+  - grants `membershipType = EMPLOYEE`, `status = ACTIVE` + the offered roles,
+    atomically, one redemption only.
+
+Lifecycle: PENDING → ACCEPTED | REVOKED | EXPIRED (a.DB CHECK pins the
+values). Non-enumeration: creating for an existing account looks byte-for-byte
+identical to an unknown one, the response never signals whether the address has
+an account, and `POST members`/`GET member-candidates` stay absent. The
+platform-only global AppUser search stays on `PLATFORM_AGENCY_CREATE`.
+
+Token security: 256-bit `crypto.randomBytes` token, delivered out-of-band via
+`MemberInvitationDeliveryService` (never in any API response); the DB stores
+only the SHA-256 digest (`tokenHash`, unique, with the service-side
+`crypto.timingSafeEqual` compare); no welcome email yet —
+`MEMBER_INVITE_DELIVERY` defaults to `none` (hard no-op), `dev` provably refuses
+to email in production (NODE_ENV check), delivery itself is NOT configured.
+
+Audit: every lifecycle transition logs an `AGENCY_MEMBER_INVITATION_*` event
+(SUCCESS/FAILURE) with `targetHash = SHA-256(email)` and metadata that never
+contains the token, its hash or any password. Database table
+`agency_member_invitation` (+ `agency_member_invitation_role`) in migration
+`20260919150000_agency_member_invitation`, with the partial unique
+`(agency_id, email) WHERE status = 'PENDING'` and the
+`agency_member_invitation_role_scope` trigger mirroring role tenancy.
+
+NOT in this slice: real email delivery, custom role CRUD, ownership transfer,
+and any frontend. Verified by 46 unit/HTTP tests (in-memory), plus a throwaway
+real-DB HTTP smoke covering all 20 required behavioral points (cleaned up, no
+residue: re-verified 0 rows after).
 
 ## [AGENCY_AUTHORIZATION]
 
@@ -693,16 +752,30 @@ user + roles), profile edit, ACTIVE/SUSPENDED status, role view/replace.
 Suspended users are rejected at login and on every JWT validation, so an
 existing HttpOnly cookie stops working immediately after suspension.
 
-NOT implemented: `GET /health`, api-contract, Agency model, tenant enforcement,
-custom agency roles and
-agency-side role assignments (the `agency` table, and therefore the
-`role.agency_id` foreign key, do not exist yet), business models beyond
+- RBAC seed idempotent; `AGENCY_MEMBER_INVITE` is consumed by the Member
+  Invitations flow (no longer reserved-unused; see [MEMBER_INVITATIONS])
+- Member Invitations vertical slice (IMPLEMENTED, backend only): see
+  [MEMBER_INVITATIONS] — `AGENCY_MEMBER_INVITE`-guarded create/list/revoke under
+  `/v1/agencies/:agencyCode/member-invitations` plus token-only inspect/accept
+  under `/v1/member-invitations/:token`; 256-bit token delivered out-of-band
+  (delivery provider abstracted, NOT wired to email — `MEMBER_INVITE_DELIVERY`
+  defaults to `none`, `dev` refuses non-local NODE_ENV); DB stores SHA-256
+  tokenHash only; anonymous new-account acceptance with Argon2id password;
+  existing-account acceptance requires the matching signed-in account;
+  non-enumeration (existing-account invites identical to unknown, no
+  `member-candidates`/`POST members`); `AGENCY_MEMBER_INVITATION_*` audit events
+  with `targetHash` and metadata never carrying token/tokenHash/password;
+  migration `20260919150000_agency_member_invitation` applied (no drift);
+  46 unit/HTTP tests + throwaway real-DB smoke (20 points) passed
+
+NOT implemented: `GET /health`, api-contract, tenant enforcement beyond the
+RBAC/membership guards above, business models beyond
 `app_user`/`role`/`permission`/`role_permission`/
-`platform_role_assignment`. The Group 1 backend RBAC slice (canonical scoped
-permission catalog, default role presets, PLATFORM Role CRUD, Global Agency
-Role CRUD, available-permissions, Role↔Permission API, CASL-backed guard,
-idempotent seed, Swagger, role ownership schema foundation) IS implemented and
-unit/HTTP/live verified.
+`platform_role_assignment`/`agency`/`agency_membership`/invitations. The Group 1
+backend RBAC slice (canonical scoped permission catalog, default role presets,
+PLATFORM Role CRUD, Global Agency Role CRUD, available-permissions, Role↔Permission
+API, CASL-backed guard, idempotent seed, Swagger, role ownership schema
+foundation) IS implemented and unit/HTTP/live verified.
 
 ## [SELECTED_NOT_IMPLEMENTED]
 

@@ -26,6 +26,7 @@ model AppUser {
   agencyApplications       AgencyApplication[]
   agencyApplicationReviews AgencyApplication[]      @relation("AgencyApplicationReviews")
   agencyMemberships        AgencyMembership[]
+  memberInvitationsCreated AgencyMemberInvitation[] @relation("AgencyMemberInvitationCreator")
 
   @@map("app_user")
 }
@@ -66,6 +67,7 @@ model Role {
   permissions           RolePermission[]
   platformAssignments   PlatformRoleAssignment[]
   agencyRoleAssignments AgencyRoleAssignment[]
+  memberInvitationRoles AgencyMemberInvitationRole[]
 
   // Name uniqueness is enforced by two partial unique indexes created in the
   // `role_agency_ownership` migration (not expressible in Prisma PSL):
@@ -140,6 +142,7 @@ model Agency {
 
   members      AgencyMembership[]
   applications AgencyApplication[]
+  memberInvitations AgencyMemberInvitation[]
 
   @@map("agency")
 }
@@ -248,6 +251,74 @@ model AgencyRoleAssignment {
   @@unique([membershipId, roleId])
   @@index([roleId])
   @@map("agency_role_assignment")
+}
+
+/**
+ * A consent-based membership invitation, keyed to an EMAIL address.
+ *
+ * The invitation holds zero inside information: it records who invited whom
+ * into which agency, the roles offered at creation time, and a 256-bit random
+ * redemption token kept only as its SHA-256 hex digest (`tokenHash`). The
+ * plaintext token exists exclusively in the delivery channel (email) and is
+ * never stored, returned by an API, or logged. Email is NOT a foreign key to
+ * AppUser on purpose: invitations must not probe whether an address is already
+ * an account, so acceptance decides that in one interactive transaction instead
+ * of at creation time.
+ *
+ * The database guarantees the lifecycle:
+ *   agency_member_invitation_status_check  status in PENDING | ACCEPTED |
+ *     REVOKED | EXPIRED
+ *   agency_member_invitation_pending_agency_email_key  partial UNIQUE
+ *     (agency_id, email) WHERE status = 'PENDING' — at most one outstanding
+ *     invitation per address per agency
+ */
+model AgencyMemberInvitation {
+  id             BigInt    @id @default(autoincrement())
+  code           String    @unique @db.VarChar(24)
+  agencyId       BigInt    @map("agency_id")
+  email          String    @db.Citext
+  // Lifecycle: PENDING | ACCEPTED | REVOKED | EXPIRED (CHECK in the migration).
+  status         String    @default("PENDING") @map("status") @db.VarChar(16)
+  // SHA-256 hex of the plaintext redemption token; the plaintext never touches
+  // the database. Unique so acceptance looks the token up by hash.
+  tokenHash      String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt      DateTime  @map("expires_at") @db.Timestamptz()
+  acceptedAt     DateTime? @map("accepted_at") @db.Timestamptz()
+  revokedAt      DateTime? @map("revoked_at") @db.Timestamptz()
+  // The agency-side inviter (AppUser). Not a member on the platform, not a
+  // "status" column: this is who chose to invite.
+  createdByUserId BigInt   @map("created_by_user_id")
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  agency          Agency                          @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  createdBy       AppUser                         @relation("AgencyMemberInvitationCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  roles           AgencyMemberInvitationRole[]
+
+  @@index([agencyId, status], map: "agency_member_invitation_agency_status_idx")
+  @@index([agencyId, email], map: "agency_member_invitation_agency_email_idx")
+  @@map("agency_member_invitation")
+}
+
+/**
+ * The AGENCY roles offered by an invitation, captured at creation time.
+ *
+ * The same tenant rule as `AgencyRoleAssignment` applies (mirrored trigger
+ * `agency_member_invitation_role_scope`): a role must be AGENCY-scoped and,
+ * when custom, owned by the invitation's own agency. The set is a snapshot
+ * offered to the invitee — a later member role replacement authorizes changes
+ * afterwards, it is not required before acceptance.
+ */
+model AgencyMemberInvitationRole {
+  invitationId BigInt @map("invitation_id")
+  roleId       BigInt @map("role_id")
+
+  invitation AgencyMemberInvitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  role       Role                    @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([invitationId, roleId])
+  @@index([roleId])
+  @@map("agency_member_invitation_role")
 }
 
 /**

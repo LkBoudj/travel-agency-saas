@@ -37,6 +37,11 @@ anonymous travelers, platform operators.
                          management + Agencies (list, create, details, edit,
                          suspend/reactivate). Overview is an honest placeholder.
                          Exists.
+- Root `package.json` +   One command (`npm run all` / `npm run dev`) starts every
+  `scripts/dev-all.mjs`   app's dev server with prefixed output: backend :3000,
+                          dashboard :5173, admin :5174, storefront :3001 (3000 is
+                          the API). Apps without `node_modules` are skipped with
+                          the exact install command printed.
 
 ## [TECH_STACK]
 - dashboard: React19+TS+Vite+RR7+Tailwind4+shadcn(@base-ui)+TSQuery/Table+

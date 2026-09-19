@@ -87,6 +87,40 @@ export type AgencyMembership = Prisma.AgencyMembershipModel
  */
 export type AgencyRoleAssignment = Prisma.AgencyRoleAssignmentModel
 /**
+ * Model AgencyMemberInvitation
+ * *
+ *  * A consent-based membership invitation, keyed to an EMAIL address.
+ *  *
+ *  * The invitation holds zero inside information: it records who invited whom
+ *  * into which agency, the roles offered at creation time, and a 256-bit random
+ *  * redemption token kept only as its SHA-256 hex digest (`tokenHash`). The
+ *  * plaintext token exists exclusively in the delivery channel (email) and is
+ *  * never stored, returned by an API, or logged. Email is NOT a foreign key to
+ *  * AppUser on purpose: invitations must not probe whether an address is already
+ *  * an account, so acceptance decides that in one interactive transaction instead
+ *  * of at creation time.
+ *  *
+ *  * The database guarantees the lifecycle:
+ *  *   agency_member_invitation_status_check  status in PENDING | ACCEPTED |
+ *  *     REVOKED | EXPIRED
+ *  *   agency_member_invitation_pending_agency_email_key  partial UNIQUE
+ *  *     (agency_id, email) WHERE status = 'PENDING' — at most one outstanding
+ *  *     invitation per address per agency
+ */
+export type AgencyMemberInvitation = Prisma.AgencyMemberInvitationModel
+/**
+ * Model AgencyMemberInvitationRole
+ * *
+ *  * The AGENCY roles offered by an invitation, captured at creation time.
+ *  *
+ *  * The same tenant rule as `AgencyRoleAssignment` applies (mirrored trigger
+ *  * `agency_member_invitation_role_scope`): a role must be AGENCY-scoped and,
+ *  * when custom, owned by the invitation's own agency. The set is a snapshot
+ *  * offered to the invitee — a later member role replacement authorizes changes
+ *  * afterwards, it is not required before acceptance.
+ */
+export type AgencyMemberInvitationRole = Prisma.AgencyMemberInvitationRoleModel
+/**
  * Model AuditLog
  * *
  *  * Security-relevant events, append-only.

@@ -28,6 +28,35 @@ export const envSchema = z.object({
     .default(60)
     .describe('Platform AppUser searches per window, counted per actor and per IP'),
   RATE_LIMIT_APP_USER_SEARCH_WINDOW_SECONDS: z.coerce.number().int().positive().default(3600),
+
+  // Member invitations.
+  // How long an invitation stays redeemable. `MEMBER_INVITE_DELIVERY` picks the
+  // out-of-band channel: `none` (default — invitation persists but nothing is
+  // sent) or `dev` (log the accept link; refused in production). A real email
+  // provider will attach to MemberInvitationDeliveryService when one exists.
+  MEMBER_INVITE_EXPIRES_HOURS: z.coerce.number().int().positive().default(72),
+  MEMBER_INVITE_DELIVERY: z.enum(['none', 'dev']).default('none'),
+  RATE_LIMIT_MEMBER_INVITE_CREATE_LIMIT: z.coerce
+    .number()
+    .int()
+    .min(0)
+    .default(30)
+    .describe('Invitations created per window, counted per actor and per IP'),
+  RATE_LIMIT_MEMBER_INVITE_CREATE_WINDOW_SECONDS: z.coerce.number().int().positive().default(3600),
+  RATE_LIMIT_MEMBER_INVITE_INSPECT_LIMIT: z.coerce
+    .number()
+    .int()
+    .min(0)
+    .default(60)
+    .describe('Token inspections per window, counted per IP'),
+  RATE_LIMIT_MEMBER_INVITE_INSPECT_WINDOW_SECONDS: z.coerce.number().int().positive().default(3600),
+  RATE_LIMIT_MEMBER_INVITE_ACCEPT_LIMIT: z.coerce
+    .number()
+    .int()
+    .min(0)
+    .default(30)
+    .describe('Token redemptions per window, counted per IP'),
+  RATE_LIMIT_MEMBER_INVITE_ACCEPT_WINDOW_SECONDS: z.coerce.number().int().positive().default(3600),
 });
 
 export type Env = z.infer<typeof envSchema>;

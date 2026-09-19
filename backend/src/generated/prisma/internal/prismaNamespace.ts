@@ -406,6 +406,8 @@ export const ModelName = {
   AgencyApplication: 'AgencyApplication',
   AgencyMembership: 'AgencyMembership',
   AgencyRoleAssignment: 'AgencyRoleAssignment',
+  AgencyMemberInvitation: 'AgencyMemberInvitation',
+  AgencyMemberInvitationRole: 'AgencyMemberInvitationRole',
   AuditLog: 'AuditLog'
 } as const
 
@@ -422,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "appUser" | "role" | "permission" | "rolePermission" | "platformRoleAssignment" | "agency" | "agencyApplication" | "agencyMembership" | "agencyRoleAssignment" | "auditLog"
+    modelProps: "appUser" | "role" | "permission" | "rolePermission" | "platformRoleAssignment" | "agency" | "agencyApplication" | "agencyMembership" | "agencyRoleAssignment" | "agencyMemberInvitation" | "agencyMemberInvitationRole" | "auditLog"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1092,6 +1094,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AgencyMemberInvitation: {
+      payload: Prisma.$AgencyMemberInvitationPayload<ExtArgs>
+      fields: Prisma.AgencyMemberInvitationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgencyMemberInvitationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgencyMemberInvitationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload>
+        }
+        findFirst: {
+          args: Prisma.AgencyMemberInvitationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgencyMemberInvitationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload>
+        }
+        findMany: {
+          args: Prisma.AgencyMemberInvitationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload>[]
+        }
+        create: {
+          args: Prisma.AgencyMemberInvitationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload>
+        }
+        createMany: {
+          args: Prisma.AgencyMemberInvitationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgencyMemberInvitationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload>[]
+        }
+        delete: {
+          args: Prisma.AgencyMemberInvitationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload>
+        }
+        update: {
+          args: Prisma.AgencyMemberInvitationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgencyMemberInvitationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgencyMemberInvitationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgencyMemberInvitationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgencyMemberInvitationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationPayload>
+        }
+        aggregate: {
+          args: Prisma.AgencyMemberInvitationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgencyMemberInvitation>
+        }
+        groupBy: {
+          args: Prisma.AgencyMemberInvitationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyMemberInvitationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgencyMemberInvitationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyMemberInvitationCountAggregateOutputType> | number
+        }
+      }
+    }
+    AgencyMemberInvitationRole: {
+      payload: Prisma.$AgencyMemberInvitationRolePayload<ExtArgs>
+      fields: Prisma.AgencyMemberInvitationRoleFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgencyMemberInvitationRoleFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgencyMemberInvitationRoleFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload>
+        }
+        findFirst: {
+          args: Prisma.AgencyMemberInvitationRoleFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgencyMemberInvitationRoleFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload>
+        }
+        findMany: {
+          args: Prisma.AgencyMemberInvitationRoleFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload>[]
+        }
+        create: {
+          args: Prisma.AgencyMemberInvitationRoleCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload>
+        }
+        createMany: {
+          args: Prisma.AgencyMemberInvitationRoleCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgencyMemberInvitationRoleCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload>[]
+        }
+        delete: {
+          args: Prisma.AgencyMemberInvitationRoleDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload>
+        }
+        update: {
+          args: Prisma.AgencyMemberInvitationRoleUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload>
+        }
+        deleteMany: {
+          args: Prisma.AgencyMemberInvitationRoleDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgencyMemberInvitationRoleUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgencyMemberInvitationRoleUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload>[]
+        }
+        upsert: {
+          args: Prisma.AgencyMemberInvitationRoleUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyMemberInvitationRolePayload>
+        }
+        aggregate: {
+          args: Prisma.AgencyMemberInvitationRoleAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgencyMemberInvitationRole>
+        }
+        groupBy: {
+          args: Prisma.AgencyMemberInvitationRoleGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyMemberInvitationRoleGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgencyMemberInvitationRoleCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyMemberInvitationRoleCountAggregateOutputType> | number
+        }
+      }
+    }
     AuditLog: {
       payload: Prisma.$AuditLogPayload<ExtArgs>
       fields: Prisma.AuditLogFieldRefs
@@ -1321,6 +1471,32 @@ export const AgencyRoleAssignmentScalarFieldEnum = {
 } as const
 
 export type AgencyRoleAssignmentScalarFieldEnum = (typeof AgencyRoleAssignmentScalarFieldEnum)[keyof typeof AgencyRoleAssignmentScalarFieldEnum]
+
+
+export const AgencyMemberInvitationScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  agencyId: 'agencyId',
+  email: 'email',
+  status: 'status',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  revokedAt: 'revokedAt',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyMemberInvitationScalarFieldEnum = (typeof AgencyMemberInvitationScalarFieldEnum)[keyof typeof AgencyMemberInvitationScalarFieldEnum]
+
+
+export const AgencyMemberInvitationRoleScalarFieldEnum = {
+  invitationId: 'invitationId',
+  roleId: 'roleId'
+} as const
+
+export type AgencyMemberInvitationRoleScalarFieldEnum = (typeof AgencyMemberInvitationRoleScalarFieldEnum)[keyof typeof AgencyMemberInvitationRoleScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {
@@ -1628,6 +1804,8 @@ export type GlobalOmitConfig = {
   agencyApplication?: Prisma.AgencyApplicationOmit
   agencyMembership?: Prisma.AgencyMembershipOmit
   agencyRoleAssignment?: Prisma.AgencyRoleAssignmentOmit
+  agencyMemberInvitation?: Prisma.AgencyMemberInvitationOmit
+  agencyMemberInvitationRole?: Prisma.AgencyMemberInvitationRoleOmit
   auditLog?: Prisma.AuditLogOmit
 }
 
