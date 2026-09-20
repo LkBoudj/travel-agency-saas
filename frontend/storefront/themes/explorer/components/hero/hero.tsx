@@ -92,7 +92,7 @@ export default function Hero({
                   className="flex items-center gap-3 py-1 pe-8 sm:pe-10 md:[&:nth-child(n+2)]:ps-10"
                 >
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white/90 backdrop-blur-sm">
-                    <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
+                    <Icon className="h-[18px] w-[18px]" />
                   </span>
                   <span className="whitespace-nowrap text-[15px] font-medium text-white/90">
                     {item.label}

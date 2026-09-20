@@ -11,6 +11,7 @@ export default function SectionHeader({
   headingId,
   eyebrowId,
 }: SectionHeaderProps) {
+  const isCenter = align === "center";
   const isDark = tone === "dark";
 
   const titleLines = title.split("\n");
