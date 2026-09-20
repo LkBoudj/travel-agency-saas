@@ -7,6 +7,7 @@ import { AgencySelectionPage } from "@/features/agency-context/pages/agency-sele
 import { LegacyRedirectPage } from "@/features/agency-context/pages/legacy-redirect-page"
 import { agencyRoutes } from "@/features/agency/routes/agency.routes"
 import { authRoutes } from "@/features/auth/routes/auth.routes"
+import { bookingRoutes } from "@/features/bookings/routes/bookings.routes"
 import { customerRoutes } from "@/features/customers/routes/customers.routes"
 import { DashboardPage } from "@/features/dashboard/pages/dashboard-page"
 import { memberRoutes } from "@/features/members/routes/members.routes"
@@ -19,9 +20,9 @@ import { DashboardLayout } from "@/layouts/dashboard-layout"
  * When a feature grows enough to own its route module (e.g. bookings.routes.tsx),
  * spread its group into DashboardLayout below and delete the placeholder line:
  *
- *   placeholder(AGENCY_ROUTES.bookings, "Bookings"),
+ *   placeholder(AGENCY_ROUTES.settings, "Settings"),
  *   ...
- *   ...bookingRoutes,
+ *   ...settingsRoutes,
  */
 const placeholder = (path: string, title: string): RouteObject => ({
   path,
@@ -56,8 +57,8 @@ const authenticatedRoutes: RouteObject[] = [
               { index: true, element: <Navigate to={AGENCY_ROUTES.dashboard} replace /> },
               { path: AGENCY_ROUTES.dashboard, element: <DashboardPage /> },
               ...tripRoutes,
+              ...bookingRoutes,
               ...agencyRoutes,
-              placeholder(AGENCY_ROUTES.bookings, "Bookings"),
               ...customerRoutes,
               ...memberRoutes,
               placeholder(AGENCY_ROUTES.settings, "Settings"),

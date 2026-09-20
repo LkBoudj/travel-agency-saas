@@ -40,7 +40,7 @@ export default function DestinationCard({
   return (
     <Link
       href={`/destinations/${destination.slug}`}
-      className="group relative block h-full w-full overflow-hidden rounded-[20px] shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition-shadow duration-300 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+      className="group relative block h-full w-full overflow-hidden rounded-panel shadow-card transition-[transform,box-shadow] duration-500 ease-out hover:-translate-y-1 hover:shadow-panel focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
     >
       <Image
         src={destination.image.src}
@@ -65,7 +65,7 @@ export default function DestinationCard({
       >
         <span className="flex w-full flex-col items-start">
           <span
-            className={`font-bold leading-[1.1] tracking-[-0.01em] text-white ${styles.name}`}
+            className={`font-display font-medium leading-[1.1] tracking-[-0.01em] text-white ${styles.name}`}
           >
             {destination.name}
           </span>
@@ -78,7 +78,7 @@ export default function DestinationCard({
             className={`mt-4 inline-flex items-center gap-2 font-semibold text-white ${styles.tourCount}`}
           >
             {destination.tourCount} Tours
-            <ArrowRight className="h-[18px] w-[18px] transition-transform duration-300 group-hover:translate-x-1" />
+            <ArrowRight className="h-[18px] w-[18px] transition-transform duration-300 group-hover:translate-x-1 rtl:-scale-x-100 rtl:group-hover:-translate-x-1" />
           </span>
         </span>
       </span>

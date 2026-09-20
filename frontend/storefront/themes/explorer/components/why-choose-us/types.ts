@@ -11,4 +11,5 @@ export interface WhyChooseUsProps {
 
 export interface FeatureCardProps {
   feature: Feature;
+  index: number;
 }

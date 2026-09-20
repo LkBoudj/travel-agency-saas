@@ -172,7 +172,8 @@ export class DeparturesController {
     summary: 'Replace a departure of this tour',
     description:
       'Full replacement of the operational fields; `status` may move between OPEN and ' +
-      'CLOSED only. A cancelled departure cannot be edited. The tour status is never ' +
+      'CLOSED only. A cancelled departure cannot be edited. Capacity cannot be reduced ' +
+      'below the seats already reserved by active bookings. The tour status is never ' +
       'touched by this action.',
   })
   @ApiParam(AGENCY_CODE_PARAM_DOC)
@@ -183,7 +184,9 @@ export class DeparturesController {
   @ApiBadRequestResponse({ description: 'Invalid body (schema validation, incl. date rules)' })
   @ApiNotFoundResponse({ description: `${TOUR_NOT_FOUND_DOC}; or ${DEPARTURE_NOT_FOUND_DOC}` })
   @ApiConflictResponse({
-    description: 'Departure is cancelled and cannot be edited (DEPARTURE_ALREADY_CANCELLED)',
+    description:
+      'Departure is cancelled and cannot be edited (DEPARTURE_ALREADY_CANCELLED), or capacity ' +
+      'cannot drop below reserved seats (DEPARTURE_CAPACITY_BELOW_RESERVED)',
   })
   async update(
     @CurrentUser() actor: InternalAuthUser,
@@ -218,9 +221,11 @@ export class DeparturesController {
     summary: 'Cancel a departure of this tour',
     description:
       'One-way terminal action (like archiving a tour): status becomes CANCELLED and the row ' +
-      'stays readable by code. Cancelling a departure NEVER changes the tour status silently — ' +
-      'a PUBLISHED SCHEDULED tour that loses its last OPEN departure stays PUBLISHED and a ' +
-      'later publish attempt still runs the normal readiness gate.',
+      'stays readable by code. A departure with active bookings (PENDING/CONFIRMED reserved ' +
+      'seats) cannot be cancelled — its bookings must be cancelled first. Cancelling a ' +
+      'departure NEVER changes the tour status silently — a PUBLISHED SCHEDULED tour that ' +
+      'loses its last OPEN departure stays PUBLISHED and a later publish attempt still runs ' +
+      'the normal readiness gate.',
   })
   @ApiParam(AGENCY_CODE_PARAM_DOC)
   @ApiParam(TOUR_CODE_PARAM_DOC)
@@ -228,7 +233,9 @@ export class DeparturesController {
   @ApiOkResponse({ description: 'The cancelled departure', schema: DEPARTURE_SCHEMA })
   @ApiNotFoundResponse({ description: `${TOUR_NOT_FOUND_DOC}; or ${DEPARTURE_NOT_FOUND_DOC}` })
   @ApiConflictResponse({
-    description: 'Departure is already cancelled (DEPARTURE_ALREADY_CANCELLED)',
+    description:
+      'Departure already cancelled (DEPARTURE_ALREADY_CANCELLED), or active bookings still ' +
+      'reserve seats (DEPARTURE_HAS_ACTIVE_BOOKINGS)',
   })
   async cancel(
     @CurrentUser() actor: InternalAuthUser,

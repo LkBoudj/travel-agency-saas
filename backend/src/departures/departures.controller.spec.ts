@@ -41,6 +41,13 @@ type DepartureRow = {
   updatedAt: Date;
 };
 
+type BookingRow = {
+  id: bigint;
+  departureId: bigint;
+  status: 'PENDING' | 'CONFIRMED' | 'CANCELLED';
+  reservedSeats: number;
+};
+
 type RoleRow = {
   id: bigint;
   key: string;
@@ -82,6 +89,7 @@ const employee = { id: 2n, code: 'USR-EMPLOYEE0001', email: 'employee@mail.com' 
 const DB = {
   tours: [] as TourRow[],
   departures: [] as DepartureRow[],
+  bookings: [] as BookingRow[],
   roles: new Map<bigint, RoleRow>(),
   users: new Map<bigint, UserRow>(),
   memberships: [] as MembershipRow[],
@@ -190,6 +198,21 @@ function addDeparture(
   return row;
 }
 
+function addBooking(
+  departureId: bigint,
+  overrides: Partial<BookingRow> = {},
+): BookingRow {
+  const row: BookingRow = {
+    id: id(),
+    departureId,
+    status: 'PENDING',
+    reservedSeats: 2,
+    ...overrides,
+  };
+  DB.bookings.push(row);
+  return row;
+}
+
 /** A valid creation payload, ready to be overridden per test. */
 function createPayload() {
   return {
@@ -277,6 +300,34 @@ const prismaMock = {
   agencyMembership: {
     findMany: vi.fn(async () => []),
   },
+  booking: {
+    aggregate: vi.fn(
+      async ({
+        where,
+      }: {
+        where: { departureId: bigint; status: { in: string[] } };
+      }) => {
+        const reservedSeats = DB.bookings
+          .filter(
+            (b) =>
+              b.departureId === where.departureId &&
+              where.status.in.includes(b.status),
+          )
+          .reduce((sum, b) => sum + b.reservedSeats, 0);
+        return { _sum: { reservedSeats } };
+      },
+    ),
+  },
+  $queryRaw: vi.fn(async (_template: unknown, ...values: unknown[]) => {
+    const departureId = values[0] as bigint;
+    const row = DB.departures.find((d) => d.id === departureId);
+    if (!row) return [];
+    return [{ status: row.status }];
+  }),
+  $transaction: vi.fn(async (arg: unknown) => {
+    if (typeof arg !== 'function') return undefined;
+    return arg(prismaMock);
+  }),
   tour: {
     findFirst: vi.fn(
       async ({ where }: { where: { agencyId: bigint; code: string } }) => {
@@ -359,6 +410,7 @@ const prismaMock = {
 function baseline(): void {
   DB.tours = [];
   DB.departures = [];
+  DB.bookings = [];
   DB.roles.clear();
   DB.users.clear();
   DB.memberships = [];
@@ -731,6 +783,38 @@ describe('Agency departures API', () => {
     expect(missing.body.errorCode).toBe('DEPARTURE_NOT_FOUND');
   });
 
+  it('409 DEPARTURE_CAPACITY_BELOW_RESERVED when capacity drops below reserved seats', async () => {
+    seedAdminOwner();
+    const tour = addTour(SAHARA.id);
+    const departure = addDeparture(tour.id, { capacity: 12 });
+    addBooking(departure.id, { reservedSeats: 6 });
+    addBooking(departure.id, { status: 'CONFIRMED', reservedSeats: 2 });
+
+    const res = await as(adminToken)
+      .put(`${base()}/tours/${tour.code}/departures/${departure.code}`)
+      .send({ ...createPayload(), capacity: 7, status: 'OPEN' });
+
+    expect(res.status).toBe(409);
+    expect(res.body.errorCode).toBe('DEPARTURE_CAPACITY_BELOW_RESERVED');
+    expect(DB.departures[0]!.capacity).toBe(12);
+  });
+
+  it('allows a capacity equal to the reserved seats and ignores released seats', async () => {
+    seedAdminOwner();
+    const tour = addTour(SAHARA.id);
+    const departure = addDeparture(tour.id, { capacity: 12 });
+    addBooking(departure.id, { status: 'CANCELLED', reservedSeats: 9 });
+    addBooking(departure.id, { reservedSeats: 4 });
+
+    const res = await as(adminToken)
+      .put(`${base()}/tours/${tour.code}/departures/${departure.code}`)
+      .send({ ...createPayload(), capacity: 4, status: 'CLOSED' });
+
+    expect(res.status).toBe(200);
+    expect(res.body.capacity).toBe(4);
+    expect(res.body.status).toBe('CLOSED');
+  });
+
   // -------------------------------------------------------------------- cancel
 
   it('cancels a departure one-way and records the audit event', async () => {
@@ -764,6 +848,37 @@ describe('Agency departures API', () => {
       .put(`${base()}/tours/${tour.code}/departures/${open.code}`)
       .send({ ...createPayload(), status: 'OPEN' });
     expect(edit.status).toBe(409);
+  });
+
+  it('409 DEPARTURE_HAS_ACTIVE_BOOKINGS while a departure still has reserved seats', async () => {
+    seedAdminOwner();
+    const tour = addTour(SAHARA.id);
+    const departure = addDeparture(tour.id);
+    addBooking(departure.id, { status: 'PENDING', reservedSeats: 2 });
+    addBooking(departure.id, { status: 'CONFIRMED', reservedSeats: 3 });
+
+    const res = await as(adminToken).post(
+      `${base()}/tours/${tour.code}/departures/${departure.code}/cancel`,
+    );
+
+    expect(res.status).toBe(409);
+    expect(res.body.errorCode).toBe('DEPARTURE_HAS_ACTIVE_BOOKINGS');
+    expect(DB.departures[0]!.status).toBe('OPEN');
+  });
+
+  it('cancels a departure once all its bookings released their seats', async () => {
+    seedAdminOwner();
+    const tour = addTour(SAHARA.id);
+    const departure = addDeparture(tour.id);
+    addBooking(departure.id, { status: 'CANCELLED', reservedSeats: 2 });
+
+    const res = await as(adminToken).post(
+      `${base()}/tours/${tour.code}/departures/${departure.code}/cancel`,
+    );
+
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('CANCELLED');
+    expect(DB.departures[0]!.status).toBe('CANCELLED');
   });
 
   it('cancelling the last OPEN departure of a PUBLISHED scheduled tour leaves it PUBLISHED', async () => {

@@ -32,15 +32,15 @@ export default function TestimonialCard({
 
       <Quote
         aria-hidden="true"
-        className={`mt-6 ${isMain ? "h-[32px] w-[32px]" : "h-[26px] w-[26px]"}`}
-        strokeWidth={1.6}
+        className={`mt-6 text-primary ${isMain ? "h-[34px] w-[34px]" : "h-[28px] w-[28px]"}`}
+        strokeWidth={1.4}
         fill="currentColor"
-        opacity={0.12}
+        opacity={0.18}
       />
 
       <blockquote
-        className={`mt-3 font-medium leading-[1.5] tracking-[-0.01em] text-slate-900 ${
-          isMain ? "text-[21px] sm:text-[24px]" : "text-[16.5px]"
+        className={`mt-3 font-display font-normal leading-[1.45] tracking-[-0.015em] text-slate-900 ${
+          isMain ? "text-[22px] sm:text-[26px]" : "text-[18px]"
         }`}
       >
         “{testimonial.content}”

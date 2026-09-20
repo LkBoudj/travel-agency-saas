@@ -1,5 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '../generated/prisma/client.js';
+import { BOOKING_ACTIVE_STATUSES } from '../bookings/bookings.types.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { generateDepartureCode } from './departure-code.js';
 import type {
@@ -121,34 +122,49 @@ export class DeparturesService {
   ): Promise<DepartureResponse> {
     const departure = await this.requireDeparture(agencyId, tourCode, departureCode);
 
-    if (departure.status === 'CANCELLED') {
-      throw conflict(
-        'DEPARTURE_ALREADY_CANCELLED',
-        'A cancelled departure cannot be edited',
-      );
-    }
+    const updated = await this.prisma.$transaction(async (tx) => {
+      // Re-read and lock the row so the capacity check cannot race a booking.
+      const status = await this.lockDepartureStatus(tx, departure.id);
+      if (status === 'CANCELLED') {
+        throw conflict(
+          'DEPARTURE_ALREADY_CANCELLED',
+          'A cancelled departure cannot be edited',
+        );
+      }
 
-    const updated = await this.prisma.departure.update({
-      where: { id: departure.id },
-      data: {
-        startAt: new Date(input.startAt),
-        endAt: new Date(input.endAt),
-        capacity: input.capacity,
-        bookingDeadline: input.bookingDeadline ? new Date(input.bookingDeadline) : null,
-        notes: input.notes ?? null,
-        status: input.status,
-      },
-      select: DEPARTURE_SELECT,
+      const used = await this.activeReservedSeats(tx, departure.id);
+      if (input.capacity < used) {
+        throw conflict(
+          'DEPARTURE_CAPACITY_BELOW_RESERVED',
+          `Cannot reduce capacity below the ${used} seat(s) already reserved on this departure`,
+        );
+      }
+
+      return tx.departure.update({
+        where: { id: departure.id },
+        data: {
+          startAt: new Date(input.startAt),
+          endAt: new Date(input.endAt),
+          capacity: input.capacity,
+          bookingDeadline: input.bookingDeadline ? new Date(input.bookingDeadline) : null,
+          notes: input.notes ?? null,
+          status: input.status,
+        },
+        select: DEPARTURE_SELECT,
+      });
     });
 
     return toDepartureResponse(updated);
   }
 
   /**
-   * One-way cancellation. The tour's status is never touched implicitly: a
-   * PUBLISHED SCHEDULED tour that loses its last OPEN departure stays
-   * PUBLISHED (the dashboard surfaces the empty-schedule warning instead), and
-   * a later publish attempt re-runs the normal readiness gate.
+   * One-way cancellation. Active bookings (PENDING/CONFIRMED) block it with
+   * DEPARTURE_HAS_ACTIVE_BOOKINGS: a departure with reserved seats may only
+   * be cancelled once its bookings are cancelled first. The tour's status is
+   * never touched implicitly: a PUBLISHED SCHEDULED tour that loses its last
+   * OPEN departure stays PUBLISHED (the dashboard surfaces the empty-schedule
+   * warning instead), and a later publish attempt re-runs the normal readiness
+   * gate.
    */
   async cancel(
     agencyId: bigint,
@@ -165,12 +181,32 @@ export class DeparturesService {
       );
     }
 
-    const updated = await this.prisma.departure.update({
-      where: { id: departure.id },
-      data: { status: 'CANCELLED' },
-      select: DEPARTURE_SELECT,
+    await this.prisma.$transaction(async (tx) => {
+      // Re-read and lock the row so a concurrent booking cannot slip through.
+      const status = await this.lockDepartureStatus(tx, departure.id);
+      if (status === 'CANCELLED') {
+        throw conflict(
+          'DEPARTURE_ALREADY_CANCELLED',
+          'This departure is already cancelled',
+        );
+      }
+
+      const used = await this.activeReservedSeats(tx, departure.id);
+      if (used > 0) {
+        throw conflict(
+          'DEPARTURE_HAS_ACTIVE_BOOKINGS',
+          `Cannot cancel a departure with ${used} active reserved seat(s); cancel its bookings first`,
+        );
+      }
+
+      await tx.departure.update({
+        where: { id: departure.id },
+        data: { status: 'CANCELLED' },
+        select: { id: true },
+      });
     });
 
+    const updated = await this.requireDepartureByTour(tour.id, departureCode);
     const remainingOpenDepartures = await this.prisma.departure.count({
       where: { tourId: tour.id, status: 'OPEN' },
     });
@@ -183,6 +219,46 @@ export class DeparturesService {
   }
 
   // ------------------------------------------------------------------ helpers
+
+  /**
+   * `SELECT status ... FOR UPDATE` on the departure row inside the caller's
+   * transaction. This is the serialization point shared with the Bookings
+   * module: seat-consuming operations (booking creation) and seat-affecting
+   * departure edits (`update`, `cancel`) queue on the same row instead of
+   * racing on the derived seat count.
+   */
+  private async lockDepartureStatus(
+    tx: Prisma.TransactionClient,
+    departureId: bigint,
+  ): Promise<string> {
+    const rows = await tx.$queryRaw<Array<{ status: string }>>`
+      SELECT status
+      FROM departure
+      WHERE id = ${departureId}
+      FOR UPDATE
+    `;
+    const row = rows[0];
+    if (!row) {
+      throw new NotFoundException({
+        statusCode: 404,
+        message: 'That departure does not exist',
+        errorCode: 'DEPARTURE_NOT_FOUND',
+      });
+    }
+    return row.status;
+  }
+
+  /** Derived active seat consumption of a departure, under the caller's lock. */
+  private async activeReservedSeats(
+    tx: Prisma.TransactionClient,
+    departureId: bigint,
+  ): Promise<number> {
+    const aggregate = await tx.booking.aggregate({
+      where: { departureId, status: { in: [...BOOKING_ACTIVE_STATUSES] } },
+      _sum: { reservedSeats: true },
+    });
+    return aggregate._sum.reservedSeats ?? 0;
+  }
 
   /** A foreign or stale `TUR-...` code is a 404 in this agency, never a leak. */
   private async requireTour(agencyId: bigint, tourCode: string): Promise<TourScope> {

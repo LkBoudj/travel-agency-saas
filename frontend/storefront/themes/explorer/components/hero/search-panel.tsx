@@ -108,7 +108,7 @@ export default function SearchPanel() {
 
   return (
     <div
-      className="rounded-[18px] border border-black/5 bg-white p-3.5 shadow-[0_18px_45px_rgba(15,35,50,0.10),0_2px_8px_rgba(15,35,50,0.06)]"
+      className="rounded-panel border border-white/60 bg-white/95 p-3.5 shadow-raised ring-1 ring-black/5 backdrop-blur-xl"
       style={{ "--panel-primary": "var(--primary)" } as CSSProperties}
     >
       <form

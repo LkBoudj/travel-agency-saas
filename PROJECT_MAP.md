@@ -25,8 +25,10 @@ anonymous travelers, platform operators.
                   implemented — see [PLATFORM_ADMIN] and [AGENCY_OWNERSHIP].
                   Agency-side authorization (AGENCY permission guard), member
                   management + invitations, the Customers vertical slice
-                  (backend + Dashboard) and the Tours vertical slice
-                  (backend + Dashboard) are IMPLEMENTED — see backend/
+                  (backend + Dashboard), the Tours vertical slice
+                  (backend + Dashboard) and the Bookings vertical slice
+                  (backend + Dashboard — Module I closed) are IMPLEMENTED —
+                  see backend/
                   backend_PROJECT_MAP.md [AGENCY_AUTHORIZATION],
                   [AGENCY_MEMBERS], [MEMBER_INVITATIONS], [CUSTOMERS] and
                   [AGENCY_TOURS].
@@ -259,6 +261,48 @@ the editor are gated on `AGENCY_TOUR_*` via `useTourCapabilities` (UX only —
 the backend guards are authoritative). The dev in-memory trips repository and
 `PLACEHOLDER_TRIPS` were removed — persistence is the real Tours API. Dedicated
 `trips` i18n namespace (EN + AR). Pure helpers covered by Node `node --test`.
+
+## [BOOKINGS]
+Third agency business vertical slice (backend Module I + Dashboard), closing
+Module I end-to-end: the Dashboard bookings feature is wired to the real
+backend Bookings API. See `backend/backend_PROJECT_MAP.md` [BOOKINGS] for the
+backend detail.
+
+Backend (Module I, IMPLEMENTED): `booking` + `booking_price_line` +
+`booking_status_history` tables (migration `20260920140000_bookings_module`),
+codes `BKG-…`, guarded by `AgencyPermissionGuard` and the pre-existing
+`AGENCY_BOOKING_VIEW/CREATE/UPDATE/CANCEL/ADJUST` permissions (no RBAC change).
+REST under `/v1/agencies/:agencyCode/bookings`: list (search by booking code /
+customer name / tour name + optional `status` filter, newest first), get by
+`BKG-` code (tenant-scoped 404), create with pricing selections, one-way cancel
+(POST `:bookingCode/cancel`, optional reason). Creates re-read the departure
+inside an interactive transaction with `SELECT … FOR UPDATE` (D11, D12), so a
+burst of concurrent bookings for the last seat lets exactly one win — proven by
+the live-PostgreSQL concurrency e2e suite (`test/bookings-concurrency.e2e-spec.ts`).
+Prices are snapshotted into `booking_price_line` with basis-aware per-line
+totals (per_person × seats / per_booking × 1); the client estimate is a preview
+only, the server total is authoritative. Lifecycle begins `PENDING`; `CANCELLED`
+is terminal, freeing the reserved seats; `CONFIRMED` requires travelers
+(Module J) — any confirm attempt returns `409 BOOKING_TRAVELERS_REQUIRED`, so
+no UI exists for it. Reserved seats are immutable. Every mutation audited + in
+Swagger: `BOOKING_TRAVELERS_REQUIRED`, `BOOKING_ALREADY_CANCELLED`,
+`BOOKING_CAPACITY_EXCEEDED`, `BOOKING_NO_PRICES`, `BOOKING_PRICE_INACTIVE`,
+`BOOKING_CURRENCY_MISMATCH`, `BOOKING_DEPARTURE_CLOSED`. 34 controller specs +
+concurrency e2e; Module I gates green before the Dashboard slice.
+
+Dashboard (`frontend/dashboard` bookings feature, IMPLEMENTED — replaces the
+M0 `Bookings` placeholder route): list page (server-driven search + status
+filter), details route keyed by the `BKG-` code with the frozen price-line
+breakdown, currency, lifecycle status history, and cancel with optional reason;
+create dialog cascades customer → tour → only-OPEN departure → only-active
+pricing options and estimates the total client-side (server-authoritative on
+submit). Row actions/cancel are gated on `AGENCY_BOOKING_*` via
+`useBookingCapabilities` (UX only; backend guards authoritative). Confirm is
+deliberately absent until Module J. Dedicated `bookings` i18n namespace
+(EN + AR, RTL-correct); pure helpers covered by Node `node --test`.
+
+NOT in this slice: booking confirmation/travelers (Module J), price-adjust /
+re-pricing flows, customer ↔ bookings cross-navigation.
 
 ## [PLATFORM_ADMIN]
 IMPLEMENTED in `frontend/admin/`: authenticated Platform Super Dashboard shell

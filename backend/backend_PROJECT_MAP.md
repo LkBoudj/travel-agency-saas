@@ -59,13 +59,14 @@ The former M1 baseline checks are now executed and passing:
 - lint verification (`npm run lint`) — passes with 3 pre-existing
   `no-unused-vars` warnings in the agency-applications module
 - unit/HTTP tests (`npm test`) — 330 tests pass (18 files)
-- e2e verification (`npm run test:e2e`) — 2 tests pass against the
+- e2e verification (`npm run test:e2e`) — 6 tests pass against the
   `configureApp`-configured app (versioned `GET /v1` serves, unversioned `/`
-  is 404)
+  is 404) plus the live-PostgreSQL bookings concurrency suite
+  (`test/bookings-concurrency.e2e-spec.ts`)
 - seed idempotency — `npx prisma db seed` run twice, both succeed
 - migration status — `npx prisma migrate status` reports "Database schema is
-  up to date!" (11 migrations); `prisma migrate diff` schema vs database
-  reports "No difference detected."
+  up to date!" (21 migrations — Tours, Departures, Pricing and Bookings module
+  migrations applied to the live Neon dev database)
 - ownership invariants verified directly against the Neon dev database: 19/19
   checks, every scenario inside a rolled-back transaction with
   `SET CONSTRAINTS ALL IMMEDIATE` so the deferred triggers really run
@@ -98,6 +99,21 @@ The former M1 baseline checks are now executed and passing:
   `UPDATE customer SET status='BOGUS'` rejected by `customer_status_check`
   (temporary spec/scripts removed, no residue). Migration applied — 16
   total, `migrate status` "up to date", `migrate diff` "No difference".
+- Bookings module (Module I) — `npm test`: 499 tests pass (25 files), lint 0
+  errors (4 pre-existing warnings), build passes. 34 bookings controller specs
+  cover list/get/search, create (pricing basis per_person/per_booking, frozen
+  price lines, one currency), capacity accounting (derived seats,
+  `BOOKING_CAPACITY_EXCEEDED`), departures guards, cancel, and the
+  readiness-gated confirm (`BOOKING_TRAVELERS_REQUIRED`). Live concurrency
+  e2e (`npm run test:e2e`, 4 tests): two concurrent bookings for the last seat
+  → exactly one succeeds; concurrent cancel + booking never breaks the ledger;
+  20/20 burst lands all seats with zero lost updates; 20+1 burst → exactly 20
+  succeed and the overflow is rejected. This runs against the real Neon
+  database and proves the `SELECT ... FOR UPDATE` seat lock really serializes.
+  Required infrastructure change to `PrismaService`: interactive-transaction
+  defaults raised (`maxWait`/`timeout` 30s) because Prisma's 5s/2s defaults
+  aborted legitimately-queued row-lock waiters (P2028). Migrations applied
+  (21 total, `migrate status` "up to date").
 
 ## [SELECTED_STACK]
 

@@ -2,11 +2,13 @@ import { useSyncExternalStore } from "react"
 import i18n from "i18next"
 import { initReactI18next } from "react-i18next"
 
+import arBookings from "./locales/ar/bookings.json"
 import arCommon from "./locales/ar/common.json"
 import arAuth from "./locales/ar/auth.json"
 import arTrips from "./locales/ar/trips.json"
 import arAgency from "./locales/ar/agency.json"
 import arCustomers from "./locales/ar/customers.json"
+import enBookings from "./locales/en/bookings.json"
 import enCommon from "./locales/en/common.json"
 import enAuth from "./locales/en/auth.json"
 import enTrips from "./locales/en/trips.json"
@@ -80,6 +82,7 @@ i18n
         trips: enTrips,
         agency: enAgency,
         customers: enCustomers,
+        bookings: enBookings,
       },
       ar: {
         common: arCommon,
@@ -87,12 +90,13 @@ i18n
         trips: arTrips,
         agency: arAgency,
         customers: arCustomers,
+        bookings: arBookings,
       },
     },
     lng: detectInitialLocale(),
     fallbackLng: "en",
     supportedLngs: LOCALES,
-    ns: ["common", "auth", "trips", "agency", "customers"],
+    ns: ["common", "auth", "trips", "agency", "customers", "bookings"],
     defaultNS: "common",
     interpolation: { escapeValue: false },
   })

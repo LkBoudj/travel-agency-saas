@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import { demoAgencyConfig } from "@/features/agency/demo-agency";
 import { getActiveStorefront } from "@/themes/resolver";
 import { brandingToCssVars } from "@/design-system/branding";
@@ -8,6 +8,13 @@ import "./globals.css";
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+});
+
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  style: ["normal", "italic"],
 });
 
 export const metadata: Metadata = {
@@ -25,7 +32,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html
       lang={agency.locale}
       dir="ltr"
-      className={`${inter.variable} h-full antialiased`}
+      className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body
         className="flex min-h-full flex-col"

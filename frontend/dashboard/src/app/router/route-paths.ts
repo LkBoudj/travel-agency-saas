@@ -30,7 +30,7 @@ export const AGENCY_ROUTES = {
   trips: "trips",
   tripDetails: "trips/:tourCode",
   bookings: "bookings",
-  bookingDetails: "bookings/:bookingId",
+  bookingDetails: "bookings/:bookingCode",
   customers: "customers",
   customerDetails: "customers/:customerCode",
   agency: "agency",
