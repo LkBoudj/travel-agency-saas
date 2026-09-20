@@ -17,8 +17,9 @@ import { AUTH_COOKIE_NAME } from './auth.constants.js';
 import { clearAuthCookie, setAuthCookie } from './auth.cookie.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
-import type { LoginBody, RegisterBody } from './schemas.js';
-import { loginSchema, registerSchema } from './schemas.js';
+import { RateLimit, RateLimitGuard } from '../security/rate-limit.guard.js';
+import type { LoginBody } from './schemas.js';
+import { loginSchema } from './schemas.js';
 
 const SAFE_USER_EXAMPLE: AuthUser = {
   code: 'USR-ABCDEF123456',
@@ -35,13 +36,17 @@ export class AuthController {
     private readonly config: ConfigService,
   ) {}
 
-  @Post('register')
-  register(@Body({ schema: registerSchema }) dto: RegisterBody): Promise<AuthUser> {
-    return this.authService.register(dto);
-  }
-
   @Post('login')
   @HttpCode(200)
+  // Counted per IP and per email: an attacker rotating addresses still
+  // accumulates against the account they keep trying.
+  @UseGuards(RateLimitGuard)
+  @RateLimit({
+    scope: 'LOGIN',
+    defaultLimit: 10,
+    defaultWindowSeconds: 60,
+    dimensions: ['ip', 'email'],
+  })
   @ApiOperation({ summary: 'Log in with email and password (sets the HttpOnly auth cookie)' })
   @ApiBody({
     description: 'Credentials. Email is case-insensitive (trimmed + lowercased).',

@@ -2,11 +2,14 @@ import {
   PERMISSION_ACTIONS,
   PERMISSION_RESOURCES,
   ROLE_SCOPES,
+  SYSTEM_ROLE_KEYS,
+  SYSTEM_ROLE_SHAPES,
   type PermissionAction,
   type PermissionCatalogEntry,
   type PermissionResource,
   type PermissionScope,
   type RolePreset,
+  type SystemRoleKey,
 } from './rbac.types.js';
 
 function permission(
@@ -26,8 +29,9 @@ function preset(
   description: string,
   scope: RolePreset['scope'],
   permissionKeys: readonly string[],
+  systemKey?: RolePreset['systemKey'],
 ): RolePreset {
-  return { key, name, description, scope, permissionKeys };
+  return { key, name, description, scope, permissionKeys, ...(systemKey ? { systemKey } : {}) };
 }
 
 /**
@@ -216,6 +220,10 @@ export const RBAC_PERMISSION_CATALOG: ReadonlyArray<PermissionCatalogEntry> = [
 
   // AGENCY — agency members.
   permission('AGENCY_MEMBER_VIEW', 'View agency members', 'AGENCY', 'MEMBER', 'VIEW'),
+  // RESERVED: no endpoint consumes it yet. It backs the upcoming Member
+  // Invitations flow (email → pending invite → acceptance → membership), which
+  // will replace direct provisioning. Kept in the catalog so roles can be
+  // pre-granted without a migration.
   permission('AGENCY_MEMBER_INVITE', 'Invite agency members', 'AGENCY', 'MEMBER', 'INVITE'),
   permission('AGENCY_MEMBER_UPDATE', 'Update agency members', 'AGENCY', 'MEMBER', 'UPDATE'),
   permission('AGENCY_MEMBER_REMOVE', 'Remove agency members', 'AGENCY', 'MEMBER', 'REMOVE'),
@@ -317,6 +325,16 @@ export const ALL_AGENCY_PERMISSION_KEYS: readonly string[] = RBAC_PERMISSION_CAT
 
 export const PLATFORM_ADMIN_ROLE_KEY = 'PLATFORM_ADMIN';
 export const AGENCY_OWNER_ROLE_KEY = 'AGENCY_OWNER';
+
+/**
+ * Protected system identity of the canonical global agency role (the role every
+ * agency OWNER must hold). Ownership invariants resolve the role by this value,
+ * never by `key` or `name`, which stay editable business metadata.
+ *
+ * This is NOT an authorization mechanism: nothing is ever granted because a role
+ * carries a `systemKey`. Authorization remains `permission.key` only.
+ */
+export const AGENCY_ADMIN_SYSTEM_KEY: SystemRoleKey = 'AGENCY_ADMIN';
 
 /**
  * Default PLATFORM roles. `PLATFORM_ADMIN` is the system baseline and is always
@@ -432,6 +450,11 @@ export const DEFAULT_GLOBAL_AGENCY_ROLES: ReadonlyArray<RolePreset> = [
     'Full access to the agency workspace, including every AGENCY permission',
     'AGENCY',
     ALL_AGENCY_PERMISSION_KEYS,
+    // Carries the AGENCY_ADMIN protected system identity: this is the canonical
+    // permission bundle every agency OWNER must hold. `key` stays
+    // `AGENCY_OWNER` because it is editable business metadata; invariants point
+    // at `systemKey` instead, which the database makes immutable.
+    AGENCY_ADMIN_SYSTEM_KEY,
   ),
   preset(
     'AGENCY_MANAGER',
@@ -617,6 +640,40 @@ export function validateRbacCatalog(): void {
             `permission "${permissionKey}".`,
         );
       }
+    }
+  }
+
+  // Protected system identities: known value, correct scope, and exactly one
+  // preset per identity, so the seed can never establish two canonical roles.
+  const seenSystemKeys = new Set<SystemRoleKey>();
+  for (const role of presets) {
+    if (role.systemKey === undefined) {
+      continue;
+    }
+    if (!SYSTEM_ROLE_KEYS.includes(role.systemKey)) {
+      throw new Error(
+        `[rbac] Default role "${role.key}" declares unknown system key "${role.systemKey}".`,
+      );
+    }
+    if (seenSystemKeys.has(role.systemKey)) {
+      throw new Error(
+        `[rbac] System key "${role.systemKey}" is declared by more than one default role.`,
+      );
+    }
+    seenSystemKeys.add(role.systemKey);
+
+    const expectedScope = SYSTEM_ROLE_SHAPES[role.systemKey].scope;
+    if (role.scope !== expectedScope) {
+      throw new Error(
+        `[rbac] System role "${role.systemKey}" must be ${expectedScope}-scoped, ` +
+          `but "${role.key}" is ${role.scope}.`,
+      );
+    }
+  }
+
+  for (const systemKey of SYSTEM_ROLE_KEYS) {
+    if (!seenSystemKeys.has(systemKey)) {
+      throw new Error(`[rbac] No default role declares the required system key "${systemKey}".`);
     }
   }
 

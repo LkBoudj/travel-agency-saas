@@ -26,6 +26,7 @@ model AppUser {
   agencyApplications       AgencyApplication[]
   agencyApplicationReviews AgencyApplication[]      @relation("AgencyApplicationReviews")
   agencyMemberships        AgencyMembership[]
+  memberInvitationsCreated AgencyMemberInvitation[] @relation("AgencyMemberInvitationCreator")
 
   @@map("app_user")
 }
@@ -39,6 +40,20 @@ model Role {
   //   role_global_key_key  UNIQUE (scope, key) WHERE agency_id IS NULL
   //   role_agency_key_key  UNIQUE (agency_id, key) WHERE agency_id IS NOT NULL
   key         String   @db.VarChar(64)
+  // Stable PROTECTED system identity. Null for every normal/custom role; a
+  // value marks a canonical role the platform itself depends on. It is not an
+  // authorization mechanism (authorization stays on `permission.key`) — it is
+  // the immutable handle domain invariants are allowed to reason about, because
+  // `key` and `name` are editable business metadata.
+  //
+  // Database guarantees (see the `agency_ownership_foundation` migration):
+  //   role_system_key_key  UNIQUE (system_key) WHERE system_key IS NOT NULL
+  //   role_system_key_shape_check  a non-null system_key must be a known system
+  //     identity AND satisfy that identity's required shape
+  //     (`AGENCY_ADMIN` => scope = 'AGENCY' AND agency_id IS NULL)
+  //   role_protect_system_identity  trigger: a non-null system_key can never be
+  //     changed or cleared, and such a role can never be deleted
+  systemKey   String?  @map("system_key") @db.VarChar(64)
   scope       String   @db.VarChar(16)
   // Ownership discriminator for AGENCY roles. Null means the role is global
   // (PLATFORM roles, or Platform-Admin-managed global AGENCY roles); a value
@@ -52,6 +67,7 @@ model Role {
   permissions           RolePermission[]
   platformAssignments   PlatformRoleAssignment[]
   agencyRoleAssignments AgencyRoleAssignment[]
+  memberInvitationRoles AgencyMemberInvitationRole[]
 
   // Name uniqueness is enforced by two partial unique indexes created in the
   // `role_agency_ownership` migration (not expressible in Prisma PSL):
@@ -113,17 +129,61 @@ model Agency {
   // constraint (`agency_status_check`) restricts the value to ACTIVE | SUSPENDED.
   // SUSPENDED is a platform-side operation state, not an identity status.
   status      String   @default("ACTIVE") @map("status") @db.VarChar(16)
-  // Optional contact/description fields captured with the agency.
+  // Optional descriptive fields captured with the agency. `country` is free
+  // text for now and may later reference a Country entity.
+  //
+  // There is deliberately no `website`/`domain` field: custom domains are a
+  // separate concern that belongs to the future Agency Dashboard -> Settings ->
+  // Domain feature (configuration + DNS verification), not to this foundation.
   country     String?  @db.VarChar(100)
-  website     String?  @db.VarChar(255)
   description String?  @db.Text
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
-  members      AgencyMembership[]
-  applications AgencyApplication[]
+  members           AgencyMembership[]
+  applications      AgencyApplication[]
+  memberInvitations AgencyMemberInvitation[]
+  customers         Customer[]
+  tours             Tour[]
+  bookings          Booking[]
 
   @@map("agency")
+}
+
+/**
+ * A business customer record owned by one agency.
+ * A Customer is NOT an identity: it never connects to `app_user`, holds no
+ * credentials, and is never forced into the authentication model. It exists so
+ * an agency can attach identity/contact data to a booking without the person
+ * having a SaaS account.
+ * Tenant isolation is enforced the same way as every other agency-owned row:
+ * each record carries `agency_id`, every query is scoped by it, `agency_id` is
+ * never accepted from a request body, and the FK to `agency` cascades so a
+ * deleted agency takes its customer records with it.
+ * `status` is restricted by the database CHECK constraint
+ * (`customer_status_check`) to ACTIVE | ARCHIVED. Archiving (the
+ * `AGENCY_CUSTOMER_ARCHIVE` capability) is the deletion equivalent and is
+ * one-way in the current model — there is no restore permission.
+ */
+model Customer {
+  id        BigInt   @id @default(autoincrement())
+  // Backend-generated, immutable external identifier (`CUS-...`).
+  code      String   @unique @db.VarChar(24)
+  agencyId  BigInt   @map("agency_id")
+  firstName String?  @map("first_name") @db.VarChar(100)
+  lastName  String?  @map("last_name") @db.VarChar(100)
+  email     String?  @db.Citext
+  phone     String?  @db.VarChar(32)
+  notes     String?  @db.Text
+  status    String   @default("ACTIVE") @map("status") @db.VarChar(16)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  agency   Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@index([agencyId])
+  @@map("customer")
 }
 
 model AgencyApplication {
@@ -166,14 +226,32 @@ model AgencyApplication {
 }
 
 model AgencyMembership {
-  id        BigInt   @id @default(autoincrement())
-  agencyId  BigInt   @map("agency_id")
-  appUserId BigInt   @map("app_user_id")
+  id             BigInt @id @default(autoincrement())
+  agencyId       BigInt @map("agency_id")
+  appUserId      BigInt @map("app_user_id")
+  // Ownership of the agency, kept explicit and separate from authorization.
+  // A database CHECK (`agency_membership_type_check`) restricts the value to
+  // OWNER | EMPLOYEE. Ownership is NEVER inferred from a role key, and holding
+  // the canonical AGENCY_ADMIN role does NOT make a member the owner: an
+  // EMPLOYEE may hold AGENCY_ADMIN too.
+  //
+  // Database guarantees (see the `agency_ownership_foundation` migration):
+  //   agency_membership_owner_key  UNIQUE (agency_id) WHERE type = 'OWNER'
+  //     — at most one OWNER (immediate; a partial unique index is never
+  //       deferrable)
+  //   agency_membership_owner_active_check  an OWNER row must be ACTIVE
+  //   agency_ownership_invariants  DEFERRED constraint trigger — after COMMIT
+  //     every agency has exactly one OWNER, that OWNER is ACTIVE, and that
+  //     OWNER holds the canonical AGENCY_ADMIN system role
+  membershipType String @map("membership_type") @db.VarChar(16)
   // Membership lifecycle. The database CHECK constraint
   // (`agency_membership_status_check`) restricts the value to ACTIVE | SUSPENDED.
   // It is a membership status inside one agency, not the AppUser identity
-  // status (`app_user.status`), which stays authoritative for authentication.
-  status    String   @default("ACTIVE") @map("status") @db.VarChar(16)
+  // status (`app_user.status`), which stays authoritative for authentication,
+  // and not the agency's own business status (`agency.status`). Suspending the
+  // business is `agency.status`; an OWNER membership can never be SUSPENDED.
+  status         String @default("ACTIVE") @map("status") @db.VarChar(16)
+
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
 
@@ -183,6 +261,10 @@ model AgencyMembership {
 
   @@unique([agencyId, appUserId])
   @@index([appUserId])
+  // Supports the ownership lookups the invariant trigger and the agency list
+  // perform. "At most one OWNER" itself is the partial unique index
+  // `agency_membership_owner_key`, which Prisma PSL cannot express.
+  @@index([agencyId, membershipType], map: "agency_membership_type_idx")
   @@map("agency_membership")
 }
 
@@ -191,10 +273,489 @@ model AgencyRoleAssignment {
   membershipId BigInt @map("membership_id")
   roleId       BigInt @map("role_id")
 
+  // Tenant isolation (see the `agency_role_assignment_scope` migration). Two
+  // BEFORE triggers keep an assignment inside one tenant, because the rule spans
+  // three tables and a CHECK cannot read other tables:
+  //   agency_role_assignment_scope  the role must be scope = AGENCY, and either
+  //     global (agency_id IS NULL) or owned by the membership's own agency
+  //   role_protect_assigned_scope   a role's scope/owning agency cannot change
+  //     while it is assigned, so a valid assignment cannot later become a
+  //     cross-tenant grant
+  // AgencyPermissionsService applies the same rule again when computing
+  // permissions, so a row that somehow bypassed the database grants nothing.
+
   membership AgencyMembership @relation(fields: [membershipId], references: [id], onDelete: Cascade)
   role       Role             @relation(fields: [roleId], references: [id], onDelete: Cascade)
 
   @@unique([membershipId, roleId])
   @@index([roleId])
   @@map("agency_role_assignment")
+}
+
+/**
+ * A consent-based membership invitation, keyed to an EMAIL address.
+ * The invitation holds zero inside information: it records who invited whom
+ * into which agency, the roles offered at creation time, and a 256-bit random
+ * redemption token kept only as its SHA-256 hex digest (`tokenHash`). The
+ * plaintext token exists exclusively in the delivery channel (email) and is
+ * never stored, returned by an API, or logged. Email is NOT a foreign key to
+ * AppUser on purpose: invitations must not probe whether an address is already
+ * an account, so acceptance decides that in one interactive transaction instead
+ * of at creation time.
+ * The database guarantees the lifecycle:
+ * agency_member_invitation_status_check  status in PENDING | ACCEPTED |
+ * REVOKED | EXPIRED
+ * agency_member_invitation_pending_agency_email_key  partial UNIQUE
+ * (agency_id, email) WHERE status = 'PENDING' — at most one outstanding
+ * invitation per address per agency
+ */
+model AgencyMemberInvitation {
+  id              BigInt    @id @default(autoincrement())
+  code            String    @unique @db.VarChar(24)
+  agencyId        BigInt    @map("agency_id")
+  email           String    @db.Citext
+  // Lifecycle: PENDING | ACCEPTED | REVOKED | EXPIRED (CHECK in the migration).
+  status          String    @default("PENDING") @map("status") @db.VarChar(16)
+  // SHA-256 hex of the plaintext redemption token; the plaintext never touches
+  // the database. Unique so acceptance looks the token up by hash.
+  tokenHash       String    @unique @map("token_hash") @db.VarChar(64)
+  expiresAt       DateTime  @map("expires_at") @db.Timestamptz()
+  acceptedAt      DateTime? @map("accepted_at") @db.Timestamptz()
+  revokedAt       DateTime? @map("revoked_at") @db.Timestamptz()
+  // The agency-side inviter (AppUser). Not a member on the platform, not a
+  // "status" column: this is who chose to invite.
+  createdByUserId BigInt    @map("created_by_user_id")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  agency    Agency                       @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  createdBy AppUser                      @relation("AgencyMemberInvitationCreator", fields: [createdByUserId], references: [id], onDelete: Cascade)
+  roles     AgencyMemberInvitationRole[]
+
+  @@index([agencyId, status], map: "agency_member_invitation_agency_status_idx")
+  @@index([agencyId, email], map: "agency_member_invitation_agency_email_idx")
+  @@map("agency_member_invitation")
+}
+
+/**
+ * The AGENCY roles offered by an invitation, captured at creation time.
+ * The same tenant rule as `AgencyRoleAssignment` applies (mirrored trigger
+ * `agency_member_invitation_role_scope`): a role must be AGENCY-scoped and,
+ * when custom, owned by the invitation's own agency. The set is a snapshot
+ * offered to the invitee — a later member role replacement authorizes changes
+ * afterwards, it is not required before acceptance.
+ */
+model AgencyMemberInvitationRole {
+  invitationId BigInt @map("invitation_id")
+  roleId       BigInt @map("role_id")
+
+  invitation AgencyMemberInvitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  role       Role                   @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([invitationId, roleId])
+  @@index([roleId])
+  @@map("agency_member_invitation_role")
+}
+
+/**
+ * Security-relevant events, append-only.
+ * It exists so questions like "has the directory been probed?" or "who removed
+ * that member?" have an answer. Rows are never updated or deleted by
+ * application code.
+ * Deliberately NOT a foreign key to AppUser or Agency: an audit record must
+ * survive the deletion of whatever it describes, and a cascade would erase
+ * exactly the history an investigation needs. Actors and agencies are recorded
+ * by their stable public `code`.
+ * `targetHash` carries a SHA-256 of a sensitive lookup term (for example a
+ * searched email) so repeated probing is still correlatable without the log
+ * itself becoming a second copy of the data being protected.
+ */
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  /**
+   * Stable event name, e.g. PLATFORM_APP_USER_SEARCH, AGENCY_MEMBER_REMOVE.
+   */
+  action     String   @db.VarChar(64)
+  /**
+   * SUCCESS | DENIED | FAILURE.
+   */
+  outcome    String   @db.VarChar(16)
+  /**
+   * The acting AppUser's public code; null for an unauthenticated attempt.
+   */
+  actorCode  String?  @map("actor_code") @db.VarChar(24)
+  /**
+   * The agency the action happened in, when it was agency-scoped.
+   */
+  agencyCode String?  @map("agency_code") @db.VarChar(24)
+  /**
+   * The subject's public code, when the action names one.
+   */
+  targetCode String?  @map("target_code") @db.VarChar(24)
+  /**
+   * SHA-256 of a sensitive term, never the term itself.
+   */
+  targetHash String?  @map("target_hash") @db.VarChar(64)
+  /**
+   * Small non-sensitive context (result counts, error codes).
+   */
+  metadata   Json?
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  @@index([action, createdAt])
+  @@index([actorCode, createdAt])
+  @@index([agencyCode, createdAt])
+  @@map("audit_log")
+}
+
+/**
+ * A reusable travel product (a "tour") owned by one agency.
+ * This is the Module F aggregate: the product template an agency authors and
+ * publishes. Tenant isolation follows the same composite super-key pattern as
+ * every agency-owned row — `agency_id` is required, the FK cascades, and it is
+ * never accepted from a request body.
+ * Lifecycle (`status`, CHECK `tour_status_check`): DRAFT → PUBLISHED → ARCHIVED.
+ * Publishing is an explicit, guarded action (`AGENCY_TOUR_PUBLISH` runs the
+ * readiness gate server-side; the backend NEVER auto-publishes). ARCHIVED is a
+ * one-way terminal state like customers.
+ * Deliberate Module F scope: departures, prices and extras belong to later
+ * modules (G/H), so none of them live here. Duration is derived by the client
+ * from `format` + days/nights/hours; only the raw values are stored.
+ * `activityRequirements`: read-only structured metadata (difficulty, distance,
+ * elevation, minimum age, fitness, required equipment). Simple value lists
+ * (`highlights`, `included`, `notIncluded`, `gallery`) are stored as JSON, the
+ * same way `activityRequirements` is.
+ */
+model Tour {
+  id                   BigInt   @id @default(autoincrement())
+  // Backend-generated, immutable external identifier (`TUR-...`).
+  code                 String   @unique @db.VarChar(24)
+  agencyId             BigInt   @map("agency_id")
+  name                 String   @db.VarChar(120)
+  // Agency-internal reference, never shown to travelers (may be null).
+  internalRef          String?  @map("internal_ref") @db.VarChar(80)
+  // Lifecycle: DRAFT | PUBLISHED | ARCHIVED (CHECK in the migration).
+  status               String   @default("DRAFT") @map("status") @db.VarChar(16)
+  // Product structure enums (CHECKs in the migration).
+  //   format           experience | day_excursion | stay | circuit | cruise
+  format               String   @db.VarChar(24)
+  //   geographic_scope domestic | international
+  geographicScope      String   @map("geographic_scope") @db.VarChar(16)
+  //   availability_mode scheduled | on_request | custom_quote
+  availabilityMode     String   @map("availability_mode") @db.VarChar(16)
+  participationMode    String?  @map("participation_mode") @db.VarChar(24)
+  guidanceType         String?  @map("guidance_type") @db.VarChar(24)
+  // Raw duration values; meaning derives from `format` (hours / same-day /
+  // days + nights). `isFlexible` is only meaningful under custom_quote.
+  days                 Int?
+  nights               Int?
+  hours                Int?
+  isFlexible           Boolean  @default(false) @map("is_flexible")
+  // Departure location structure (wilayaCode / cityId / place), unchanged from
+  // the client. Locations stay self-contained until the reference subsystem
+  // lands; the backend never resolves wilaya labels.
+  origin               Json?
+  // Minimum travelers the agency wants per booking (a product rule, not a
+  // capacity field — capacity belongs to departures).
+  minTravelers         Int      @default(1) @map("min_travelers")
+  // Free-text spoken languages when guidance is offered.
+  languages            String[] @default([])
+  // Taxonomy selections (client enum vocabularies; echoed back verbatim).
+  themes               String[] @default([])
+  activities           String[] @default([])
+  audiences            String[] @default([])
+  transportModes       String[] @default([]) @map("transport_modes")
+  accommodationTypes   String[] @default([]) @map("accommodation_types")
+  // Structured activity requirements metadata (see the comment above).
+  activityRequirements Json?    @map("activity_requirements")
+  shortDescription     String?  @map("short_description") @db.VarChar(160)
+  description          String?  @db.Text
+  highlights           Json     @default("[]")
+  included             Json     @default("[]")
+  notIncluded          Json     @default("[]") @map("not_included")
+  importantInformation String?  @map("important_information") @db.Text
+  cancellationPolicy   String?  @map("cancellation_policy") @db.Text
+  meetingPoint         String?  @map("meeting_point") @db.VarChar(500)
+  meetingInstructions  String?  @map("meeting_instructions") @db.VarChar(2000)
+  coverImageUrl        String?  @map("cover_image_url") @db.VarChar(2048)
+  gallery              Json     @default("[]")
+  createdAt            DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt            DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  agency         Agency             @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  destinations   TourDestination[]
+  itinerary      TourItineraryDay[]
+  departures     Departure[]
+  pricingOptions PricingOption[]
+  bookings       Booking[]
+
+  @@index([agencyId])
+  @@map("tour")
+}
+
+/**
+ * One scheduled, operational instance of a tour (Module G).
+ * A Departure is created for a Tour by an authorized agency member and carries
+ * the concrete run information the booking flow needs: explicit start/end, the
+ * seat capacity of that departure, an optional booking deadline, and the
+ * operational notes. Tenancy is inherited from the owning Tour — the row never
+ * stores an `agency_id` and application code never accepts a tour reference
+ * from a request body; the FK cascades so a deleted agency takes its
+ * departures' tours with them.
+ * Lifecycle vocabulary (CHECK in the migration):
+ * OPEN       — bookable, counts toward a SCHEDULED tour's publish readiness
+ * CLOSED     — booking disabled by the agency; does not count for publishing
+ * CANCELLED  — terminal: the departure will not run; does not count either
+ * A new departure always starts OPEN and the backend never auto-publishes.
+ * Seat consumption (`sold out` / booked seats) is derived in the Bookings
+ * module and is deliberately absent here.
+ */
+model Departure {
+  id              BigInt    @id @default(autoincrement())
+  // Backend-generated, immutable external identifier (`DEP-...`).
+  code            String    @unique @db.VarChar(24)
+  tourId          BigInt    @map("tour_id")
+  // Lifecycle: OPEN | CLOSED | CANCELLED (CHECK in the migration).
+  status          String    @default("OPEN") @db.VarChar(16)
+  startAt         DateTime  @map("start_at") @db.Timestamptz()
+  endAt           DateTime  @map("end_at") @db.Timestamptz()
+  // Total bookable seats for this run; board position is derived later.
+  capacity        Int
+  bookingDeadline DateTime? @map("booking_deadline") @db.Timestamptz()
+  // Agency-internal operational notes, never shown to travelers by default.
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  tour     Tour             @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  prices   DeparturePrice[]
+  bookings Booking[]
+
+  @@index([tourId])
+  @@map("departure")
+}
+
+/**
+ * A reusable pricing category defined once per Tour and priced per Departure
+ * (Module H).
+ * A PricingOption is a definition only — "Adult", "Child", "Single room",
+ * "Double room" — with a currency (single currency per tour, `DZD` by default)
+ * and a basis (`per_person` or `per_booking`). The actual money lives in
+ * `DeparturePrice`, one row per departure/option pair. Tenancy is inherited
+ * from the owning Tour — the row never stores an `agency_id` and the FK
+ * cascades.
+ * Lifecycle: ACTIVE -> INACTIVE. Deactivation (the equivalent of archiving a
+ * tour) is one-way and deliberate; deactivating an option keeps the prices
+ * already stored on departures (so history and past bookings stay intact) but
+ * stops it being offered going forward.
+ * The name is case-insensitive (CITEXT) and unique per tour. The currency is
+ * a 3-letter ISO-4217 code validated at the API layer and normalized in the
+ * DB; a tour keeps a single currency so stored prices are never ambiguous.
+ */
+model PricingOption {
+  id          BigInt   @id @default(autoincrement())
+  // Backend-generated, immutable external identifier (`PRC-...`).
+  code        String   @unique @db.VarChar(24)
+  tourId      BigInt   @map("tour_id")
+  name        String   @db.Citext
+  description String?  @db.VarChar(500)
+  // per_person | per_booking (CHECK in the migration).
+  basis       String   @db.VarChar(16)
+  currency    String   @default("DZD") @db.VarChar(3)
+  // Lifecycle: ACTIVE | INACTIVE (CHECK in the migration).
+  status      String   @default("ACTIVE") @db.VarChar(16)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  tour              Tour               @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  prices            DeparturePrice[]
+  bookingPriceLines BookingPriceLine[]
+
+  @@unique([tourId, name])
+  @@index([tourId])
+  @@map("pricing_option")
+}
+
+/**
+ * The actual price of one PricingOption on one Departure (Module H).
+ * One row per (departure, option) pair — the money is scoped to the concrete
+ * run of the tour, so the same "Adult" option can cost different amounts across
+ * departures. Tenancy is inherited through the departure -> tour -> agency
+ * chain; the FKs cascade. Rows are managed as a whole set per departure (a
+ * `PUT` replaces the set, like the tour aggregate's children), so there is no
+ * public code for an individual price row.
+ * `amount` is positive and limited to DECIMAL(12,2) (CHECK in the migration).
+ * Bookings (Module I) will read these rows and apply the option's basis; this
+ * module never computes totals.
+ */
+model DeparturePrice {
+  departureId     BigInt  @map("departure_id")
+  pricingOptionId BigInt  @map("pricing_option_id")
+  amount          Decimal @db.Decimal(12, 2)
+
+  departure     Departure     @relation(fields: [departureId], references: [id], onDelete: Cascade)
+  pricingOption PricingOption @relation(fields: [pricingOptionId], references: [id], onDelete: Cascade)
+
+  @@id([departureId, pricingOptionId])
+  @@index([pricingOptionId])
+  @@map("departure_price")
+}
+
+/**
+ * One ordered stop of a tour.
+ * Location is deliberately a plain, self-contained structure (wilaya code +
+ * free-text locality + free-text place) — the platform reference subsystem for
+ * countries/cities is a later module, and the backend never resolves wilaya
+ * labels. Position is the display order; uniqueness on `(tour_id, position)`
+ * keeps the ordered list consistent.
+ */
+model TourDestination {
+  id         BigInt  @id @default(autoincrement())
+  tourId     BigInt  @map("tour_id")
+  position   Int
+  // Domestic: stable Algerian wilaya code (e.g. "16" for Algiers).
+  wilayaCode String? @map("wilaya_code") @db.VarChar(8)
+  // Free-text city/commune within the selected wilaya.
+  locality   String? @db.VarChar(120)
+  // Specific place the traveler actually goes; also the destination for
+  // international tours.
+  place      String? @db.VarChar(200)
+
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@unique([tourId, position])
+  @@index([tourId])
+  @@map("tour_destination")
+}
+
+/**
+ * One day of a tour itinerary, in display order.
+ */
+model TourItineraryDay {
+  id          BigInt @id @default(autoincrement())
+  tourId      BigInt @map("tour_id")
+  position    Int
+  title       String @db.VarChar(200)
+  location    String @db.VarChar(200)
+  description String @db.Text
+
+  tour Tour @relation(fields: [tourId], references: [id], onDelete: Cascade)
+
+  @@unique([tourId, position])
+  @@index([tourId])
+  @@map("tour_itinerary_day")
+}
+
+/**
+ * An agency booking of one Customer on one Departure (Module I).
+ * A Booking links one agency Customer to one concrete scheduled run of that
+ * same agency's Tour and owns immutable `reservedSeats` plus a server-computed
+ * `totalAmount`. Unlike Departure/PricingOption, a Booking spans two aggregates
+ * (Customer and Departure), so it carries its own `agency_id`; the FK cascades
+ * and application code never accepts an agency reference from a request body.
+ * `tourId` is derived by the backend from the selected Departure and is never
+ * trusted from the request.
+ * Lifecycle (CHECK in the migration): PENDING -> CONFIRMED -> CANCELLED.
+ * Creation always lands PENDING; confirmation and cancellation are explicit
+ * gated actions. PENDING and CONFIRMED consume Departure capacity; CANCELLED
+ * releases it. Seat consumption is derived by summing the `reservedSeats` of
+ * non-cancelled Bookings per Departure — there is deliberately no
+ * `booked_seats` counter on Departure.
+ * The total is computed server-side from the Departure's stored prices at
+ * creation and frozen into `booking_price_line` snapshot rows, so later
+ * Pricing edits or deactivations never rewrite an existing Booking. One
+ * Booking has exactly one currency, matching the Tour's single-currency rule.
+ * Payments, refunds and balances belong to a later module and are deliberately
+ * absent here.
+ */
+model Booking {
+  id                 BigInt    @id @default(autoincrement())
+  // Backend-generated, immutable external identifier (`BKG-...`).
+  code               String    @unique @db.VarChar(24)
+  agencyId           BigInt    @map("agency_id")
+  customerId         BigInt    @map("customer_id")
+  tourId             BigInt    @map("tour_id")
+  departureId        BigInt    @map("departure_id")
+  // Lifecycle: PENDING | CONFIRMED | CANCELLED (CHECK in the migration).
+  status             String    @default("PENDING") @map("status") @db.VarChar(16)
+  // Immutable seat reservation; consumed while PENDING or CONFIRMED.
+  reservedSeats      Int       @map("reserved_seats")
+  currency           String    @db.VarChar(3)
+  // Server-computed snapshot total (the sum of all price-line totals).
+  totalAmount        Decimal   @map("total_amount") @db.Decimal(12, 2)
+  notes              String?   @db.Text
+  confirmedAt        DateTime? @map("confirmed_at") @db.Timestamptz()
+  cancelledAt        DateTime? @map("cancelled_at") @db.Timestamptz()
+  cancellationReason String?   @map("cancellation_reason") @db.VarChar(500)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz()
+
+  agency        Agency                 @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  customer      Customer               @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  tour          Tour                   @relation(fields: [tourId], references: [id], onDelete: Cascade)
+  departure     Departure              @relation(fields: [departureId], references: [id], onDelete: Cascade)
+  priceLines    BookingPriceLine[]
+  statusHistory BookingStatusHistory[]
+
+  @@index([agencyId])
+  @@index([customerId])
+  @@index([departureId])
+  @@index([departureId, status])
+  @@map("booking")
+}
+
+/**
+ * One immutable price line of a Booking (Module I).
+ * A Booking must not depend on mutable Pricing: at creation the server copies
+ * the applied option's code, name, basis, currency and unit amount into these
+ * snapshot rows along with the quantity, so a later rename, reprice or
+ * deactivation can never change what a past Booking records. `per_person`
+ * lines carry `quantity = reservedSeats`; `per_booking` lines carry
+ * `quantity = 1`; each line is `unitAmount * quantity`. `pricingOptionId` is
+ * an optional internal reference to the definition that was snapped (kept a
+ * SetNull FK so a hypothetical cleanup of options never destroys booking
+ * history).
+ */
+model BookingPriceLine {
+  id              BigInt  @id @default(autoincrement())
+  bookingId       BigInt  @map("booking_id")
+  pricingOptionId BigInt? @map("pricing_option_id")
+  // FROZEN snapshot of the option definition, never re-read live.
+  optionCode      String  @map("option_code") @db.VarChar(24)
+  optionName      String  @map("option_name") @db.VarChar(100)
+  // per_person | per_booking (CHECK in the migration).
+  basis           String  @db.VarChar(16)
+  currency        String  @db.VarChar(3)
+  unitAmount      Decimal @map("unit_amount") @db.Decimal(12, 2)
+  quantity        Int
+  lineTotal       Decimal @map("line_total") @db.Decimal(12, 2)
+
+  booking       Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  pricingOption PricingOption? @relation(fields: [pricingOptionId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId])
+  @@map("booking_price_line")
+}
+
+/**
+ * Business lifecycle history of a Booking (Module I).
+ * One row per status transition, written inside the same transaction as the
+ * transition itself, so the business history always stays coherent with the
+ * current `status`. The initial transition is `fromStatus = null` ->
+ * `toStatus = PENDING`. This is a business record; the separate AuditLog row
+ * records the acting AppUser's event on the agency.
+ */
+model BookingStatusHistory {
+  id         BigInt   @id @default(autoincrement())
+  bookingId  BigInt   @map("booking_id")
+  fromStatus String?  @map("from_status") @db.VarChar(16)
+  toStatus   String   @map("to_status") @db.VarChar(16)
+  actorCode  String?  @map("actor_code") @db.VarChar(24)
+  reason     String?  @db.VarChar(500)
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@map("booking_status_history")
 }

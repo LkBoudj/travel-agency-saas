@@ -21,7 +21,7 @@ export function NotFoundPage() {
           {t("common:notFound.description")}
         </p>
       </div>
-      <Link to={ROUTES.dashboard} className={buttonVariants()}>
+      <Link to={ROUTES.agencies} className={buttonVariants()}>
         {t("common:notFound.backToDashboard")}
       </Link>
     </div>

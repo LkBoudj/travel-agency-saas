@@ -4,6 +4,8 @@
     "description": "Create, organize, and manage your travel experiences.",
     "createTrip": "Create trip",
     "clearFilters": "Clear filters",
+    "loading": "Loading trips…",
+    "noTrips": "No trips yet.",
     "resultCount_one": "{{count}} trip",
     "resultCount_other": "{{count}} trips",
     "resultCountFiltered": "{{results}} of {{total}} trips"
@@ -36,6 +38,7 @@
     },
     "cancel": "Cancel",
     "submit": "Create trip",
+    "submitting": "Creating…",
     "successTitle": "Draft created",
     "successDescription": "Continue setting it up below."
   },
@@ -76,6 +79,7 @@
     },
     "recommended": {
       "title": "Recommended before publish",
+      "pricing": "Pricing",
       "meetingInstructions": "Meeting instructions",
       "themes": "Themes",
       "itinerary": "Itinerary"
@@ -125,6 +129,10 @@
     "description": "Try adjusting your search or destination filter.",
     "clearFilters": "Clear filters"
   },
+  "error": {
+    "loadFailed": "We could not load the trips.",
+    "retry": "Try again"
+  },
   "editor": {
     "sections": {
       "overview": "Overview",
@@ -152,6 +160,9 @@
       "saveChanges": "Save changes",
       "unsaved": "Unsaved changes",
       "discard": "Discard"
+    },
+    "save": {
+      "successTitle": "Changes saved"
     },
     "publishGuard": {
       "title": "This trip is no longer ready to publish",
@@ -280,7 +291,6 @@
   "departureStatus": {
     "open": "Open",
     "closed": "Closed",
-    "sold_out": "Sold out",
     "cancelled": "Cancelled"
   },
   "pricingBasis": {
@@ -463,40 +473,123 @@
     "descriptionPlaceholder": "Arrival, airport transfer, hotel check-in...",
     "add": "Add day"
   },
-  "pricingEditor": {
-    "title": "Pricing options",
-    "helper": "Categories only — final prices are set per departure below.",
-    "empty": "No pricing options yet. Add one like {{name}} or {{alternate}}.",
-    "namePlaceholder": "Adult",
-    "childPlaceholder": "Child",
-    "nameAria": "Pricing option {{n}} name",
-    "removeAria": "Remove pricing option {{n}}",
-    "descriptionLabel": "Description",
-    "descriptionPlaceholder": "Ages 12 and above",
-    "basisLabel": "Basis",
-    "activeLabel": "Active",
-    "add": "Add pricing option"
-  },
   "departures": {
     "title": "Departures",
-    "helper": "Each departure is one scheduled occurrence with its own capacity, deadline, status, and prices.",
+    "helper": "Each departure is one scheduled occurrence with its own capacity, booking deadline, and status.",
     "empty": "No departures yet. Add one to schedule this trip.",
-    "departureLabel": "Departure {{n}}",
-    "statusAria": "Departure {{n}} status",
-    "removeAria": "Remove departure {{n}}",
-    "startLabel": "Start (date & time)",
-    "startHelper": "Travelers see the time of day.",
-    "endLabel": "End (date & time)",
-    "capacityLabel": "Capacity",
-    "capacityPlaceholder": "40",
-    "deadlineLabel": "Booking deadline",
-    "pricesLabel": "Prices",
-    "noPriceHint": "Add pricing options above to set departure prices.",
-    "priceAria": "{{option}} price for departure {{n}}",
-    "notesLabel": "Internal notes",
-    "notesHelper": "Only visible to your team.",
-    "notesPlaceholder": "Optional internal notes for this departure.",
-    "add": "Add departure"
+    "departuresCount_one": "{{count}} departure",
+    "departuresCount_other": "{{count}} departures",
+    "create": "Add departure",
+    "loading": "Loading departures…",
+    "retry": "Try again",
+    "publishedNoOpen": {
+      "title": "No open departures",
+      "body": "This trip is published but not bookable — departures move travelers through the day and the schedule needs at least one open departure."
+    },
+    "columns": {
+      "status": "Status",
+      "start": "Start",
+      "end": "End",
+      "capacity": "Capacity",
+      "deadline": "Booking deadline",
+      "actions": "Actions"
+    },
+    "deadlineNone": "No deadline",
+    "editAria": "Edit {{name}}",
+    "cancelAria": "Cancel {{name}}",
+    "pricesAria": "Set prices for {{name}}",
+    "cancelTitle": "Cancel this departure?",
+    "cancelBody": "Cancelling is permanent — the departure closes and can never be reopened. The trip itself stays unchanged.",
+    "cancelConfirm": "Cancel departure",
+    "cancelDialogCancel": "Keep departure",
+    "cancelSuccess": "Departure cancelled.",
+    "createSuccess": "Departure added.",
+    "updateSuccess": "Departure saved.",
+    "form": {
+      "createTitle": "Add departure",
+      "editTitle": "Edit departure",
+      "description": "Travelers see the date and time; the deadline is when booking closes.",
+      "startLabel": "Start (date & time)",
+      "startHelper": "Travelers see the time of day.",
+      "endLabel": "End (date & time)",
+      "capacityLabel": "Capacity",
+      "deadlineLabel": "Booking deadline",
+      "deadlineHelper": "Optional — booking closes at this point.",
+      "deadlineAfterStart": "The booking deadline cannot land after the start.",
+      "statusLabel": "Status",
+      "notesLabel": "Internal notes",
+      "notesHelper": "Only visible to your team.",
+      "notesPlaceholder": "Optional internal notes for this departure.",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "submitCreate": "Add departure",
+      "submitEdit": "Save changes"
+    }
+  },
+  "pricing": {
+    "title": "Pricing",
+    "helper": "Customer categories with a price set on each open departure.",
+    "create": "Add pricing option",
+    "loading": "Loading pricing…",
+    "retry": "Try again",
+    "empty": "No pricing options yet. Add customer categories, then set a price for each one on every open departure.",
+    "statusActive": "Active",
+    "statusInactive": "Inactive",
+    "summary": {
+      "optionsCount_one": "{{count}} pricing option",
+      "optionsCount_other": "{{count}} pricing options",
+      "startingPrice": "Starting price:",
+      "noPrice": "No starting price — set prices on open departures.",
+      "pricedDepartures_one": "{{count}} open departure priced",
+      "pricedDepartures_other": "{{count}} open departures priced"
+    },
+    "columns": {
+      "name": "Name",
+      "basis": "Basis",
+      "currency": "Currency",
+      "pricedDepartures": "Priced departures",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "editAria": "Edit {{name}}",
+    "deactivateAria": "Deactivate {{name}}",
+    "deactivateTitle": "Deactivate this pricing option?",
+    "deactivateBody": "Inactive options become history: they can no longer be priced on departures, and future price sets simply will not include them. The option itself is never deleted.",
+    "deactivateConfirm": "Deactivate option",
+    "deactivateCancel": "Keep option",
+    "deactivateSuccess": "Pricing option deactivated.",
+    "createSuccess": "Pricing option added.",
+    "updateSuccess": "Pricing option saved.",
+    "form": {
+      "createTitle": "Add pricing option",
+      "editTitle": "Edit pricing option",
+      "description": "Customer categories define who pays how. Prices are set per departure below.",
+      "nameLabel": "Name",
+      "namePlaceholder": "Adult",
+      "nameHelper": "A short label travelers recognize, e.g. Adult.",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Ages 12 and above",
+      "basisLabel": "Basis",
+      "currencyHelper": "Priced in the tour's currency (DZD), fixed when the first option is created.",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "submitCreate": "Add option",
+      "submitEdit": "Save changes"
+    }
+  },
+  "departurePrices": {
+    "title": "Prices for {{departure}}",
+    "description": "One price per customer category. Leave a field empty to remove that price; the whole set is saved together.",
+    "loading": "Loading departure prices…",
+    "retry": "Try again",
+    "noOptions": "No active pricing options to price. Add an option in the Pricing section first.",
+    "amountPlaceholder": "0.00",
+    "amountAria": "Price for {{name}} in {{currency}}",
+    "cancel": "Cancel",
+    "saving": "Saving…",
+    "submit": "Save prices",
+    "success": "Departure prices saved.",
+    "clearSuccess": "Departure prices cleared."
   },
   "availabilityInfo": {
     "helper": "No scheduled departures are created for this mode.",
@@ -542,6 +635,7 @@
     "extras": {
       "title": "Extras",
       "helper": "Optional add-ons purchasable with the trip.",
+      "basisLabel": "Pricing basis",
       "empty": "No extras yet. Add one to offer optional add-ons.",
       "nameLabel": "Name",
       "namePlaceholder": "Airport VIP service",
@@ -591,6 +685,10 @@
     "dayTitleRequired": "Day title is required",
     "locationRequired": "Location is required",
     "pricingOptionNameRequired": "Pricing option name is required",
+    "pricingOptionNameMax": "Keep it under 100 characters",
+    "pricingOptionDescriptionMax": "Keep it under 500 characters",
+    "pricePositive": "Price must be a positive number",
+    "priceDecimals": "Use at most two decimal places",
     "itemRequired": "Item is required",
     "extraNameRequired": "Extra name is required",
     "priceNotNegative": "Price cannot be negative",

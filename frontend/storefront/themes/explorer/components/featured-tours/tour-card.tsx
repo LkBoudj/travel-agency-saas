@@ -19,13 +19,12 @@ const badgeStyles: Record<
 > = {
   "best-seller": {
     label: "Best Seller",
-    className:
-      "bg-[color-mix(in_srgb,var(--primary)_14%,white)] text-primary",
+    className: "bg-primary-echo text-primary",
     Icon: Crown,
   },
   featured: {
     label: "Featured",
-    className: "bg-sky-100 text-sky-700",
+    className: "bg-white/90 text-slate-700 backdrop-blur-sm",
     Icon: Star,
   },
   "limited-availability": {
@@ -47,7 +46,7 @@ export default function TourCard({ tour }: TourCardProps) {
   const badge = tour.badge ? badgeStyles[tour.badge] : undefined;
 
   return (
-    <article className="group flex h-full flex-col overflow-hidden rounded-[20px] border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_16px_32px_-20px_rgba(15,23,42,0.18)]">
+    <article className="group flex h-full flex-col overflow-hidden rounded-panel border border-slate-200/80 bg-white shadow-card transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1.5 hover:shadow-panel">
       <Link
         href={`/tours/${tour.slug}`}
         className="relative block aspect-[3/2] overflow-hidden"
@@ -59,16 +58,16 @@ export default function TourCard({ tour }: TourCardProps) {
           width={tour.image.width}
           height={tour.image.height}
           sizes="(max-width: 639px) 92vw, (max-width: 1023px) 50vw, 33vw"
-          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
+          className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
           style={{ objectPosition: tour.image.objectPosition ?? "50% 40%" }}
         />
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 via-black/0 to-black/0"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-black/0 to-black/0"
         />
         {badge ? (
           <span
-            className={`absolute left-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold shadow-sm ${badge.className}`}
+            className={`absolute start-4 top-4 z-10 inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12px] font-semibold shadow-sm ${badge.className}`}
           >
             <badge.Icon className="h-[14px] w-[14px]" strokeWidth={ICON_STROKE} />
             {badge.label}
@@ -77,14 +76,14 @@ export default function TourCard({ tour }: TourCardProps) {
         <button
           type="button"
           aria-label={`Save ${tour.title} to favorites`}
-          className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-slate-500 shadow-[0_4px_12px_rgba(15,23,42,0.12)] ring-1 ring-black/5 backdrop-blur transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="absolute end-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/95 text-slate-500 shadow-sm ring-1 ring-black/5 backdrop-blur transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
         >
           <Heart className="h-[19px] w-[19px]" strokeWidth={ICON_STROKE} />
         </button>
       </Link>
 
       <div className="flex flex-1 flex-col p-6">
-        <h3 className="text-[21px] font-bold leading-snug tracking-[-0.01em] text-slate-900">
+        <h3 className="font-display text-[24px] font-medium leading-snug tracking-[-0.01em] text-slate-900">
           <Link
             href={`/tours/${tour.slug}`}
             className="transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
@@ -125,19 +124,22 @@ export default function TourCard({ tour }: TourCardProps) {
               <p className="text-[12px] font-medium uppercase tracking-[0.12em] text-slate-400">
                 From
               </p>
-              <p className="mt-1 text-[27px] font-bold leading-none tracking-[-0.01em] text-primary">
+              <p className="mt-1 font-display text-[30px] font-medium leading-none tracking-[-0.01em] text-primary">
                 {formatPrice(tour.price, tour.currency ?? "USD")}
-                <span className="ml-1.5 text-[13.5px] font-normal text-slate-400">
+                <span className="ms-1.5 font-sans text-[13.5px] font-normal text-slate-400">
                   / person
                 </span>
               </p>
             </div>
             <Link
               href={`/tours/${tour.slug}`}
-              className="inline-flex h-11 items-center gap-2 rounded-full border border-primary px-6 text-[15px] font-semibold text-primary transition-colors hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+              className="group/btn inline-flex h-11 items-center gap-2 rounded-full border border-primary px-6 text-[15px] font-semibold text-primary transition-colors hover:bg-primary hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
             >
               View Tour
-              <ArrowRight className="h-4 w-4" strokeWidth={ICON_STROKE} />
+              <ArrowRight
+                className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1 rtl:-scale-x-100 rtl:group-hover/btn:-translate-x-1"
+                strokeWidth={ICON_STROKE}
+              />
             </Link>
           </div>
         </div>

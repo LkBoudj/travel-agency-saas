@@ -72,7 +72,32 @@ export interface RolePreset {
   description: string;
   scope: RoleScope;
   permissionKeys: readonly string[];
+  /**
+   * Protected system identity for this preset (`role.system_key`), or absent
+   * for an ordinary preset. It marks a role the platform's own invariants
+   * depend on; it is NOT an authorization mechanism — authorization stays on
+   * `permission.key`. See `SYSTEM_ROLE_KEYS`.
+   */
+  systemKey?: SystemRoleKey;
 }
+
+/**
+ * Protected system role identities. Deliberately minimal: an identity is added
+ * here only when a domain invariant must be able to point at exactly one role
+ * without depending on editable `key`/`name` metadata.
+ *
+ * `AGENCY_ADMIN` is the canonical global agency role every agency OWNER must
+ * hold. It is the authorization bundle, not ownership itself: an EMPLOYEE may
+ * hold it too, and holding it never makes anyone an owner.
+ */
+export const SYSTEM_ROLE_KEYS = ['AGENCY_ADMIN'] as const;
+
+export type SystemRoleKey = (typeof SYSTEM_ROLE_KEYS)[number];
+
+/** Required shape of each system role, mirrored by `role_system_key_shape_check`. */
+export const SYSTEM_ROLE_SHAPES: Readonly<Record<SystemRoleKey, { scope: RoleScope }>> = {
+  AGENCY_ADMIN: { scope: 'AGENCY' },
+};
 
 export interface RoleResponse {
   id: string;

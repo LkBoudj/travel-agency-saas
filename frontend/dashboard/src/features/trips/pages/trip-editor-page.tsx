@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next"
 import { useParams } from "react-router-dom"
 import { Button } from "@/components/ui/button"
-import { ConfirmDialog } from "@/components/shared/confirm-dialog"
 import { BookingSettingsSection } from "../components/booking-settings-section"
 import { DeparturesAndPricingSection } from "../components/departures-and-pricing-section"
 import { ItineraryEditor } from "../components/itinerary-editor"
@@ -10,24 +9,25 @@ import { TripEditorHeader } from "../components/trip-editor-header"
 import { TripEditorNav } from "../components/trip-editor-nav"
 import { TripMediaSection } from "../components/trip-media-section"
 import { TripOverviewForm } from "../components/trip-overview-form"
+import { getTourErrorMessage } from "../lib/tour-error-adapter"
 import {
   useTripEditor,
   type TripEditorSection,
 } from "../hooks/use-trip-editor"
 
-/** Trip editor shell for `/trips/:tripId` (v4). */
+/** Trip editor shell for `/trips/:tourCode`. */
 export function TripEditorPage() {
   const { t } = useTranslation()
-  const { tripId } = useParams()
-  const editor = useTripEditor(tripId)
-  const { activeSection, setActiveSection } = editor
+  const { tourCode } = useParams()
+  const editor = useTripEditor(tourCode)
+  const { activeSection, setActiveSection, tourQuery } = editor
 
   const renderSection = (section: TripEditorSection) => {
     switch (section) {
       case "itinerary":
         return <ItineraryEditor {...editor} />
       case "departures":
-        return <DeparturesAndPricingSection {...editor} />
+        return <DeparturesAndPricingSection editor={editor} />
       case "details":
         return <TripDetailsForm {...editor} />
       case "media":
@@ -37,6 +37,35 @@ export function TripEditorPage() {
       default:
         return null
     }
+  }
+
+  if (tourQuery.isPending) {
+    return (
+      <div className="mx-auto w-full max-w-6xl">
+        <p className="rounded-lg border p-6 text-sm text-muted-foreground">
+          {t("trips:page.loading")}
+        </p>
+      </div>
+    )
+  }
+
+  if (tourQuery.isError) {
+    return (
+      <div className="mx-auto w-full max-w-6xl">
+        <div className="flex flex-col items-start gap-3 rounded-lg border p-6">
+          <p className="text-sm text-muted-foreground">
+            {getTourErrorMessage(tourQuery.error)}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => void tourQuery.refetch()}
+          >
+            {t("trips:error.retry")}
+          </Button>
+        </div>
+      </div>
+    )
   }
 
   const isOverview = activeSection === "overview"
@@ -61,19 +90,6 @@ export function TripEditorPage() {
       </div>
 
       <TripEditorFooter editor={editor} />
-
-      <ConfirmDialog
-        open={editor.publishedSaveBlocked}
-        onOpenChange={(open) => {
-          if (!open) editor.resetSaveBlock()
-        }}
-        title={t("trips:editor.publishGuard.title")}
-        description={t("trips:editor.publishGuard.description")}
-        confirmLabel={t("trips:editor.publishGuard.confirm")}
-        cancelLabel={t("trips:editor.publishGuard.cancel")}
-        onConfirm={editor.unpublishAndSave}
-        destructive
-      />
     </form>
   )
 }
@@ -85,7 +101,8 @@ type TripEditorFooterProps = {
 /**
  * Global dirty bar (v4): appears ONLY while the draft differs from the saved
  * snapshot — "Unsaved changes" + Discard + Save. No autosave, never shown
- * when clean. Save is guarded by the publish policy in the editor hook.
+ * when clean. Status choices inside the editor are persisted through the
+ * backend's publish/unpublish/archive actions on save.
  */
 function TripEditorFooter({ editor }: TripEditorFooterProps) {
   const { t } = useTranslation()

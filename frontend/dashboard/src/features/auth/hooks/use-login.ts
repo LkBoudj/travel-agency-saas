@@ -1,24 +1,29 @@
 import { zodResolver } from "@hookform/resolvers/zod"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useMemo } from "react"
 import { useTranslation } from "react-i18next"
 import { useForm } from "react-hook-form"
 import { useNavigate } from "react-router-dom"
+
 import { ROUTES } from "@/app/router/route-paths"
+import { AUTH_QUERY_KEY, login } from "../api/auth.api"
+import { getAuthErrorMessage } from "../lib/auth-errors"
 import {
   createLoginSchema,
   type LoginFormValues,
 } from "../schemas/login.schema"
-import { isDemoLogin } from "../utils/demo-login"
 
 /**
- * Login flow orchestration.
+ * Login flow.
  *
- * Development-only: `demo@travel-saas.test` with any password jumps straight
- * to `/dashboard` in dev builds. Wire the real authentication mutation into
- * `onSubmit` later (server errors, navigation after a successful login, etc.).
+ * Navigation happens only after the backend has actually authenticated the
+ * request and set its HttpOnly session cookie — there is no development
+ * shortcut and no client-side session state. The landing route is the agency
+ * chooser, which decides where to go based on the user's memberships.
  */
-export function useLogin(onSubmit?: (data: LoginFormValues) => void) {
+export function useLogin() {
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const { t } = useTranslation()
 
   const resolver = useMemo(() => zodResolver(createLoginSchema(t)), [t])
@@ -28,18 +33,28 @@ export function useLogin(onSubmit?: (data: LoginFormValues) => void) {
     defaultValues: { email: "", password: "" },
   })
 
-  const handleSubmit = form.handleSubmit((data) => {
-    /**
-     * Development-only demo authentication: reach `/dashboard` before the real
-     * backend exists. Inert in production builds (see utils/demo-login).
-     */
-    if (isDemoLogin(data.email, data.password)) {
-      navigate(ROUTES.dashboard)
-      return
-    }
-
-    onSubmit?.(data)
+  const mutation = useMutation({
+    mutationFn: (values: LoginFormValues) =>
+      login({ email: values.email, password: values.password }),
+    onSuccess: (user) => {
+      // Seed the session cache so the guards do not refetch before redirecting.
+      queryClient.setQueryData(AUTH_QUERY_KEY, user)
+      navigate(ROUTES.agencies, { replace: true })
+    },
   })
 
-  return { form, handleSubmit }
+  const handleSubmit = form.handleSubmit((values) => {
+    mutation.mutate(values)
+  })
+
+  const errorMessage = mutation.isError
+    ? getAuthErrorMessage(mutation.error)
+    : undefined
+
+  return {
+    form,
+    handleSubmit,
+    isPending: mutation.isPending,
+    errorMessage,
+  }
 }

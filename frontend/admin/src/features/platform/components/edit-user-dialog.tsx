@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -88,51 +89,53 @@ export function EditUserDialog({
             Update the email or name. Roles and status have their own controls.
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} noValidate>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="edit-user-email">Email</FieldLabel>
-              <Input
-                id="edit-user-email"
-                type="email"
-                autoComplete="off"
-                autoFocus
-                aria-invalid={!!formState.errors.email}
-                {...register("email")}
-              />
-              <FieldError errors={[{ message: formState.errors.email?.message }]} />
-            </Field>
-            <div className="grid gap-5 @md/field-group:grid-cols-2">
+        <form onSubmit={onSubmit} noValidate className="flex min-h-0 flex-1 flex-col gap-4">
+          <DialogBody>
+            <FieldGroup>
               <Field>
-                <FieldLabel htmlFor="edit-user-first-name">First name</FieldLabel>
+                <FieldLabel htmlFor="edit-user-email">Email</FieldLabel>
                 <Input
-                  id="edit-user-first-name"
+                  id="edit-user-email"
+                  type="email"
                   autoComplete="off"
-                  aria-invalid={!!formState.errors.firstName}
-                  {...register("firstName")}
+                  autoFocus
+                  aria-invalid={!!formState.errors.email}
+                  {...register("email")}
                 />
-                <FieldDescription>Optional</FieldDescription>
-                <FieldError
-                  errors={[{ message: formState.errors.firstName?.message }]}
-                />
+                <FieldError errors={[{ message: formState.errors.email?.message }]} />
               </Field>
-              <Field>
-                <FieldLabel htmlFor="edit-user-last-name">Last name</FieldLabel>
-                <Input
-                  id="edit-user-last-name"
-                  autoComplete="off"
-                  aria-invalid={!!formState.errors.lastName}
-                  {...register("lastName")}
-                />
-                <FieldError
-                  errors={[{ message: formState.errors.lastName?.message }]}
-                />
-              </Field>
-            </div>
-            {serverErrorMessage ? (
-              <FieldError>{serverErrorMessage}</FieldError>
-            ) : null}
-          </FieldGroup>
+              <div className="grid gap-5 @md/field-group:grid-cols-2">
+                <Field>
+                  <FieldLabel htmlFor="edit-user-first-name">First name</FieldLabel>
+                  <Input
+                    id="edit-user-first-name"
+                    autoComplete="off"
+                    aria-invalid={!!formState.errors.firstName}
+                    {...register("firstName")}
+                  />
+                  <FieldDescription>Optional</FieldDescription>
+                  <FieldError
+                    errors={[{ message: formState.errors.firstName?.message }]}
+                  />
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="edit-user-last-name">Last name</FieldLabel>
+                  <Input
+                    id="edit-user-last-name"
+                    autoComplete="off"
+                    aria-invalid={!!formState.errors.lastName}
+                    {...register("lastName")}
+                  />
+                  <FieldError
+                    errors={[{ message: formState.errors.lastName?.message }]}
+                  />
+                </Field>
+              </div>
+              {serverErrorMessage ? (
+                <FieldError>{serverErrorMessage}</FieldError>
+              ) : null}
+            </FieldGroup>
+          </DialogBody>
           <DialogFooter className="mt-4">
             <Button
               type="button"

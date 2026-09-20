@@ -48,15 +48,6 @@ function createItineraryDaySchema(t: TFunction) {
   })
 }
 
-function createPricingOptionSchema(t: TFunction) {
-  return z.object({
-    name: z.string().min(1, t("trips:validation.pricingOptionNameRequired")),
-    description: z.string(),
-    basis: z.enum(["per_person", "per_booking"]),
-    active: z.boolean(),
-  })
-}
-
 function createIncludedItemSchema(t: TFunction) {
   return z.object({
     text: z.string().min(1, t("trips:validation.itemRequired")),
@@ -72,42 +63,6 @@ function createExtraSchema(t: TFunction) {
       .nonnegative(t("trips:validation.priceNotNegative")),
     basis: z.enum(["per_person", "per_booking"]),
   })
-}
-
-function createDeparturePriceBandSchema(t: TFunction) {
-  return z.object({
-    pricingOption: z.string().min(1),
-    price: z.coerce
-      .number()
-      .nonnegative(t("trips:validation.priceNotNegative")),
-  })
-}
-
-function createDepartureSchema(t: TFunction) {
-  return z
-    .object({
-      startAt: z.string().min(1, t("trips:validation.startAtRequired")),
-      endAt: z.string().min(1, t("trips:validation.endAtRequired")),
-      capacity: z.coerce
-        .number()
-        .int()
-        .positive(t("trips:validation.capacityPositive")),
-      bookingDeadline: z
-        .string()
-        .min(1, t("trips:validation.bookingDeadlineRequired")),
-      status: z.enum(["open", "closed", "sold_out", "cancelled"]),
-      notes: z.string(),
-      prices: z.array(createDeparturePriceBandSchema(t)),
-    })
-    .superRefine((departure, ctx) => {
-      if (departure.endAt < departure.startAt) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["endAt"],
-          message: t("trips:validation.endAfterStart"),
-        })
-      }
-    })
 }
 
 /** Physical profile. Optional; every number must stay non-negative. */
@@ -144,8 +99,8 @@ const multiDayFormats = ["stay", "circuit", "cruise"] as const
 /**
  * Full trip editor schema.
  *
- * Trip-level and departure-level responsibilities stay separated:
- * - capacity and final prices belong to departures
+ * Trip-level and departure-level responsibilities stay separated: departures
+ * are managed through the Departures module (`/departures`), not this form.
  * - minimum travelers sits on the trip (not a capacity field)
  *
  * Duration is derived from the trip format:
@@ -193,8 +148,6 @@ export function createTripFormSchema(t: TFunction) {
       description: z.string(),
       highlights: z.array(createHighlightSchema(t)),
       itinerary: z.array(createItineraryDaySchema(t)),
-      pricingOptions: z.array(createPricingOptionSchema(t)),
-      departures: z.array(createDepartureSchema(t)),
       included: z.array(createIncludedItemSchema(t)),
       notIncluded: z.array(createIncludedItemSchema(t)),
       importantInformation: z.string(),

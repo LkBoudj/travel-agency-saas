@@ -20,6 +20,8 @@ import type { NavUserProps } from "@/components/nav-user"
 const PAGE_TITLES: Record<string, string> = {
   [ROUTES.overview]: "Overview",
   [ROUTES.users]: "Users",
+  [ROUTES.platformUsers]: "Users",
+  [ROUTES.agencies]: "Agencies",
   [ROUTES.rolesAndPermissions]: "Roles & Permissions",
 }
 
@@ -33,7 +35,10 @@ function toMenuUser(user: AuthUser): NavUserProps["user"] {
 
 function PageBreadcrumb() {
   const { pathname } = useLocation()
-  const title = PAGE_TITLES[pathname] ?? "Platform"
+  // Detail routes carry a dynamic segment, so they are matched by prefix.
+  const title =
+    PAGE_TITLES[pathname] ??
+    (pathname.startsWith(`${ROUTES.agencies}/`) ? "Agencies" : "Platform")
 
   return (
     <Breadcrumb>
@@ -53,7 +58,7 @@ export function DashboardLayout() {
     <SidebarProvider defaultOpen>
       <AppSidebar user={toMenuUser(user)} />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+        <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-backdrop-filter:bg-background/80">
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
@@ -61,7 +66,7 @@ export function DashboardLayout() {
           />
           <PageBreadcrumb />
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 p-4 md:p-6">
           <Outlet />
         </div>
       </SidebarInset>

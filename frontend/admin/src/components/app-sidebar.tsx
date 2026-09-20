@@ -9,6 +9,7 @@ import { NavMain, type NavItem } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
 import { ROUTES } from "@/app/router/route-paths"
 import {
+  BuildingIcon,
   GalleryVerticalEndIcon,
   LayoutDashboardIcon,
   ShieldIcon,
@@ -32,6 +33,11 @@ const platformNav: NavItem[] = [
         url: ROUTES.platformUsers,
       },
     ],
+  },
+  {
+    title: "Agencies",
+    url: ROUTES.agencies,
+    icon: <BuildingIcon />,
   },
   {
     title: "Roles & Permissions",

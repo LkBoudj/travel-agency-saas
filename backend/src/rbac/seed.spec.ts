@@ -2,6 +2,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RBAC_BOOTSTRAP_EMAIL_ENV } from '../../prisma/seed.js';
 import { getBootstrapEmail, seedRbacBootstrap } from '../../prisma/seed.js';
 import {
+  AGENCY_ADMIN_SYSTEM_KEY,
+  AGENCY_OWNER_ROLE_KEY,
   ALL_PLATFORM_PERMISSION_KEYS,
   DEFAULT_GLOBAL_AGENCY_ROLES,
   DEFAULT_PLATFORM_ROLES,
@@ -26,6 +28,7 @@ type StoredRole = {
   scope: string;
   agencyId: bigint | null;
   description: string | null;
+  systemKey?: string | null;
 };
 type StoredUser = { id: bigint; email: string };
 type StoredAssignment = { appUserId: bigint; roleId: bigint };
@@ -113,9 +116,25 @@ const prismaMock = {
   role: {
     findFirst: vi.fn(
       async (args: {
-        where: { scope: string; key: string; agencyId: bigint | null };
+        where: {
+          scope?: string;
+          key?: string;
+          agencyId?: bigint | null;
+          systemKey?: string | null;
+        };
       }): Promise<StoredRole | null> => {
-        const role = store.roles.get(args.where.key);
+        // Lookup by protected system identity (used to guarantee a single
+        // canonical role) has no key/scope in the filter.
+        if (args.where.systemKey !== undefined) {
+          for (const role of store.roles.values()) {
+            if ((role.systemKey ?? null) === args.where.systemKey) {
+              return role;
+            }
+          }
+          return null;
+        }
+
+        const role = args.where.key === undefined ? undefined : store.roles.get(args.where.key);
         if (
           role &&
           role.scope === args.where.scope &&
@@ -128,11 +147,27 @@ const prismaMock = {
       },
     ),
     create: vi.fn(async (args: { data: Omit<StoredRole, 'id'> }): Promise<StoredRole> => {
-      const row: StoredRole = { id: store.nextRoleId, ...args.data };
+      const row: StoredRole = { systemKey: null, id: store.nextRoleId, ...args.data };
       store.nextRoleId += 1n;
       store.roles.set(row.key, row);
       return row;
     }),
+    update: vi.fn(
+      async (args: {
+        where: { id: bigint };
+        data: { systemKey?: string | null };
+      }): Promise<StoredRole> => {
+        for (const role of store.roles.values()) {
+          if (role.id === args.where.id) {
+            if (args.data.systemKey !== undefined) {
+              role.systemKey = args.data.systemKey;
+            }
+            return role;
+          }
+        }
+        throw new Error(`[seed.spec] role ${args.where.id} not found`);
+      },
+    ),
   },
   rolePermission: {
     createMany: vi.fn(
@@ -386,6 +421,77 @@ describe('prisma/seed.ts RBAC bootstrap', () => {
     await seedRbacBootstrap(prismaMock);
 
     expect(store.assignments).toHaveLength(0);
+  });
+
+  // --------------------------------------------------- protected system role
+
+  it('establishes exactly one canonical AGENCY_ADMIN system role', async () => {
+    await seedRbacBootstrap(prismaMock);
+
+    const holders = [...store.roles.values()].filter(
+      (role) => role.systemKey === AGENCY_ADMIN_SYSTEM_KEY,
+    );
+    expect(holders).toHaveLength(1);
+    expect(holders[0]!.key).toBe(AGENCY_OWNER_ROLE_KEY);
+  });
+
+  it('gives the canonical system role the global agency shape', async () => {
+    await seedRbacBootstrap(prismaMock);
+
+    const canonical = [...store.roles.values()].find(
+      (role) => role.systemKey === AGENCY_ADMIN_SYSTEM_KEY,
+    )!;
+    expect(canonical.scope).toBe('AGENCY');
+    expect(canonical.agencyId).toBeNull();
+  });
+
+  it('does not create a second canonical role on a re-run', async () => {
+    await seedRbacBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
+    await seedRbacBootstrap(prismaMock);
+
+    const holders = [...store.roles.values()].filter(
+      (role) => role.systemKey === AGENCY_ADMIN_SYSTEM_KEY,
+    );
+    expect(holders).toHaveLength(1);
+  });
+
+  it('adopts a pre-existing agency role that predates system identities', async () => {
+    // An installation seeded before `system_key` existed: the role is already
+    // there, customized, and must gain the identity without being overwritten.
+    store.roles.set(AGENCY_OWNER_ROLE_KEY, {
+      id: 800n,
+      key: AGENCY_OWNER_ROLE_KEY,
+      name: 'Renamed Owner Role',
+      scope: 'AGENCY',
+      agencyId: null,
+      description: 'Locally customized',
+      systemKey: null,
+    });
+    store.nextRoleId = 801n;
+
+    await seedRbacBootstrap(prismaMock);
+
+    const canonical = store.roles.get(AGENCY_OWNER_ROLE_KEY)!;
+    expect(canonical.id).toBe(800n);
+    expect(canonical.systemKey).toBe(AGENCY_ADMIN_SYSTEM_KEY);
+    expect(canonical.name).toBe('Renamed Owner Role');
+    expect(canonical.description).toBe('Locally customized');
+  });
+
+  it('fails loudly when another role already holds the system identity', async () => {
+    store.roles.set('SOME_OTHER_ROLE', {
+      id: 900n,
+      key: 'SOME_OTHER_ROLE',
+      name: 'Impostor',
+      scope: 'AGENCY',
+      agencyId: null,
+      description: null,
+      systemKey: AGENCY_ADMIN_SYSTEM_KEY,
+    });
+    store.nextRoleId = 901n;
+
+    await expect(seedRbacBootstrap(prismaMock)).rejects.toThrow(/already held by role/);
   });
 
   it('does not attempt an assignment when no bootstrap email is configured', async () => {

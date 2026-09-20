@@ -57,9 +57,22 @@ export const ModelName = {
   RolePermission: 'RolePermission',
   PlatformRoleAssignment: 'PlatformRoleAssignment',
   Agency: 'Agency',
+  Customer: 'Customer',
   AgencyApplication: 'AgencyApplication',
   AgencyMembership: 'AgencyMembership',
-  AgencyRoleAssignment: 'AgencyRoleAssignment'
+  AgencyRoleAssignment: 'AgencyRoleAssignment',
+  AgencyMemberInvitation: 'AgencyMemberInvitation',
+  AgencyMemberInvitationRole: 'AgencyMemberInvitationRole',
+  AuditLog: 'AuditLog',
+  Tour: 'Tour',
+  Departure: 'Departure',
+  PricingOption: 'PricingOption',
+  DeparturePrice: 'DeparturePrice',
+  TourDestination: 'TourDestination',
+  TourItineraryDay: 'TourItineraryDay',
+  Booking: 'Booking',
+  BookingPriceLine: 'BookingPriceLine',
+  BookingStatusHistory: 'BookingStatusHistory'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -97,6 +110,7 @@ export const RoleScalarFieldEnum = {
   id: 'id',
   name: 'name',
   key: 'key',
+  systemKey: 'systemKey',
   scope: 'scope',
   agencyId: 'agencyId',
   description: 'description',
@@ -145,13 +159,29 @@ export const AgencyScalarFieldEnum = {
   name: 'name',
   status: 'status',
   country: 'country',
-  website: 'website',
   description: 'description',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type AgencyScalarFieldEnum = (typeof AgencyScalarFieldEnum)[keyof typeof AgencyScalarFieldEnum]
+
+
+export const CustomerScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  agencyId: 'agencyId',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  email: 'email',
+  phone: 'phone',
+  notes: 'notes',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
 
 
 export const AgencyApplicationScalarFieldEnum = {
@@ -178,6 +208,7 @@ export const AgencyMembershipScalarFieldEnum = {
   id: 'id',
   agencyId: 'agencyId',
   appUserId: 'appUserId',
+  membershipType: 'membershipType',
   status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -195,12 +226,228 @@ export const AgencyRoleAssignmentScalarFieldEnum = {
 export type AgencyRoleAssignmentScalarFieldEnum = (typeof AgencyRoleAssignmentScalarFieldEnum)[keyof typeof AgencyRoleAssignmentScalarFieldEnum]
 
 
+export const AgencyMemberInvitationScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  agencyId: 'agencyId',
+  email: 'email',
+  status: 'status',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  acceptedAt: 'acceptedAt',
+  revokedAt: 'revokedAt',
+  createdByUserId: 'createdByUserId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyMemberInvitationScalarFieldEnum = (typeof AgencyMemberInvitationScalarFieldEnum)[keyof typeof AgencyMemberInvitationScalarFieldEnum]
+
+
+export const AgencyMemberInvitationRoleScalarFieldEnum = {
+  invitationId: 'invitationId',
+  roleId: 'roleId'
+} as const
+
+export type AgencyMemberInvitationRoleScalarFieldEnum = (typeof AgencyMemberInvitationRoleScalarFieldEnum)[keyof typeof AgencyMemberInvitationRoleScalarFieldEnum]
+
+
+export const AuditLogScalarFieldEnum = {
+  id: 'id',
+  action: 'action',
+  outcome: 'outcome',
+  actorCode: 'actorCode',
+  agencyCode: 'agencyCode',
+  targetCode: 'targetCode',
+  targetHash: 'targetHash',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type AuditLogScalarFieldEnum = (typeof AuditLogScalarFieldEnum)[keyof typeof AuditLogScalarFieldEnum]
+
+
+export const TourScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  agencyId: 'agencyId',
+  name: 'name',
+  internalRef: 'internalRef',
+  status: 'status',
+  format: 'format',
+  geographicScope: 'geographicScope',
+  availabilityMode: 'availabilityMode',
+  participationMode: 'participationMode',
+  guidanceType: 'guidanceType',
+  days: 'days',
+  nights: 'nights',
+  hours: 'hours',
+  isFlexible: 'isFlexible',
+  origin: 'origin',
+  minTravelers: 'minTravelers',
+  languages: 'languages',
+  themes: 'themes',
+  activities: 'activities',
+  audiences: 'audiences',
+  transportModes: 'transportModes',
+  accommodationTypes: 'accommodationTypes',
+  activityRequirements: 'activityRequirements',
+  shortDescription: 'shortDescription',
+  description: 'description',
+  highlights: 'highlights',
+  included: 'included',
+  notIncluded: 'notIncluded',
+  importantInformation: 'importantInformation',
+  cancellationPolicy: 'cancellationPolicy',
+  meetingPoint: 'meetingPoint',
+  meetingInstructions: 'meetingInstructions',
+  coverImageUrl: 'coverImageUrl',
+  gallery: 'gallery',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TourScalarFieldEnum = (typeof TourScalarFieldEnum)[keyof typeof TourScalarFieldEnum]
+
+
+export const DepartureScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  tourId: 'tourId',
+  status: 'status',
+  startAt: 'startAt',
+  endAt: 'endAt',
+  capacity: 'capacity',
+  bookingDeadline: 'bookingDeadline',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DepartureScalarFieldEnum = (typeof DepartureScalarFieldEnum)[keyof typeof DepartureScalarFieldEnum]
+
+
+export const PricingOptionScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  tourId: 'tourId',
+  name: 'name',
+  description: 'description',
+  basis: 'basis',
+  currency: 'currency',
+  status: 'status',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PricingOptionScalarFieldEnum = (typeof PricingOptionScalarFieldEnum)[keyof typeof PricingOptionScalarFieldEnum]
+
+
+export const DeparturePriceScalarFieldEnum = {
+  departureId: 'departureId',
+  pricingOptionId: 'pricingOptionId',
+  amount: 'amount'
+} as const
+
+export type DeparturePriceScalarFieldEnum = (typeof DeparturePriceScalarFieldEnum)[keyof typeof DeparturePriceScalarFieldEnum]
+
+
+export const TourDestinationScalarFieldEnum = {
+  id: 'id',
+  tourId: 'tourId',
+  position: 'position',
+  wilayaCode: 'wilayaCode',
+  locality: 'locality',
+  place: 'place'
+} as const
+
+export type TourDestinationScalarFieldEnum = (typeof TourDestinationScalarFieldEnum)[keyof typeof TourDestinationScalarFieldEnum]
+
+
+export const TourItineraryDayScalarFieldEnum = {
+  id: 'id',
+  tourId: 'tourId',
+  position: 'position',
+  title: 'title',
+  location: 'location',
+  description: 'description'
+} as const
+
+export type TourItineraryDayScalarFieldEnum = (typeof TourItineraryDayScalarFieldEnum)[keyof typeof TourItineraryDayScalarFieldEnum]
+
+
+export const BookingScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  agencyId: 'agencyId',
+  customerId: 'customerId',
+  tourId: 'tourId',
+  departureId: 'departureId',
+  status: 'status',
+  reservedSeats: 'reservedSeats',
+  currency: 'currency',
+  totalAmount: 'totalAmount',
+  notes: 'notes',
+  confirmedAt: 'confirmedAt',
+  cancelledAt: 'cancelledAt',
+  cancellationReason: 'cancellationReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BookingScalarFieldEnum = (typeof BookingScalarFieldEnum)[keyof typeof BookingScalarFieldEnum]
+
+
+export const BookingPriceLineScalarFieldEnum = {
+  id: 'id',
+  bookingId: 'bookingId',
+  pricingOptionId: 'pricingOptionId',
+  optionCode: 'optionCode',
+  optionName: 'optionName',
+  basis: 'basis',
+  currency: 'currency',
+  unitAmount: 'unitAmount',
+  quantity: 'quantity',
+  lineTotal: 'lineTotal'
+} as const
+
+export type BookingPriceLineScalarFieldEnum = (typeof BookingPriceLineScalarFieldEnum)[keyof typeof BookingPriceLineScalarFieldEnum]
+
+
+export const BookingStatusHistoryScalarFieldEnum = {
+  id: 'id',
+  bookingId: 'bookingId',
+  fromStatus: 'fromStatus',
+  toStatus: 'toStatus',
+  actorCode: 'actorCode',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type BookingStatusHistoryScalarFieldEnum = (typeof BookingStatusHistoryScalarFieldEnum)[keyof typeof BookingStatusHistoryScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+export const JsonNullValueInput = {
+  JsonNull: JsonNull
+} as const
+
+export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
 export const QueryMode = {
@@ -217,4 +464,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

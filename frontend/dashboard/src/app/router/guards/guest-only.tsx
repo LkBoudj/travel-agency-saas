@@ -1,16 +1,25 @@
-import { Outlet } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom"
+
+import { ROUTES } from "@/app/router/route-paths"
+import { useCurrentUser } from "@/features/auth/hooks/use-current-user"
+import { FullPageLoader } from "@/components/shared/full-page-loader"
 
 /**
- * Architectural boundary for the guest-only area (login, register, ...).
+ * Gate for the guest area.
  *
- * Real authentication does not exist yet, so the guard currently renders its
- * nested routes unconditionally. Nothing is hardcoded and no auth state is
- * invented here.
- *
- * TODO(auth): once an auth store/hook exists, read the authentication status
- * here and, when the user is already authenticated, redirect to
- * `ROUTES.dashboard` with `replace`; otherwise keep rendering <Outlet />.
+ * An already-signed-in visitor is sent to the agency chooser, which decides
+ * where they actually belong based on their memberships.
  */
 export function GuestOnly() {
+  const { data: user, isPending } = useCurrentUser()
+
+  if (isPending) {
+    return <FullPageLoader />
+  }
+
+  if (user) {
+    return <Navigate to={ROUTES.agencies} replace />
+  }
+
   return <Outlet />
 }

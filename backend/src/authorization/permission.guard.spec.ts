@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AuthModule } from '../auth/auth.module.js';
+import { SecurityModule } from '../security/security.module.js';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { configureApp } from '../setup-app.js';
@@ -84,7 +85,7 @@ describe('PermissionGuard (JWT + CASL + DB-driven permission.key)', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, AuthorizationModule],
+      imports: [ConfigModule.forRoot({ isGlobal: true }), AuthModule, SecurityModule, AuthorizationModule],
       controllers: [ProtectedController],
     })
       .overrideProvider(PrismaService)

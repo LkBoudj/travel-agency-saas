@@ -6,6 +6,7 @@ import { useForm, useWatch } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
+  DialogBody,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -131,62 +132,64 @@ export function RoleFormDialog({
           <DialogDescription>
             {mode === "create"
               ? "Add a role, then choose its permissions next."
-              : "Update the display name or description. The technical key cannot be changed."}
+              : "The technical key cannot be changed."}
           </DialogDescription>
         </DialogHeader>
-        <form onSubmit={onSubmit} noValidate>
-          <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="role-name">Display name</FieldLabel>
-              <Input
-                id="role-name"
-                autoComplete="off"
-                autoFocus
-                aria-invalid={!!formState.errors.name}
-                {...register("name")}
-              />
-              <FieldError
-                errors={[{ message: formState.errors.name?.message }]}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="role-key">Technical key</FieldLabel>
-              <Input
-                id="role-key"
-                autoComplete="off"
-                spellCheck={false}
-                readOnly={mode === "edit"}
-                className="font-mono"
-                aria-invalid={!!formState.errors.key}
-                aria-readonly={mode === "edit"}
-                {...register("key", {
-                  onChange: () => setKeyEdited(true),
-                })}
-              />
-              <FieldDescription>
-                {mode === "create"
-                  ? "Suggested from the display name. Uppercase letters, digits and underscores, starting with a letter."
-                  : "Technical keys are permanent and cannot be edited."}
-              </FieldDescription>
-              <FieldError errors={[{ message: formState.errors.key?.message }]} />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="role-description">Description</FieldLabel>
-              <Textarea
-                id="role-description"
-                rows={3}
-                placeholder="Optional"
-                aria-invalid={!!formState.errors.description}
-                {...register("description")}
-              />
-              <FieldError
-                errors={[{ message: formState.errors.description?.message }]}
-              />
-            </Field>
-            {serverErrorMessage ? (
-              <FieldError>{serverErrorMessage}</FieldError>
-            ) : null}
-          </FieldGroup>
+        <form onSubmit={onSubmit} noValidate className="flex min-h-0 flex-1 flex-col gap-4">
+          <DialogBody>
+            <FieldGroup className="gap-4">
+              <Field>
+                <FieldLabel htmlFor="role-name">Display name</FieldLabel>
+                <Input
+                  id="role-name"
+                  autoComplete="off"
+                  autoFocus
+                  aria-invalid={!!formState.errors.name}
+                  {...register("name")}
+                />
+                <FieldError
+                  errors={[{ message: formState.errors.name?.message }]}
+                />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="role-key">Technical key</FieldLabel>
+                <Input
+                  id="role-key"
+                  autoComplete="off"
+                  spellCheck={false}
+                  readOnly={mode === "edit"}
+                  className="font-mono"
+                  aria-invalid={!!formState.errors.key}
+                  aria-readonly={mode === "edit"}
+                  {...register("key", {
+                    onChange: () => setKeyEdited(true),
+                  })}
+                />
+                {mode === "create" ? (
+                  <FieldDescription>
+                    Suggested from the name. A–Z, 0–9 and underscores.
+                  </FieldDescription>
+                ) : null}
+                <FieldError errors={[{ message: formState.errors.key?.message }]} />
+              </Field>
+              <Field>
+                <FieldLabel htmlFor="role-description">Description</FieldLabel>
+                <Textarea
+                  id="role-description"
+                  rows={2}
+                  placeholder="Optional"
+                  aria-invalid={!!formState.errors.description}
+                  {...register("description")}
+                />
+                <FieldError
+                  errors={[{ message: formState.errors.description?.message }]}
+                />
+              </Field>
+              {serverErrorMessage ? (
+                <FieldError>{serverErrorMessage}</FieldError>
+              ) : null}
+            </FieldGroup>
+          </DialogBody>
           <DialogFooter className="mt-4">
             <Button
               type="button"

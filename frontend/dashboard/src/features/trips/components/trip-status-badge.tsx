@@ -1,10 +1,9 @@
 import { useTranslation } from "react-i18next"
+import { TRIP_STATUS_LABELS, type TripStatus } from "../types/trip.types"
 import {
   DEPARTURE_STATUS_LABELS,
-  TRIP_STATUS_LABELS,
   type DepartureStatus,
-  type TripStatus,
-} from "../types/trip.types"
+} from "../types/departure.types"
 
 type TripStatusBadgeProps = { status: TripStatus }
 
@@ -41,18 +40,16 @@ export function TripStatusBadge({ status }: TripStatusBadgeProps) {
 type DepartureStatusBadgeProps = { status: DepartureStatus }
 
 const departureStatusTones: Record<DepartureStatus, string> = {
-  open: "border-primary/15 bg-primary/10 text-primary",
-  closed: "border-border bg-muted text-muted-foreground",
-  sold_out: "border-destructive/15 bg-destructive/10 text-destructive",
-  cancelled:
+  OPEN: "border-primary/15 bg-primary/10 text-primary",
+  CLOSED: "border-border bg-muted text-muted-foreground",
+  CANCELLED:
     "border-border bg-muted text-muted-foreground line-through decoration-muted-foreground/50",
 }
 
 const departureStatusDots: Record<DepartureStatus, string> = {
-  open: "bg-primary",
-  closed: "bg-muted-foreground",
-  sold_out: "bg-destructive",
-  cancelled: "bg-muted-foreground",
+  OPEN: "bg-primary",
+  CLOSED: "bg-muted-foreground",
+  CANCELLED: "bg-muted-foreground",
 }
 
 /** Compact pill badge for a single departure's scheduling state. */

@@ -48,6 +48,24 @@ export type PlatformRoleAssignment = Prisma.PlatformRoleAssignmentModel
  */
 export type Agency = Prisma.AgencyModel
 /**
+ * Model Customer
+ * *
+ *  * A business customer record owned by one agency.
+ *  * A Customer is NOT an identity: it never connects to `app_user`, holds no
+ *  * credentials, and is never forced into the authentication model. It exists so
+ *  * an agency can attach identity/contact data to a booking without the person
+ *  * having a SaaS account.
+ *  * Tenant isolation is enforced the same way as every other agency-owned row:
+ *  * each record carries `agency_id`, every query is scoped by it, `agency_id` is
+ *  * never accepted from a request body, and the FK to `agency` cascades so a
+ *  * deleted agency takes its customer records with it.
+ *  * `status` is restricted by the database CHECK constraint
+ *  * (`customer_status_check`) to ACTIVE | ARCHIVED. Archiving (the
+ *  * `AGENCY_CUSTOMER_ARCHIVE` capability) is the deletion equivalent and is
+ *  * one-way in the current model — there is no restore permission.
+ */
+export type Customer = Prisma.CustomerModel
+/**
  * Model AgencyApplication
  * 
  */
@@ -62,3 +80,194 @@ export type AgencyMembership = Prisma.AgencyMembershipModel
  * 
  */
 export type AgencyRoleAssignment = Prisma.AgencyRoleAssignmentModel
+/**
+ * Model AgencyMemberInvitation
+ * *
+ *  * A consent-based membership invitation, keyed to an EMAIL address.
+ *  * The invitation holds zero inside information: it records who invited whom
+ *  * into which agency, the roles offered at creation time, and a 256-bit random
+ *  * redemption token kept only as its SHA-256 hex digest (`tokenHash`). The
+ *  * plaintext token exists exclusively in the delivery channel (email) and is
+ *  * never stored, returned by an API, or logged. Email is NOT a foreign key to
+ *  * AppUser on purpose: invitations must not probe whether an address is already
+ *  * an account, so acceptance decides that in one interactive transaction instead
+ *  * of at creation time.
+ *  * The database guarantees the lifecycle:
+ *  * agency_member_invitation_status_check  status in PENDING | ACCEPTED |
+ *  * REVOKED | EXPIRED
+ *  * agency_member_invitation_pending_agency_email_key  partial UNIQUE
+ *  * (agency_id, email) WHERE status = 'PENDING' — at most one outstanding
+ *  * invitation per address per agency
+ */
+export type AgencyMemberInvitation = Prisma.AgencyMemberInvitationModel
+/**
+ * Model AgencyMemberInvitationRole
+ * *
+ *  * The AGENCY roles offered by an invitation, captured at creation time.
+ *  * The same tenant rule as `AgencyRoleAssignment` applies (mirrored trigger
+ *  * `agency_member_invitation_role_scope`): a role must be AGENCY-scoped and,
+ *  * when custom, owned by the invitation's own agency. The set is a snapshot
+ *  * offered to the invitee — a later member role replacement authorizes changes
+ *  * afterwards, it is not required before acceptance.
+ */
+export type AgencyMemberInvitationRole = Prisma.AgencyMemberInvitationRoleModel
+/**
+ * Model AuditLog
+ * *
+ *  * Security-relevant events, append-only.
+ *  * It exists so questions like "has the directory been probed?" or "who removed
+ *  * that member?" have an answer. Rows are never updated or deleted by
+ *  * application code.
+ *  * Deliberately NOT a foreign key to AppUser or Agency: an audit record must
+ *  * survive the deletion of whatever it describes, and a cascade would erase
+ *  * exactly the history an investigation needs. Actors and agencies are recorded
+ *  * by their stable public `code`.
+ *  * `targetHash` carries a SHA-256 of a sensitive lookup term (for example a
+ *  * searched email) so repeated probing is still correlatable without the log
+ *  * itself becoming a second copy of the data being protected.
+ */
+export type AuditLog = Prisma.AuditLogModel
+/**
+ * Model Tour
+ * *
+ *  * A reusable travel product (a "tour") owned by one agency.
+ *  * This is the Module F aggregate: the product template an agency authors and
+ *  * publishes. Tenant isolation follows the same composite super-key pattern as
+ *  * every agency-owned row — `agency_id` is required, the FK cascades, and it is
+ *  * never accepted from a request body.
+ *  * Lifecycle (`status`, CHECK `tour_status_check`): DRAFT → PUBLISHED → ARCHIVED.
+ *  * Publishing is an explicit, guarded action (`AGENCY_TOUR_PUBLISH` runs the
+ *  * readiness gate server-side; the backend NEVER auto-publishes). ARCHIVED is a
+ *  * one-way terminal state like customers.
+ *  * Deliberate Module F scope: departures, prices and extras belong to later
+ *  * modules (G/H), so none of them live here. Duration is derived by the client
+ *  * from `format` + days/nights/hours; only the raw values are stored.
+ *  * `activityRequirements`: read-only structured metadata (difficulty, distance,
+ *  * elevation, minimum age, fitness, required equipment). Simple value lists
+ *  * (`highlights`, `included`, `notIncluded`, `gallery`) are stored as JSON, the
+ *  * same way `activityRequirements` is.
+ */
+export type Tour = Prisma.TourModel
+/**
+ * Model Departure
+ * *
+ *  * One scheduled, operational instance of a tour (Module G).
+ *  * A Departure is created for a Tour by an authorized agency member and carries
+ *  * the concrete run information the booking flow needs: explicit start/end, the
+ *  * seat capacity of that departure, an optional booking deadline, and the
+ *  * operational notes. Tenancy is inherited from the owning Tour — the row never
+ *  * stores an `agency_id` and application code never accepts a tour reference
+ *  * from a request body; the FK cascades so a deleted agency takes its
+ *  * departures' tours with them.
+ *  * Lifecycle vocabulary (CHECK in the migration):
+ *  * OPEN       — bookable, counts toward a SCHEDULED tour's publish readiness
+ *  * CLOSED     — booking disabled by the agency; does not count for publishing
+ *  * CANCELLED  — terminal: the departure will not run; does not count either
+ *  * A new departure always starts OPEN and the backend never auto-publishes.
+ *  * Seat consumption (`sold out` / booked seats) is derived in the Bookings
+ *  * module and is deliberately absent here.
+ */
+export type Departure = Prisma.DepartureModel
+/**
+ * Model PricingOption
+ * *
+ *  * A reusable pricing category defined once per Tour and priced per Departure
+ *  * (Module H).
+ *  * A PricingOption is a definition only — "Adult", "Child", "Single room",
+ *  * "Double room" — with a currency (single currency per tour, `DZD` by default)
+ *  * and a basis (`per_person` or `per_booking`). The actual money lives in
+ *  * `DeparturePrice`, one row per departure/option pair. Tenancy is inherited
+ *  * from the owning Tour — the row never stores an `agency_id` and the FK
+ *  * cascades.
+ *  * Lifecycle: ACTIVE -> INACTIVE. Deactivation (the equivalent of archiving a
+ *  * tour) is one-way and deliberate; deactivating an option keeps the prices
+ *  * already stored on departures (so history and past bookings stay intact) but
+ *  * stops it being offered going forward.
+ *  * The name is case-insensitive (CITEXT) and unique per tour. The currency is
+ *  * a 3-letter ISO-4217 code validated at the API layer and normalized in the
+ *  * DB; a tour keeps a single currency so stored prices are never ambiguous.
+ */
+export type PricingOption = Prisma.PricingOptionModel
+/**
+ * Model DeparturePrice
+ * *
+ *  * The actual price of one PricingOption on one Departure (Module H).
+ *  * One row per (departure, option) pair — the money is scoped to the concrete
+ *  * run of the tour, so the same "Adult" option can cost different amounts across
+ *  * departures. Tenancy is inherited through the departure -> tour -> agency
+ *  * chain; the FKs cascade. Rows are managed as a whole set per departure (a
+ *  * `PUT` replaces the set, like the tour aggregate's children), so there is no
+ *  * public code for an individual price row.
+ *  * `amount` is positive and limited to DECIMAL(12,2) (CHECK in the migration).
+ *  * Bookings (Module I) will read these rows and apply the option's basis; this
+ *  * module never computes totals.
+ */
+export type DeparturePrice = Prisma.DeparturePriceModel
+/**
+ * Model TourDestination
+ * *
+ *  * One ordered stop of a tour.
+ *  * Location is deliberately a plain, self-contained structure (wilaya code +
+ *  * free-text locality + free-text place) — the platform reference subsystem for
+ *  * countries/cities is a later module, and the backend never resolves wilaya
+ *  * labels. Position is the display order; uniqueness on `(tour_id, position)`
+ *  * keeps the ordered list consistent.
+ */
+export type TourDestination = Prisma.TourDestinationModel
+/**
+ * Model TourItineraryDay
+ * *
+ *  * One day of a tour itinerary, in display order.
+ */
+export type TourItineraryDay = Prisma.TourItineraryDayModel
+/**
+ * Model Booking
+ * *
+ *  * An agency booking of one Customer on one Departure (Module I).
+ *  * A Booking links one agency Customer to one concrete scheduled run of that
+ *  * same agency's Tour and owns immutable `reservedSeats` plus a server-computed
+ *  * `totalAmount`. Unlike Departure/PricingOption, a Booking spans two aggregates
+ *  * (Customer and Departure), so it carries its own `agency_id`; the FK cascades
+ *  * and application code never accepts an agency reference from a request body.
+ *  * `tourId` is derived by the backend from the selected Departure and is never
+ *  * trusted from the request.
+ *  * Lifecycle (CHECK in the migration): PENDING -> CONFIRMED -> CANCELLED.
+ *  * Creation always lands PENDING; confirmation and cancellation are explicit
+ *  * gated actions. PENDING and CONFIRMED consume Departure capacity; CANCELLED
+ *  * releases it. Seat consumption is derived by summing the `reservedSeats` of
+ *  * non-cancelled Bookings per Departure — there is deliberately no
+ *  * `booked_seats` counter on Departure.
+ *  * The total is computed server-side from the Departure's stored prices at
+ *  * creation and frozen into `booking_price_line` snapshot rows, so later
+ *  * Pricing edits or deactivations never rewrite an existing Booking. One
+ *  * Booking has exactly one currency, matching the Tour's single-currency rule.
+ *  * Payments, refunds and balances belong to a later module and are deliberately
+ *  * absent here.
+ */
+export type Booking = Prisma.BookingModel
+/**
+ * Model BookingPriceLine
+ * *
+ *  * One immutable price line of a Booking (Module I).
+ *  * A Booking must not depend on mutable Pricing: at creation the server copies
+ *  * the applied option's code, name, basis, currency and unit amount into these
+ *  * snapshot rows along with the quantity, so a later rename, reprice or
+ *  * deactivation can never change what a past Booking records. `per_person`
+ *  * lines carry `quantity = reservedSeats`; `per_booking` lines carry
+ *  * `quantity = 1`; each line is `unitAmount * quantity`. `pricingOptionId` is
+ *  * an optional internal reference to the definition that was snapped (kept a
+ *  * SetNull FK so a hypothetical cleanup of options never destroys booking
+ *  * history).
+ */
+export type BookingPriceLine = Prisma.BookingPriceLineModel
+/**
+ * Model BookingStatusHistory
+ * *
+ *  * Business lifecycle history of a Booking (Module I).
+ *  * One row per status transition, written inside the same transaction as the
+ *  * transition itself, so the business history always stays coherent with the
+ *  * current `status`. The initial transition is `fromStatus = null` ->
+ *  * `toStatus = PENDING`. This is a business record; the separate AuditLog row
+ *  * records the acting AppUser's event on the agency.
+ */
+export type BookingStatusHistory = Prisma.BookingStatusHistoryModel

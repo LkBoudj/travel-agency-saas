@@ -1,85 +1,90 @@
+import { Info } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { useWatch } from "react-hook-form"
+import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
 import type { TripEditor } from "../hooks/use-trip-editor"
-import { DeparturesEditor } from "./departures-editor"
-import { PricingOptionsEditor } from "./pricing-options-editor"
+import { DeparturesManager } from "./departures-manager"
+import { PricingManager } from "./pricing-manager"
 import { SectionHeading } from "./section-heading"
 
-type DeparturesAndPricingSectionProps = Pick<
-  TripEditor,
-  "form" | "fieldArrays" | "addDeparture"
->
+type DeparturesAndPricingSectionProps = {
+  editor: TripEditor
+}
+
+const NON_SCHEDULED_MODES = new Set(["on_request", "custom_quote"])
 
 /**
- * Departures & Pricing section, adapted to the trip's availability mode:
- * - scheduled → full departures editor
- * - on_request → informational state, no departures
- * - custom_quote → informational state, no departures
+ * Departures & Pricing (Modules G + H live).
  *
- * Pricing option categories stay at trip level in every mode; only actual
- * departure prices (which belong to departures) are skipped without one.
+ * Scheduled trips get the real DeparturesManager — a published trip simply
+ * shows the warning when it holds no open departure, it is never silently
+ * unpublished here. On-request and custom-quote modes carry no scheduled
+ * departures by definition, so they explain the mode instead. Pricing is the
+ * live module beneath: options are managed here and priced per departure
+ * inside the manager above.
  */
 export function DeparturesAndPricingSection({
-  form,
-  fieldArrays,
-  addDeparture,
+  editor,
 }: DeparturesAndPricingSectionProps) {
   const { t } = useTranslation()
+  const { agency } = useAgencyContext()
   const availabilityMode = useWatch({
     name: "availabilityMode",
-    control: form.control,
+    control: editor.form.control,
   })
 
-  const informational = availabilityMode === "on_request" || availabilityMode === "custom_quote"
+  const mode = availabilityMode ?? "scheduled"
+  const nonScheduled = NON_SCHEDULED_MODES.has(mode)
+  const tour = editor.tourQuery.data
 
   return (
     <div className="grid gap-6">
-      <PricingOptionsEditor form={form} fieldArrays={fieldArrays} />
+      <section className="grid gap-4">
+        <SectionHeading helper={t("trips:departures.helper")}>
+          {t("trips:departures.title")}
+        </SectionHeading>
 
-      <div className="border-t" />
+        {nonScheduled ? (
+          <AvailabilityInfo mode={mode} />
+        ) : (
+          <DeparturesManager
+            agencyCode={agency.code}
+            tourCode={tour?.code ?? ""}
+            tourStatus={tour?.status}
+          />
+        )}
+      </section>
 
-      {availabilityMode === "on_request" && (
-        <AvailabilityInfo
-          title={t("trips:availability.on_request")}
-          body={t("trips:availabilityInfo.bodyOnRequest")}
-        />
-      )}
-
-      {availabilityMode === "custom_quote" && (
-        <AvailabilityInfo
-          title={t("trips:availability.custom_quote")}
-          body={t("trips:availabilityInfo.bodyCustomQuote")}
-        />
-      )}
-
-      {!informational && (
-        <DeparturesEditor
-          form={form}
-          fieldArrays={fieldArrays}
-          addDeparture={addDeparture}
-        />
-      )}
+      <PricingManager
+        agencyCode={agency.code}
+        tourCode={tour?.code ?? ""}
+      />
     </div>
   )
 }
 
-type AvailabilityInfoProps = {
-  title: string
-  body: string
-}
-
-function AvailabilityInfo({ title, body }: AvailabilityInfoProps) {
+function AvailabilityInfo({ mode }: { mode: string }) {
   const { t } = useTranslation()
 
+  const body =
+    mode === "custom_quote"
+      ? t("trips:availabilityInfo.bodyCustomQuote")
+      : t("trips:availabilityInfo.bodyOnRequest")
+
   return (
-    <div className="grid gap-3">
-      <SectionHeading helper={t("trips:availabilityInfo.helper")}>
-        {t("trips:departures.title")}
-      </SectionHeading>
-      <p className="rounded-lg border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
-        <span className="font-medium text-foreground">{title}.</span>{" "}
-        {body}
-      </p>
+    <div className="flex items-start gap-3 rounded-lg border border-dashed px-4 py-4 text-sm">
+      <span className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+        <Info className="size-4" aria-hidden />
+      </span>
+      <div className="grid gap-1">
+        <p className="font-medium">
+          {t(`trips:availability.${mode}`)}
+        </p>
+        <p className="text-[13px] text-muted-foreground">{body}</p>
+        <p className="text-xs text-muted-foreground/70">
+          {t("trips:availabilityInfo.helper")}
+        </p>
+      </div>
     </div>
   )
 }

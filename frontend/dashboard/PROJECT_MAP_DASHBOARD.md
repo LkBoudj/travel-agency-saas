@@ -38,13 +38,14 @@ cross-feature reuse.
 createBrowserRouter with feature-owned route modules. Guest routes:
 /login, /register, /register/agency, /verify-email, /forgot-password,
 /reset-password. Authenticated routes: /dashboard, /trips,
-/trips/:tripId, /bookings, /bookings/:bookingId, /customers,
-/customers/:customerId, /agency, /team, /settings. Feature routes spread into
+/trips/:tourCode, /bookings, /bookings/:bookingId, /customers,
+/customers/:customerCode, /agency, /team, /settings. Feature routes spread into
 DashboardLayout.children. Lazy loading per feature group. Guards
 (RequireAuth, GuestOnly) are UX only.
 Trip v4: trip creation happens in a Create Trip drawer on the Trips list;
 the standalone /trips/new route was removed (creation always yields a
-draft trip and navigates to its editor at /trips/:tripId).
+draft trip and navigates to its editor at /trips/:tourCode — the backend tour
+code, not a database id).
 Agency Profile M1: the /agency placeholder was replaced by the agency
 feature route module (features/agency/routes/agency.routes.tsx) —
 AgencySettingsPage at /agency. Storefront was removed wholesale with the
@@ -74,30 +75,81 @@ navigates to /dashboard. Status: UI COMPLETE, wired to the shared dev
 boundary, needs backend wiring.
 
 ### Trips
-Routes: /trips, /trips/:tripId (v4: /trips/new removed — creation is a
-drawer on the list). 1 page, +1 create drawer, 18+ components, 3 hooks,
-2 schemas (editor + create), domain readiness functions, a dev in-memory
-trip repository, and a zustand trip-editor store. Professional domain
-model: format, scope, availability, duration, themes, activities, audience,
-physical profile, transport, accommodation. Trip!=Departure correctly
-modeled. Status: UI SUBSTANTIALLY BUILT (M1 of v4 done), needs API wiring.
+Routes: /trips, /trips/:tourCode (v4: /trips/new removed — creation is a
+drawer on the list). Backend name is Tour (`TUR-…`, `:tourCode`); the UI keeps
+Trip naming. List page, create drawer, and editor are WIRED to the real Tours
+API (`API /v1/agencies/:agencyCode/tours`). List: single useTours query,
+search + status server-driven (debounced search), format/scope/destination
+client-side; row actions (publish/archive) gated via useTourCapabilities.
+Editor: useTripEditor loads via useTour (GET), Save PUTs the full aggregate
+then runs the explicit publish/unpublish/archive transition; a failed
+transition leaves the tour where the server kept it; editor store (sanctioned
+Zustand exception) owns the canonical draft. Readiness panel mirrors the
+server gate (required: name, resolved destination, shortDescription,
+coverImage, availability; SCHEDULED publish requires ≥ 1 OPEN departure
+counted from the real Departures API; pricing (RECOMMENDED) satisfied when
+the tour holds an ACTIVE pricing option AND ≥ 1 priced OPEN departure —
+both from the real pricing overview). The Departures & Pricing section runs
+the live DeparturesManager plus the live PricingManager.
+Pure lib (payload/destination display/actions/error messages/departure
+payloads) covered by node --test. The dev in-memory trip repository and
+PLACEHOLDER_TRIPS were removed — persistence is the real API. Status:
+IMPLEMENTED (Modules F + G + H; trips API wired, departures and pricing live).
 
 ### Departures & Pricing
-Within Trip editor (not separate route). DeparturesAndPricingSection +
-DeparturesEditor + PricingOptionsEditor. Adapts to the trip's availability
-mode: scheduled → full departures editor; on_request / custom_quote →
-informational states (no fake departures). Correctly separates trip-level
-pricing option definitions from departure-level actual prices. Departure
-start/end are ISO datetimes (startAt/endAt) with endAt >= startAt.
-Status: UI BUILT within trip editor.
+Within Trip editor (not separate route). Modules G + H IMPLEMENTED: the section
+adapts to the availability mode — SCHEDULED tours render the live
+DeparturesManager (`features/trips/components/departures-manager.tsx`,
+backed by `useDepartures` → `/v1/agencies/:agencyCode/tours/:tourCode/departures`):
+list (status/start/end/capacity/deadline), create via form dialog, edit
+(blocked for CANCELLED), one-way cancel behind a confirm dialog, per-
+occurrence status badges, and a warning banner when a PUBLISHED tour has no
+OPEN departures (cancel never auto-unpublishes). Actions gated on
+`AGENCY_DEPARTURE_CREATE/UPDATE/DELETE` via useAgencyPermission (UX only).
+ON_REQUEST / CUSTOM_QUOTE show an information panel instead.
+
+Beneath it the live PricingManager (`features/trips/components/pricing-manager.tsx`)
+backed by `usePricingOverview` →
+`.../tours/:tourCode/pricing-options` (Module H): options list with ACTIVE/INACTIVE
+status badges, derived starting price + priced-open-departure summary (fed by
+the tours API's `startingPrice`), create/edit option dialog, one-way
+deactivate behind a confirm dialog; per-departure prices are edited inside
+DeparturesManager via the "Prices" coin action → `DeparturePricesDialog`
+(one amount per ACTIVE option as a whole-set PUT replacement; clearing a field
+removes that price; INACTIVE option prices are history and never enter a new
+set). Pricing data layer: `types/pricing.types.ts`, `api/pricing.api.ts`
+(pricingQueryKeys + fetchers), `hooks/use-pricing.ts` (overview/option/prices
+queries + create/update/deactivate/set-prices mutations; `useSetDeparturePrices`
+invalidates pricing + tours so `startingPrice` refreshes), `lib/pricing-payloads.ts`
+(+ tests), `schemas/pricing-form.schema.ts` (option + money validation with
+≤ 2 decimals). Actions gated on `AGENCY_PRICING_VIEW` / `AGENCY_PRICING_MANAGE`
+(UX only — backend guards authoritative). Readiness Pricing item is now real:
+satisfied when pricing option count (ACTIVE) > 0 and priced open departures > 0 —
+both from the pricing overview. Status: IMPLEMENTED (Modules G + H).
 
 ### Bookings
 Routes: /bookings, /bookings/:bookingId. Booking→Departure→Trip. Financial
 snapshot read-only. No payment in Phase 1. Status: NOT STARTED.
 
 ### Customers
-Routes: /customers, /customers/:customerId. Agency CRM records. Customer!=User.
-Status: NOT STARTED.
+Routes: /customers, /customers/:customerCode. Agency CRM records. Customer!=User
+(never an app_user link; the stable key is the backend `CUS-…` code).
+Status: IMPLEMENTED — backend `customer` table (migration
+`20260919191328_agency_customers`; ACTIVE | ARCHIVED via
+`customer_status_check`) + REST module under
+`/v1/agencies/:agencyCode/customers`, guarded by
+`AgencyPermissionGuard` + the pre-existing `AGENCY_CUSTOMER_VIEW/CREATE/
+UPDATE/ARCHIVE` permissions; list (ACTIVE only, search = debounced contains
+match on code/name/email/phone), get by code (archived stay readable), create
+(blank→null, email normalized), partial update (null clears), one-way archive
+(`CUSTOMER_NOT_FOUND` 404, `CUSTOMER_ALREADY_ARCHIVED` 409); every mutation
+audited + in Swagger. Dashboard feature: list + create/edit dialog + details
+page + archive ConfirmDialog; controls in `features/customers/` (types, lib +
+3 node --test spec groups, schemas, api, hooks incl. use-customer-capabilities,
+components, pages, routes). Action gating on AGENCY_CUSTOMER_* is UX only — the
+backend guards are authoritative. Dedicated `customers` i18n namespace (EN+AR,
+RTL-correct). No restore is offered anywhere.
+NOT in this slice: Customers↔Bookings (Module I), customer counts.
 
 ### Agency Profile
 Route: /agency (real page since M1). Public identity: name, tagline, short
@@ -223,9 +275,15 @@ Availability, Duration. Nothing else. A created trip is always `draft`.
 - Publish readiness: `computePublishReadiness(trip)` returns
   { required[], recommended[], canPublish }. Required: basic information
   (name), destination (resolved), customer-facing summary
-  (shortDescription), cover photo, pricing (pricing option definitions),
-  availability (mode set; scheduled additionally needs >= 1 departure).
-  Progress counts REQUIRED items only; canPublish = all required satisfied.
+  (shortDescription), cover photo, availability (mode set; scheduled
+  additionally needs >= 1 departure). Pricing is RECOMMENDED and is
+  satisfied from real data: the trip holds an ACTIVE pricing option AND at
+  least one OPEN departure carries a price (both via the pricing overview
+  API). Progress counts REQUIRED items only; canPublish = all required
+  satisfied. Matches the backend publish gate (backend counts ≥ 1 OPEN
+  departure for SCHEDULED — Module G; departure status climbs through the
+  Departures API, never the trip payload; pricing is checked on the
+  dashboard as recommended, Module H).
 - Structural change: `isStructuralChange(trip, field, context?)` is true
   for format / geographicScope / availabilityMode / status changes and
   destination-list edits. Format/scope/availability changes require an
@@ -317,12 +375,13 @@ feature reuse exists.
 ## [PAGE_INVENTORY]
 /login (Auth), /register (Auth), /register/agency (Auth/Onboarding),
 /verify-email (Auth), /forgot-password (Auth), /reset-password (Auth),
-/dashboard (Overview), /trips (Trips list), /trips/:tripId (Trip edit),
+/dashboard (Overview), /trips (Trips list), /trips/:tourCode (Trip edit,
+keyed by the backend TUR-… code; formerly /trips/:tripId),
 /agency (Agency Profile settings). Creation is a drawer on /trips (v4; the
 former /trips/new page was removed). Unbuilt domains are M0 placeholder
 pages, replaced by feature route modules as features land: /bookings
 (placeholder), /bookings/:bookingId (from bookings feature), /customers
-(placeholder), /customers/:customerId (from customers feature),
+(customers feature), /customers/:customerCode (customers feature),
 /team (placeholder), /settings (placeholder).
 
 ## [CURRENT_IMPLEMENTATION]
@@ -339,8 +398,10 @@ dashboard-header.tsx (mobile toggle + user menu),
 user-menu.tsx (Account placeholder menu: Agency Profile/Settings/Sign out),
 components/shared/placeholder-page.tsx (honest placeholder for unbuilt
 domains). Auth feature: 6 pages, 9 components, 5 hooks, 6 schemas, routes,
-demo-login (dev-only). Trips feature: 2 pages, 13 components, 2 hooks, 1
-comprehensive schema, types, routes, placeholder-trips (TODO remove).
+demo-login (dev-only). Trips feature: list + editor pages, create drawer,
+comprehensive schema, domain taxonomy, types, routes — now wired to the real
+Tours API (see the Agency Tours milestone below; dev in-memory repo and
+PLACEHOLDER_TRIPS removed).
 DashboardPage: temporary placeholder. No API client, no useAuthStore, no
 bookings/customers/team/settings features + agency feature (see below).
 ... [prior M0/M1 content unchanged] ...
@@ -583,6 +644,61 @@ verification claims. Full en/ar i18n (agency namespace) with key parity.
 Gaps: real auth not wired (M1); API client not created; placeholder
 pages replaced by feature route modules as features land.
 
+Agency Tours integration milestone (Module F — dashboard trips feature wired to
+the real backend Tours API): new trip contract types (types/tour.types.ts,
+wire mirrors backend/src/tours), tours.api.ts (query keys + list/get/create/
+update/publish/unpublish/archive), pure lib — tour-destination-display,
+tour-payloads (TripFormValues ↔ TourPayload + create payload + row read model),
+tour-actions (row actions + status helpers), tour-error-messages +
+tour-error-adapter (backend errorCode → localized message) — with 4 node --test
+spec groups; hooks use-tours / use-tour / use-tour-mutations / use-tour-
+capabilities / use-debounced-value. List rewired: trips-page uses one useTours
+query (debounced search + status server-driven; format/scope/destination
+client-side), trips-toolbar owns the filter types, use-trip-filters keeps the
+client-side filters. Create drawer rewired through use-create-trip
+(useCreateTour + navigate to /trips/:tourCode, `creating` pending state).
+Editor rewired: use-trip-editor loads via useTour, Save PUTs then transitions
+publish/unpublish/archive (failure rebases the form to the server state so a
+failed transition is never misrepresented); editor page keyed by :tourCode with
+  loading/error/retry; the readiness panel matches the backend gate (scheduled
+  counts OPEN departures from the real API; pricing recommended, satisfied
+  from the real pricing overview); departures-and-pricing-section renders the
+  live DeparturesManager (Module G) and, since the pricing milestone, the live
+  PricingManager (Module H).
+RoutePaths.tripDetails = "trips/:tourCode". Dev
+api/trips.api.ts and utils/placeholder-trips.ts deleted (grep-verified), draft.ts
+pruned. Verification: node --test 119 specs pass, npm run lint clean, npm run
+typecheck + npm run build pass.
+- Departures milestone (Module G, backend + dashboard): DepturesManager +
+  departure-form-dialog wired to the real Departures API (typed types/api/
+  hooks in features/trips), uppercase OPEN/CLOSED/CANCELLED statuses, create →
+  always OPEN (status never sent), edit blocked on CANCELLED, one-way cancel
+  with confirm dialog + `remainingOpenDepartures` toast, PUBLISHED-no-open
+  warning banner, `AGENCY_DEPARTURE_*` gating, readiness consumed via the real
+  open count, i18n EN+AR keys. Embedded `departures` stripped from the Tour
+  form/draft/payload and the draft-only departures-editor deleted (grep-
+  verified); trip-status-badge DepartureBadge repointed to the wire statuses.
+  Pure lib (departure-payloads, tour-payloads, tour-error-messages, tour-
+  actions, tour-destination-display) covered by node --test; lint, typecheck
+  and build clean.
+- Pricing milestone (Module H, backend + dashboard): live PricingManager in
+  the Departures & Pricing section — options (create/edit/one-way deactivate,
+  ACTIVE/INACTIVE badges), derived starting price + priced-open-departure
+  summary (tour list/rows consume the tours API `startingPrice`), per-
+  departure price sets via the DeparturePricesDialog (whole-set PUT, one
+  amount per ACTIVE option, clearing a field removes that price). Data
+  layer: pricing.types/api.pricing.api/use-pricing (overview/option/prices
+  queries + create/update/deactivate/set-prices mutations; set-prices
+  invalidates pricing + tours), lib/pricing-payloads (+tests),
+  schemas/pricing-form.schema (money ≤ 2 decimals, positive). Readiness
+  Pricing item now real (ACTIVE option AND priced open departure, from the
+  pricing overview). `pricing-options-editor` (deferred placeholder) deleted
+  and `pricingOptions` stripped from trip schema/draft/editor/payload; extras
+  `basisLabel` repointed to trips:details.extras.basisLabel. Error codes
+  PRICING_OPTION_* / PRICING_CURRENCY_MISMATCH mapped in tour-error-messages.
+  i18n EN+AR live pricing block replacing pricing.deferred. node --test,
+  lint, typecheck and build all clean.
+
 ## [DECISIONS]
 Feature-first architecture. Thin pages. TanStack Query owns server
 state. Zustand for meaningful cross-page client state only. RHF+Zod
@@ -638,8 +754,11 @@ editor and overview offer skeleton hides nothing that the task schedules
 for redesign; relocated blocks (description/highlights/activity
 requirements to Details, min travelers to Booking settings) stay fully
 functional rather than being invented/stubbed in the new Overview. The
-dev in-memory trip repository mirrors the existing PLACEHOLDER_TRIPS
-precedent as a clearly-marked swap boundary, NOT a production endpoint.
+editor persists through the real backend Tours API (the dev in-memory trip
+repository and PLACEHOLDER_TRIPS precedent were removed when it landed).
+Status is never sent in the trip payload — it moves only through the
+explicit publish/unpublish/archive actions, and a failed transition leaves
+the tour exactly where the server actually kept it.
 Agency Profile M1 decisions: one shared Agency persistence boundary for
 both onboarding and settings (no parallel source of truth); service
 languages modeled as an open string[] (ar/fr/en only as initial UI
@@ -684,8 +803,8 @@ Locale preference — currently client-persisted (localStorage);
 backend-managed per-user locale belongs to the user profile. Error
 messages from an API — contract must return stable codes (not UI
 strings) so they can be localized reactively. Future feature domains
-(bookings, customers, team, settings) must be added to the locale packages
-as they land.
+(bookings, team, settings) must be added to the locale packages
+as they land (customers landed with its own namespace, EN + AR).
 Structured reference data — DOCUMENTED dependency: commune (Baladiyah)
 names per wilaya are not included in the frontend reference set; the
 editor therefore exposes City/Commune as controlled free text and
@@ -694,13 +813,17 @@ commune dataset (from the backend or a vetted source) slots into
 algeria-geo.ts without form-model changes. International destinations
 likewise stay free-text until structured country/city reference data
 exists. Neither dataset is fabricated (protocol: no invented geo data).
-Trip v4 backend contract — the trips API does not exist yet; the editor
-persists through a dev in-memory repository (features/trips/api,
-marked TODO(api)) standing in for the future trips.api.ts. When the
-real API lands it must implement: create trip (6-field payload →
-draft), fetch trip by id, update whole trip (single mutation). Backend
-must also enforce publish-readiness and never auto-publish a trip
-whose editor shows it incomplete; the frontend guard is UX only.
+Trip v4 backend contract — RESOLVED (Agency Tours + Departures milestones): the
+dashboard trips feature now persists through the real backend Tours API
+(`/v1/agencies/:agencyCode/tours`; create → draft, fetch by code, PUT full
+aggregate) and schedules through the Departures API
+(`/v1/agencies/:agencyCode/tours/:tourCode/departures`; list/create/edit/cancel).
+The backend enforces publish-readiness server-side and never auto-publishes;
+the frontend readiness panel mirrors that gate (UX plus the authoritative
+guard). Trip-contract gap closed through the Pricing milestone (Module H):
+price option definitions and per-departure price sets now live in the
+pricing module; the tours list renders the real derived `startingPrice`. The
+trips list's nextDeparture renders the actual upcoming departure.
 Meeting-instructions fallback (departure-first, else trip default)
 pends departure data modelled with per-option prices. Dev in-memory
 data is ephemeral (page refresh drops created trips) — by design, no
@@ -735,7 +858,9 @@ Mobile application. Data export. Bulk operations. Advanced search.
 Redis/frontend caching. Service workers.
 Trip v4 beyond M1 (REDESIGNS SCHEDULED FOR LATER — keep existing
 working editors as-is): redesigned Itinerary editor; redesigned
-Departures & Pricing editor; redesigned Details with rich/media writer
+departures/pricing editors (DeparturesManager + PricingManager are live; a
+richer redesigned editor is deferred); redesigned Details
+with rich/media writer
 fields; redesigned Media gallery; redesigned Booking settings with
 custom question builder; drag-and-drop destination reorder (dnd-kit);
 Published Snapshots / Working Drafts; publish audit trail; custom-quote

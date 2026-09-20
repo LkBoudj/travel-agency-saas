@@ -29,8 +29,17 @@ export default function Footer({
   const contact = footer.contact;
 
   return (
-    <footer className="bg-surface-inverse text-white">
-      <div className="mx-auto max-w-[1440px] px-5 pb-14 pt-20 sm:px-8 lg:px-10 lg:pb-[72px] lg:pt-24">
+    <footer className="relative overflow-hidden bg-surface-inverse text-white">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 top-0 flex justify-center overflow-hidden"
+      >
+        <span className="select-none whitespace-nowrap font-display text-[clamp(7rem,24vw,26rem)] font-semibold leading-[0.78] text-white/[0.05]">
+          {agencyName}
+        </span>
+      </div>
+
+      <div className="relative mx-auto max-w-[1440px] px-5 pb-14 pt-20 sm:px-8 lg:px-10 lg:pb-[72px] lg:pt-24">
         <div className="grid grid-cols-1 gap-y-12 sm:grid-cols-2 sm:gap-x-8 lg:grid-cols-12 lg:gap-x-6 xl:gap-x-10">
           {/* Brand column */}
           <div className="flex flex-col sm:col-span-2 lg:col-span-5">

@@ -3,7 +3,6 @@ import { JwtService } from '@nestjs/jwt';
 import { Test } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../app.module.js';
-import { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { configureApp } from '../setup-app.js';
 import { AUTH_COOKIE_NAME } from './auth.constants.js';
@@ -43,7 +42,7 @@ const prismaMock = {
   },
 };
 
-describe('Auth API (POST /v1/auth/register, POST /v1/auth/login, POST /v1/auth/logout, GET /v1/auth/me)', () => {
+describe('Auth API (POST /v1/auth/login, POST /v1/auth/logout, GET /v1/auth/me)', () => {
   let app: INestApplication;
   let token: string;
 
@@ -60,53 +59,6 @@ describe('Auth API (POST /v1/auth/register, POST /v1/auth/login, POST /v1/auth/l
 
   afterAll(async () => {
     await app.close();
-  });
-
-  describe('register', () => {
-    it('creates a user, hashes the password, and never returns passwordHash', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/v1/auth/register')
-        .send({ email: 'new@example.com', password: 'secret123', firstName: 'Alan', lastName: 'Turing' });
-
-      expect(res.status).toBe(201);
-      expect(res.body.code).toMatch(/^USR-[0-9A-F]{12}$/);
-      expect(res.body).toEqual({
-        code: res.body.code,
-        email: 'new@example.com',
-        firstName: 'Alan',
-        lastName: 'Turing',
-      });
-      expect(res.body).not.toHaveProperty('passwordHash');
-
-      const createData = prismaMock.appUser.create.mock.calls[0][0].data;
-      expect(createData.passwordHash).toBe('mock-hashed-password');
-      expect(createData.passwordHash).not.toBe('secret123');
-      expect(createData.code).toMatch(/^USR-[0-9A-F]{12}$/);
-    });
-
-    it('rejects a duplicate email with a 409 conflict', async () => {
-      prismaMock.appUser.create.mockRejectedValueOnce(
-        new Prisma.PrismaClientKnownRequestError(
-          'Unique constraint failed on the fields: (`email`)',
-          { code: 'P2002', clientVersion: '7.10.0', meta: { target: ['email'] } },
-        ),
-      );
-
-      const res = await request(app.getHttpServer())
-        .post('/v1/auth/register')
-        .send({ email: 'owner@example.com', password: 'secret123' });
-
-      expect(res.status).toBe(409);
-      expect(res.body.errorCode).toBe('EMAIL_ALREADY_REGISTERED');
-    });
-
-    it('rejects an invalid email shape with 400', async () => {
-      const res = await request(app.getHttpServer())
-        .post('/v1/auth/register')
-        .send({ email: 'not-an-email', password: 'secret123' });
-
-      expect(res.status).toBe(400);
-    });
   });
 
   describe('login', () => {

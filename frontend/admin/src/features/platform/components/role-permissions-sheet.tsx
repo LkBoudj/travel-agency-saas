@@ -12,6 +12,7 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetBody,
   SheetFooter,
   SheetHeader,
   SheetTitle,
@@ -152,7 +153,7 @@ function PermissionEditor({
 
   return (
     <>
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <SheetBody>
         <div className="flex flex-col gap-6 pb-2">
           {groups.map((group) => (
             <PermissionGroupSection
@@ -168,9 +169,9 @@ function PermissionEditor({
             />
           ))}
         </div>
-      </div>
+      </SheetBody>
 
-      <SheetFooter className="border-t">
+      <SheetFooter>
         {errorMessage ? (
           <p role="alert" className="text-sm text-destructive">
             {errorMessage}
@@ -240,7 +241,7 @@ export function RolePermissionsSheet({
         side="right"
         className="w-full gap-0 p-0 data-[side=right]:sm:max-w-md"
       >
-        <SheetHeader className="border-b">
+        <SheetHeader>
           <SheetTitle>Manage permissions</SheetTitle>
           <SheetDescription>
             Choose the {scopeLabel} permissions granted to{" "}
@@ -249,13 +250,13 @@ export function RolePermissionsSheet({
         </SheetHeader>
 
         {isLoading ? (
-          <div className="flex-1 overflow-y-auto px-4 py-4">
+          <SheetBody>
             <PermissionsSkeleton />
-          </div>
+          </SheetBody>
         ) : null}
 
         {!isLoading && isError ? (
-          <div className="flex flex-1 flex-col items-start gap-3 overflow-y-auto px-4 py-4">
+          <SheetBody className="flex flex-col items-start gap-3">
             <p className="flex items-center gap-2 text-sm text-destructive">
               <CircleAlertIcon className="size-4" />
               Could not load the permission catalog.
@@ -264,17 +265,17 @@ export function RolePermissionsSheet({
               <RotateCcwIcon />
               Retry
             </Button>
-          </div>
+          </SheetBody>
         ) : null}
 
         {!isLoading && !isError && totalPermissions === 0 ? (
-          <div className="flex-1 overflow-y-auto px-4 py-4">
+          <SheetBody>
             <p className="text-sm text-muted-foreground">
               {scope === "PLATFORM"
                 ? "No platform permissions are available."
                 : "No agency permissions are available yet."}
             </p>
-          </div>
+          </SheetBody>
         ) : null}
 
         {!isLoading && !isError && totalPermissions > 0 && serverKeys ? (

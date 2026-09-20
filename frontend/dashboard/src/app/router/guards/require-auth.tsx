@@ -1,16 +1,28 @@
-import { Outlet } from "react-router-dom"
+import { Navigate, Outlet, useLocation } from "react-router-dom"
+
+import { ROUTES } from "@/app/router/route-paths"
+import { useCurrentUser } from "@/features/auth/hooks/use-current-user"
+import { FullPageLoader } from "@/components/shared/full-page-loader"
 
 /**
- * Architectural boundary for the authenticated dashboard area.
+ * Gate for the authenticated area.
  *
- * Real authentication does not exist yet, so the guard currently renders its
- * nested routes unconditionally. Nothing is hardcoded and no auth state is
- * invented here.
- *
- * TODO(auth): once an auth store/hook exists, read the authentication status
- * here and, when the user is unauthenticated, redirect to `ROUTES.login` with
- * `{ state: { from: location } } replace`; otherwise keep rendering <Outlet />.
+ * While the session is still resolving it renders a loader rather than the
+ * dashboard, so protected content never flashes before the answer arrives. The
+ * attempted location is carried to the login screen so the user can be returned
+ * to it after signing in.
  */
 export function RequireAuth() {
+  const { data: user, isPending } = useCurrentUser()
+  const location = useLocation()
+
+  if (isPending) {
+    return <FullPageLoader />
+  }
+
+  if (!user) {
+    return <Navigate to={ROUTES.login} replace state={{ from: location }} />
+  }
+
   return <Outlet />
 }

@@ -10,10 +10,10 @@ export default function PromotionalBanner({
     <section
       id="offers"
       aria-labelledby="promotional-banner-heading"
-      className="bg-white"
+      className="bg-surface-alt"
     >
       <div className="mx-auto max-w-[1440px] px-5 py-[96px] sm:px-8 lg:px-10 lg:py-[120px]">
-        <div className="relative min-h-[560px] overflow-hidden rounded-[24px] lg:h-[440px] lg:min-h-0">
+        <div className="relative min-h-[560px] overflow-hidden rounded-hero lg:h-[460px] lg:min-h-0">
           <Image
             src={promotion.image.src}
             alt={promotion.image.alt}
@@ -49,7 +49,7 @@ export default function PromotionalBanner({
 
               <h2
                 id="promotional-banner-heading"
-                className="mt-5 text-[36px] font-bold leading-[1.08] tracking-[-0.02em] text-white sm:text-[44px] lg:text-[48px]"
+                className="mt-5 font-display text-[38px] font-medium leading-[1.08] tracking-[-0.02em] text-white sm:text-[46px] lg:text-[54px]"
               >
                 {promotion.title}
               </h2>

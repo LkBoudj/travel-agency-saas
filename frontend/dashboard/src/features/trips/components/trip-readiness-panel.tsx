@@ -1,8 +1,11 @@
 import { Check, Circle } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { NativeSelect } from "@/components/ui/native-select"
+import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
 import { useTripEditorStore } from "@/stores/trip-editor.store"
 import { computePublishReadiness } from "../domain/trip-readiness"
+import { openDepartureCount, useDepartures } from "../hooks/use-departures"
+import { usePricingOverview } from "../hooks/use-pricing"
 import type { TripEditor } from "../hooks/use-trip-editor"
 import { SectionHeading } from "./section-heading"
 import { TripField } from "./trip-field"
@@ -12,11 +15,11 @@ const REQUIRED_LABELS: Record<string, string> = {
   destination: "trips:readiness.items.destination",
   shortDescription: "trips:readiness.items.shortDescription",
   coverImage: "trips:readiness.items.coverImage",
-  pricing: "trips:readiness.items.pricing",
   availability: "trips:readiness.items.availability",
 }
 
 const RECOMMENDED_LABELS: Record<string, string> = {
+  pricing: "trips:readiness.recommended.pricing",
   meetingInstructions: "trips:readiness.recommended.meetingInstructions",
   themes: "trips:readiness.recommended.themes",
   itinerary: "trips:readiness.recommended.itinerary",
@@ -24,17 +27,40 @@ const RECOMMENDED_LABELS: Record<string, string> = {
 
 /**
  * Side rail card: Trip Status + publish readiness. Progress counts the
- * required items only; canPublish is displayed as a plain summary, never
- * auto-enforcing an unpublish (published-but-incomplete saves are guarded at
- * the footer).
+ * required items only. Choosing `published` here and saving asks the backend
+ * to publish; if readiness is no longer satisfied the backend refuses with a
+ * 409 and the draft stays a DRAFT — the UI never fabricates a published state.
  */
 export function TripReadinessPanel({ editor }: { editor: TripEditor }) {
   const { t } = useTranslation()
+  const { agency } = useAgencyContext()
   const { register } = editor.form
   const draft = useTripEditorStore((state) => state.draft)
+  const tour = editor.tourQuery.data
+
+  // Scheduling readiness reads the real OPEN departure count for this tour.
+  // The count starts at 0 while the departures load; it settles to the truth
+  // the same instant the list does. On-request and custom-quote modes ignore
+  // it entirely.
+  const departuresQuery = useDepartures(agency.code, tour?.code)
+  const openDepartureCountValue = openDepartureCount(departuresQuery.data ?? [])
+
+  // Pricing readiness reads the live overview: at least one ACTIVE option AND
+  // at least one open departure actually holding a price make it satisfied.
+  const pricingQuery = usePricingOverview(agency.code, tour?.code)
+  const pricingOptionCount =
+    pricingQuery.data?.options.filter((option) => option.status === "ACTIVE")
+      .length ?? 0
+  const pricedOpenDepartureCount =
+    pricingQuery.data?.pricedOpenDepartureCount ?? 0
 
   const readiness = draft
-    ? computePublishReadiness(draft)
+    ? computePublishReadiness({
+        ...draft,
+        openDepartureCount: openDepartureCountValue,
+        pricingOptionCount,
+        pricedOpenDepartureCount,
+      })
     : { required: [], recommended: [], canPublish: false }
   const completed = readiness.required.filter((item) => item.satisfied).length
 

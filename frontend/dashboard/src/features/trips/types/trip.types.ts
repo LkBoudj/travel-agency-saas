@@ -1,9 +1,6 @@
 /** Lifecycle states of a reusable travel product. */
 export type TripStatus = "draft" | "published" | "archived"
 
-/** Scheduling state of a single departure occurrence. */
-export type DepartureStatus = "open" | "closed" | "sold_out" | "cancelled"
-
 /** How a price component is charged to the customer. */
 export type PricingBasis = "per_person" | "per_booking"
 
@@ -313,23 +310,6 @@ export type PricingOption = {
   active: boolean
 }
 
-/** One price row inside a departure, tied to a Pricing Option name. */
-export type DeparturePriceBand = {
-  pricingOption: string
-  price: number
-}
-
-/** One scheduled occurrence of a trip. start/end carry date + time of day. */
-export type Departure = {
-  startAt: string
-  endAt: string
-  capacity: number
-  bookingDeadline: string
-  status: DepartureStatus
-  notes: string
-  prices: DeparturePriceBand[]
-}
-
 /** Optional add-on purchasable with the trip. */
 export type TripExtra = {
   name: string
@@ -361,13 +341,6 @@ export const TRIP_STATUS_LABELS: Record<TripStatus, string> = {
   draft: "trips:status.draft",
   published: "trips:status.published",
   archived: "trips:status.archived",
-}
-
-export const DEPARTURE_STATUS_LABELS: Record<DepartureStatus, string> = {
-  open: "trips:departureStatus.open",
-  closed: "trips:departureStatus.closed",
-  sold_out: "trips:departureStatus.sold_out",
-  cancelled: "trips:departureStatus.cancelled",
 }
 
 export const PRICING_BASIS_LABELS: Record<PricingBasis, string> = {

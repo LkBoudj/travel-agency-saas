@@ -2,7 +2,8 @@ import { useTranslation } from "react-i18next"
 import { parseISO } from "date-fns"
 import { Image, Pencil } from "lucide-react"
 import { Link } from "react-router-dom"
-import { ROUTES } from "@/app/router/route-paths"
+import { AGENCY_SECTIONS, agencyPath } from "@/features/agency-context/lib/agency-paths"
+import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
 import { getIntlLocale, type AppLocale } from "@/i18n"
 import { BidiText } from "@/components/shared/bidi-text"
 import { buttonVariants } from "@/components/ui/button"
@@ -37,6 +38,8 @@ function formatDate(
  * Edit — a compact ghost icon button with an accessible name.
  */
 export function TripsTable({ trips }: TripsTableProps) {
+  const { agency } = useAgencyContext()
+  const tripsPath = agencyPath(agency.code, AGENCY_SECTIONS.trips)
   const { t, i18n } = useTranslation()
   const locale = (i18n.language ?? "en") as AppLocale
 
@@ -68,7 +71,7 @@ export function TripsTable({ trips }: TripsTableProps) {
               <tr key={trip.id} className="hover:bg-muted/40">
                 <td className="px-3 py-2 align-middle">
                   <Link
-                    to={`${ROUTES.trips}/${trip.id}`}
+                    to={`${tripsPath}/${trip.id}`}
                     className="flex items-center gap-3"
                   >
                     {trip.coverImageUrl ? (
@@ -140,7 +143,7 @@ export function TripsTable({ trips }: TripsTableProps) {
                 <td className="px-3 py-2 align-middle">
                   <div className="flex items-center justify-end">
                     <Link
-                      to={`${ROUTES.trips}/${trip.id}`}
+                      to={`${tripsPath}/${trip.id}`}
                       aria-label={t("trips:table.editTripAria", {
                         name: trip.name,
                       })}

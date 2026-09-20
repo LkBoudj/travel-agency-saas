@@ -1,0 +1,11 @@
+{
+  "name": "travel-agency-saas",
+  "version": "0.0.1",
+  "private": true,
+  "description": "Repo root orchestrator. `npm run all` starts every app's dev server.",
+  "type": "module",
+  "scripts": {
+    "all": "node scripts/dev-all.mjs",
+    "dev": "node scripts/dev-all.mjs"
+  }
+}
