@@ -16,8 +16,12 @@ export type PublishReadinessInput = {
   shortDescription: string
   coverImageUrl: string
   availabilityMode: unknown
-  departures: unknown[]
-  pricingOptions: unknown[]
+  /** Count of OPEN departures — the only thing scheduling readiness needs. */
+  openDepartureCount: number
+  /** ACTIVE pricing options — pricing readiness needs at least one. */
+  pricingOptionCount: number
+  /** OPEN departures holding ≥1 price — pricing needs a real price too. */
+  pricedOpenDepartureCount: number
   themes: string[]
   meetingInstructions: string
   itinerary: unknown[]
@@ -33,12 +37,12 @@ const MULTI_DAY_FORMATS = new Set(["stay", "circuit", "cruise"])
  * - destination     → at least one resolved stop
  * - shortDescription→ customer-facing summary
  * - coverImage      → cover photo
- * - pricing         → pricing option definitions exist
  * - availability    → availability is set; scheduled additionally needs
- *                     at least one departure
+ *                     at least one open departure
  *
  * Recommended (not counted toward progress):
- * - meetingInstructions, themes, itinerary
+ * - pricing (needs both a category and a real price on an open departure),
+ *   meetingInstructions, themes, itinerary
  */
 export function computePublishReadiness(
   input: PublishReadinessInput
@@ -53,7 +57,7 @@ export function computePublishReadiness(
   const availabilitySatisfied =
     typeof input.availabilityMode === "string" &&
     input.availabilityMode.length > 0 &&
-    (input.availabilityMode !== "scheduled" || input.departures.length > 0)
+    (input.availabilityMode !== "scheduled" || input.openDepartureCount > 0)
 
   const badge = (key: string, label: string, satisfied: boolean) => ({
     key,
@@ -70,11 +74,15 @@ export function computePublishReadiness(
       input.shortDescription.trim().length > 0
     ),
     badge("coverImage", "Cover photo", input.coverImageUrl.trim().length > 0),
-    badge("pricing", "Pricing", input.pricingOptions.length > 0),
     badge("availability", "Availability", availabilitySatisfied),
   ]
 
   const recommended = [
+    badge(
+      "pricing",
+      "Pricing",
+      input.pricingOptionCount > 0 && input.pricedOpenDepartureCount > 0
+    ),
     badge(
       "meetingInstructions",
       "Meeting instructions",

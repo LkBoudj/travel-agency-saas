@@ -1,0 +1,84 @@
+{
+  "page": {
+    "title": "Customers",
+    "description": "Manage the business customers of this agency.",
+    "create": "New customer",
+    "loading": "Loading customers...",
+    "updating": "Updating...",
+    "searchPlaceholder": "Search customers",
+    "searchAria": "Search customers",
+    "noCustomers": "This agency has no customers yet.",
+    "noResults": "No customers match \"{query}\"."
+  },
+  "error": {
+    "loadFailed": "We could not load the customers.",
+    "retry": "Try again"
+  },
+  "table": {
+    "customer": "Customer",
+    "contact": "Contact",
+    "status": "Status",
+    "created": "Created",
+    "actions": "Actions",
+    "viewDetails": "Details",
+    "edit": "Edit",
+    "archive": "Archive",
+    "noActions": "—"
+  },
+  "status": {
+    "active": "Active",
+    "archived": "Archived"
+  },
+  "form": {
+    "createTitle": "New customer",
+    "editTitle": "Edit customer",
+    "description": "Every field is optional. A customer can be a bare name, a bare phone number, or anything in between.",
+    "firstNameLabel": "First name",
+    "firstNamePlaceholder": "First name",
+    "lastNameLabel": "Last name",
+    "lastNamePlaceholder": "Last name",
+    "emailLabel": "Email",
+    "emailPlaceholder": "name@example.com",
+    "phoneLabel": "Phone",
+    "phonePlaceholder": "Phone number",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Anything useful about this customer...",
+    "optional": "Optional",
+    "cancel": "Cancel",
+    "submitCreate": "Create customer",
+    "submitEdit": "Save changes",
+    "saving": "Saving..."
+  },
+  "validation": {
+    "firstNameMax": "First name must be 100 characters or fewer.",
+    "lastNameMax": "Last name must be 100 characters or fewer.",
+    "email": "Enter a valid email address.",
+    "phoneMax": "Phone must be 32 characters or fewer.",
+    "notesMax": "Notes must be 2000 characters or fewer."
+  },
+  "create": {
+    "success": "Customer created."
+  },
+  "update": {
+    "success": "Customer updated."
+  },
+  "archive": {
+    "title": "Archive this customer?",
+    "description": "Archiving moves the customer to the archive. It is a one-way action: there is no restore.",
+    "confirm": "Archive",
+    "success": "Customer archived."
+  },
+  "details": {
+    "back": "Back to customers",
+    "code": "Code",
+    "status": "Status",
+    "createdAt": "Created",
+    "updatedAt": "Updated",
+    "email": "Email",
+    "phone": "Phone",
+    "notes": "Notes",
+    "noNotes": "No notes.",
+    "unknown": "Unknown customer",
+    "notFound": "This customer does not exist in this agency, or may have been archived."
+  }
+}

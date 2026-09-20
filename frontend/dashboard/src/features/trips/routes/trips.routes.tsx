@@ -6,8 +6,8 @@ import { TripsPage } from "../pages/trips-page"
 /**
  * Trips routes. Mounted inside the dashboard layout by the central router.
  *
- * Creation happens in the Create Trip drawer on the list (v4); there is no
- * `/trips/new` route. `/trips/:tripId` hosts the full trip editor.
+ * Creation happens in the Create Trip drawer on the list; there is no
+ * `/trips/new` route. `/trips/:tourCode` hosts the full trip editor.
  */
 export const tripRoutes: RouteObject[] = [
   { path: AGENCY_ROUTES.trips, element: <TripsPage /> },

@@ -36,7 +36,7 @@ export function CreateTripDrawer({
 }: CreateTripDrawerProps) {
   const { t } = useTranslation()
   const locale = useAppLocale()
-  const { form, handleSubmit } = useCreateTrip({ onOpenChange })
+  const { form, handleSubmit, creating } = useCreateTrip({ onOpenChange })
 
   const {
     register,
@@ -280,11 +280,16 @@ export function CreateTripDrawer({
               <footer className="flex items-center justify-end gap-2 border-t border-border p-4 sm:px-6">
                 <Drawer.Close
                   type="button"
+                  disabled={creating}
                   render={<Button variant="ghost" />}
                 >
                   {t("trips:create.cancel")}
                 </Drawer.Close>
-                <Button type="submit">{t("trips:create.submit")}</Button>
+                <Button type="submit" disabled={creating}>
+                  {creating
+                    ? t("trips:create.submitting")
+                    : t("trips:create.submit")}
+                </Button>
               </footer>
             </form>
           </Drawer.Popup>

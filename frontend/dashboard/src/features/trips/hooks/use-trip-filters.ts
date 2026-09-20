@@ -1,19 +1,21 @@
 import { useMemo, useState } from "react"
 import type {
   Trip,
-  TripStatus,
   TripFormat,
   GeographicScope,
 } from "../types/trip.types"
 
-export type TripStatusFilter = TripStatus | "all"
 export type TripFormatFilter = TripFormat | "all"
 export type TripScopeFilter = GeographicScope | "all"
 
-/** Client-side filter state for the trips list. Replaced by server queries later. */
+/**
+ * Client-side filter taps for the trips list.
+ *
+ * The backend owns search and status (its query already matches name/reference
+ * and status), so those two stay on the page as server-query state. Format,
+ * scope and destination are trimmed here on the server result only.
+ */
 export function useTripFilters(trips: Trip[]) {
-  const [search, setSearch] = useState("")
-  const [status, setStatus] = useState<TripStatusFilter>("all")
   const [format, setFormat] = useState<TripFormatFilter>("all")
   const [scope, setScope] = useState<TripScopeFilter>("all")
   const [destination, setDestination] = useState("")
@@ -31,40 +33,26 @@ export function useTripFilters(trips: Trip[]) {
   )
 
   const results = useMemo(() => {
-    const query = search.trim().toLowerCase()
     return trips.filter((trip) => {
-      const matchesSearch =
-        query === "" ||
-        trip.name.toLowerCase().includes(query) ||
-        trip.internalRef?.toLowerCase().includes(query)
-      const matchesStatus = status === "all" || trip.status === status
       const matchesFormat = format === "all" || trip.format === format
       const matchesScope = scope === "all" || trip.geographicScope === scope
       const matchesDestination =
         destination === "" ||
         trip.destinations.some((d) => d.name === destination)
-      return (
-        matchesSearch &&
-        matchesStatus &&
-        matchesFormat &&
-        matchesScope &&
-        matchesDestination
-      )
+      return matchesFormat && matchesScope && matchesDestination
     })
-  }, [trips, search, status, format, scope, destination])
+  }, [trips, format, scope, destination])
 
   const hasActiveFilters =
-    search !== "" ||
-    status !== "all" ||
-    format !== "all" ||
-    scope !== "all" ||
-    destination !== ""
+    format !== "all" || scope !== "all" || destination !== ""
+
+  const clear = () => {
+    setFormat("all")
+    setScope("all")
+    setDestination("")
+  }
 
   return {
-    search,
-    setSearch,
-    status,
-    setStatus,
     format,
     setFormat,
     scope,
@@ -74,5 +62,6 @@ export function useTripFilters(trips: Trip[]) {
     destinationOptions,
     results,
     hasActiveFilters,
+    clear,
   }
 }

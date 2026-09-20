@@ -16,16 +16,13 @@ import type * as Prisma from "../internal/prismaNamespace.js"
  * Model AuditLog
  * *
  *  * Security-relevant events, append-only.
- *  *
  *  * It exists so questions like "has the directory been probed?" or "who removed
  *  * that member?" have an answer. Rows are never updated or deleted by
  *  * application code.
- *  *
  *  * Deliberately NOT a foreign key to AppUser or Agency: an audit record must
  *  * survive the deletion of whatever it describes, and a cascade would erase
  *  * exactly the history an investigation needs. Actors and agencies are recorded
  *  * by their stable public `code`.
- *  *
  *  * `targetHash` carries a SHA-256 of a sensitive lookup term (for example a
  *  * searched email) so repeated probing is still correlatable without the log
  *  * itself becoming a second copy of the data being protected.
@@ -503,31 +500,38 @@ export type $AuditLogPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
     /**
-     * * Stable event name, e.g. PLATFORM_APP_USER_SEARCH, AGENCY_MEMBER_REMOVE.
+     * *
+     *    * Stable event name, e.g. PLATFORM_APP_USER_SEARCH, AGENCY_MEMBER_REMOVE.
      */
     action: string
     /**
-     * * SUCCESS | DENIED | FAILURE.
+     * *
+     *    * SUCCESS | DENIED | FAILURE.
      */
     outcome: string
     /**
-     * * The acting AppUser's public code; null for an unauthenticated attempt.
+     * *
+     *    * The acting AppUser's public code; null for an unauthenticated attempt.
      */
     actorCode: string | null
     /**
-     * * The agency the action happened in, when it was agency-scoped.
+     * *
+     *    * The agency the action happened in, when it was agency-scoped.
      */
     agencyCode: string | null
     /**
-     * * The subject's public code, when the action names one.
+     * *
+     *    * The subject's public code, when the action names one.
      */
     targetCode: string | null
     /**
-     * * SHA-256 of a sensitive term, never the term itself.
+     * *
+     *    * SHA-256 of a sensitive term, never the term itself.
      */
     targetHash: string | null
     /**
-     * * Small non-sensitive context (result counts, error codes).
+     * *
+     *    * Small non-sensitive context (result counts, error codes).
      */
     metadata: runtime.JsonValue | null
     createdAt: Date

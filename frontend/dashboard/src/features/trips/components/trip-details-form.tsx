@@ -424,7 +424,7 @@ export function TripDetailsForm({ form, fieldArrays }: TripDetailsFormProps) {
               </TripField>
 
               <TripField
-                label={t("trips:pricingEditor.basisLabel")}
+                label={t("trips:details.extras.basisLabel")}
                 htmlFor={`extras.${index}.basis`}
               >
                 <NativeSelect

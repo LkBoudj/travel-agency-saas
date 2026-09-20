@@ -9,10 +9,14 @@ import {
   translateOptions,
 } from "../constants/trip-taxonomy"
 import type {
-  TripStatusFilter,
-  TripFormatFilter,
-  TripScopeFilter,
-} from "../hooks/use-trip-filters"
+  TripStatus,
+  TripFormat,
+  GeographicScope,
+} from "../types/trip.types"
+
+export type TripStatusFilter = TripStatus | "all"
+export type TripFormatFilter = TripFormat | "all"
+export type TripScopeFilter = GeographicScope | "all"
 
 type TripsToolbarProps = {
   search: string

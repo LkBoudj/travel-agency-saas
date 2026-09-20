@@ -28,11 +28,11 @@ export const ROUTES = {
 export const AGENCY_ROUTES = {
   dashboard: "dashboard",
   trips: "trips",
-  tripDetails: "trips/:tripId",
+  tripDetails: "trips/:tourCode",
   bookings: "bookings",
   bookingDetails: "bookings/:bookingId",
   customers: "customers",
-  customerDetails: "customers/:customerId",
+  customerDetails: "customers/:customerCode",
   agency: "agency",
   team: "team",
   settings: "settings",

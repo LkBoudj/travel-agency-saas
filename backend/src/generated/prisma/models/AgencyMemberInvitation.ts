@@ -16,7 +16,6 @@ import type * as Prisma from "../internal/prismaNamespace.js"
  * Model AgencyMemberInvitation
  * *
  *  * A consent-based membership invitation, keyed to an EMAIL address.
- *  *
  *  * The invitation holds zero inside information: it records who invited whom
  *  * into which agency, the roles offered at creation time, and a 256-bit random
  *  * redemption token kept only as its SHA-256 hex digest (`tokenHash`). The
@@ -25,13 +24,12 @@ import type * as Prisma from "../internal/prismaNamespace.js"
  *  * AppUser on purpose: invitations must not probe whether an address is already
  *  * an account, so acceptance decides that in one interactive transaction instead
  *  * of at creation time.
- *  *
  *  * The database guarantees the lifecycle:
- *  *   agency_member_invitation_status_check  status in PENDING | ACCEPTED |
- *  *     REVOKED | EXPIRED
- *  *   agency_member_invitation_pending_agency_email_key  partial UNIQUE
- *  *     (agency_id, email) WHERE status = 'PENDING' — at most one outstanding
- *  *     invitation per address per agency
+ *  * agency_member_invitation_status_check  status in PENDING | ACCEPTED |
+ *  * REVOKED | EXPIRED
+ *  * agency_member_invitation_pending_agency_email_key  partial UNIQUE
+ *  * (agency_id, email) WHERE status = 'PENDING' — at most one outstanding
+ *  * invitation per address per agency
  */
 export type AgencyMemberInvitationModel = runtime.Types.Result.DefaultSelection<Prisma.$AgencyMemberInvitationPayload>
 

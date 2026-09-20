@@ -6,10 +6,12 @@ import arCommon from "./locales/ar/common.json"
 import arAuth from "./locales/ar/auth.json"
 import arTrips from "./locales/ar/trips.json"
 import arAgency from "./locales/ar/agency.json"
+import arCustomers from "./locales/ar/customers.json"
 import enCommon from "./locales/en/common.json"
 import enAuth from "./locales/en/auth.json"
 import enTrips from "./locales/en/trips.json"
 import enAgency from "./locales/en/agency.json"
+import enCustomers from "./locales/en/customers.json"
 
 /** Locales officially supported by the Dashboard. */
 export type AppLocale = "en" | "ar"
@@ -77,18 +79,20 @@ i18n
         auth: enAuth,
         trips: enTrips,
         agency: enAgency,
+        customers: enCustomers,
       },
       ar: {
         common: arCommon,
         auth: arAuth,
         trips: arTrips,
         agency: arAgency,
+        customers: arCustomers,
       },
     },
     lng: detectInitialLocale(),
     fallbackLng: "en",
     supportedLngs: LOCALES,
-    ns: ["common", "auth", "trips", "agency"],
+    ns: ["common", "auth", "trips", "agency", "customers"],
     defaultNS: "common",
     interpolation: { escapeValue: false },
   })

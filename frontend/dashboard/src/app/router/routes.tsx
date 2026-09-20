@@ -7,6 +7,7 @@ import { AgencySelectionPage } from "@/features/agency-context/pages/agency-sele
 import { LegacyRedirectPage } from "@/features/agency-context/pages/legacy-redirect-page"
 import { agencyRoutes } from "@/features/agency/routes/agency.routes"
 import { authRoutes } from "@/features/auth/routes/auth.routes"
+import { customerRoutes } from "@/features/customers/routes/customers.routes"
 import { DashboardPage } from "@/features/dashboard/pages/dashboard-page"
 import { memberRoutes } from "@/features/members/routes/members.routes"
 import { tripRoutes } from "@/features/trips/routes/trips.routes"
@@ -57,7 +58,7 @@ const authenticatedRoutes: RouteObject[] = [
               ...tripRoutes,
               ...agencyRoutes,
               placeholder(AGENCY_ROUTES.bookings, "Bookings"),
-              placeholder(AGENCY_ROUTES.customers, "Customers"),
+              ...customerRoutes,
               ...memberRoutes,
               placeholder(AGENCY_ROUTES.settings, "Settings"),
             ],

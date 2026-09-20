@@ -1,10 +1,9 @@
 import type { TripFormValues } from "../schemas/trip.schema"
-import { persistTrip, type CreateTripInput } from "../api/trips.api"
 
 /**
- * Draft utilities: clone, equality, empty draft, create-to-draft mapping,
- * and display-label helpers. Pure functions — no React, no i18n, no
- * persistence. Kept feature-local to trips.
+ * Draft utilities: clone, equality, and the empty draft used before a stored
+ * tour loads. Pure functions — no React, no i18n, no persistence. Kept
+ * feature-local to trips.
  */
 
 export function cloneDraft(draft: TripFormValues): TripFormValues {
@@ -15,7 +14,7 @@ export function draftsEqual(a: TripFormValues, b: TripFormValues): boolean {
   return JSON.stringify(a) === JSON.stringify(b)
 }
 
-/** Empty draft used as the default when loading an unknown trip id. */
+/** Empty draft used when no stored tour has loaded yet. */
 export function createEmptyDraft(): TripFormValues {
   return {
     status: "draft",
@@ -44,8 +43,6 @@ export function createEmptyDraft(): TripFormValues {
     description: "",
     highlights: [],
     itinerary: [],
-    pricingOptions: [],
-    departures: [],
     included: [],
     notIncluded: [],
     importantInformation: "",
@@ -56,23 +53,4 @@ export function createEmptyDraft(): TripFormValues {
     coverImageUrl: "",
     gallery: [],
   }
-}
-
-/**
- * Persist a create-trip payload (the 6-field form) as a new draft and return
- * its id + draft for navigation and toast. Canonical == saved copy.
- */
-export function persistCreatePayload(
-  input: CreateTripInput
-): { id: string; draft: TripFormValues } {
-  const defaults = createEmptyDraft()
-  return persistTrip(input, defaults)
-}
-
-/** Stable display label for the editor header / breadcrumb. */
-export function resolveTripLabel(
-  draft: TripFormValues | null,
-  fallback: string
-): string {
-  return draft?.name?.trim() || fallback
 }

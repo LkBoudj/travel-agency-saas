@@ -4,6 +4,8 @@
     "description": "أنشئ رحلاتك ونظّمها وأدرها.",
     "createTrip": "إنشاء رحلة",
     "clearFilters": "مسح عوامل التصفية",
+    "loading": "جارٍ تحميل الرحلات…",
+    "noTrips": "لا توجد رحلات بعد.",
     "resultCount_one": "رحلة واحدة",
     "resultCount_two": "رحلتان",
     "resultCount_few": "{{count}} رحلات",
@@ -39,6 +41,7 @@
     },
     "cancel": "إلغاء",
     "submit": "إنشاء رحلة",
+    "submitting": "جارٍ الإنشاء…",
     "successTitle": "تم إنشاء المسودة",
     "successDescription": "أكمل إعدادها من الأسفل."
   },
@@ -82,6 +85,7 @@
     },
     "recommended": {
       "title": "موصى به قبل النشر",
+      "pricing": "الأسعار",
       "meetingInstructions": "تعليمات الالتقاء",
       "themes": "المواضيع",
       "itinerary": "برنامج الرحلة"
@@ -131,6 +135,10 @@
     "description": "جرّب تعديل البحث أو عامل تصفية الوجهة.",
     "clearFilters": "مسح عوامل التصفية"
   },
+  "error": {
+    "loadFailed": "تعذّر تحميل الرحلات.",
+    "retry": "إعادة المحاولة"
+  },
   "editor": {
     "sections": {
       "overview": "نظرة عامة",
@@ -158,6 +166,9 @@
       "saveChanges": "حفظ التغييرات",
       "unsaved": "تغييرات غير محفوظة",
       "discard": "تجاهل"
+    },
+    "save": {
+      "successTitle": "تم حفظ التغييرات"
     },
     "publishGuard": {
       "title": "لم تعد هذه الرحلة جاهزة للنشر",
@@ -286,7 +297,6 @@
   "departureStatus": {
     "open": "مفتوح",
     "closed": "مغلق",
-    "sold_out": "نفدت المقاعد",
     "cancelled": "ملغى"
   },
   "pricingBasis": {
@@ -469,40 +479,123 @@
     "descriptionPlaceholder": "الوصول، النقل من المطار، تسجيل الدخول في الفندق...",
     "add": "إضافة يوم"
   },
-  "pricingEditor": {
-    "title": "خيارات الأسعار",
-    "helper": "فئات فقط — تُحدد الأسعار النهائية لكل انطلاق أدناه.",
-    "empty": "لا توجد خيارات أسعار بعد. أضف واحدًا مثل {{name}} أو {{alternate}}.",
-    "namePlaceholder": "بالغ",
-    "childPlaceholder": "طفل",
-    "nameAria": "اسم خيار السعر {{n}}",
-    "removeAria": "إزالة خيار السعر {{n}}",
-    "descriptionLabel": "الوصف",
-    "descriptionPlaceholder": "من سن 12 عامًا فما فوق",
-    "basisLabel": "الأساس",
-    "activeLabel": "فعال",
-    "add": "إضافة خيار سعر"
-  },
   "departures": {
     "title": "مواعيد الانطلاق",
-    "helper": "كل انطلاق هو موعد محدد له سعته وآخر موعد حجز وحالته وأسعاره.",
+    "helper": "كل موعد انطلاق هو حدوث مجدول واحد له سعته الخاصة وآخر موعد حجز وحالته.",
     "empty": "لا توجد مواعيد انطلاق بعد. أضف واحدًا لجدولة الرحلة.",
-    "departureLabel": "انطلاق {{n}}",
-    "statusAria": "حالة الانطلاق {{n}}",
-    "removeAria": "إزالة الانطلاق {{n}}",
-    "startLabel": "البداية (التاريخ والوقت)",
-    "startHelper": "يرى المسافرون وقت اليوم.",
-    "endLabel": "النهاية (التاريخ والوقت)",
-    "capacityLabel": "السعة",
-    "capacityPlaceholder": "40",
-    "deadlineLabel": "آخر موعد للحجز",
-    "pricesLabel": "الأسعار",
-    "noPriceHint": "أضف خيارات الأسعار أعلاه لتحديد أسعار الانطلاق.",
-    "priceAria": "سعر {{option}} للانطلاق {{n}}",
-    "notesLabel": "ملاحظات داخلية",
-    "notesHelper": "لا يظهر إلا لفريقك.",
-    "notesPlaceholder": "ملاحظات داخلية اختيارية لهذا الانطلاق.",
-    "add": "إضافة موعد انطلاق"
+    "departuresCount_one": "{{count}} موعد انطلاق",
+    "departuresCount_other": "{{count}} موعد انطلاق",
+    "create": "إضافة موعد انطلاق",
+    "loading": "جارٍ تحميل مواعيد الانطلاق…",
+    "retry": "إعادة المحاولة",
+    "publishedNoOpen": {
+      "title": "لا توجد مواعيد انطلاق مفتوحة",
+      "body": "هذه الرحلة منشورة لكن لا يمكن حجزها — وتحتاج الجدولة إلى موعد انطلاق مفتوح واحد على الأقل لكي تُحجز."
+    },
+    "columns": {
+      "status": "الحالة",
+      "start": "البداية",
+      "end": "النهاية",
+      "capacity": "السعة",
+      "deadline": "آخر موعد للحجز",
+      "actions": "إجراءات"
+    },
+    "deadlineNone": "بدون موعد للحجز",
+    "editAria": "تعديل {{name}}",
+    "cancelAria": "إلغاء {{name}}",
+    "pricesAria": "تحديد أسعار {{name}}",
+    "cancelTitle": "إلغاء هذا الموعد؟",
+    "cancelBody": "الإلغاء نهائي — يُغلق الموعد ولا يمكن إعادة فتحه أبدًا. لا تتغير الرحلة نفسها.",
+    "cancelConfirm": "إلغاء الموعد",
+    "cancelDialogCancel": "إبقاء الموعد",
+    "cancelSuccess": "تم إلغاء الموعد.",
+    "createSuccess": "تمت إضافة الموعد.",
+    "updateSuccess": "تم حفظ الموعد.",
+    "form": {
+      "createTitle": "إضافة موعد انطلاق",
+      "editTitle": "تعديل موعد الانطلاق",
+      "description": "يرى المسافرون التاريخ والوقت؛ آخر موعد للحجز هو موعد إغلاق الحجز.",
+      "startLabel": "البداية (التاريخ والوقت)",
+      "startHelper": "يرى المسافرون وقت اليوم.",
+      "endLabel": "النهاية (التاريخ والوقت)",
+      "capacityLabel": "السعة",
+      "deadlineLabel": "آخر موعد للحجز",
+      "deadlineHelper": "اختياري — يُغلق الحجز في هذا الموعد.",
+      "deadlineAfterStart": "لا يمكن أن يكون آخر موعد للحجز بعد موعد البداية.",
+      "statusLabel": "الحالة",
+      "notesLabel": "ملاحظات داخلية",
+      "notesHelper": "لا يظهر إلا لفريقك.",
+      "notesPlaceholder": "ملاحظات داخلية اختيارية لهذا الموعد.",
+      "cancel": "إلغاء",
+      "saving": "جارٍ الحفظ…",
+      "submitCreate": "إضافة موعد",
+      "submitEdit": "حفظ التغييرات"
+    }
+  },
+  "pricing": {
+    "title": "الأسعار",
+    "helper": "فئات العملاء مع سعر محدد على كل موعد انطلاق مفتوح.",
+    "create": "إضافة خيار سعر",
+    "loading": "جارٍ تحميل الأسعار…",
+    "retry": "إعادة المحاولة",
+    "empty": "لا توجد خيارات أسعار بعد. أضف فئات العملاء، ثم حدد سعرًا لكل فئة على كل موعد انطلاق مفتوح.",
+    "statusActive": "فعال",
+    "statusInactive": "غير فعال",
+    "summary": {
+      "optionsCount_one": "{{count}} خيار سعر",
+      "optionsCount_other": "{{count}} خيار سعر",
+      "startingPrice": "السعر الابتدائي:",
+      "noPrice": "لا يوجد سعر ابتدائي — حدد الأسعار على مواعيد الانطلاق المفتوحة.",
+      "pricedDepartures_one": "{{count}} موعد انطلاق مفتوح مُسعَّر",
+      "pricedDepartures_other": "{{count}} مواعيد انطلاق مفتوحة مُسعَّرة"
+    },
+    "columns": {
+      "name": "الاسم",
+      "basis": "الأساس",
+      "currency": "العملة",
+      "pricedDepartures": "المواعيد المُسعَّرة",
+      "status": "الحالة",
+      "actions": "إجراءات"
+    },
+    "editAria": "تعديل {{name}}",
+    "deactivateAria": "إلغاء تفعيل {{name}}",
+    "deactivateTitle": "إلغاء تفعيل هذا الخيار؟",
+    "deactivateBody": "تصبح الخيارات غير الفعالة جزءًا من السجل: لا يمكن تسعيرها بعد الآن، ولن تتضمن مجموعات الأسعار المستقبلية. لا يُحذف الخيار نفسه أبدًا.",
+    "deactivateConfirm": "إلغاء التفعيل",
+    "deactivateCancel": "إبقاء الخيار",
+    "deactivateSuccess": "تم إلغاء تفعيل خيار السعر.",
+    "createSuccess": "تمت إضافة خيار السعر.",
+    "updateSuccess": "تم حفظ خيار السعر.",
+    "form": {
+      "createTitle": "إضافة خيار سعر",
+      "editTitle": "تعديل خيار السعر",
+      "description": "تحدد فئات العملاء من يدفع وكيف. تُحدد الأسعار لكل موعد أدناه.",
+      "nameLabel": "الاسم",
+      "namePlaceholder": "بالغ",
+      "nameHelper": "تسمية قصيرة يتعرف عليها المسافرون، مثل: بالغ.",
+      "descriptionLabel": "الوصف",
+      "descriptionPlaceholder": "من سن 12 عامًا فما فوق",
+      "basisLabel": "الأساس",
+      "currencyHelper": "يُسعَّر بعملة الرحلة (دينار جزائري)، تُثبت عند إنشاء الخيار الأول.",
+      "cancel": "إلغاء",
+      "saving": "جارٍ الحفظ…",
+      "submitCreate": "إضافة الخيار",
+      "submitEdit": "حفظ التغييرات"
+    }
+  },
+  "departurePrices": {
+    "title": "أسعار {{departure}}",
+    "description": "سعر واحد لكل فئة عملاء. اترك الحقل فارغًا لإزالة ذلك السعر؛ يُحفظ المجموعة كاملة معًا.",
+    "loading": "جارٍ تحميل أسعار الموعد…",
+    "retry": "إعادة المحاولة",
+    "noOptions": "لا توجد خيارات أسعار فعالة لتسعيرها. أضف خيارًا في قسم الأسعار أولًا.",
+    "amountPlaceholder": "0.00",
+    "amountAria": "سعر {{name}} بعملة {{currency}}",
+    "cancel": "إلغاء",
+    "saving": "جارٍ الحفظ…",
+    "submit": "حفظ الأسعار",
+    "success": "تم حفظ أسعار الموعد.",
+    "clearSuccess": "تم مسح أسعار الموعد."
   },
   "availabilityInfo": {
     "helper": "لا تُنشأ مواعيد انطلاق مجدولة لهذا الوضع.",
@@ -548,6 +641,7 @@
     "extras": {
       "title": "الخدمات الإضافية",
       "helper": "إضافات اختيارية يمكن شراؤها مع الرحلة.",
+      "basisLabel": "أساس التسعير",
       "empty": "لا توجد خدمات إضافية بعد. أضف واحدة لتقديم إضافات اختيارية.",
       "nameLabel": "الاسم",
       "namePlaceholder": "خدمة كبار الشخصيات في المطار",
@@ -597,6 +691,10 @@
     "dayTitleRequired": "عنوان اليوم مطلوب",
     "locationRequired": "الموقع مطلوب",
     "pricingOptionNameRequired": "اسم خيار السعر مطلوب",
+    "pricingOptionNameMax": "اقصِره على 100 حرف",
+    "pricingOptionDescriptionMax": "اقصِره على 500 حرف",
+    "pricePositive": "يجب أن يكون السعر رقمًا موجبًا",
+    "priceDecimals": "استخدم منزلتين عشريتين كحد أقصى",
     "itemRequired": "العنصر مطلوب",
     "extraNameRequired": "اسم الخدمة الإضافية مطلوب",
     "priceNotNegative": "لا يمكن أن يكون السعر سالبًا",

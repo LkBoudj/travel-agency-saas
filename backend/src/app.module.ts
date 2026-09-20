@@ -12,6 +12,11 @@ import { AgencyApplicationsModule } from './agency-applications/agency-applicati
 import { MeModule } from './me/me.module.js';
 import { AgencyMembersModule } from './agency-members/agency-members.module.js';
 import { MemberInvitationsModule } from './member-invitations/member-invitations.module.js';
+import { CustomersModule } from './customers/customers.module.js';
+import { ToursModule } from './tours/tours.module.js';
+import { DeparturesModule } from './departures/departures.module.js';
+import { PricingModule } from './pricing/pricing.module.js';
+import { BookingsModule } from './bookings/bookings.module.js';
 import { AgencyAccessModule } from './agency-access/agency-access.module.js';
 import { AgenciesModule } from './agencies/agencies.module.js';
 import { RbacModule } from './rbac/rbac.module.js';
@@ -30,6 +35,11 @@ import { RbacModule } from './rbac/rbac.module.js';
     AgencyAccessModule,
     AgencyMembersModule,
     MemberInvitationsModule,
+    CustomersModule,
+    ToursModule,
+    DeparturesModule,
+    PricingModule,
+    BookingsModule,
     MeModule,
   ],
   controllers: [AppController],

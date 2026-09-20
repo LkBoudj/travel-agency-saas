@@ -29,6 +29,27 @@ PENDING for the backend.
   idempotent seed and Swagger, on top of the Identity + RBAC database
   foundation and M2, plus Platform User CRUD + platform-role assignment +
   ACTIVE/SUSPENDED status (see [PLATFORM_USERS]).
+- Customers vertical slice (backend + frontend/dashboard) complete:
+  agency-scoped `customer` model, REST CRUD + one-way archive under
+  `/v1/agencies/:agencyCode/customers`, and the Agency Dashboard Customers
+  feature (list/search/create/edit/archive/details, i18n EN+AR) — see
+  [CUSTOMERS].
+- Tours vertical slice (backend + frontend/dashboard) complete (Module F):
+  agency-scoped `tour` aggregate with ordered destinations + itinerary,
+  REST CRUD + explicit publish/unpublish + one-way archive under
+  `/v1/agencies/:agencyCode/tours`, and the Agency Dashboard Trips feature
+  wired to it (list/create/editor/readiness) — see [AGENCY_TOURS].
+- Departures vertical slice (backend + frontend/dashboard) complete (Module G):
+  per-tour scheduled occurrences under `/v1/agencies/:agencyCode/tours/:tourCode/departures`,
+  with a live Dashboard DeparturesManager — see [AGENCY_DEPARTURES].
+  Module G scope: pricing options (Module H) are still NOT part of the Tour
+  contract; a SCHEDULED tour publishes only while it has ≥ 1 OPEN departure.
+- Pricing vertical slice (backend + frontend/dashboard) complete (Module H):
+  tour-owned pricing options + per-departure whole-set prices under
+  `/v1/agencies/:agencyCode/tours/:tourCode/pricing-options` (and
+  `.../departures/:departureCode/prices`), single currency per tour,
+  one-way deactivate, with a live Dashboard PricingManager + per-departure
+  price dialogs and a real `startingPrice` — see [AGENCY_PRICING].
 
 ### Group 1 closure verification (verified reality)
 
@@ -67,6 +88,16 @@ The former M1 baseline checks are now executed and passing:
   self-suspension → 400 `CANNOT_SUSPEND_OWN_ACCOUNT`, suspend → login 401 and
   previously issued JWT 401, reactivate → login 200, no `passwordHash`/`id`
   leakage; synthetic verification users removed afterwards
+- Customers slice — `npm test`: 382 tests pass (21 files), lint 0 errors,
+  build passes. The 20 customers controller specs (in-memory) cover tenant
+  scoping (foreign/unknown `CUS-` code → 404), create with partial data
+  (blank → `null`, email trimmed + lowercased), update clear-semantics,
+  one-way archive + 409 `CUSTOMER_ALREADY_ARCHIVED`, list search and
+  pagination-free ACTIVE-only ordering. Throwaway real-Neon smoke: create →
+  archived record leaves the listing but stays readable by code; raw SQL
+  `UPDATE customer SET status='BOGUS'` rejected by `customer_status_check`
+  (temporary spec/scripts removed, no residue). Migration applied — 16
+  total, `migrate status` "up to date", `migrate diff` "No difference".
 
 ## [SELECTED_STACK]
 
@@ -193,7 +224,11 @@ Nest routes
   `20260916103945_refine_rbac_identifiers`, `20260916104751_role_scope_name_unique`,
   `20260916195827_platform_role_assignment`, `20260917051422_scoped_platform_permissions`,
   `20260917061114_role_agency_ownership`, `20260917071337_add_role_key`,
-  `20260917100000_add_app_user_status`.
+  `20260917100000_add_app_user_status`,
+  `20260919191328_agency_customers`,
+  `20260920100000_tours_module`,
+  `20260920101000_tour_origin`,
+  `20260920120000_departures_module`.
   Customized migration history:
   manually adds `CREATE EXTENSION IF NOT EXISTS citext;` and the
   `role_scope_check` / `permission_scope_check` CHECK constraints
@@ -209,6 +244,44 @@ Nest routes
   backfills legacy rows and renames legacy key `X` → `PLATFORM_<RESOURCE>_<ACTION>`
   in two phases so existing `role_permission` links (which reference
   `permission.id`) are preserved.
+- `20260919191328_agency_customers` adds the agency-owned `customer` table:
+  BIGSERIAL id, `code` VARCHAR(24) UNIQUE (backend-generated `CUS-…`,
+  `generateCustomerCode()` = `CUS-` + 6 crypto.randomBytes hex chars),
+  non-null `agency_id` BIGINT FK → `agency` ON DELETE CASCADE (indexed),
+  nullable `first_name`/`last_name` VARCHAR(100), nullable `email` CITEXT
+  (NOT unique — a customer record is a record, not an identity), nullable
+  `phone` VARCHAR(32), nullable `notes` TEXT (length capped at 2000 by the
+  request schema), `status` VARCHAR(16) NOT NULL DEFAULT 'ACTIVE' pinned by
+  the hand-added `customer_status_check` CHECK constraint to
+  ACTIVE | ARCHIVED, timestamptz created_at/updated_at. Comment convention
+  matches the other customized migrations.
+- `20260920100000_tours_module` adds the agency-owned `tour` aggregate and its
+  two ordered children. `tour`: code `TUR-…` (`generateTourCode()`, unique),
+  agency_id FK → `agency` ON DELETE CASCADE (indexed), name, optional internal_ref,
+  format/scopes/availability/participation/guidance enum strings, days/nights/hours,
+  is_flexible, min_travelers, languages/themes/activities/audiences/
+  transport_modes/accommodation_types string arrays, `activity_requirements`
+  Json, short_description/description, highlights/included/not_included Json,
+  important_information/cancellation_policy/meeting_point/meeting_instructions,
+  cover_image_url, gallery Json, `status` pinned to DRAFT | PUBLISHED | ARCHIVED
+  by `tour_status_check`. `tour_destination` (position, wilaya_code, locality,
+  place; unique `(tour_id, position)`) and `tour_itinerary_day` (position,
+  title, location, description; unique `(tour_id, position)`) cascade with the
+  tour.
+- `20260920101000_tour_origin` adds the JSON `origin` column (wilayaCode /
+  cityId / place) on `tour` for the trip origin location.
+- `20260920120000_departures_module` adds the per-tour `departure` table:
+  BIGSERIAL id, `code` VARCHAR(24) UNIQUE (backend-generated `DEP-…`,
+  `generateDepartureCode()` = `DEP-` + 6 crypto.randomBytes hex chars),
+  non-null `tour_id` BIGINT FK → `tour` ON DELETE CASCADE (indexed)
+  — the Departure is scoped through its tour, never by its own agency_id —
+  non-null timestamptz `start_at`/`end_at`, `capacity` integer NOT NULL,
+  nullable timestamptz `booking_deadline`, nullable `notes` TEXT,
+  `status` VARCHAR(16) NOT NULL DEFAULT 'OPEN' pinned by the hand-added
+  `departure_status_check` CHECK constraint to OPEN | CLOSED | CANCELLED,
+  timestamptz created_at/updated_at. Three more hand-added CHECKs:
+  `departure_end_after_start_check`, `departure_capacity_check`
+  (capacity > 0), `departure_deadline_before_start_check`.
 - Migrations: `prisma/migrations/` existing; migration order authoritative.
 - Seed: `prisma/seed.ts` (`seedRbacBootstrap`, run via `prisma db seed` →
   `prisma/seed.command.ts` → Vitest, wrapped in one interactive transaction
@@ -373,7 +446,8 @@ and results are capped at `APP_USER_LOOKUP_LIMIT`. The response carries only
 NOT in this slice (deferred): AgencyPermissionsService / AgencyPermissionGuard /
 agency CASL / agency-scoped request authorization, member management (add,
 remove, suspend employee, change membershipType), transfer ownership,
-customer model and customer counts.
+customer counts (the Customer model itself is implemented later — see
+[CUSTOMERS]).
 
 ## [AGENCY_MEMBERS]
 
@@ -485,6 +559,232 @@ and any frontend. Verified by 46 unit/HTTP tests (in-memory), plus a throwaway
 real-DB HTTP smoke covering all 20 required behavioral points (cleaned up, no
 residue: re-verified 0 rows after).
 
+## [CUSTOMERS]
+
+IMPLEMENTED (backend + Agency Dashboard). Agency business customer records —
+a Customer is deliberately NOT an identity: no `app_user` link, no
+credentials, no database id in the API contract. The only stable external key
+is the backend-generated `code` (`CUS-…`).
+
+Database (migration `20260919191328_agency_customers`, see [PRISMA]):
+`customer` table with `agency_id` FK → `agency` ON DELETE CASCADE, nullable
+contact fields, CITEXT email (not unique), and `status` constrained to
+ACTIVE | ARCHIVED by `customer_status_check`.
+
+Routes, all under `/v1/agencies/:agencyCode/customers`, guarded by
+`JwtAuthGuard` + `AgencyPermissionGuard`; every query is re-scoped by the
+route's resolved `agency_id`:
+
+- `GET   customers?search=` (`AGENCY_CUSTOMER_VIEW`) — ACTIVE only, newest
+  first; search matches code / first name / last name / email / phone
+  (insensitive contains)
+- `GET   customers/:customerCode` (`AGENCY_CUSTOMER_VIEW`) — archived records
+  stay readable, so a stored link to a customer keeps working
+- `POST  customers` (`AGENCY_CUSTOMER_CREATE`) — all fields optional; blank →
+  `null`, email trimmed + lowercased by `normalizeCustomerEmail`
+- `PATCH customers/:customerCode` (`AGENCY_CUSTOMER_UPDATE`) — partial
+  update: omitted fields untouched, `null`/blank clears
+- `PATCH customers/:customerCode/archive` (`AGENCY_CUSTOMER_ARCHIVE`) —
+  one-way soft-delete; re-archiving → 409 `CUSTOMER_ALREADY_ARCHIVED`
+
+Error contract: `CUSTOMER_NOT_FOUND` (404, tenant-scoped — a foreign or
+stale `CUS-` code never leaks existence), `CUSTOMER_ALREADY_ARCHIVED` (409).
+Every mutation writes an `AGENCY_CUSTOMER_CREATED/UPDATED/ARCHIVED` audit
+event. The four permissions are pre-existing catalog entries — no RBAC change
+was needed. Swagger documents the module.
+
+Frontend (`frontend/dashboard` customers feature): list page with backend
+search (debounced) + shared create/edit form dialog, a details route keyed by
+the `CUS-` code (`customers/:customerCode`), edit dialog, and one-way archive
+through `ConfirmDialog`. Row actions and buttons are gated on
+`AGENCY_CUSTOMER_VIEW/CREATE/UPDATE/ARCHIVE` via `useCustomerCapabilities`
+(UX only — the backend guards are authoritative). Pure display/payload/action
+helpers are covered by Node's built-in `node --test` (23 customer specs; 100
+across the app). UI strings live in a dedicated `customers` i18n namespace
+(EN + AR, RTL-correct). No restore is offered anywhere: an archived customer
+leaves the listing and only its details page (by code) still resolves it.
+
+NOT in this slice: linking Customers to Bookings (Module I), customer counts
+in platform views, custom field sets.
+
+## [AGENCY_TOURS]
+
+IMPLEMENTED (backend + Agency Dashboard) — Module F of the trips roadmap. The
+reusable travel product aggregate for ONE agency; the Dashboard calls it a
+Trip at the UI layer. Children are stored ordered (position 0..n) and are
+fully owned by the aggregate.
+
+Database (migrations `20260920100000_tours_module`,
+`20260920101000_tour_origin`, see [PRISMA]): `tour` (TUR-… code, agency_id FK
+cascade, status DRAFT | PUBLISHED | ARCHIVED via `tour_status_check`) with
+`tour_destination` (position, wilaya_code, locality, place) and
+`tour_itinerary_day` (position, title, location, description) children —
+both with unique `(tour_id, position)`. The wire uses `cityId` for the
+stored `locality` column.
+
+Routes, all under `/v1/agencies/:agencyCode/tours`, guarded by `JwtAuthGuard` +
+`AgencyPermissionGuard`; every query is re-scoped by the route's resolved
+`agency_id`, so a foreign or stale `TUR-` code is a 404 and never leaks
+existence:
+
+- `GET   tours?search=&status=` (`AGENCY_TOUR_VIEW`) — newest first, ARCHIVED
+  excluded unless `status=ARCHIVED`; search matches code / name / internalRef /
+  destination locality/place (insensitive contains)
+- `GET   tours/:tourCode` (`AGENCY_TOUR_VIEW`) — archived stay readable
+- `POST  tours` (`AGENCY_TOUR_CREATE`) — always lands DRAFT; the backend never
+  auto-publishes
+- `PUT   tours/:tourCode` (`AGENCY_TOUR_UPDATE`) — full aggregate replacement
+  in ONE transaction: scalar fields overwritten, destinations + itinerary
+  deleted and re-created (positions 0..n)
+- `POST  tours/:tourCode/publish` (`AGENCY_TOUR_PUBLISH`) — explicit only;
+  idempotent when already PUBLISHED; runs a server-side readiness gate
+- `POST  tours/:tourCode/unpublish` (`AGENCY_TOUR_PUBLISH`) — idempotent when
+  already DRAFT
+- `PATCH tours/:tourCode/archive` (`AGENCY_TOUR_DELETE`) — one-way, like
+  customers
+
+Publish readiness gate (`computeTourPublishBlockers`, Module F + G): what the Tour
+aggregate itself owns — NAME, a resolved DESTINATION (domestic → wilayaCode,
+international → place), SHORT_DESCRIPTION, COVER_IMAGE, and
+SCHEDULED_DEPARTURES_REQUIRED, which now counts OPEN departures through the
+Departures module: a SCHEDULED tour publishes only while it holds ≥ 1 OPEN
+departure (CLOSED / CANCELLED don't count) — see [AGENCY_DEPARTURES]. Pricing is
+NOT checked (Module H). ON_REQUEST / CUSTOM_QUOTE publish once the Tour-owned
+required fields are ready. Blocked publish → 409
+`TOUR_PUBLISH_READINESS_BLOCKED` (with `metadata.blockers`); archived cannot be
+(un)published → 409 `TOUR_PUBLISH_STATE_BLOCKED`; re-archiving → 409
+`TOUR_ALREADY_ARCHIVED`; a foreign or stale `TUR-` code → 404 `TOUR_NOT_FOUND`
+(tenant-scoped, never leaks existence). Publishing an already-PUBLISHED tour is
+idempotent, so an already-published tour stays PUBLISHED even if its last open
+departure is later closed or cancelled — the readiness gate guards the
+transition, it never retroactively unpublishes.
+
+Every mutation writes an `AGENCY_TOUR_CREATED/UPDATED/PUBLISHED/UNPUBLISHED/
+ARCHIVED` audit event. The five permissions (`AGENCY_TOUR_VIEW/CREATE/UPDATE/
+DELETE/PUBLISH`) are pre-existing catalog entries, consumed by the
+`AGENCY_TOUR_MANAGER` preset — no RBAC change was needed. Swagger documents the
+module. Verified by 25 controller specs (in-memory) covering tenant scoping,
+lifecycle transitions and the readiness gate.
+
+NOT in this slice: pricing options (Module H); status is never part of the write
+payload — it moves only through the explicit publish/unpublish/archive actions.
+
+## [AGENCY_DEPARTURES]
+
+IMPLEMENTED (backend + Agency Dashboard) — Module G of the trips roadmap. One
+departure = one scheduled occurrence of a tour, with its own timing, capacity,
+optional booking deadline, status and notes. Departures live under their tour:
+`/v1/agencies/:agencyCode/tours/:tourCode/departures`, so a Departure never
+carries an agency_id — tenancy resolves through the route's tour, and a foreign
+or stale `TUR-` / `DEP-` code is a 404 that never leaks existence.
+
+Database (migration `20260920120000_departures_module`, see [PRISMA]):
+`departure` table as described above, with start/end timestamptz, capacity > 0,
+deadline ≤ start, and status pinned to OPEN | CLOSED | CANCELLED by CHECKs.
+
+Routes, guarded by `JwtAuthGuard` + `AgencyPermissionGuard`:
+
+- `GET   .../departures` (`AGENCY_DEPARTURE_VIEW`) — newest first; optional
+  `?status=` filter; cancelled departures stay listed
+- `GET   .../departures/:departureCode` (`AGENCY_DEPARTURE_VIEW`)
+- `POST  .../departures` (`AGENCY_DEPARTURE_CREATE`) — always lands OPEN; the
+  backend never accepts a client `status`, `tourId` or `agencyId` (zod
+  `.strict()` → 400) and never auto-publishes the tour
+- `PUT   .../departures/:departureCode` (`AGENCY_DEPARTURE_UPDATE`) — full
+  replacement of the operational fields + optional status (OPEN ↔ CLOSED);
+  CANCELLED edits → 409 `DEPARTURE_ALREADY_CANCELLED`
+- `POST  .../departures/:departureCode/cancel` (`AGENCY_DEPARTURE_DELETE`) —
+  one-way OPEN/CLOSED → CANCELLED; repeat cancel → 409
+  `DEPARTURE_ALREADY_CANCELLED`; returns `{ departure, tourStatus,
+  remainingOpenDepartures }`; the Tour status is NEVER touched — cancelling the
+  last open departure of a PUBLISHED tour leaves it PUBLISHED (the UI warns
+  instead)
+
+`status`/`tourId`/`agencyId` are never part of any write payload. Errors:
+`DEPARTURE_NOT_FOUND` (404), `DEPARTURE_ALREADY_CANCELLED` (409), 400
+validation, 403 missing permissions. Every create/update/cancel writes an
+`AGENCY_DEPARTURE_CREATED/UPDATED/CANCELLED` audit event (cancel carries
+`{ tourCode, tourStatus, remainingOpenDepartures }`). The four permissions
+(`AGENCY_DEPARTURE_VIEW/CREATE/UPDATE/DELETE`) are pre-existing catalog
+entries — no RBAC catalog change was needed. Swagger documents the module.
+Verified by 18 controller specs (in-memory) covering tenant scoping, the strict
+payload boundary, status transitions, one-way cancel and the never-touch-the-tour
+invariant.
+
+NOT in this slice: per-departure prices by PricingOption (Module H); capacity's
+booked-seats count and sold-out states (Bookings module).
+
+## [AGENCY_PRICING]
+
+IMPLEMENTED (backend + Agency Dashboard) — Module H of the trips roadmap. A
+PricingOption is a tour-owned customer category definition (`Adult`, `Child`,
+…): name, optional description, charging `basis` (`per_person` |
+`per_booking`) and currency. The actual money lives on DeparturePrice — one
+amount per (departure, option) — managed as a whole set per departure. Routes
+live under the tour: `/v1/agencies/:agencyCode/tours/:tourCode`, so tenancy
+resolves through the route's tour and a foreign/stale `TUR-` / `PRC-` /
+`DEP-` code is a 404 that never leaks existence.
+
+Database (migration `20260920130000_pricing_module`, see [PRISMA]):
+`pricing_option` (code `PRC-…`, name/description/basis/currency, status pinned
+to ACTIVE | INACTIVE by CHECK, tenant-scoped via composite super-key) and
+`departure_price` (composite PK `(departure_id, pricing_option_id)`, amount
+`DECIMAL(12,2)` ≥ 0). One currency per tour: set at the first option's
+creation (backend default `DZD` when omitted), immutable after, and enforced
+by the service across every option and price of the tour.
+
+Routes, guarded by `JwtAuthGuard` + `AgencyPermissionGuard`:
+
+- `GET   .../pricing-options` (`AGENCY_PRICING_VIEW`) — pricing overview:
+  options (newest first, both statuses) + derived `startingPrice` (minimum
+  amount across the tour's OPEN departures, `null` when none) +
+  `pricedOpenDepartureCount` (distinct OPEN departures carrying ≥ 1 price);
+  this one response drives the dashboard's pricing section and readiness panel
+- `GET   .../pricing-options/:optionCode` (`AGENCY_PRICING_VIEW`) — deactivated
+  options stay readable so stored `PRC-…` links keep working
+- `POST  .../pricing-options` (`AGENCY_PRICING_MANAGE`) — always lands ACTIVE;
+  `code` is backend-generated and never accepted; bodies are zod `.strict()`
+  (a client `status`, `tourId` or `agencyId` → 400); optional `currency`
+  (uppercase 3-letter) is checked against the tour's existing currency
+- `PUT   .../pricing-options/:optionCode` (`AGENCY_PRICING_MANAGE`) — full
+  replacement of name/description/basis; currency is immutable after creation
+  and status moves only through deactivate; editing a deactivated option → 409
+  `PRICING_OPTION_INACTIVE`
+- `POST  .../pricing-options/:optionCode/deactivate` (`AGENCY_PRICING_MANAGE`)
+  — one-way terminal action like archiving a tour: ACTIVE → INACTIVE, repeat
+  cancel → 409 `PRICING_OPTION_ALREADY_INACTIVE`; there is no hard delete, and
+  prices already stored on departures stay (history only, never re-offerable)
+- `GET   .../departures/:departureCode/prices` (`AGENCY_PRICING_VIEW`) — the
+  departure's stored set (cancelled departures included); a never-priced
+  departure returns `{ departureCode, currency: null, prices: [] }`
+- `PUT   .../departures/:departureCode/prices` (`AGENCY_PRICING_MANAGE`) —
+  whole-set replacement in one transaction (like the tour aggregate's
+  children): option codes omitted from the payload drop out, present ones are
+  (re)created with their amount. Every code must belong to the same tour and
+  be ACTIVE (`PRICING_OPTION_INACTIVE` 409) and amounts share one currency
+  (`PRICING_CURRENCY_MISMATCH` 409); a cancelled departure is locked
+  (`DEPARTURE_ALREADY_CANCELLED` 409)
+
+Errors: `PRICING_OPTION_NOT_FOUND` / `DEPARTURE_NOT_FOUND` (404, tenant-
+scoped), `PRICING_OPTION_NAME_TAKEN` (409, one name per tour),
+`PRICING_OPTION_INACTIVE`, `PRICING_OPTION_ALREADY_INACTIVE`,
+`PRICING_CURRENCY_MISMATCH`, `DEPARTURE_ALREADY_CANCELLED` (409), 400
+validation, 403 missing permissions. Every mutation writes an
+`AGENCY_PRICING_OPTION_CREATED / UPDATED / DEACTIVATED` or
+`AGENCY_DEPARTURE_PRICES_REPLACED` audit event (replace carries `{ tourCode,
+optionCount, currency }`). The two permissions (`AGENCY_PRICING_VIEW` /
+`AGENCY_PRICING_MANAGE`) are pre-existing catalog entries — no RBAC catalog
+change. Swagger documents the module. The Tour publish gate is unchanged:
+pricing is still never required for publishing (recommended on the dashboard
+only). Verified by controller specs (in-memory) covering tenant scoping, the
+strict payload boundary, single-currency enforcement, name uniqueness, the
+one-way deactivate transition, whole-set replacement and the never-touch-the-
+tour invariant.
+
+NOT in this slice: seat consumption / sold-out states (Bookings module),
+promotions and exchange-rate logic (explicitly out of MVP), Tour publish-gate
+integration.
+
 ## [AGENCY_AUTHORIZATION]
 
 IMPLEMENTED. Makes AGENCY permissions enforceable inside one specific agency,
@@ -537,7 +837,8 @@ its UI; every route stays enforced server-side. Database ids, `systemKey` and
 role-permission internals are not exposed.
 
 NOT in this slice: agency member management, invitations, custom role CRUD,
-ownership transfer, and any agency business feature.
+ownership transfer, and any agency business feature beyond the Customers and
+Tours slices (see [CUSTOMERS] and [AGENCY_TOURS]).
 
 ## [PLATFORM_AUTHORIZATION]
 
@@ -767,11 +1068,65 @@ existing HttpOnly cookie stops working immediately after suspension.
   with `targetHash` and metadata never carrying token/tokenHash/password;
   migration `20260919150000_agency_member_invitation` applied (no drift);
   46 unit/HTTP tests + throwaway real-DB smoke (20 points) passed
+- Customers vertical slice (IMPLEMENTED, backend + dashboard): see [CUSTOMERS] —
+  agency-scoped `customer` model (migration `20260919191328_agency_customers`
+  applied, no drift), `AGENCY_CUSTOMER_*`-guarded REST CRUD + one-way archive
+  under `/v1/agencies/:agencyCode/customers` with `CUSTOMER_NOT_FOUND` /
+  `CUSTOMER_ALREADY_ARCHIVED`, blank→`null` + email normalization,
+  `AGENCY_CUSTOMER_*` audit events and Swagger; 20 controller specs (425 total
+  backend tests) + a throwaway real-Neon smoke incl. the `customer_status_check`
+  CHECK rejection; dashboard list/search/create/edit/archive/details in a
+  dedicated EN+AR `customers` namespace with 23 Node `node --test` specs
+- Tours vertical slice (IMPLEMENTED, backend + dashboard): see [AGENCY_TOURS] —
+  agency-scoped `tour` aggregate + ordered `tour_destination` /
+  `tour_itinerary_day` children (migrations `20260920100000_tours_module` and
+  `20260920101000_tour_origin` applied, no drift), `AGENCY_TOUR_*`-guarded
+  REST CRUD + explicit publish/unpublish + one-way archive under
+  `/v1/agencies/:agencyCode/tours`, never auto-publishes, server-side publish
+  readiness gate (SCHEDULED publishes only while it holds ≥ 1 OPEN departure —
+  Module G; pricing not required until Module H), `TOUR_NOT_FOUND` /
+  `TOUR_PUBLISH_READINESS_BLOCKED`
+  / `TOUR_PUBLISH_STATE_BLOCKED` / `TOUR_ALREADY_ARCHIVED`, `AGENCY_TOUR_*`
+  audit events and Swagger; 25 controller specs; dashboard Trips feature
+  rewired to the real API (list/create/editor/:tourCode) with its dev
+  in-memory repo removed
+- Departures vertical slice (IMPLEMENTED, backend + dashboard): see [AGENCY_DEPARTURES] —
+  per-tour `departure` rows (migration `20260920120000_departures_module`
+  applied, no drift), `AGENCY_DEPARTURE_*`-guarded REST CRUD + one-way cancel
+  under `/v1/agencies/:agencyCode/tours/:tourCode/departures`, always-OPEN on
+  create, status OPEN | CLOSED | CANCELLED (zod `.strict()` rejects client
+  status/tourId/agencyId), button-checked end/server deadlines, cancel never
+  touches `tour.status` and returns `remainingOpenDepartures`,
+  `DEPARTURE_NOT_FOUND` / `DEPARTURE_ALREADY_CANCELLED`,
+  `AGENCY_DEPARTURE_*` audit events and Swagger; 18 controller specs; dashboard
+  Departures & Pricing section now runs a live DeparturesManager
+  (list/create/edit/cancel, upper-case status badges, cancel confirmation,
+  PUBLISHED-with-no-OPEN warning, readiness fed by the real open count);
+  embedded draft `departures` stripped from the Tour form/draft/payload
+- Pricing vertical slice (IMPLEMENTED, backend + dashboard): see [AGENCY_PRICING] —
+  `pricing_option` + `departure_price` rows (migration
+  `20260920130000_pricing_module`), `AGENCY_PRICING_VIEW`/`MANAGE`-guarded
+  REST: options CRUD-overview + one-way deactivate under
+  `/v1/agencies/:agencyCode/tours/:tourCode/pricing-options`, whole-set price
+  replacement under `.../departures/:departureCode/prices`, single forced
+  currency per tour (default `DZD`, immutable after first option), zod
+  `.strict()` reject of client status/tour/agency refs, `startingPrice` +
+  `pricedOpenDepartureCount` derived in the overview, `PRICING_OPTION_*` /
+  `PRICING_CURRENCY_MISMATCH` errors, `AGENCY_PRICING_*` + prices audit events
+  and Swagger; Tour list/create/get now carry `startingPrice`; publish gate
+  still ignores pricing. Dashboard runs a live PricingManager (options
+  create/edit/one-way deactivate, starting-price summary), per-departure
+  DeparturePricesDialog (whole-set PUT, clear-by-empty), readiness pricing
+  item fed by the real overview, and `trips:details.extras.basisLabel`
+  repointed after the draft `pricing-options-editor` was deleted
 
 NOT implemented: `GET /health`, api-contract, tenant enforcement beyond the
 RBAC/membership guards above, business models beyond
 `app_user`/`role`/`permission`/`role_permission`/
-`platform_role_assignment`/`agency`/`agency_membership`/invitations. The Group 1
+`platform_role_assignment`/`agency`/`agency_membership`/invitations/`customer`/
+`tour`/`tour_destination`/`tour_itinerary_day`/`departure`/`pricing_option`/
+`departure_price`.
+The Group 1
 backend RBAC slice (canonical scoped permission catalog, default role presets,
 PLATFORM Role CRUD, Global Agency Role CRUD, available-permissions, Role↔Permission
 API, CASL-backed guard, idempotent seed, Swagger, role ownership schema

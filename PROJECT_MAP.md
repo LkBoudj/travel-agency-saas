@@ -23,8 +23,13 @@ anonymous travelers, platform operators.
                   Agency Foundation (Agency lifecycle + explicit OWNER/EMPLOYEE
                   membership + database-enforced ownership invariants)
                   implemented — see [PLATFORM_ADMIN] and [AGENCY_OWNERSHIP].
-                  Agency-scoped authorization and agency member management are
-                  NOT implemented.
+                  Agency-side authorization (AGENCY permission guard), member
+                  management + invitations, the Customers vertical slice
+                  (backend + Dashboard) and the Tours vertical slice
+                  (backend + Dashboard) are IMPLEMENTED — see backend/
+                  backend_PROJECT_MAP.md [AGENCY_AUTHORIZATION],
+                  [AGENCY_MEMBERS], [MEMBER_INVITATIONS], [CUSTOMERS] and
+                  [AGENCY_TOURS].
 - frontend/dashboard/    React SPA — agency management only; does NOT render the
                          public storefront.
 - frontend/storefront/   Next.js 16.3.5 App Router PUBLIC STOREFRONT — one app,
@@ -64,8 +69,10 @@ anonymous travelers, platform operators.
 Platform-owned: User, Theme{id,nameKey,version,preview,settingsSchema},
 theme-specific settings schema. Agency (tenant) owns: Agency, Membership(role),
 AgencyProfile, AgencySettings, Storefront{slug,enabled,themeId,branding,
-themeSettings}, Trip(overview/itinerary/pricingOptions/media), Departure(dates/
-capacity/deadline/status + prices by pricingOptionId), Booking(→departure,
+themeSettings}, Trip(=backend Tour, overview/itinerary/media owned today;
+pricing options Module H, departures Module G), Departure(dates/
+capacity/deadline/status OPEN|CLOSED|CANCELLED + prices by pricingOptionId —
+Module H), Booking(→departure,
 snapshot), Customer, Media. Trip ≠ Departure. Prices are departure-specific.
 Composite super-keys (agency_id,id) on tenant tables.
 
@@ -175,6 +182,84 @@ self-declared and clearly not verified. Algeria legal compliance (Loi
 18-05 Art. 8 & 11 tourist-activity licence requirements) is a FUTURE
 backend-enforced gate, not a Dashboard claim.
 
+## [CUSTOMERS]
+Agency business customer records — first agency business slice, vertical
+(backend + Dashboard). A Customer is NOT an identity: no `app_user` link, no
+credentials; booking records can exist for customers who never sign in.
+
+Backend (see `backend/backend_PROJECT_MAP.md` [CUSTOMERS]): `customer` table
+(migration `20260919191328_agency_customers`, `agency_id` FK cascade, CITEXT
+email not unique, `customer_status_check` pinning ACTIVE | ARCHIVED). REST
+under `/v1/agencies/:agencyCode/customers`, agency-scoped via
+`AgencyPermissionGuard` and the pre-existing `AGENCY_CUSTOMER_VIEW/CREATE/
+UPDATE/ARCHIVE` permissions (no RBAC change): searchable list (ACTIVE only, no
+pagination yet), get by `CUS-` code (archived stay readable), create (blank →
+null, email normalized), partial update (null clears), one-way archive
+(`CUSTOMER_NOT_FOUND` 404 tenant-scoped, `CUSTOMER_ALREADY_ARCHIVED` 409).
+Every mutation is audited (`AGENCY_CUSTOMER_CREATED/UPDATED/ARCHIVED`) and
+documented in Swagger.
+
+Dashboard (`frontend/dashboard` customers feature): list + search + shared
+create/edit dialog, details route keyed by the customer code, one-way archive
+with confirmation. Controls are gated on the `AGENCY_CUSTOMER_*` permissions
+(UX only; backend guards authoritative). UI is a dedicated `customers` i18n
+namespace (EN + AR, RTL-correct). Archived customers leave the listing; no
+restore is offered anywhere.
+
+NOT in this slice: Customers ↔ Bookings (Module I), customer counts in
+platform views.
+
+## [TOURS]
+Agency reusable travel products — second agency business vertical slice
+(backend + Dashboard). The backend names the product **Tour** (`TUR-…` code,
+`/v1/agencies/:agencyCode/tours`); the Dashboard keeps calling it a *Trip* at
+the UI layer (`/trips`). See `backend/backend_PROJECT_MAP.md` [AGENCY_TOURS]
+for the backend detail.
+
+Backend: `tour` aggregate + ordered `tour_destination` / `tour_itinerary_day`
+children (migrations `20260920100000_tours_module`, `20260920101000_tour_origin`),
+guarded by `AgencyPermissionGuard` and the pre-existing AGENCY catalog
+(`AGENCY_TOUR_VIEW/CREATE/UPDATE/DELETE/PUBLISH`; `AGENCY_TOUR_MANAGER`
+preset). Lifecycle: create always lands DRAFT; `PUT` is a full aggregate
+replacement in one transaction (children re-created, positions 0..n); publish
+is EXPLICIT only and runs a server-side readiness gate (`NAME`,
+`DESTINATION` resolved, `SHORT_DESCRIPTION`, `COVER_IMAGE`,
+`SCHEDULED_DEPARTURES_REQUIRED` — SCHEDULED tours publish only while they hold
+≥ 1 OPEN departure, counted through the Departures module; pricing stays
+Module H); the gate is checked on the transition only, so an already-published
+tour stays PUBLISHED even if its last open departure is later closed/cancelled;
+unpublish is idempotent; archive is one-way. Departures (Module G, IMPLEMENTED):
+per-tour `departure` rows (migration `20260920120000_departures_module`) under
+`/v1/agencies/:agencyCode/tours/:tourCode/departures`, `AGENCY_DEPARTURE_*`
+guarded, create always lands OPEN, wire statuses OPEN|CLOSED|CANCELLED, cancel
+is one-way and never changes `tour.status`. Contract: `TOUR_NOT_FOUND`,
+`DEPARTURE_NOT_FOUND` (404, tenant-scoped),
+`TOUR_PUBLISH_READINESS_BLOCKED` / `TOUR_PUBLISH_STATE_BLOCKED` /
+`TOUR_ALREADY_ARCHIVED`, `DEPARTURE_ALREADY_CANCELLED` (409). Every mutation
+audited + in Swagger. See `backend/backend_PROJECT_MAP.md` [AGENCY_DEPARTURES].
+
+Dashboard (`frontend/dashboard` trips feature): list wired to the real API
+(search + status server-driven; format/scope/destination client-side), create
+drawer, editor keyed by `TUR-` code (`/trips/:tourCode`). Load = GET, Save =
+PUT aggregate + explicit publish/unpublish/archive transition; a failed
+transition leaves the tour exactly where the server kept it. Readiness panel matches the server gate (pricing satisfied—recommended—from the real pricing overview;
+scheduled readiness counts OPEN departures from the real API). The Departures &
+Pricing section is live on both Modules: a DeparturesManager (list/create/edit/
+cancel, per-occurrence status badges, cancel confirmation, PUBLISHED-with-no-
+open-departures warning banner) and, above/below it, the PricingManager (option
+create/edit/one-way deactivate, derived starting price + priced-open-departure
+summary, per-departure whole-set price dialogs inside the departures manager,
+gated on AGENCY_PRICING_VIEW/MANAGE); on-request and custom-quote tours explain
+the mode instead. The old draft-only
+`departures-editor` was deleted and embedded `departures` were stripped from the
+Tour form/draft/payload; the deferred `pricing-options-editor` placeholder was
+deleted and draft `pricingOptions` stripped — real departures and prices live
+only in the backend. Lists and
+the editor are gated on `AGENCY_TOUR_*` via `useTourCapabilities` (UX only —
+the backend guards are authoritative). The dev in-memory trips repository and
+`PLACEHOLDER_TRIPS` were removed — persistence is the real Tours API. Dedicated
+`trips` i18n namespace (EN + AR). Pure helpers covered by Node `node --test`.
+
 ## [PLATFORM_ADMIN]
 IMPLEMENTED in `frontend/admin/`: authenticated Platform Super Dashboard shell
 (cookie-session login, `RequireAuth`/`GuestOnly` guards, sidebar shell, Overview
@@ -275,7 +360,9 @@ PostgreSQL · managed Postgres = Neon (see [DECISIONS]). Preview strategy = one
 shared public/preview renderer (D13); preview plumbing, `/[locale]` Arabic
 routes + middleware + i18n, full SEO metadata (canonical/hreflang/OG/JSON-LD),
 hostname/slug tenant resolution, and wiring the Trips / Trip-detail routes are
-pending Storefront platform work.
+pending Storefront platform work. Trips persistence — the Dashboard trips
+feature now persists through the real backend Tours API (see [TOURS]); the dev
+in-memory trip repository and `PLACEHOLDER_TRIPS` were removed.
 
 ## [DO_NOT_BUILD_YET]
 billing/subscription enforcement · online payments · custom-domain automation ·

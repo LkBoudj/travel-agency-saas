@@ -16,7 +16,6 @@ import type * as Prisma from "../internal/prismaNamespace.js"
  * Model AgencyMemberInvitationRole
  * *
  *  * The AGENCY roles offered by an invitation, captured at creation time.
- *  *
  *  * The same tenant rule as `AgencyRoleAssignment` applies (mirrored trigger
  *  * `agency_member_invitation_role_scope`): a role must be AGENCY-scoped and,
  *  * when custom, owned by the invitation's own agency. The set is a snapshot

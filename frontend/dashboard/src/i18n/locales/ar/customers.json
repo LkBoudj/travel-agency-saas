@@ -1,0 +1,84 @@
+{
+  "page": {
+    "title": "العملاء",
+    "description": "إدارة العملاء التجاريين لهذه الوكالة.",
+    "create": "إضافة عميل",
+    "loading": "جارٍ تحميل العملاء...",
+    "updating": "جارٍ التحديث...",
+    "searchPlaceholder": "البحث عن العملاء",
+    "searchAria": "البحث عن العملاء",
+    "noCustomers": "لا يوجد عملاء لهذه الوكالة بعد.",
+    "noResults": "لا توجد نتائج تطابق \"{query}\"."
+  },
+  "error": {
+    "loadFailed": "تعذّر تحميل العملاء.",
+    "retry": "إعادة المحاولة"
+  },
+  "table": {
+    "customer": "العميل",
+    "contact": "التواصل",
+    "status": "الحالة",
+    "created": "تاريخ الإنشاء",
+    "actions": "إجراءات",
+    "viewDetails": "التفاصيل",
+    "edit": "تعديل",
+    "archive": "أرشفة",
+    "noActions": "—"
+  },
+  "status": {
+    "active": "نشط",
+    "archived": "مؤرشف"
+  },
+  "form": {
+    "createTitle": "عميل جديد",
+    "editTitle": "تعديل العميل",
+    "description": "جميع الحقول اختيارية. يمكن أن يكون العميل اسمًا فقط، أو رقم هاتف فقط، أو أي شيء بينهما.",
+    "firstNameLabel": "الاسم الأول",
+    "firstNamePlaceholder": "الاسم الأول",
+    "lastNameLabel": "اسم العائلة",
+    "lastNamePlaceholder": "اسم العائلة",
+    "emailLabel": "البريد الإلكتروني",
+    "emailPlaceholder": "name@example.com",
+    "phoneLabel": "رقم الهاتف",
+    "phonePlaceholder": "رقم الهاتف",
+    "notesLabel": "ملاحظات",
+    "notesPlaceholder": "أي معلومات مفيدة عن هذا العميل...",
+    "optional": "اختياري",
+    "cancel": "إلغاء",
+    "submitCreate": "إنشاء العميل",
+    "submitEdit": "حفظ التغييرات",
+    "saving": "جارٍ الحفظ..."
+  },
+  "validation": {
+    "firstNameMax": "يجب ألا يتجاوز الاسم الأول 100 حرف.",
+    "lastNameMax": "يجب ألا يتجاوز اسم العائلة 100 حرف.",
+    "email": "أدخل بريدًا إلكترونيًا صالحًا.",
+    "phoneMax": "يجب ألا يتجاوز رقم الهاتف 32 حرفًا.",
+    "notesMax": "يجب ألا تتجاوز الملاحظات 2000 حرف."
+  },
+  "create": {
+    "success": "تم إنشاء العميل."
+  },
+  "update": {
+    "success": "تم تحديث العميل."
+  },
+  "archive": {
+    "title": "أرشفة هذا العميل؟",
+    "description": "تنقل الأرشفة العميل إلى الأرشيف. هذا الإجراء نهائي ولا يمكن التراجع عنه.",
+    "confirm": "أرشفة",
+    "success": "تمت أرشفة العميل."
+  },
+  "details": {
+    "back": "العودة إلى العملاء",
+    "code": "الرمز",
+    "status": "الحالة",
+    "createdAt": "تاريخ الإنشاء",
+    "updatedAt": "آخر تحديث",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "notes": "ملاحظات",
+    "noNotes": "لا توجد ملاحظات.",
+    "unknown": "عميل غير معروف",
+    "notFound": "هذا العميل غير موجود في هذه الوكالة، أو ربما تمت أرشفته."
+  }
+}
