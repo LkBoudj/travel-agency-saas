@@ -17,6 +17,7 @@ import { ToursModule } from './tours/tours.module.js';
 import { DeparturesModule } from './departures/departures.module.js';
 import { PricingModule } from './pricing/pricing.module.js';
 import { BookingsModule } from './bookings/bookings.module.js';
+import { TravelersModule } from './travelers/travelers.module.js';
 import { AgencyAccessModule } from './agency-access/agency-access.module.js';
 import { AgenciesModule } from './agencies/agencies.module.js';
 import { RbacModule } from './rbac/rbac.module.js';
@@ -40,6 +41,7 @@ import { RbacModule } from './rbac/rbac.module.js';
     DeparturesModule,
     PricingModule,
     BookingsModule,
+    TravelersModule,
     MeModule,
   ],
   controllers: [AppController],

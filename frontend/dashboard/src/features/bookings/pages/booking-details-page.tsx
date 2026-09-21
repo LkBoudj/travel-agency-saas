@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button"
 import { AGENCY_SECTIONS, agencyPath } from "@/features/agency-context/lib/agency-paths"
 import { useAgencyContext } from "@/features/agency-context/hooks/use-agency-context"
 import { BookingCancelDialog } from "../components/booking-cancel-dialog"
+import { BookingConfirmDialog } from "../components/booking-confirm-dialog"
 import { BookingStatusBadge } from "../components/booking-status-badge"
+import { TravelersManager } from "../components/travelers-manager"
 import { useBooking } from "../hooks/use-booking"
 import { useBookingCapabilities } from "../hooks/use-booking-capabilities"
-import { bookingRowActions } from "../lib/booking-actions"
+import { bookingRowActions, canViewTravelers } from "../lib/booking-actions"
 import {
   bookingCustomerName,
   formatBookingAmount,
@@ -36,6 +38,7 @@ export function BookingDetailsPage() {
   const { t } = useTranslation()
 
   const [cancelOpen, setCancelOpen] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const bookingQuery = useBooking(agency.code, bookingCode)
   const booking = bookingQuery.data ?? null
@@ -86,13 +89,22 @@ export function BookingDetailsPage() {
             title={booking.code}
             description={booking.tour.name}
             actions={
-              actions?.canCancel ? (
-                <Button
-                  variant="destructive"
-                  onClick={() => setCancelOpen(true)}
-                >
-                  {t("bookings:details.cancel")}
-                </Button>
+              actions ? (
+                <div className="flex items-center gap-2">
+                  {actions.canConfirm ? (
+                    <Button onClick={() => setConfirmOpen(true)}>
+                      {t("bookings:confirm.submit")}
+                    </Button>
+                  ) : null}
+                  {actions.canCancel ? (
+                    <Button
+                      variant="destructive"
+                      onClick={() => setCancelOpen(true)}
+                    >
+                      {t("bookings:details.cancel")}
+                    </Button>
+                  ) : null}
+                </div>
               ) : undefined
             }
           />
@@ -168,7 +180,13 @@ export function BookingDetailsPage() {
             </dl>
           </div>
 
-          {booking.status === "PENDING" ? (
+          {canViewTravelers(capabilities) ? (
+            <TravelersManager
+              agencyCode={agency.code}
+              booking={booking}
+              capabilities={capabilities.traveler}
+            />
+          ) : booking.status === "PENDING" ? (
             <p className="max-w-xl text-xs text-muted-foreground">
               {t("bookings:details.pendingHint")}
             </p>
@@ -184,6 +202,12 @@ export function BookingDetailsPage() {
         booking={booking}
         open={cancelOpen}
         onOpenChange={setCancelOpen}
+      />
+      <BookingConfirmDialog
+        agencyCode={agency.code}
+        booking={booking}
+        open={confirmOpen}
+        onOpenChange={setConfirmOpen}
       />
     </div>
   )

@@ -72,7 +72,8 @@ export const ModelName = {
   TourItineraryDay: 'TourItineraryDay',
   Booking: 'Booking',
   BookingPriceLine: 'BookingPriceLine',
-  BookingStatusHistory: 'BookingStatusHistory'
+  BookingStatusHistory: 'BookingStatusHistory',
+  BookingTraveler: 'BookingTraveler'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -425,6 +426,22 @@ export const BookingStatusHistoryScalarFieldEnum = {
 } as const
 
 export type BookingStatusHistoryScalarFieldEnum = (typeof BookingStatusHistoryScalarFieldEnum)[keyof typeof BookingStatusHistoryScalarFieldEnum]
+
+
+export const BookingTravelerScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  bookingId: 'bookingId',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  email: 'email',
+  phone: 'phone',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BookingTravelerScalarFieldEnum = (typeof BookingTravelerScalarFieldEnum)[keyof typeof BookingTravelerScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -282,9 +282,11 @@ the live-PostgreSQL concurrency e2e suite (`test/bookings-concurrency.e2e-spec.t
 Prices are snapshotted into `booking_price_line` with basis-aware per-line
 totals (per_person × seats / per_booking × 1); the client estimate is a preview
 only, the server total is authoritative. Lifecycle begins `PENDING`; `CANCELLED`
-is terminal, freeing the reserved seats; `CONFIRMED` requires travelers
-(Module J) — any confirm attempt returns `409 BOOKING_TRAVELERS_REQUIRED`, so
-no UI exists for it. Reserved seats are immutable. Every mutation audited + in
+is terminal, freeing the reserved seats; `CONFIRMED` requires a complete traveler manifest (Module J). Confirm is
+wired front-to-back: the confirm dialog gates submit on
+`travelerManifestComplete` (`disabled={pending || !complete}`) so it cannot
+offer a guaranteed 409; manifest shown as i18n `{{count}} of {{seats}}`
+(EN+AR, RTL-correct). Reserved seats immutable. Reserved seats are immutable. Every mutation audited + in
 Swagger: `BOOKING_TRAVELERS_REQUIRED`, `BOOKING_ALREADY_CANCELLED`,
 `BOOKING_CAPACITY_EXCEEDED`, `BOOKING_NO_PRICES`, `BOOKING_PRICE_INACTIVE`,
 `BOOKING_CURRENCY_MISMATCH`, `BOOKING_DEPARTURE_CLOSED`. 34 controller specs +
@@ -293,16 +295,18 @@ concurrency e2e; Module I gates green before the Dashboard slice.
 Dashboard (`frontend/dashboard` bookings feature, IMPLEMENTED — replaces the
 M0 `Bookings` placeholder route): list page (server-driven search + status
 filter), details route keyed by the `BKG-` code with the frozen price-line
-breakdown, currency, lifecycle status history, and cancel with optional reason;
+breakdown, currency, lifecycle status history, traveler manifest summary, and cancel with optional
+reason;
 create dialog cascades customer → tour → only-OPEN departure → only-active
 pricing options and estimates the total client-side (server-authoritative on
 submit). Row actions/cancel are gated on `AGENCY_BOOKING_*` via
 `useBookingCapabilities` (UX only; backend guards authoritative). Confirm is
-deliberately absent until Module J. Dedicated `bookings` i18n namespace
+shipped in Module J (travelers slice). Dedicated `bookings` i18n namespace
 (EN + AR, RTL-correct); pure helpers covered by Node `node --test`.
 
-NOT in this slice: booking confirmation/travelers (Module J), price-adjust /
-re-pricing flows, customer ↔ bookings cross-navigation.
+NOT in this slice: price-adjust / re-pricing flows, customer ↔ bookings
+cross-navigation. (Booking confirmation/travelers Module J SHIPPED; see
+travelers slice + Module J roadmap lines below.)
 
 ## [PLATFORM_ADMIN]
 IMPLEMENTED in `frontend/admin/`: authenticated Platform Super Dashboard shell

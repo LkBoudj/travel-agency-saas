@@ -111,6 +111,7 @@ export const BOOKING_ROW_SELECT = {
   code: true,
   status: true,
   departureId: true,
+  reservedSeats: true,
 } as const satisfies Prisma.BookingSelect;
 
 export type BookingRow = Prisma.BookingGetPayload<{

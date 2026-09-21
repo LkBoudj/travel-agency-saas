@@ -186,27 +186,40 @@ export class BookingsController {
 
   @Post('bookings/:bookingCode/confirm')
   @RequireAgencyPermissions('AGENCY_BOOKING_UPDATE')
+  @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Confirm a booking of this agency',
     description:
       'The PENDING → CONFIRMED transition. Confirmation is readiness-gated on the booking\'s ' +
-      'Traveler records, which arrive in a later module, so this action currently refuses every ' +
-      'booking with BOOKING_TRAVELERS_REQUIRED — no CONFIRMED booking can exist until traveler ' +
-      'readiness is satisfiable.',
+      'Traveler records: the record count must equal the booking\'s immutable reservedSeats ' +
+      '(a mismatch is rejected with BOOKING_TRAVELER_COUNT_MISMATCH), so no CONFIRMED booking ' +
+      'can exist without a complete traveler manifest.',
   })
   @ApiParam(AGENCY_CODE_PARAM_DOC)
   @ApiParam(BOOKING_CODE_PARAM_DOC)
   @ApiOkResponse({ description: 'The confirmed booking', schema: BOOKING_SCHEMA })
   @ApiConflictResponse({
     description:
-      'Booking already confirmed, cancelled, or missing traveler readiness (BOOKING_…).',
+      'Booking already confirmed or cancelled, or the traveler manifest does not match the ' +
+      'reserved seats (BOOKING_…).',
   })
   @ApiNotFoundResponse({ description: 'Booking not found in this agency (BOOKING_NOT_FOUND)' })
-  confirm(
+  async confirm(
+    @CurrentUser() actor: InternalAuthUser,
     @CurrentAgency() access: AgencyAccessContext,
     @Param('bookingCode') bookingCode: string,
   ): Promise<BookingResponse> {
-    return this.bookings.confirm(access.agency.id, bookingCode);
+    const booking = await this.bookings.confirm(access.agency.id, bookingCode, actor.code);
+
+    await this.audit.record({
+      action: AUDIT_ACTIONS.agencyBookingConfirmed,
+      outcome: 'SUCCESS',
+      actorCode: actor.code,
+      agencyCode: access.agency.code,
+      targetCode: booking.code,
+    });
+
+    return booking;
   }
 
   @Post('bookings/:bookingCode/cancel')

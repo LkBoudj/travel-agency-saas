@@ -28,6 +28,7 @@ export const PERMISSION_RESOURCES = [
   'BOOKING',
   'PAYMENT',
   'REFUND',
+  'TRAVELER',
 ] as const;
 
 export type PermissionResource = (typeof PERMISSION_RESOURCES)[number];

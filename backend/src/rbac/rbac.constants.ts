@@ -296,6 +296,11 @@ export const RBAC_PERMISSION_CATALOG: ReadonlyArray<PermissionCatalogEntry> = [
   permission('AGENCY_BOOKING_CANCEL', 'Cancel bookings', 'AGENCY', 'BOOKING', 'CANCEL'),
   permission('AGENCY_BOOKING_ADJUST', 'Adjust bookings', 'AGENCY', 'BOOKING', 'ADJUST'),
 
+  // AGENCY — booking travelers (Module J).
+  permission('AGENCY_TRAVELER_VIEW', 'View travelers', 'AGENCY', 'TRAVELER', 'VIEW'),
+  permission('AGENCY_TRAVELER_CREATE', 'Add travelers', 'AGENCY', 'TRAVELER', 'CREATE'),
+  permission('AGENCY_TRAVELER_UPDATE', 'Update travelers', 'AGENCY', 'TRAVELER', 'UPDATE'),
+
   // AGENCY — payments.
   permission('AGENCY_PAYMENT_VIEW', 'View payments', 'AGENCY', 'PAYMENT', 'VIEW'),
   permission('AGENCY_PAYMENT_RECORD', 'Record payments', 'AGENCY', 'PAYMENT', 'RECORD'),
@@ -484,6 +489,9 @@ export const DEFAULT_GLOBAL_AGENCY_ROLES: ReadonlyArray<RolePreset> = [
       'AGENCY_BOOKING_ADJUST',
       'AGENCY_PAYMENT_VIEW',
       'AGENCY_PAYMENT_RECORD',
+      'AGENCY_TRAVELER_VIEW',
+      'AGENCY_TRAVELER_CREATE',
+      'AGENCY_TRAVELER_UPDATE',
     ],
   ),
   preset(
@@ -542,6 +550,7 @@ export const DEFAULT_GLOBAL_AGENCY_ROLES: ReadonlyArray<RolePreset> = [
       'AGENCY_REFUND_VIEW',
       'AGENCY_AUDIT_VIEW',
       'AGENCY_ROLE_VIEW',
+      'AGENCY_TRAVELER_VIEW',
     ],
   ),
 ];

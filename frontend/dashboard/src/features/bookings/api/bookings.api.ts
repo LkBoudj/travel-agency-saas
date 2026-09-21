@@ -3,7 +3,9 @@ import type {
   AgencyBooking,
   BookingDetail,
   BookingStatus,
+  BookingTraveler,
   CreateBookingPayload,
+  TravelerWritePayload,
 } from "../types/bookings.types"
 
 /**
@@ -31,6 +33,8 @@ export const bookingsQueryKeys = {
     ] as const,
   detail: (agencyCode: string, bookingCode: string) =>
     ["agency", agencyCode, "bookings", "detail", bookingCode] as const,
+  travelers: (agencyCode: string, bookingCode: string) =>
+    ["agency", agencyCode, "bookings", bookingCode, "travelers"] as const,
 }
 
 function base(agencyCode: string): string {
@@ -94,5 +98,62 @@ export function cancelBooking(
   return apiRequest<AgencyBooking>(
     `${base(agencyCode)}/bookings/${encodeURIComponent(bookingCode)}/cancel`,
     { method: "POST", body: JSON.stringify({ reason }) }
+  )
+}
+
+/** The booking's traveler records, newest first. Readable at any lifecycle point. */
+export function listTravelers(
+  agencyCode: string,
+  bookingCode: string
+): Promise<BookingTraveler[]> {
+  return apiRequest<BookingTraveler[]>(
+    `${base(agencyCode)}/bookings/${encodeURIComponent(bookingCode)}/travelers`
+  )
+}
+
+/**
+ * Adds one named seat to a PENDING booking. The backend generates the
+ * `TRV-...` code and enforces the manifest cap (`reservedSeats`) and the
+ * PENDING-only write rule.
+ */
+export function addTraveler(
+  agencyCode: string,
+  bookingCode: string,
+  payload: TravelerWritePayload
+): Promise<BookingTraveler> {
+  return apiRequest<BookingTraveler>(
+    `${base(agencyCode)}/bookings/${encodeURIComponent(bookingCode)}/travelers`,
+    { method: "POST", body: JSON.stringify(payload) }
+  )
+}
+
+/**
+ * Corrects one traveler's record while the booking is still PENDING. A blank
+ * field is sent as `null`, clearing the stored value.
+ */
+export function updateTraveler(
+  agencyCode: string,
+  bookingCode: string,
+  travelerCode: string,
+  payload: TravelerWritePayload
+): Promise<BookingTraveler> {
+  return apiRequest<BookingTraveler>(
+    `${base(agencyCode)}/bookings/${encodeURIComponent(bookingCode)}/travelers/${encodeURIComponent(travelerCode)}`,
+    { method: "PATCH", body: JSON.stringify(payload) }
+  )
+}
+
+/**
+ * One-way PENDING → CONFIRMED. No body: the backend validates the traveler
+ * manifest against `reservedSeats` under a booking row lock, so a partial
+ * manifest is refused with `BOOKING_TRAVELER_COUNT_MISMATCH`.
+ */
+export function confirmBooking(
+  agencyCode: string,
+  bookingCode: string
+): Promise<AgencyBooking> {
+  return apiRequest<AgencyBooking>(
+    `${base(agencyCode)}/bookings/${encodeURIComponent(bookingCode)}/confirm`,
+    { method: "POST" }
   )
 }

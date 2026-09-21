@@ -2,6 +2,8 @@ import 'dotenv/config';
 import { PrismaNeon } from '@prisma/adapter-neon';
 import { Prisma, PrismaClient } from '../src/generated/prisma/client.js';
 import {
+  AGENCY_OWNER_ROLE_KEY,
+  ALL_AGENCY_PERMISSION_KEYS,
   ALL_PLATFORM_PERMISSION_KEYS,
   DEFAULT_GLOBAL_AGENCY_ROLES,
   DEFAULT_PLATFORM_ROLES,
@@ -168,8 +170,14 @@ async function assignBootstrapUser(tx: SeedClient, roleId: bigint): Promise<void
  * - Permissions are code-owned: `RBAC_PERMISSION_CATALOG` is the source of
  *   truth, so metadata is synchronized on every run and keys that are no longer
  *   defined in the catalog are removed.
- * - `PLATFORM_ADMIN` is the system baseline: it is always synchronized to every
- *   PLATFORM permission so platform operators cannot lock themselves out.
+ * - `PLATFORM_ADMIN` is the platform system baseline: it is always synchronized
+ *   to every PLATFORM permission so platform operators cannot lock themselves
+ *   out.
+ * - `AGENCY_OWNER` is the agency system baseline (it carries the protected
+ *   `AGENCY_ADMIN` role identity): it is always synchronized to every AGENCY
+ *   permission so a long-standing agency owner gains new AGENCY capabilities
+ *   the moment they are added to the catalog — an owner who never logs in to
+ *   re-provision is never left without new permissions.
  * - Every other default role is a create-only preset: it is created with its
  *   canonical permission set when missing, and an existing role's permission
  *   mappings, name and description are never overwritten.
@@ -184,6 +192,7 @@ export async function seedRbacBootstrap(prisma: PrismaClient): Promise<void> {
 
       const platformAdminPreset = requirePreset(DEFAULT_PLATFORM_ROLES, PLATFORM_ADMIN_ROLE_KEY);
       const platformAdminRoleId = await upsertSystemRole(tx, platformAdminPreset);
+      await ensureSystemRoleIdentity(tx, platformAdminPreset, platformAdminRoleId);
       await syncRolePermissions(
         tx,
         platformAdminRoleId,
@@ -191,8 +200,27 @@ export async function seedRbacBootstrap(prisma: PrismaClient): Promise<void> {
         permissionIdByKey,
       );
 
+      // The agency system baseline is always synchronized too (see the
+      // ownership rules above), so existing AGENCY_OWNER roles pick up newly
+      // added catalog permissions on re-seed instead of going stale.
+      const agencyOwnerPreset = requirePreset(
+        DEFAULT_GLOBAL_AGENCY_ROLES,
+        AGENCY_OWNER_ROLE_KEY,
+      );
+      const agencyOwnerRoleId = await upsertSystemRole(tx, agencyOwnerPreset);
+      await ensureSystemRoleIdentity(tx, agencyOwnerPreset, agencyOwnerRoleId);
+      await syncRolePermissions(
+        tx,
+        agencyOwnerRoleId,
+        ALL_AGENCY_PERMISSION_KEYS,
+        permissionIdByKey,
+      );
+
       for (const preset of [...DEFAULT_PLATFORM_ROLES, ...DEFAULT_GLOBAL_AGENCY_ROLES]) {
-        if (preset.key === PLATFORM_ADMIN_ROLE_KEY) {
+        if (
+          preset.key === PLATFORM_ADMIN_ROLE_KEY ||
+          preset.key === AGENCY_OWNER_ROLE_KEY
+        ) {
           continue;
         }
         const existing = await tx.role.findFirst({

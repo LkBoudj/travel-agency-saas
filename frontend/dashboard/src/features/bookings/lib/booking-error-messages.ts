@@ -32,8 +32,13 @@ const MESSAGES: Record<string, string> = {
   BOOKING_INVALID_TRANSITION:
     "This booking cannot move to that status from its current one.",
   BOOKING_ALREADY_CANCELLED: "This booking was already cancelled.",
-  BOOKING_TRAVELERS_REQUIRED:
-    "Confirmation needs traveler details, which are not available yet.",
+  BOOKING_TRAVELERS_FROZEN:
+    "This booking is no longer pending, so its traveler list is frozen.",
+  BOOKING_TRAVELER_LIMIT_REACHED:
+    "This booking already has as many travelers as reserved seats.",
+  BOOKING_TRAVELER_COUNT_MISMATCH:
+    "The traveler list does not match the reserved seats — confirm needs one traveler per seat.",
+  TRAVELER_NOT_FOUND: "This traveler does not exist on this booking.",
 
   // --- linked records -------------------------------------------------------
   CUSTOMER_NOT_FOUND: "This customer does not exist in this agency.",

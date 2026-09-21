@@ -10,7 +10,7 @@
     "filterLabel": "Status",
     "filterAll": "All statuses",
     "noBookings": "This agency has no bookings yet.",
-    "noResults": "No bookings match \"{query}\"."
+    "noResults": "No bookings match \"{{query}}\"."
   },
   "error": {
     "loadFailed": "We could not load the bookings.",
@@ -46,7 +46,7 @@
     "departurePlaceholder": "Select a departure",
     "departureLoading": "Loading departures...",
     "departureEmpty": "This tour has no open departures.",
-    "departureOption": "{date} — {capacity} seats",
+    "departureOption": "{{date}} — {{capacity}} seats",
     "seatsLabel": "Reserved seats",
     "seatsPlaceholder": "Number of seats",
     "pricingLabel": "Add-ons",
@@ -101,8 +101,47 @@
     "basisBooking": "Per booking",
     "historyTitle": "Status history",
     "historyEmpty": "No status changes recorded.",
-    "pendingHint": "This booking stays pending until traveler details are recorded (a later module); it still holds its reserved seats.",
+    "pendingHint": "This booking stays pending until its traveler list matches the reserved seats; confirming is only possible with one traveler per seat.",
     "cancel": "Cancel booking"
+  },
+  "travelers": {
+    "title": "Travelers",
+    "count": "{{count}} of {{seats}}",
+    "empty": "No travelers recorded yet.",
+    "frozenHint": "This booking is no longer pending, so its traveler list is frozen.",
+    "add": "Add traveler",
+    "edit": "Edit",
+    "form": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "notes": "Notes",
+      "add": "Add traveler",
+      "save": "Save changes",
+      "added": "Traveler added.",
+      "saved": "Traveler updated.",
+      "cancel": "Cancel"
+    },
+    "validation": {
+      "firstNameRequired": "Enter the traveler's first name.",
+      "lastNameRequired": "Enter the traveler's last name.",
+      "nameMax": "Names must be 100 characters or fewer.",
+      "emailInvalid": "Enter a valid email address.",
+      "phoneMax": "Phone must be 32 characters or fewer.",
+      "notesMax": "Notes must be 2000 characters or fewer."
+    }
+  },
+  "confirm": {
+    "title": "Confirm this booking?",
+    "description": "Confirmation records the current traveler list as the booking's ticket manifest. It is a one-way action: there is no going back to pending.",
+    "count": "{{count}} of {{seats}} travelers recorded",
+    "ready": "The traveler manifest matches the reserved seats — this booking is ready to confirm.",
+    "notReady": "The traveler manifest does not yet match the reserved seats; add or edit travelers before confirming.",
+    "cancelAction": "Cancel",
+    "submit": "Confirm booking",
+    "confirming": "Confirming...",
+    "success": "Booking confirmed."
   },
   "validation": {
     "customerRequired": "Choose a customer.",
