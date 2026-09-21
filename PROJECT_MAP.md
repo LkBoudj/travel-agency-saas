@@ -34,6 +34,12 @@ anonymous travelers, platform operators.
                   [AGENCY_TOURS].
 - frontend/dashboard/    React SPA — agency management only; does NOT render the
                          public storefront.
+- frontend/agency-dashboard-mantine/  Vite 8 + React 19 + Mantine 9 SPA — the
+                         new production-grade agency dashboard (per
+                         improve_dash.md): separate workspace so the old
+                         dashboard stays untouched as reference. Dev port
+                         5175. Foundation + features built incrementally;
+                         see its README and the implementation plan.
 - frontend/storefront/   Next.js 16.3.5 App Router PUBLIC STOREFRONT — one app,
                          all agencies, all themes. Exists.
 - frontend/marketplace/  PUBLIC web = Marketplace + Trip Details + Agency
@@ -47,8 +53,9 @@ anonymous travelers, platform operators.
 - Root `package.json` +   One command (`npm run all` / `npm run dev`) starts every
   `scripts/dev-all.mjs`   app's dev server with prefixed output: backend :3000,
                           dashboard :5173, admin :5174, storefront :3001 (3000 is
-                          the API). Apps without `node_modules` are skipped with
-                          the exact install command printed.
+                          the API), agency-dashboard-mantine :5175. Apps without
+                          `node_modules` are skipped with the exact install
+                          command printed.
 
 ## [TECH_STACK]
 - dashboard: React19+TS+Vite+RR7+Tailwind4+shadcn(@base-ui)+TSQuery/Table+

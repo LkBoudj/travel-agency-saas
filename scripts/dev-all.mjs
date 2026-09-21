@@ -41,6 +41,13 @@ const APPS = [
     url: "http://localhost:3001",
     color: "\x1b[35m",
   },
+  {
+    name: "agency-ui",
+    dir: "frontend/agency-dashboard-mantine",
+    run: "dev",
+    url: "http://localhost:5175",
+    color: "\x1b[34m",
+  },
 ];
 
 const npmCommand = process.platform === "win32" ? "npm.cmd" : "npm";
