@@ -86,6 +86,38 @@ export type CancelBookingPayload = {
   reason?: string | null
 }
 
+/**
+ * One named seat of the booking (Module J). Resolves through the booking, so
+ * it carries no agency key of its own; the only stable external key is the
+ * backend-generated `TRV-...` code.
+ */
+export type BookingTraveler = {
+  code: string
+  firstName: string
+  lastName: string
+  email: string | null
+  phone: string | null
+  notes: string | null
+  createdAt: string
+  updatedAt: string
+}
+
+/**
+ * Traveler write body — names and contact details only. Amounts and codes are
+ * never client-authored; the backend generates the traveler's `TRV-...` code
+ * and refuses writes once the booking leaves PENDING.
+ */
+export type TravelerWritePayload = {
+  firstName: string
+  lastName: string
+  email: string | null
+  phone: string | null
+  notes: string | null
+}
+
+/** Confirm body — there is none; the transition is a bare POST. */
+export type ConfirmBookingPayload = Record<string, never>
+
 /** Presentation keys for booking statuses, resolved through i18next. */
 export const BOOKING_STATUS_LABELS: Record<BookingStatus, string> = {
   PENDING: "bookings:status.pending",

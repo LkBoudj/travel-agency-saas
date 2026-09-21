@@ -295,3 +295,21 @@ export type BookingPriceLine = Prisma.BookingPriceLineModel
  *  * records the acting AppUser's event on the agency.
  */
 export type BookingStatusHistory = Prisma.BookingStatusHistoryModel
+/**
+ * Model BookingTraveler
+ * *
+ *  * One traveler record of a Booking (Module J).
+ *  * A Booking's travelers are reconciled against its immutable `reservedSeats`:
+ *  * a PENDING booking is confirmable only when the number of traveler records
+ *  * equals `reservedSeats`. Travelers are NOT an identity — they carry no
+ *  * `app_user` link and no credentials, like Customers — and they resolve through
+ *  * their Booking, so tenancy is inherited (`:agencyCode` + `:bookingCode` route)
+ *  * and no traveler row carries an `agency_id`.
+ *  * Records are written only while the parent Booking is PENDING: a CONFIRMED
+ *  * booking's traveler list is the confirmation's ticket manifest and a
+ *  * CANCELLED booking's is historical. The database enforces that invariant via
+ *  * the `booking_traveler_booking_pending` trigger set and there is deliberately
+ *  * no delete endpoint — travelers are added and corrected while the booking is
+ *  * still being prepared, then frozen by confirmation.
+ */
+export type BookingTraveler = Prisma.BookingTravelerModel

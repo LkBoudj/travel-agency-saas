@@ -109,6 +109,19 @@ type BookingStatusHistoryRow = {
   createdAt: Date;
 };
 
+type TravelerRow = {
+  id: bigint;
+  code: string;
+  bookingId: bigint;
+  firstName: string;
+  lastName: string;
+  email: string | null;
+  phone: string | null;
+  notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 type RoleRow = {
   id: bigint;
   key: string;
@@ -165,6 +178,7 @@ const DB = {
   bookings: [] as BookingRow[],
   priceLines: [] as BookingPriceLineRow[],
   statusHistory: [] as BookingStatusHistoryRow[],
+  travelers: [] as TravelerRow[],
   roles: new Map<bigint, RoleRow>(),
   users: new Map<bigint, UserRow>(),
   memberships: [] as MembershipRow[],
@@ -391,6 +405,27 @@ function addStatusHistory(
   return row;
 }
 
+function addTraveler(
+  bookingId: bigint,
+  overrides: Partial<TravelerRow> = {},
+): TravelerRow {
+  const row: TravelerRow = {
+    id: id(),
+    code: publicCode('TRV'),
+    bookingId,
+    firstName: 'Amel',
+    lastName: 'Benali',
+    email: null,
+    phone: null,
+    notes: null,
+    createdAt: NOW,
+    updatedAt: NOW,
+    ...overrides,
+  };
+  DB.travelers.push(row);
+  return row;
+}
+
 function projectBooking(row: BookingRow) {
   const customer = DB.customers.find((c) => c.id === row.customerId)!;
   const tour = DB.tours.find((t) => t.id === row.tourId)!;
@@ -441,6 +476,19 @@ function projectBookingDetail(row: BookingRow) {
         reason: h.reason,
         createdAt: h.createdAt,
       })),
+  };
+}
+
+function projectTraveler(row: TravelerRow) {
+  return {
+    code: row.code,
+    firstName: row.firstName,
+    lastName: row.lastName,
+    email: row.email,
+    phone: row.phone,
+    notes: row.notes,
+    createdAt: row.createdAt,
+    updatedAt: row.updatedAt,
   };
 }
 
@@ -835,6 +883,87 @@ const prismaMock = {
       },
     ),
   },
+  bookingTraveler: {
+    count: vi.fn(
+      async ({ where }: { where: { bookingId: bigint } }) =>
+        DB.travelers.filter((t) => t.bookingId === where.bookingId).length,
+    ),
+    findMany: vi.fn(
+      async ({
+        where,
+        orderBy,
+      }: {
+        where: { bookingId: bigint };
+        orderBy?: { createdAt: 'asc' };
+      }) => {
+        let rows = DB.travelers.filter((t) => t.bookingId === where.bookingId);
+        if (orderBy?.createdAt === 'asc') {
+          rows = [...rows].sort(
+            (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+          );
+        }
+        return rows.map(projectTraveler);
+      },
+    ),
+    findFirst: vi.fn(
+      async ({
+        where,
+      }: {
+        where: { code: string; bookingId: bigint };
+        select: { id: true };
+      }) => {
+        const row = DB.travelers.find(
+          (t) =>
+            t.code === where.code && t.bookingId === where.bookingId,
+        );
+        if (!row) return null;
+        return { id: row.id };
+      },
+    ),
+    create: vi.fn(
+      async ({
+        data,
+      }: {
+        data: {
+          code: string;
+          bookingId: bigint;
+          firstName: string;
+          lastName: string;
+          email: string | null;
+          phone: string | null;
+          notes: string | null;
+        };
+      }) => {
+        const row: TravelerRow = {
+          id: id(),
+          code: data.code,
+          bookingId: data.bookingId,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          notes: data.notes,
+          createdAt: NOW,
+          updatedAt: NOW,
+        };
+        DB.travelers.push(row);
+        return projectTraveler(row);
+      },
+    ),
+    update: vi.fn(
+      async ({
+        where,
+        data,
+      }: {
+        where: { id: bigint };
+        data: Record<string, unknown>;
+      }) => {
+        const row = DB.travelers.find((t) => t.id === where.id)!;
+        Object.assign(row, data);
+        return projectTraveler(row);
+      },
+    ),
+  },
   auditLog: {
     create: vi.fn(
       async ({
@@ -848,6 +977,19 @@ const prismaMock = {
     ),
   },
   $queryRaw: vi.fn(async (_template: unknown, ...values: unknown[]) => {
+    const queryText = String((_template as string[])?.[0] ?? '');
+    if (queryText.includes('FROM booking')) {
+      const bookingId = values[0] as bigint;
+      const bookingRow = DB.bookings.find((b) => b.id === bookingId);
+      if (!bookingRow) return [];
+      return [
+        {
+          id: bookingRow.id,
+          status: bookingRow.status,
+          reserved_seats: bookingRow.reservedSeats,
+        },
+      ];
+    }
     const departureId = values[0] as bigint;
     const row = DB.departures.find((d) => d.id === departureId);
     if (!row) return [];
@@ -877,6 +1019,7 @@ function baseline(): void {
   DB.bookings = [];
   DB.priceLines = [];
   DB.statusHistory = [];
+  DB.travelers = [];
   DB.roles.clear();
   DB.users.clear();
   DB.memberships = [];
@@ -1585,19 +1728,59 @@ describe('GET /v1/agencies/:agencyCode/bookings/:bookingCode', () => {
 });
 
 describe('POST /v1/agencies/:agencyCode/bookings/:bookingCode/confirm', () => {
-  it('409 BOOKING_TRAVELERS_REQUIRED until travelers exist (Module J)', async () => {
+  it('409 BOOKING_TRAVELER_COUNT_MISMATCH until the manifest matches reservedSeats', async () => {
     const tour = addTour(SAHARA.id);
     const departure = addDeparture(tour.id);
     const customer = addCustomer(SAHARA.id);
-    const booking = addBooking(departure, tour, customer, { status: 'PENDING' });
+    const booking = addBooking(departure, tour, customer, {
+      status: 'PENDING',
+      reservedSeats: 2,
+    });
+    addTraveler(booking.id);
 
     const res = await request(app.getHttpServer())
       .post(`${base()}/bookings/${booking.code}/confirm`)
       .set(authHeader(adminToken))
       .expect(409);
 
-    expect(res.body.errorCode).toBe('BOOKING_TRAVELERS_REQUIRED');
+    expect(res.body.errorCode).toBe('BOOKING_TRAVELER_COUNT_MISMATCH');
+    expect(res.body.expected).toBe(2);
+    expect(res.body.actual).toBe(1);
     expect(DB.bookings[0]!.status).toBe('PENDING');
+  });
+
+  it('confirms a PENDING booking when traveler count matches reservedSeats', async () => {
+    const tour = addTour(SAHARA.id);
+    const departure = addDeparture(tour.id);
+    const customer = addCustomer(SAHARA.id);
+    const booking = addBooking(departure, tour, customer, {
+      status: 'PENDING',
+      reservedSeats: 2,
+    });
+    addTraveler(booking.id);
+    addTraveler(booking.id);
+    addStatusHistory(booking.id);
+
+    const res = await request(app.getHttpServer())
+      .post(`${base()}/bookings/${booking.code}/confirm`)
+      .set(authHeader(adminToken))
+      .expect(200);
+
+    expect(res.body.status).toBe('CONFIRMED');
+    expect(res.body.confirmedAt).toBeTruthy();
+    expect(res.body.reservedSeats).toBe(2);
+
+    expect(DB.bookings[0]!.status).toBe('CONFIRMED');
+    expect(DB.statusHistory).toHaveLength(2);
+    expect(DB.statusHistory[1]).toMatchObject({
+      fromStatus: 'PENDING',
+      toStatus: 'CONFIRMED',
+      actorCode: admin.code,
+    });
+
+    const audit = DB.auditLog.find((a) => a.action === 'AGENCY_BOOKING_CONFIRMED');
+    expect(audit?.targetCode).toBe(booking.code);
+    expect(audit?.agencyCode).toBe(SAHARA.code);
   });
 
   it('409 when the booking is already confirmed', async () => {

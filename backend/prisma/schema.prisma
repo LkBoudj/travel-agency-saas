@@ -696,6 +696,7 @@ model Booking {
   departure     Departure              @relation(fields: [departureId], references: [id], onDelete: Cascade)
   priceLines    BookingPriceLine[]
   statusHistory BookingStatusHistory[]
+  travelers     BookingTraveler[]
 
   @@index([agencyId])
   @@index([customerId])
@@ -758,4 +759,38 @@ model BookingStatusHistory {
 
   @@index([bookingId])
   @@map("booking_status_history")
+}
+
+/**
+ * One traveler record of a Booking (Module J).
+ * A Booking's travelers are reconciled against its immutable `reservedSeats`:
+ * a PENDING booking is confirmable only when the number of traveler records
+ * equals `reservedSeats`. Travelers are NOT an identity — they carry no
+ * `app_user` link and no credentials, like Customers — and they resolve through
+ * their Booking, so tenancy is inherited (`:agencyCode` + `:bookingCode` route)
+ * and no traveler row carries an `agency_id`.
+ * Records are written only while the parent Booking is PENDING: a CONFIRMED
+ * booking's traveler list is the confirmation's ticket manifest and a
+ * CANCELLED booking's is historical. The database enforces that invariant via
+ * the `booking_traveler_booking_pending` trigger set and there is deliberately
+ * no delete endpoint — travelers are added and corrected while the booking is
+ * still being prepared, then frozen by confirmation.
+ */
+model BookingTraveler {
+  id        BigInt   @id @default(autoincrement())
+  // Backend-generated, immutable external identifier (`TRV-...`).
+  code      String   @unique @db.VarChar(24)
+  bookingId BigInt   @map("booking_id")
+  firstName String   @map("first_name") @db.VarChar(100)
+  lastName  String   @map("last_name") @db.VarChar(100)
+  email     String?  @db.Citext
+  phone     String?  @db.VarChar(32)
+  notes     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@map("booking_traveler")
 }

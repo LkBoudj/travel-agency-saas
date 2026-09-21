@@ -418,7 +418,8 @@ export const ModelName = {
   TourItineraryDay: 'TourItineraryDay',
   Booking: 'Booking',
   BookingPriceLine: 'BookingPriceLine',
-  BookingStatusHistory: 'BookingStatusHistory'
+  BookingStatusHistory: 'BookingStatusHistory',
+  BookingTraveler: 'BookingTraveler'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -434,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "appUser" | "role" | "permission" | "rolePermission" | "platformRoleAssignment" | "agency" | "customer" | "agencyApplication" | "agencyMembership" | "agencyRoleAssignment" | "agencyMemberInvitation" | "agencyMemberInvitationRole" | "auditLog" | "tour" | "departure" | "pricingOption" | "departurePrice" | "tourDestination" | "tourItineraryDay" | "booking" | "bookingPriceLine" | "bookingStatusHistory"
+    modelProps: "appUser" | "role" | "permission" | "rolePermission" | "platformRoleAssignment" | "agency" | "customer" | "agencyApplication" | "agencyMembership" | "agencyRoleAssignment" | "agencyMemberInvitation" | "agencyMemberInvitationRole" | "auditLog" | "tour" | "departure" | "pricingOption" | "departurePrice" | "tourDestination" | "tourItineraryDay" | "booking" | "bookingPriceLine" | "bookingStatusHistory" | "bookingTraveler"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2066,6 +2067,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    BookingTraveler: {
+      payload: Prisma.$BookingTravelerPayload<ExtArgs>
+      fields: Prisma.BookingTravelerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BookingTravelerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BookingTravelerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload>
+        }
+        findFirst: {
+          args: Prisma.BookingTravelerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BookingTravelerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload>
+        }
+        findMany: {
+          args: Prisma.BookingTravelerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload>[]
+        }
+        create: {
+          args: Prisma.BookingTravelerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload>
+        }
+        createMany: {
+          args: Prisma.BookingTravelerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BookingTravelerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload>[]
+        }
+        delete: {
+          args: Prisma.BookingTravelerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload>
+        }
+        update: {
+          args: Prisma.BookingTravelerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload>
+        }
+        deleteMany: {
+          args: Prisma.BookingTravelerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BookingTravelerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BookingTravelerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload>[]
+        }
+        upsert: {
+          args: Prisma.BookingTravelerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookingTravelerPayload>
+        }
+        aggregate: {
+          args: Prisma.BookingTravelerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBookingTraveler>
+        }
+        groupBy: {
+          args: Prisma.BookingTravelerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BookingTravelerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BookingTravelerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BookingTravelerCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2441,6 +2516,22 @@ export const BookingStatusHistoryScalarFieldEnum = {
 export type BookingStatusHistoryScalarFieldEnum = (typeof BookingStatusHistoryScalarFieldEnum)[keyof typeof BookingStatusHistoryScalarFieldEnum]
 
 
+export const BookingTravelerScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  bookingId: 'bookingId',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  email: 'email',
+  phone: 'phone',
+  notes: 'notes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BookingTravelerScalarFieldEnum = (typeof BookingTravelerScalarFieldEnum)[keyof typeof BookingTravelerScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2772,6 +2863,7 @@ export type GlobalOmitConfig = {
   booking?: Prisma.BookingOmit
   bookingPriceLine?: Prisma.BookingPriceLineOmit
   bookingStatusHistory?: Prisma.BookingStatusHistoryOmit
+  bookingTraveler?: Prisma.BookingTravelerOmit
 }
 
 /* Types for Logging */

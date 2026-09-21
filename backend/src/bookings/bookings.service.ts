@@ -21,8 +21,17 @@ import {
 const DEFAULT_CURRENCY = 'DZD';
 const MAX_TOTAL = new Prisma.Decimal('9999999999.99');
 
-function conflict(errorCode: string, message: string) {
-  return new ConflictException({ statusCode: 409, message, errorCode });
+function conflict(
+  errorCode: string,
+  message: string,
+  metadata?: Record<string, unknown>,
+) {
+  return new ConflictException({
+    statusCode: 409,
+    message,
+    errorCode,
+    ...metadata,
+  });
 }
 
 /** The departure row re-read under `FOR UPDATE` inside a booking transaction. */
@@ -42,6 +51,19 @@ interface DepartureLockRow {
   capacity: unknown;
   start_at: Date;
   booking_deadline: Date | null;
+}
+
+/** The booking row re-read under `FOR UPDATE` inside the confirm transaction. */
+interface LockedBooking {
+  id: bigint;
+  status: string;
+  reservedSeats: number;
+}
+
+interface BookingLockRow {
+  id: unknown;
+  status: string;
+  reserved_seats: unknown;
 }
 
 /** A `DeparturePrice` joined with its option definition, as the snapshot reads it. */
@@ -104,12 +126,12 @@ function toBigInt(value: unknown): bigint {
  * - One booking has one currency (the tour's single currency); mixed-currency
  *   selections are rejected.
  *
- * Lifecycle model (Module I):
+ * Lifecycle model (Modules I + J):
  * - `PENDING -> CANCELLED` is available through the cancel action.
- * - Confirmation is readiness-gated on the Booking's Traveler records, which
- *   arrive in Module J: the transition contract is enforced here but no PENDING
- *   booking can actually reach CONFIRMED yet, so no historical CONFIRMED
- *   booking with zero Travelers can ever exist.
+ * - `PENDING -> CONFIRMED` is readiness-gated on the Booking's Traveler
+ *   records: the record count must equal the immutable `reservedSeats` claim,
+ *   checked under `SELECT ... FOR UPDATE` on the booking row so the manifest
+ *   can never be enlarged or shrunk into a mismatch.
  */
 @Injectable()
 export class BookingsService {
@@ -257,14 +279,19 @@ export class BookingsService {
   /**
    * The PENDING -> CONFIRMED transition.
    *
-   * Confirmation is readiness-gated on the Booking's Traveler records
-   * (tickets must exist before a PENDING booking can be confirmed), which
-   * arrive in Module J. Until then no booking is confirmable: this enforces
-   * the transition contract (valid origin state) and then refuses with a
-   * dedicated error, so no historical CONFIRMED booking with zero Travelers
-   * can ever be written.
+   * Confirmation is readiness-gated on the Booking's Traveler records: the
+   * record count must equal the immutable `reservedSeats` claim before the
+   * seat manifest can be frozen. The gate re-reads the booking under
+   * `SELECT ... FOR UPDATE` inside a transaction, so a concurrent traveler
+   * write can never slip past a confirm (or a confirm past a traveler write).
+   * On success the transition is appended to the booking's status history with
+   * the acting member's code.
    */
-  async confirm(agencyId: bigint, bookingCode: string): Promise<BookingResponse> {
+  async confirm(
+    agencyId: bigint,
+    bookingCode: string,
+    actorCode: string,
+  ): Promise<BookingResponse> {
     const booking = await this.requireBooking(
       agencyId,
       bookingCode,
@@ -281,9 +308,49 @@ export class BookingsService {
       );
     }
 
-    throw conflict(
-      'BOOKING_TRAVELERS_REQUIRED',
-      "Confirmation requires the booking's Traveler records, which are not implemented yet",
+    await this.prisma.$transaction(async (tx) => {
+      const locked = await this.lockBooking(tx, booking.id);
+      if (locked.status === 'CONFIRMED' || locked.status === 'CANCELLED') {
+        throw conflict(
+          locked.status === 'CONFIRMED'
+            ? 'BOOKING_ALREADY_CONFIRMED'
+            : 'BOOKING_INVALID_TRANSITION',
+          locked.status === 'CONFIRMED'
+            ? 'This booking is already confirmed'
+            : 'A cancelled booking cannot be confirmed',
+        );
+      }
+
+      const travelerCount = await tx.bookingTraveler.count({
+        where: { bookingId: locked.id },
+      });
+      if (travelerCount !== locked.reservedSeats) {
+        throw conflict(
+          'BOOKING_TRAVELER_COUNT_MISMATCH',
+          `Confirmation requires ${locked.reservedSeats} traveler record(s) for the ` +
+            `${locked.reservedSeats} reserved seat(s), found ${travelerCount}`,
+          { expected: locked.reservedSeats, actual: travelerCount },
+        );
+      }
+
+      await tx.booking.update({
+        where: { id: locked.id },
+        data: { status: 'CONFIRMED', confirmedAt: new Date() },
+        select: { id: true },
+      });
+
+      await tx.bookingStatusHistory.create({
+        data: {
+          bookingId: locked.id,
+          fromStatus: 'PENDING',
+          toStatus: 'CONFIRMED',
+          actorCode,
+        },
+      });
+    });
+
+    return toBookingResponse(
+      await this.requireBooking(agencyId, bookingCode, BOOKING_LIST_SELECT),
     );
   }
 
@@ -424,6 +491,37 @@ export class BookingsService {
       capacity: Number(row.capacity),
       startAt: row.start_at,
       bookingDeadline: row.booking_deadline,
+    };
+  }
+
+  /**
+   * `SELECT ... FOR UPDATE` on the booking row inside the caller's
+   * transaction. This is the serialization point for confirmation: a confirm
+   * and a concurrent traveler write on the same booking queue on this lock, so
+   * the traveler-count readiness gate always sees a consistent manifest.
+   */
+  private async lockBooking(
+    tx: Prisma.TransactionClient,
+    bookingId: bigint,
+  ): Promise<LockedBooking> {
+    const rows = await tx.$queryRaw<BookingLockRow[]>`
+      SELECT id, status, reserved_seats
+      FROM booking
+      WHERE id = ${bookingId}
+      FOR UPDATE
+    `;
+    const row = rows[0];
+    if (!row) {
+      throw new NotFoundException({
+        statusCode: 404,
+        message: 'That booking does not exist',
+        errorCode: 'BOOKING_NOT_FOUND',
+      });
+    }
+    return {
+      id: toBigInt(row.id),
+      status: row.status,
+      reservedSeats: Number(row.reserved_seats),
     };
   }
 
