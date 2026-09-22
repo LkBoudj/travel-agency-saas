@@ -39,3 +39,6 @@ Thumbs.db
 
 # Misc
 *.pem
+
+# Backups of removed nested git histories (kept local, not committed)
+frontend/*.history.bundle
