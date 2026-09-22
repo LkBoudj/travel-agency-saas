@@ -16,7 +16,7 @@ import {
 export const theme = createTheme({
   colors,
   primaryColor: 'brand',
-  primaryShade: { light: 6, dark: 7 },
+  primaryShade: { light: 6, dark: 5 },
   autoContrast: true,
   fontFamily,
   fontFamilyMonospace,

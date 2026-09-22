@@ -1,4 +1,9 @@
-@import '@fontsource-variable/inter';
+@import '@fontsource/fira-sans/300.css';
+@import '@fontsource/fira-sans/400.css';
+@import '@fontsource/fira-sans/500.css';
+@import '@fontsource/fira-sans/600.css';
+@import '@fontsource/fira-sans/700.css';
+@import '@fontsource-variable/fira-code';
 
 :root {
   --app-heading-h1: clamp(1.5rem, 2vw + 1rem, 2rem);
@@ -7,6 +12,10 @@
   --app-heading-h4: 1.125rem;
   --app-heading-h5: 1rem;
   --app-heading-h6: 0.875rem;
+
+  --app-glass-bg: rgb(15 23 42 / 0.72);
+  --app-glass-blur: blur(14px) saturate(140%);
+  --app-glass-border: rgb(148 163 184 / 0.16);
 }
 
 *,
@@ -25,6 +34,8 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--mantine-color-dark-7);
+  color: var(--mantine-color-text);
 }
 
 ::-webkit-scrollbar {
@@ -37,7 +48,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--mantine-color-gray-4);
+  background-color: var(--mantine-color-dark-4);
   border-radius: var(--mantine-radius-md);
   border: 2px solid transparent;
   background-clip: content-box;

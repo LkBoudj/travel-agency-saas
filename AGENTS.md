@@ -90,3 +90,19 @@ Skills live in `.opencode/skills/` (repo-wide) and `frontend/<app>/.opencode/ski
 - Repo-wide policy belongs **here**, not in app files.
 - App `AGENTS.md` files are **deltas**: stack, directory structure, naming, and conventions specific to that app. Keep them slim.
 - If a rule applies to more than one app, move it here.
+
+## 10. Frontend Structure
+
+For React/frontend code, optimize for easy tracing and clear separation of responsibilities.
+
+- Page components must stay thin and focus on composition/orchestration.
+- Move data fetching, navigation, side effects, and derived state into feature hooks.
+- Move meaningful UI sections into components.
+- Keep components primarily focused on rendering and user interaction.
+- Move pure calculations, transforms, predicates, and decision logic into `lib` helpers.
+- Prefer feature-local `components/`, `hooks/`, and `lib/` folders.
+- Promote code to shared/global components only when it is genuinely reused.
+- Do not create tiny wrapper components or abstractions with no clear value.
+- Avoid mixing fetching, business decisions, side effects, and large UI markup in one file.
+- Prefer this flow: **Page → Hooks → Components → Lib**.
+- Keep changes minimal. Preserve existing behavior unless the task explicitly requires a behavior change. Do not refactor unrelated working code.

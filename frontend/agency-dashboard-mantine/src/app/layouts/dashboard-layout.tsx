@@ -4,6 +4,13 @@ import { useDisclosure } from '@mantine/hooks';
 import { DashboardHeader } from './dashboard-header.tsx';
 import { DashboardSidebar } from './dashboard-sidebar.tsx';
 
+const glassStyle = {
+  backgroundColor: 'var(--app-glass-bg)',
+  backdropFilter: 'var(--app-glass-blur)',
+  WebkitBackdropFilter: 'var(--app-glass-blur)',
+  borderColor: 'var(--app-glass-border)',
+} as const;
+
 export function DashboardLayout() {
   const [navOpened, { toggle, close }] = useDisclosure();
 
@@ -17,10 +24,10 @@ export function DashboardLayout() {
       }}
       padding="md"
     >
-      <AppShell.Header>
+      <AppShell.Header style={glassStyle}>
         <DashboardHeader onToggleNav={toggle} />
       </AppShell.Header>
-      <AppShell.Navbar p="xs">
+      <AppShell.Navbar p="xs" style={glassStyle}>
         <DashboardSidebar onNavigate={close} />
       </AppShell.Navbar>
       <AppShell.Main>

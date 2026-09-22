@@ -29,7 +29,7 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
       <Group gap="sm" wrap="nowrap">
         <Burger onClick={onToggleNav} hiddenFrom="sm" size="sm" />
         <Group gap={8} wrap="nowrap">
-          <IconBuildingSkyscraper size={20} />
+          <IconBuildingSkyscraper size={20} color="var(--mantine-color-brand-5)" />
           <Text fw={700} visibleFrom="xs">
             {agencyName}
           </Text>

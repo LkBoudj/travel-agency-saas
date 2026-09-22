@@ -1,8 +1,8 @@
 export const fontFamily =
-  'Inter Variable, Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
+  'Fira Sans, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
 
 export const fontFamilyMonospace =
-  'ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace';
+  '"Fira Code Variable", "Fira Code", ui-monospace, "SF Mono", "Cascadia Code", "JetBrains Mono", Menlo, Consolas, monospace';
 
 export const fontSizes = {
   xs: '0.75rem',

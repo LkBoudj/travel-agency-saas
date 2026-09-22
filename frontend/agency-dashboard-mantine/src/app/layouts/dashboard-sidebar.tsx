@@ -26,6 +26,12 @@ export function DashboardSidebar({ onNavigate }: { onNavigate: () => void }) {
                 leftSection={<Icon size={16} />}
                 active={pathname === item.to}
                 onClick={onNavigate}
+                style={{
+                  borderRadius: 'var(--mantine-radius-md)',
+                  '--nl-bg': 'color-mix(in srgb, var(--mantine-color-brand-5) 18%, transparent)',
+                  '--nl-hover': 'color-mix(in srgb, var(--mantine-color-brand-5) 26%, transparent)',
+                  '--nl-color': 'var(--mantine-color-brand-0)',
+                }}
               />
             );
           })}

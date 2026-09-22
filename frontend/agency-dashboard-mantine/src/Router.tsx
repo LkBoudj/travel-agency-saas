@@ -12,6 +12,8 @@ import { CustomersPage } from './features/customers/pages/customers.page.tsx';
 import { MembersPage } from './features/members/pages/members.page.tsx';
 import { OverviewPage } from './features/overview/pages/overview.page.tsx';
 import { FeaturePlaceholderPage } from './features/placeholder/pages/feature-placeholder.page.tsx';
+import { TripsEditorPage } from './features/trips/pages/trips-editor.page.tsx';
+import { TripsPage } from './features/trips/pages/trips.page.tsx';
 import { StyleGuidePage } from './pages/StyleGuide.page';
 
 const router = createBrowserRouter([
@@ -59,7 +61,15 @@ const router = createBrowserRouter([
                 path: 'trips',
                 element: (
                   <RequirePermission permissions={['AGENCY_TOUR_VIEW']}>
-                    <FeaturePlaceholderPage titleKey="nav.trips" />
+                    <TripsPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: 'trips/:tourCode',
+                element: (
+                  <RequirePermission permissions={['AGENCY_TOUR_VIEW']}>
+                    <TripsEditorPage />
                   </RequirePermission>
                 ),
               },

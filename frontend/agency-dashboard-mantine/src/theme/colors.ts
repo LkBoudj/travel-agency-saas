@@ -1,29 +1,29 @@
 import type { MantineColorsTuple } from '@mantine/core';
 
 export const brand: MantineColorsTuple = [
-  '#EEF9F7',
-  '#D8F1ED',
-  '#B0E5DC',
-  '#83D4C8',
-  '#57BFB1',
-  '#31AA9A',
-  '#1E9587',
-  '#18786D',
-  '#135C54',
-  '#0E423C',
+  '#F0FDF4',
+  '#DCFCE7',
+  '#BBF7D0',
+  '#86EFAC',
+  '#4ADE80',
+  '#22C55E',
+  '#16A34A',
+  '#15803D',
+  '#166534',
+  '#14532D',
 ];
 
 export const dark: MantineColorsTuple = [
-  '#C6CED6',
-  '#ABB8C2',
-  '#8E9CA9',
-  '#6E7E8D',
-  '#556776',
-  '#42515F',
-  '#34404C',
-  '#28323C',
-  '#1E262E',
-  '#151B21',
+  '#F8FAFC',
+  '#E2E8F0',
+  '#94A3B8',
+  '#64748B',
+  '#475569',
+  '#334155',
+  '#1B2336',
+  '#0F172A',
+  '#0B1324',
+  '#060B14',
 ];
 
 export const gray: MantineColorsTuple = [

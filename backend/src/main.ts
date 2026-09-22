@@ -19,6 +19,9 @@ async function bootstrap() {
     config.get<string>('NODE_ENV') === 'production'
       ? undefined
       : [
+        // frontend/agency-dashboard-mantine
+          'http://localhost:5175',
+          'http://127.0.0.1:5175',
           // frontend/dashboard
           'http://localhost:5173',
           'http://127.0.0.1:5173',

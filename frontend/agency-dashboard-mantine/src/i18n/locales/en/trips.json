@@ -1,0 +1,283 @@
+{
+  "title": "Trips",
+  "subtitle": "The product catalog your departures quote against.",
+  "searchPlaceholder": "Search trips…",
+  "create": "New trip",
+  "tripsEmpty": "No trips found.",
+  "loadError": "Could not load trips.",
+  "menu": "Trip actions",
+  "edit": "Edit",
+  "publish": "Publish",
+  "unpublish": "Unpublish",
+  "archive": "Archive",
+  "statusFilterLabel": "Filter by status",
+  "statusFilter": {
+    "all": "All statuses",
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived"
+  },
+  "columns": {
+    "tour": "Trip",
+    "destinations": "Destinations",
+    "schedule": "Schedule",
+    "status": "Status",
+    "price": "Starting price",
+    "created": "Created"
+  },
+  "confirm": {
+    "publishTitle": "Publish {{name}}?",
+    "publishBody": "This trip becomes visible to the public once its readiness checks pass.",
+    "unpublishTitle": "Unpublish {{name}}?",
+    "unpublishBody": "The trip stops being publicly visible. Future departures keep their data.",
+    "archiveTitle": "Archive {{name}}?",
+    "archiveBody": "The trip is archived and can no longer be published. Departures already scheduled keep running. This cannot be undone."
+  },
+  "notifications": {
+    "created": "Trip created.",
+    "updated": "Trip updated.",
+    "published": "Trip published.",
+    "unpublished": "Trip unpublished.",
+    "archived": "Trip archived.",
+    "tourNotFound": "This trip is no longer available.",
+    "publishBlocked": "This trip is not ready to publish yet",
+    "publishStateBlocked": "The trip is not in a state that can be published.",
+    "alreadyArchived": "This trip is already archived.",
+    "unknownError": "Something went wrong. Try again."
+  },
+  "blockers": {
+    "NAME": "Give the trip a name.",
+    "DESTINATION": "Add at least one destination with a place or city.",
+    "SHORT_DESCRIPTION": "Write a short description.",
+    "COVER_IMAGE": "Set a cover image URL.",
+    "SCHEDULED_DEPARTURES_REQUIRED": "Scheduled trips need at least one open departure before they can publish."
+  },
+  "createDrawer": {
+    "title": "New trip",
+    "step": "Step {{current}} of {{total}}",
+    "subtitle": "Start with the essentials — a draft is fine, you'll finish it in the editor.",
+    "formatDescriptions": {
+      "experience": "A few hours long",
+      "day_excursion": "Fixed at one day",
+      "stay": "Multi-day at one base",
+      "circuit": "Multi-day on the move",
+      "cruise": "Multi-day at sea"
+    },
+    "name": "Name",
+    "format": "Format",
+    "scope": "Scope",
+    "availability": "Availability",
+    "destinationPlace": "Destination place or city",
+    "destinationPlaceholder": "e.g. Djanet, Algiers, Sahara…",
+    "destinationHelp": "Choose one of your existing places or type a new one.",
+    "readyHint": "Name and destination get this trip started. The editor (step 2) covers description, cover image and departures.",
+    "submit": "Create draft"
+  },
+  "readiness": {
+    "title": "Publish readiness",
+    "departureHint": "Scheduled trips also need at least one open departure, managed from the departures section."
+  },
+  "editor": {
+    "titleEdit": "Edit trip",
+    "subtitleEdit": "Changes replace the whole trip.",
+    "newDraft": "New draft",
+    "welcomeHint": "Step 2 of 2 — this trip is a new draft. Add the details here, then publish it from the readiness panel.",
+    "backLabel": "Back to trips",
+    "readOnlyHint": "You can view this trip, but your permissions don't allow saving changes.",
+    "submitEdit": "Save changes",
+    "untitled": "Untitled trip",
+    "emptySelect": "Not set",
+    "sections": {
+      "overview": "Overview",
+      "overviewDuration": "Duration",
+      "singleDayHint": "Day excursions are fixed at 1 day.",
+      "destinations": "Destinations",
+      "originHint": "Origin is where the trip starts.",
+      "content": "Description & media",
+      "categories": "Themes & categories",
+      "lists": "Highlights & inclusions",
+      "itinerary": "Itinerary",
+      "details": "Practical information",
+      "requirements": "Physical requirements"
+    },
+    "fields": {
+      "name": "Name",
+      "internalRef": "Internal reference",
+      "format": "Format",
+      "geographicScope": "Scope",
+      "availabilityMode": "Availability",
+      "participationMode": "Participation",
+      "guidanceType": "Guidance",
+      "days": "Days",
+      "nights": "Nights",
+      "hours": "Hours",
+      "minTravelers": "Min. travellers",
+      "isFlexible": "Flexible schedule",
+      "languages": "Languages",
+      "wilayaCode": "Wilaya code",
+      "cityId": "City / commune",
+      "place": "Place",
+      "coverImageUrl": "Cover image URL",
+      "shortDescription": "Short description",
+      "description": "Full description",
+      "gallery": "Gallery image URLs",
+      "themes": "Themes",
+      "activities": "Activities",
+      "audiences": "Audiences",
+      "transportModes": "Transport",
+      "accommodationTypes": "Accommodation",
+      "highlights": "Highlights",
+      "included": "Included",
+      "notIncluded": "Not included",
+      "importantInformation": "Important information",
+      "cancellationPolicy": "Cancellation policy",
+      "meetingPoint": "Meeting point",
+      "meetingInstructions": "Meeting instructions",
+      "difficulty": "Difficulty",
+      "fitnessLevel": "Fitness level",
+      "minimumAge": "Min. age",
+      "distanceKm": "Distance (km)",
+      "elevationGainM": "Elevation gain (m)",
+      "requiredEquipment": "Required equipment"
+    },
+    "placeholders": {
+      "name": "e.g. Sahara Circuit",
+      "internalRef": "Optional",
+      "coverImageUrl": "https://…",
+      "itineraryTitle": "Day — title",
+      "itineraryLocation": "Location",
+      "itineraryDescription": "What happens this day…"
+    },
+    "lineListHint": "One item per line.",
+    "addDestination": "Add destination",
+    "removeDestination": "Remove destination",
+    "addItineraryDay": "Add day",
+    "removeItineraryDay": "Remove day"
+  },
+  "fieldErrors": {
+    "nameRequired": "Enter a name.",
+    "nameTooLong": "Keep this field to 120 characters or fewer.",
+    "destinationRequired": "Add at least one destination.",
+    "destinationsTooMany": "Keep to 50 destinations or fewer.",
+    "shortDescriptionTooLong": "Keep the short description to 160 characters or fewer.",
+    "urlTooLong": "Keep URLs to 2048 characters or fewer."
+  },
+  "errors": {
+    "network": "Could not reach the server. Check your connection and try again.",
+    "generic": "Something went wrong. Try again."
+  },
+  "catalog": {
+    "formats": {
+      "experience": "Experience",
+      "day_excursion": "Day excursion",
+      "stay": "Stay",
+      "circuit": "Circuit",
+      "cruise": "Cruise"
+    },
+    "scopes": {
+      "domestic": "Domestic",
+      "international": "International"
+    },
+    "modes": {
+      "scheduled": "Scheduled",
+      "on_request": "On request",
+      "custom_quote": "Custom quote"
+    },
+    "participations": {
+      "shared_group": "Shared group",
+      "private": "Private",
+      "individual": "Individual"
+    },
+    "guidance": {
+      "guided": "Guided",
+      "escorted": "Escorted",
+      "self_guided": "Self-guided",
+      "mixed": "Mixed"
+    },
+    "difficulties": {
+      "easy": "Easy",
+      "moderate": "Moderate",
+      "challenging": "Challenging"
+    },
+    "fitness": {
+      "basic": "Basic",
+      "normal": "Normal",
+      "good": "Good",
+      "high": "High"
+    },
+    "themes": {
+      "nature": "Nature",
+      "mountain": "Mountain",
+      "sahara_desert": "Sahara & desert",
+      "beach_coastal": "Beach & coastal",
+      "cultural": "Cultural",
+      "heritage_history": "Heritage & history",
+      "religious_spiritual": "Religious & spiritual",
+      "wellness": "Wellness",
+      "adventure": "Adventure",
+      "eco_tourism": "Eco-tourism",
+      "urban_city": "Urban & city",
+      "gastronomy": "Gastronomy",
+      "festival_event": "Festival & events",
+      "luxury": "Luxury"
+    },
+    "activities": {
+      "hiking": "Hiking",
+      "trekking": "Trekking",
+      "walking_tour": "Walking tour",
+      "sightseeing": "Sightseeing",
+      "guided_visit": "Guided visit",
+      "museum_archaeology": "Museums & archaeology",
+      "camping": "Camping",
+      "offroad_4x4": "Off-road 4×4",
+      "camel_trek": "Camel trek",
+      "cycling": "Cycling",
+      "horse_riding": "Horse riding",
+      "boat_trip": "Boat trip",
+      "swimming_beach": "Swimming & beach",
+      "fishing": "Fishing",
+      "skiing_snow": "Skiing & snow",
+      "climbing": "Climbing",
+      "kayaking": "Kayaking",
+      "diving": "Diving",
+      "wellness_hammam": "Wellness & hammam",
+      "craft_workshop": "Craft workshops",
+      "food_tasting": "Food tasting",
+      "photography": "Photography",
+      "festival": "Festival"
+    },
+    "audiences": {
+      "families": "Families",
+      "couples": "Couples",
+      "honeymoon": "Honeymoon",
+      "friends": "Friends",
+      "solo": "Solo",
+      "youth": "Youth",
+      "seniors": "Seniors",
+      "corporate": "Corporate"
+    },
+    "transports": {
+      "bus": "Bus",
+      "minibus": "Minibus",
+      "car": "Car",
+      "flight": "Flight",
+      "train": "Train",
+      "boat": "Boat",
+      "offroad_4x4": "Off-road 4×4",
+      "camel": "Camel",
+      "bicycle": "Bicycle",
+      "walking": "Walking",
+      "self_drive": "Self-drive",
+      "mixed": "Mixed"
+    },
+    "accommodations": {
+      "none": "None",
+      "hotel": "Hotel",
+      "resort": "Resort",
+      "guesthouse": "Guesthouse",
+      "homestay": "Homestay",
+      "camp": "Camp",
+      "mixed": "Mixed"
+    }
+  }
+}

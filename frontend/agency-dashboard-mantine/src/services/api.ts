@@ -28,11 +28,12 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}): Promi
       // Non-JSON error body → normalized generic below.
     }
 
-    const { message, code } = parseErrorBody(body);
+    const { message, code, metadata } = parseErrorBody(body);
     throw new ApiError(
       message === 'Request failed' ? `Request failed (${response.status})` : message,
       response.status,
-      code
+      code,
+      metadata
     );
   }
 

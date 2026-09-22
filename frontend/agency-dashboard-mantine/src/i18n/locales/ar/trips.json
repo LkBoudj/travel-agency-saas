@@ -1,0 +1,283 @@
+{
+  "title": "الرحلات",
+  "subtitle": "كتالوج المنتجات الذي تُسعَّر على أساسه الانطلاقات.",
+  "searchPlaceholder": "ابحث عن رحلات…",
+  "create": "رحلة جديدة",
+  "tripsEmpty": "لا توجد رحلات.",
+  "loadError": "تعذّر تحميل الرحلات.",
+  "menu": "إجراءات الرحلة",
+  "edit": "تعديل",
+  "publish": "نشر",
+  "unpublish": "إلغاء النشر",
+  "archive": "أرشفة",
+  "statusFilterLabel": "تصفية حسب الحالة",
+  "statusFilter": {
+    "all": "كل الحالات",
+    "draft": "مسودة",
+    "published": "منشورة",
+    "archived": "مؤرشفة"
+  },
+  "columns": {
+    "tour": "الرحلة",
+    "destinations": "الوجهات",
+    "schedule": "الجدول",
+    "status": "الحالة",
+    "price": "سعر البداية",
+    "created": "أُنشئت"
+  },
+  "confirm": {
+    "publishTitle": "نشر «{{name}}»؟",
+    "publishBody": "ستصبح هذه الرحلة مرئية للعموم بعد اجتياز فحوص الجاهزية.",
+    "unpublishTitle": "إلغاء نشر «{{name}}»؟",
+    "unpublishBody": "ستتوقف الرحلة عن الظهور للعموم، وتُحفظ بيانات انطلاقاتها.",
+    "archiveTitle": "أرشفة «{{name}}»؟",
+    "archiveBody": "تُؤرشف الرحلة ولا يمكن نشرها بعد الآن، بينما تستمر الانطلاقات المجدولة. لا يمكن التراجع عن هذا الإجراء."
+  },
+  "notifications": {
+    "created": "أُنشئت الرحلة.",
+    "updated": "حُدِّثت الرحلة.",
+    "published": "نُشرت الرحلة.",
+    "unpublished": "أُلغي نشر الرحلة.",
+    "archived": "أُرشفت الرحلة.",
+    "tourNotFound": "لم تعد هذه الرحلة متاحة.",
+    "publishBlocked": "هذه الرحلة ليست جاهزة للنشر بعد",
+    "publishStateBlocked": "الرحلة ليست في حالة تسمح بنشرها.",
+    "alreadyArchived": "هذه الرحلة مؤرشفة بالفعل.",
+    "unknownError": "حدث خطأ ما. حاول مجددًا."
+  },
+  "blockers": {
+    "NAME": "أضف اسمًا للرحلة.",
+    "DESTINATION": "أضف وجهة واحدة على الأقل بمكان أو مدينة.",
+    "SHORT_DESCRIPTION": "اكتب وصفًا قصيرًا.",
+    "COVER_IMAGE": "حدّد رابط صورة الغلاف.",
+    "SCHEDULED_DEPARTURES_REQUIRED": "تحتاج الرحلات المجدولة إلى انطلاقة واحدة مفتوحة على الأقل قبل النشر."
+  },
+  "createDrawer": {
+    "title": "رحلة جديدة",
+    "step": "الخطوة {{current}} من {{total}}",
+    "subtitle": "ابدأ بالأساسيات — المسودة مقبولة وستُكملها في المحرر.",
+    "formatDescriptions": {
+      "experience": "تدوم بضع ساعات",
+      "day_excursion": "يوم واحد ثابت",
+      "stay": "عدة أيام في قاعدة واحدة",
+      "circuit": "عدة أيام في تنقل",
+      "cruise": "عدة أيام في البحر"
+    },
+    "name": "الاسم",
+    "format": "النوع",
+    "scope": "النطاق",
+    "availability": "التوفر",
+    "destinationPlace": "المكان أو المدينة",
+    "destinationPlaceholder": "مثال: جانت، الجزائر العاصمة، الصحراء…",
+    "destinationHelp": "اختر أحد أماكنك المعروفة أو اكتب مكانًا جديدًا.",
+    "readyHint": "الاسم والوجهة يُطلقان الرحلة. يغطي المحرر (الخطوة 2) الوصف وصورة الغلاف والانطلاقات.",
+    "submit": "إنشاء مسودة"
+  },
+  "readiness": {
+    "title": "جاهزية النشر",
+    "departureHint": "تحتاج الرحلات المجدولة أيضًا إلى انطلاقة مفتوحة واحدة على الأقل، تُدار من قسم الانطلاقات."
+  },
+  "editor": {
+    "titleEdit": "تعديل الرحلة",
+    "subtitleEdit": "يستبدل الحفظ الرحلة كاملة.",
+    "newDraft": "مسودة جديدة",
+    "welcomeHint": "الخطوة 2 من 2 — هذه الرحلة مسودة جديدة. أضف التفاصيل هنا، ثم انشرها من لوحة الجاهزية.",
+    "backLabel": "العودة إلى الرحلات",
+    "readOnlyHint": "يمكنك عرض هذه الرحلة، لكن صلاحياتك لا تسمح بحفظ التغييرات.",
+    "submitEdit": "حفظ التغييرات",
+    "untitled": "رحلة بدون اسم",
+    "emptySelect": "غير محدد",
+    "sections": {
+      "overview": "نظرة عامة",
+      "overviewDuration": "المدة",
+      "singleDayHint": "الرحلات اليومية ثابتة على يوم واحد.",
+      "destinations": "الوجهات",
+      "originHint": "نقطة الانطلاق هي مكان بدء الرحلة.",
+      "content": "الوصف والوسائط",
+      "categories": "المواضيع والتصنيفات",
+      "lists": "المزايا والمشمولات",
+      "itinerary": "برنامج الرحلة",
+      "details": "معلومات عملية",
+      "requirements": "المتطلبات البدنية"
+    },
+    "fields": {
+      "name": "الاسم",
+      "internalRef": "المرجع الداخلي",
+      "format": "النوع",
+      "geographicScope": "النطاق",
+      "availabilityMode": "التوفر",
+      "participationMode": "المشاركة",
+      "guidanceType": "المرافقة",
+      "days": "الأيام",
+      "nights": "الليالي",
+      "hours": "الساعات",
+      "minTravelers": "حد أدنى للمسافرين",
+      "isFlexible": "جدول مرن",
+      "languages": "اللغات",
+      "wilayaCode": "رمز الولاية",
+      "cityId": "المدينة / البلدية",
+      "place": "المكان",
+      "coverImageUrl": "رابط صورة الغلاف",
+      "shortDescription": "وصف قصير",
+      "description": "وصف كامل",
+      "gallery": "روابط صور المعرض",
+      "themes": "المواضيع",
+      "activities": "الأنشطة",
+      "audiences": "الشرائح",
+      "transportModes": "وسائل النقل",
+      "accommodationTypes": "الإقامة",
+      "highlights": "أبرز ما يميزها",
+      "included": "يشمل",
+      "notIncluded": "لا يشمل",
+      "importantInformation": "معلومات مهمة",
+      "cancellationPolicy": "سياسة الإلغاء",
+      "meetingPoint": "نقطة اللقاء",
+      "meetingInstructions": "تعليمات اللقاء",
+      "difficulty": "الصعوبة",
+      "fitnessLevel": "مستوى اللياقة",
+      "minimumAge": "الحد الأدنى للسن",
+      "distanceKm": "المسافة (كم)",
+      "elevationGainM": "الارتفاع الصاعد (م)",
+      "requiredEquipment": "المعدات المطلوبة"
+    },
+    "placeholders": {
+      "name": "مثال: جولة الصحراء",
+      "internalRef": "اختياري",
+      "coverImageUrl": "https://…",
+      "itineraryTitle": "اليوم — العنوان",
+      "itineraryLocation": "المكان",
+      "itineraryDescription": "ماذا يحدث في هذا اليوم…"
+    },
+    "lineListHint": "عنصر واحد في كل سطر.",
+    "addDestination": "أضف وجهة",
+    "removeDestination": "إزالة الوجهة",
+    "addItineraryDay": "أضف يومًا",
+    "removeItineraryDay": "إزالة اليوم"
+  },
+  "fieldErrors": {
+    "nameRequired": "أدخل اسمًا.",
+    "nameTooLong": "الحدّ الأقصى 120 حرفًا أو أقل.",
+    "destinationRequired": "أضف وجهة واحدة على الأقل.",
+    "destinationsTooMany": "الحدّ الأقصى 50 وجهة أو أقل.",
+    "shortDescriptionTooLong": "حافظ على الوصف القصير ضمن 160 حرفًا أو أقل.",
+    "urlTooLong": "روابط الصور ضمن 2048 حرفًا أو أقل."
+  },
+  "errors": {
+    "network": "تعذّر الوصول إلى الخادم. تحقق من الاتصال وحاول مجددًا.",
+    "generic": "حدث خطأ ما. حاول مجددًا."
+  },
+  "catalog": {
+    "formats": {
+      "experience": "تجربة",
+      "day_excursion": "رحلة يومية",
+      "stay": "إقامة",
+      "circuit": "جولة",
+      "cruise": "رحلة بحرية"
+    },
+    "scopes": {
+      "domestic": "داخلية",
+      "international": "دولية"
+    },
+    "modes": {
+      "scheduled": "مجدولة",
+      "on_request": "عند الطلب",
+      "custom_quote": "عرض سعر مخصص"
+    },
+    "participations": {
+      "shared_group": "مجموعة مشتركة",
+      "private": "خاصة",
+      "individual": "فردية"
+    },
+    "guidance": {
+      "guided": "بمرشد",
+      "escorted": "بمرافقة",
+      "self_guided": "تلقائية",
+      "mixed": "مختلطة"
+    },
+    "difficulties": {
+      "easy": "سهل",
+      "moderate": "متوسط",
+      "challenging": "صعب"
+    },
+    "fitness": {
+      "basic": "أساسي",
+      "normal": "عادي",
+      "good": "جيد",
+      "high": "عالٍ"
+    },
+    "themes": {
+      "nature": "طبيعة",
+      "mountain": "جبال",
+      "sahara_desert": "الصحراء والصحاري",
+      "beach_coastal": "الشواطئ والسواحل",
+      "cultural": "ثقافي",
+      "heritage_history": "تراث وتاريخ",
+      "religious_spiritual": "ديني وروحي",
+      "wellness": "استجمام",
+      "adventure": "مغامرة",
+      "eco_tourism": "سياحة بيئية",
+      "urban_city": "مدن وحضرية",
+      "gastronomy": "مأكولات",
+      "festival_event": "مهرجانات وفعاليات",
+      "luxury": "فاخر"
+    },
+    "activities": {
+      "hiking": "مشي جبلي",
+      "trekking": "رحل مرتفعات",
+      "walking_tour": "جولة مشي",
+      "sightseeing": "استكشاف معالم",
+      "guided_visit": "زيارة بمرشد",
+      "museum_archaeology": "متاحف وآثار",
+      "camping": "تخييم",
+      "offroad_4x4": "دفع رباعي",
+      "camel_trek": "رحل بالجمال",
+      "cycling": "دراجات",
+      "horse_riding": "ركوب الخيل",
+      "boat_trip": "رحلة بالقارب",
+      "swimming_beach": "سباحة وشاطئ",
+      "fishing": "صيد",
+      "skiing_snow": "تزلج وثلوج",
+      "climbing": "تسلق",
+      "kayaking": "كاياك",
+      "diving": "غوص",
+      "wellness_hammam": "استجمام وحمّام",
+      "craft_workshop": "ورش حرفية",
+      "food_tasting": "تذوق المأكولات",
+      "photography": "تصوير",
+      "festival": "مهرجان"
+    },
+    "audiences": {
+      "families": "عائلات",
+      "couples": "أزواج",
+      "honeymoon": "شهر عسل",
+      "friends": "أصدقاء",
+      "solo": "منفردون",
+      "youth": "شباب",
+      "seniors": "كبار السن",
+      "corporate": "شركات"
+    },
+    "transports": {
+      "bus": "حافلة",
+      "minibus": "حافلة صغيرة",
+      "car": "سيارة",
+      "flight": "طائرة",
+      "train": "قطار",
+      "boat": "قارب",
+      "offroad_4x4": "دفع رباعي",
+      "camel": "جمال",
+      "bicycle": "دراجة",
+      "walking": "مشي",
+      "self_drive": "قيادة ذاتية",
+      "mixed": "مختلطة"
+    },
+    "accommodations": {
+      "none": "بدون",
+      "hotel": "فندق",
+      "resort": "منتجع",
+      "guesthouse": "نزل",
+      "homestay": "إقامة عائلية",
+      "camp": "مخيم",
+      "mixed": "مختلطة"
+    }
+  }
+}

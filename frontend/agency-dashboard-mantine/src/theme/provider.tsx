@@ -46,7 +46,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme}>
+      <MantineProvider theme={theme} forceColorScheme="dark">
         <DatesProvider settings={DATE_SETTINGS[locale]}>
           <ModalsProvider
             labels={{ confirm: t('actions.confirm'), cancel: t('actions.cancel') }}

@@ -29,3 +29,23 @@ test('parseErrorBody: falls back when message is blank or not a string', () => {
   assert.deepEqual(parseErrorBody({ message: '   ' }), { message: 'Request failed' });
   assert.deepEqual(parseErrorBody({ message: 42 }), { message: 'Request failed' });
 });
+
+test('parseErrorBody: carries backend metadata (e.g. publish blockers)', () => {
+  assert.deepEqual(
+    parseErrorBody({
+      statusCode: 409,
+      message: 'Blocked',
+      errorCode: 'TOUR_PUBLISH_READINESS_BLOCKED',
+      metadata: { blockers: ['NAME', 'COVER_IMAGE'] },
+    }),
+    {
+      message: 'Blocked',
+      code: 'TOUR_PUBLISH_READINESS_BLOCKED',
+      metadata: { blockers: ['NAME', 'COVER_IMAGE'] },
+    }
+  );
+});
+
+test('parseErrorBody: drops non-object metadata', () => {
+  assert.equal(parseErrorBody({ message: 'x', metadata: 'nope' }).metadata, undefined);
+});

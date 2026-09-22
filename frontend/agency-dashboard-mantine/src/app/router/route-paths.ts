@@ -9,6 +9,7 @@ export const dashboardPaths = {
   members: (agencyCode: string) => `/${agencyCode}/members`,
   customers: (agencyCode: string) => `/${agencyCode}/customers`,
   trips: (agencyCode: string) => `/${agencyCode}/trips`,
+  tripsDetail: (agencyCode: string, tourCode: string) => `/${agencyCode}/trips/${tourCode}`,
   departures: (agencyCode: string) => `/${agencyCode}/departures`,
   bookings: (agencyCode: string) => `/${agencyCode}/bookings`,
 } as const;
