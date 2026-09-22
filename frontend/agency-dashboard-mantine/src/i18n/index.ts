@@ -15,9 +15,11 @@ import {
 } from './locales';
 import arAuth from './locales/ar/auth.json';
 import arCommon from './locales/ar/common.json';
+import arCustomers from './locales/ar/customers.json';
 import arMembers from './locales/ar/members.json';
 import enAuth from './locales/en/auth.json';
 import enCommon from './locales/en/common.json';
+import enCustomers from './locales/en/customers.json';
 import enMembers from './locales/en/members.json';
 
 export {
@@ -33,13 +35,13 @@ export type { AppDirection, AppLocale };
 
 void i18n.use(initReactI18next).init({
   resources: {
-    en: { common: enCommon, auth: enAuth, members: enMembers },
-    ar: { common: arCommon, auth: arAuth, members: arMembers },
+    en: { common: enCommon, auth: enAuth, members: enMembers, customers: enCustomers },
+    ar: { common: arCommon, auth: arAuth, members: arMembers, customers: arCustomers },
   },
   lng: resolveInitialLocale(readStoredLocale(), window.navigator.language),
   fallbackLng: DEFAULT_LOCALE,
   supportedLngs: SUPPORTED_LOCALES,
-  ns: ['common', 'auth', 'members'],
+  ns: ['common', 'auth', 'members', 'customers'],
   defaultNS: 'common',
   interpolation: { escapeValue: false },
 });

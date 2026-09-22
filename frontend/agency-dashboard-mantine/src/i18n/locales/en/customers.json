@@ -1,0 +1,51 @@
+{
+  "title": "Customers",
+  "subtitle": "People you quote and book trips for.",
+  "searchPlaceholder": "Search customers…",
+  "create": "Add customer",
+  "customersEmpty": "No customers found.",
+  "loadError": "Could not load customers.",
+  "columns": {
+    "customer": "Customer",
+    "status": "Status",
+    "contact": "Contact",
+    "created": "Created"
+  },
+  "menu": "Customer actions",
+  "edit": "Edit",
+  "archive": "Archive",
+  "fields": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "phone": "Phone number",
+    "notes": "Notes"
+  },
+  "createDialog": {
+    "title": "Add a customer",
+    "description": "Basic contact details that the booking flow reuses.",
+    "submit": "Create customer",
+    "success": "Customer added."
+  },
+  "editDialog": {
+    "title": "Edit customer",
+    "description": "Leave a field blank to clear it.",
+    "submit": "Save changes",
+    "success": "Customer updated."
+  },
+  "confirm": {
+    "archiveTitle": "Archive {{name}}?",
+    "archiveBody": "This customer is archived and can no longer be used for new bookings. This cannot be undone."
+  },
+  "errors": {
+    "notFound": "This customer is no longer available.",
+    "alreadyArchived": "This customer is already archived.",
+    "nameTooLong": "Keep this field to 100 characters or fewer.",
+    "phoneTooLong": "Keep the phone number to 32 characters or fewer.",
+    "notesTooLong": "Keep notes to 2000 characters or fewer.",
+    "emailInvalid": "Enter a valid email address.",
+    "network": "Could not reach the server. Check your connection and try again.",
+    "generic": "Something went wrong. Try again."
+  }
+}

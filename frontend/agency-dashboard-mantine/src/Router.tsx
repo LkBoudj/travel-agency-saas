@@ -8,6 +8,7 @@ import { RequirePermission } from './app/router/guards/require-permission.tsx';
 import { RootRedirect } from './app/router/guards/root-redirect.tsx';
 import { AgencyChooserPage } from './features/agency-context/pages/agency-chooser.page.tsx';
 import { LoginPage } from './features/auth/pages/login-page.tsx';
+import { CustomersPage } from './features/customers/pages/customers.page.tsx';
 import { MembersPage } from './features/members/pages/members.page.tsx';
 import { OverviewPage } from './features/overview/pages/overview.page.tsx';
 import { FeaturePlaceholderPage } from './features/placeholder/pages/feature-placeholder.page.tsx';
@@ -50,7 +51,7 @@ const router = createBrowserRouter([
                 path: 'customers',
                 element: (
                   <RequirePermission permissions={['AGENCY_CUSTOMER_VIEW']}>
-                    <FeaturePlaceholderPage titleKey="nav.customers" />
+                    <CustomersPage />
                   </RequirePermission>
                 ),
               },
