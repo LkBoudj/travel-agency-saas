@@ -1,0 +1,69 @@
+{
+  "title": "Team",
+  "subtitle": "Manage who works in this agency and what they can do.",
+  "searchPlaceholder": "Search members…",
+  "invite": "Invite member",
+  "membersEmpty": "No members found.",
+  "loadError": "Could not load members.",
+  "columns": {
+    "member": "Member",
+    "roles": "Roles",
+    "status": "Status",
+    "joined": "Joined",
+    "created": "Created"
+  },
+  "owner": "Owner",
+  "noRoles": "No roles",
+  "you": "You",
+  "menu": "Member actions",
+  "manageRoles": "Manage roles",
+  "suspend": "Suspend",
+  "reactivate": "Reactivate",
+  "remove": "Remove",
+  "revoke": "Revoke",
+  "invitationsTitle": "Invitations",
+  "invitationsEmpty": "No invitations yet. Invite someone by email to build your team.",
+  "inviteDialog": {
+    "title": "Invite a member",
+    "description": "We'll email an invitation to this address. They join once it's accepted.",
+    "email": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "emailRequired": "Email address is required.",
+    "emailInvalid": "Enter a valid email address.",
+    "roles": "Roles",
+    "rolesDescription": "What this member can do once they join. You can change these later.",
+    "tooManyRoles": "Choose at most 50 roles.",
+    "submit": "Send invitation",
+    "success": "Invitation sent."
+  },
+  "rolesDialog": {
+    "title": "Manage roles",
+    "description": "Choose what this member can do in this agency.",
+    "tooManyRoles": "Choose at most 50 roles.",
+    "submit": "Save roles",
+    "success": "Roles updated.",
+    "empty": "No assignable roles in this agency."
+  },
+  "confirm": {
+    "suspendTitle": "Suspend {{name}}?",
+    "suspendBody": "They keep their account but lose access to this agency until reactivated.",
+    "reactivateTitle": "Reactivate {{name}}?",
+    "reactivateBody": "They regain access to this agency.",
+    "removeTitle": "Remove {{name}}?",
+    "removeBody": "Their membership and roles in this agency are removed. This cannot be undone.",
+    "revokeTitle": "Revoke invitation to {{email}}?",
+    "revokeBody": "This address can no longer join through this invitation."
+  },
+  "errors": {
+    "unknownRoles": "One or more roles are unknown or not assignable in this agency.",
+    "ownerRolesImmutable": "The owner's roles cannot be changed.",
+    "ownerStatusImmutable": "The owner cannot be suspended.",
+    "ownerRemovalImmutable": "The owner cannot be removed.",
+    "alreadyMember": "This address is already a member.",
+    "invitationExists": "A pending invitation already exists for this address.",
+    "invitationNotFound": "This invitation is no longer pending.",
+    "rateLimited": "Too many invitations. Try again later.",
+    "network": "Could not reach the server. Check your connection and try again.",
+    "generic": "Something went wrong. Try again."
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "langName": "العربية",
+  "brand": "مكتب السفر",
+  "nav": {
+    "overview": "نظرة عامة",
+    "trips": "الرحلات",
+    "departures": "المغادرة",
+    "bookings": "الحجوزات",
+    "customers": "العملاء",
+    "agency": "الوكالة",
+    "team": "الفريق",
+    "settings": "الإعدادات"
+  },
+  "actions": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "create": "إنشاء",
+    "search": "بحث",
+    "retry": "إعادة المحاولة",
+    "confirm": "تأكيد",
+    "add": "إضافة",
+    "remove": "إزالة"
+  },
+  "statuses": {
+    "active": "نشط",
+    "suspended": "موقوف",
+    "archived": "مؤرشف",
+    "draft": "مسودة",
+    "published": "منشور",
+    "open": "مفتوح",
+    "closed": "مغلق",
+    "cancelled": "ملغي",
+    "pending": "قيد الانتظار",
+    "confirmed": "مؤكد",
+    "deactivated": "معطّل",
+    "accepted": "مقبول",
+    "revoked": "ملغاة",
+    "expired": "منتهية"
+  },
+  "auth": {
+    "signIn": "تسجيل الدخول",
+    "signOut": "تسجيل الخروج",
+    "language": "اللغة"
+  },
+  "common": {
+    "loading": "جارٍ التحميل…",
+    "empty": "لا يوجد شيء هنا بعد."
+  },
+  "shell": {
+    "loading": "جارٍ التحميل…",
+    "switchAgency": "تغيير الوكالة",
+    "memberOf": "عضو في",
+    "signedAs": "مسجّل الدخول باسم",
+    "owner": "مالك",
+    "employee": "موظف"
+  },
+  "lang": {
+    "en": "English",
+    "ar": "العربية"
+  },
+  "agency": {
+    "status": "الحالة",
+    "chooseTitle": "اختر وكالة",
+    "chooseSubtitle": "اختر وكالة للمتابعة إلى لوحة التحكم. الوكالات التي تكون عضويتك فيها نشطة فقط هي القابلة للاختيار.",
+    "noAgencies": "لست عضواً في أي وكالة بعد",
+    "noAgenciesBody": "اطلب من مالك وكالة دعوتك عبر البريد الإلكتروني، ثم سجّل الدخول من جديد.",
+    "reasonSuspended": "هذه الوكالة موقوفة. يمكن لمديريها إعادة تفعيلها.",
+    "reasonMembershipSuspended": "عضويتك موقوفة. اطلب من المالك إعادة تفعيلها.",
+    "entering": "جارٍ الدخول…",
+    "loadingContext": "جارٍ فتح الوكالة…",
+    "backToAgencies": "العودة إلى قائمة الوكلات",
+    "failureSuspended": "الوكالة موقوفة",
+    "failureSuspendedBody": "لا تقبل هذه الوكالة أي عمل حالياً. يمكن لمديريها إعادة تفعيلها.",
+    "failureNotMember": "لست عضواً",
+    "failureNotMemberBody": "حسابك ليس عضواً في هذه الوكالة. اطلب من مالك دعوتك ثم سجّل الدخول من جديد.",
+    "failureInactive": "العضوية غير نشطة",
+    "failureInactiveBody": "عضويتك في هذه الوكالة غير نشطة. اطلب من المالك إعادة تفعيلها.",
+    "failurePermissionDenied": "تم رفض الوصول",
+    "failurePermissionDeniedBody": "ليست لديك صلاحية فتح هذا الجزء من الوكالة.",
+    "failureNotFound": "الوكالة غير موجودة",
+    "failureNotFoundBody": "لا توجد وكالة بهذا الرمز.",
+    "failureUnexpected": "تعذّر فتح الوكالة",
+    "failureUnexpectedBody": "حدث خطأ ما أثناء فتح هذه الوكالة. حاول مرة أخرى."
+  },
+  "placeholder": {
+    "body": "يصل هذا القسم في إصدار لاحق من لوحة التحكم."
+  },
+  "overview": {
+    "membership": "العضوية",
+    "roles": "الأدوار"
+  }
+}

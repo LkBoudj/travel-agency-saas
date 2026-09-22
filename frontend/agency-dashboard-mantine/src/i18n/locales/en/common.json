@@ -1,0 +1,95 @@
+{
+  "langName": "English",
+  "brand": "Travel Desk",
+  "nav": {
+    "overview": "Overview",
+    "trips": "Trips",
+    "departures": "Departures",
+    "bookings": "Bookings",
+    "customers": "Customers",
+    "agency": "Agency",
+    "team": "Team",
+    "settings": "Settings"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "create": "Create",
+    "search": "Search",
+    "retry": "Retry",
+    "confirm": "Confirm",
+    "add": "Add",
+    "remove": "Remove"
+  },
+  "statuses": {
+    "active": "Active",
+    "suspended": "Suspended",
+    "archived": "Archived",
+    "draft": "Draft",
+    "published": "Published",
+    "open": "Open",
+    "closed": "Closed",
+    "cancelled": "Cancelled",
+    "pending": "Pending",
+    "confirmed": "Confirmed",
+    "deactivated": "Deactivated",
+    "accepted": "Accepted",
+    "revoked": "Revoked",
+    "expired": "Expired"
+  },
+  "auth": {
+    "signIn": "Sign in",
+    "signOut": "Sign out",
+    "language": "Language"
+  },
+  "common": {
+    "loading": "Loading…",
+    "empty": "Nothing here yet."
+  },
+  "shell": {
+    "loading": "Loading…",
+    "switchAgency": "Switch agency",
+    "memberOf": "Member of",
+    "signedAs": "Signed in as",
+    "owner": "Owner",
+    "employee": "Employee"
+  },
+  "lang": {
+    "en": "English",
+    "ar": "العربية"
+  },
+  "agency": {
+    "status": "Status",
+    "chooseTitle": "Choose an agency",
+    "chooseSubtitle": "Pick an agency to continue into its dashboard. Only agencies where your membership is active are selectable.",
+    "noAgencies": "You are not a member of any agency yet",
+    "noAgenciesBody": "Ask an agency owner to invite you by email, then sign back in.",
+    "reasonSuspended": "This agency is suspended. Its administrators can reactivate it.",
+    "reasonMembershipSuspended": "Your membership is suspended. Ask an owner to reactivate it.",
+    "entering": "Entering…",
+    "loadingContext": "Opening agency…",
+    "backToAgencies": "Back to agency list",
+    "failureSuspended": "Agency suspended",
+    "failureSuspendedBody": "This agency is not accepting work right now. Its administrators can reactivate it.",
+    "failureNotMember": "Not a member",
+    "failureNotMemberBody": "Your account is not a member of this agency. Ask an owner to invite you, then sign back in.",
+    "failureInactive": "Membership inactive",
+    "failureInactiveBody": "Your membership in this agency is not active. Ask an owner to reactivate it.",
+    "failurePermissionDenied": "Access denied",
+    "failurePermissionDeniedBody": "You do not have permission to open this part of the agency.",
+    "failureNotFound": "Agency not found",
+    "failureNotFoundBody": "No agency with this code exists.",
+    "failureUnexpected": "Unable to open agency",
+    "failureUnexpectedBody": "Something went wrong while opening this agency. Try again."
+  },
+  "placeholder": {
+    "body": "This section ships in a later iteration of the dashboard."
+  },
+  "overview": {
+    "membership": "Membership",
+    "roles": "Roles"
+  }
+}
