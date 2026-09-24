@@ -14,6 +14,7 @@ import {
   resolveNextLocale,
 } from './locales';
 import arAuth from './locales/ar/auth.json';
+import arBookings from './locales/ar/bookings.json';
 import arCommon from './locales/ar/common.json';
 import arCustomers from './locales/ar/customers.json';
 import arDepartures from './locales/ar/departures.json';
@@ -21,6 +22,7 @@ import arMembers from './locales/ar/members.json';
 import arPricing from './locales/ar/pricing.json';
 import arTrips from './locales/ar/trips.json';
 import enAuth from './locales/en/auth.json';
+import enBookings from './locales/en/bookings.json';
 import enCommon from './locales/en/common.json';
 import enCustomers from './locales/en/customers.json';
 import enDepartures from './locales/en/departures.json';
@@ -49,6 +51,7 @@ void i18n.use(initReactI18next).init({
       trips: enTrips,
       departures: enDepartures,
       pricing: enPricing,
+      bookings: enBookings,
     },
     ar: {
       common: arCommon,
@@ -58,12 +61,13 @@ void i18n.use(initReactI18next).init({
       trips: arTrips,
       departures: arDepartures,
       pricing: arPricing,
+      bookings: arBookings,
     },
   },
   lng: resolveInitialLocale(readStoredLocale(), window.navigator.language),
   fallbackLng: DEFAULT_LOCALE,
   supportedLngs: SUPPORTED_LOCALES,
-  ns: ['common', 'auth', 'members', 'customers', 'trips', 'departures', 'pricing'],
+  ns: ['common', 'auth', 'members', 'customers', 'trips', 'departures', 'pricing', 'bookings'],
   defaultNS: 'common',
   interpolation: { escapeValue: false },
 });

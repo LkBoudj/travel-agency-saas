@@ -8,11 +8,12 @@ import { RequirePermission } from './app/router/guards/require-permission.tsx';
 import { RootRedirect } from './app/router/guards/root-redirect.tsx';
 import { AgencyChooserPage } from './features/agency-context/pages/agency-chooser.page.tsx';
 import { LoginPage } from './features/auth/pages/login-page.tsx';
+import { BookingDetailsPage } from './features/bookings/pages/booking-details.page.tsx';
+import { BookingsPage } from './features/bookings/pages/bookings.page.tsx';
 import { CustomersPage } from './features/customers/pages/customers.page.tsx';
 import { DeparturesPage } from './features/departures/pages/departures.page.tsx';
 import { MembersPage } from './features/members/pages/members.page.tsx';
 import { OverviewPage } from './features/overview/pages/overview.page.tsx';
-import { FeaturePlaceholderPage } from './features/placeholder/pages/feature-placeholder.page.tsx';
 import { TripsEditorPage } from './features/trips/pages/trips-editor.page.tsx';
 import { TripsPage } from './features/trips/pages/trips.page.tsx';
 import { StyleGuidePage } from './pages/StyleGuide.page';
@@ -86,7 +87,15 @@ const router = createBrowserRouter([
                 path: 'bookings',
                 element: (
                   <RequirePermission permissions={['AGENCY_BOOKING_VIEW']}>
-                    <FeaturePlaceholderPage titleKey="nav.bookings" />
+                    <BookingsPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: 'bookings/:bookingCode',
+                element: (
+                  <RequirePermission permissions={['AGENCY_BOOKING_VIEW']}>
+                    <BookingDetailsPage />
                   </RequirePermission>
                 ),
               },

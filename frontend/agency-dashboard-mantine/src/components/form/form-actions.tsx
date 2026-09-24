@@ -6,9 +6,16 @@ export interface FormActionsProps {
   cancelLabel?: string;
   onCancel?: () => void;
   submitting?: boolean;
+  disabled?: boolean;
 }
 
-export function FormActions({ submitLabel, cancelLabel, onCancel, submitting }: FormActionsProps) {
+export function FormActions({
+  submitLabel,
+  cancelLabel,
+  onCancel,
+  submitting,
+  disabled,
+}: FormActionsProps) {
   const { t } = useTranslation('common');
 
   return (
@@ -18,7 +25,7 @@ export function FormActions({ submitLabel, cancelLabel, onCancel, submitting }: 
           {cancelLabel ?? t('actions.cancel')}
         </Button>
       ) : null}
-      <Button type="submit" loading={submitting}>
+      <Button type="submit" loading={submitting} disabled={disabled}>
         {submitLabel}
       </Button>
     </Group>
