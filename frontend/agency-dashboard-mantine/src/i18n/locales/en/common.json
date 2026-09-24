@@ -36,6 +36,7 @@
     "pending": "Pending",
     "confirmed": "Confirmed",
     "deactivated": "Deactivated",
+    "inactive": "Inactive",
     "accepted": "Accepted",
     "revoked": "Revoked",
     "expired": "Expired"

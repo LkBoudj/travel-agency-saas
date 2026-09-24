@@ -1,13 +1,6 @@
 import { IconCircle, IconCircleCheck } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import {
-  Autocomplete,
-  Group,
-  Select,
-  Stack,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { Autocomplete, Group, Select, Stack, Text, TextInput } from '@mantine/core';
 import { DrawerFormShell } from '../../../components/form/drawer-form-shell.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
 import { useZodForm } from '../../../components/form/use-zod-form.ts';
@@ -84,7 +77,10 @@ export function QuickCreateDrawer({
 
           <Select
             label={t('createDrawer.format')}
-            data={FORMAT_ORDER.map((option) => ({ value: option, label: t(`catalog.formats.${option}`) }))}
+            data={FORMAT_ORDER.map((option) => ({
+              value: option,
+              label: t(`catalog.formats.${option}`),
+            }))}
             renderOption={({ option }) => (
               <Stack gap={2} py={4}>
                 <Text size="sm" fw={500}>

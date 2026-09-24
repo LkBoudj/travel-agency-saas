@@ -1,0 +1,93 @@
+{
+  "title": "Pricing",
+  "subtitle": "The price options customers choose on a trip.",
+  "section": {
+    "title": "Pricing options",
+    "helper": "Options act as customer categories — each departure gets its own price per option."
+  },
+  "columns": {
+    "option": "Option",
+    "basis": "Basis",
+    "currency": "Currency",
+    "pricedDepartures": "Priced",
+    "status": "Status"
+  },
+  "summary": {
+    "optionsCount": "{{count}} option",
+    "optionsCount_plural": "{{count}} options",
+    "startingPrice": "Starting price",
+    "noPrice": "No price yet",
+    "pricedDepartures": "{{count}} priced open departure",
+    "pricedDepartures_plural": "{{count}} priced open departures"
+  },
+  "create": "New option",
+  "empty": "No pricing options yet. Add the first one to start pricing departures.",
+  "loading": "Loading pricing…",
+  "loadError": "Could not load pricing.",
+  "menu": "Option actions",
+  "edit": "Edit",
+  "deactivate": "Deactivate",
+  "basis": {
+    "per_person": "Per person",
+    "per_booking": "Per booking"
+  },
+  "createDialog": {
+    "title": "New pricing option",
+    "description": "Created ACTIVE and used from the per-departure prices dialog.",
+    "submit": "Create option",
+    "success": "Pricing option created.",
+    "currencyHelper": "Leave the currency blank to use this trip's default (DZD). It can't be changed later."
+  },
+  "editDialog": {
+    "title": "Edit pricing option",
+    "description": "The name, description and basis can be edited while the option stays active.",
+    "submit": "Save changes",
+    "success": "Pricing option updated."
+  },
+  "fields": {
+    "nameLabel": "Name",
+    "namePlaceholder": "e.g. Adult, Child, Couple…",
+    "nameHelper": "Shown to customers when they pick a price.",
+    "nameRequired": "Enter a name.",
+    "nameTooLong": "Keep the name to 100 characters or fewer.",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "What does this category cover?",
+    "descriptionTooLong": "Keep the description to 500 characters or fewer.",
+    "basisLabel": "Pricing basis",
+    "currencyLabel": "Currency",
+    "currencyPlaceholder": "Blank = DZD",
+    "currencyInvalid": "Enter a 3-letter currency code, or leave it blank."
+  },
+  "pricesDialog": {
+    "title": "Prices for {{name}}",
+    "description": "One price per active option. Leave a field empty to remove that option's price.",
+    "loading": "Loading prices…",
+    "loadError": "Could not load prices.",
+    "noOptions": "No active pricing options. Add one from the pricing section first.",
+    "amountPlaceholder": "Amount",
+    "amountAria": "Price for {{name}}",
+    "submit": "Save prices",
+    "success": "Prices saved.",
+    "clearSuccess": "Prices cleared.",
+    "invalidAmount": "Enter a positive amount with at most two decimals, or leave the field empty."
+  },
+  "confirm": {
+    "deactivateTitle": "Deactivate {{name}}?",
+    "deactivateBody": "This option stops being offered in new price sets. Departures already priced keep their amounts. This cannot be undone."
+  },
+  "notifications": {
+    "deactivated": "Pricing option deactivated."
+  },
+  "errors": {
+    "tourNotFound": "This trip is no longer available.",
+    "optionNotFound": "This pricing option is no longer available.",
+    "departureNotFound": "This departure is no longer available.",
+    "nameTaken": "Another option already uses this name.",
+    "currencyMismatch": "The currency doesn't match this trip's currency.",
+    "optionInactive": "This option is no longer active.",
+    "alreadyInactive": "This option is already deactivated.",
+    "departureCancelled": "Cancelled departures can't be priced.",
+    "network": "Could not reach the server. Check your connection and try again.",
+    "generic": "Something went wrong. Try again."
+  }
+}

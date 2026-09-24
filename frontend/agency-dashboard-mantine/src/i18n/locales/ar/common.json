@@ -36,6 +36,7 @@
     "pending": "قيد الانتظار",
     "confirmed": "مؤكد",
     "deactivated": "معطّل",
+    "inactive": "غير نشط",
     "accepted": "مقبول",
     "revoked": "ملغاة",
     "expired": "منتهية"

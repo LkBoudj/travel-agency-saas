@@ -16,12 +16,16 @@ import {
 import arAuth from './locales/ar/auth.json';
 import arCommon from './locales/ar/common.json';
 import arCustomers from './locales/ar/customers.json';
+import arDepartures from './locales/ar/departures.json';
 import arMembers from './locales/ar/members.json';
+import arPricing from './locales/ar/pricing.json';
 import arTrips from './locales/ar/trips.json';
 import enAuth from './locales/en/auth.json';
 import enCommon from './locales/en/common.json';
 import enCustomers from './locales/en/customers.json';
+import enDepartures from './locales/en/departures.json';
 import enMembers from './locales/en/members.json';
+import enPricing from './locales/en/pricing.json';
 import enTrips from './locales/en/trips.json';
 
 export {
@@ -43,6 +47,8 @@ void i18n.use(initReactI18next).init({
       members: enMembers,
       customers: enCustomers,
       trips: enTrips,
+      departures: enDepartures,
+      pricing: enPricing,
     },
     ar: {
       common: arCommon,
@@ -50,12 +56,14 @@ void i18n.use(initReactI18next).init({
       members: arMembers,
       customers: arCustomers,
       trips: arTrips,
+      departures: arDepartures,
+      pricing: arPricing,
     },
   },
   lng: resolveInitialLocale(readStoredLocale(), window.navigator.language),
   fallbackLng: DEFAULT_LOCALE,
   supportedLngs: SUPPORTED_LOCALES,
-  ns: ['common', 'auth', 'members', 'customers', 'trips'],
+  ns: ['common', 'auth', 'members', 'customers', 'trips', 'departures', 'pricing'],
   defaultNS: 'common',
   interpolation: { escapeValue: false },
 });

@@ -1,0 +1,98 @@
+{
+  "title": "Departures",
+  "subtitle": "Schedule departures for a trip and set per-departure prices.",
+  "tourSelectLabel": "Trip",
+  "tourSelectPlaceholder": "Pick a trip…",
+  "noTours": "No trips yet",
+  "noToursBody": "Create a trip first — departures attach to a scheduled trip.",
+  "goToTrips": "Go to trips",
+  "loading": "Loading trips…",
+  "availability": {
+    "scheduled": "Scheduled",
+    "on_request": "On request",
+    "custom_quote": "Custom quote"
+  },
+  "availabilityInfo": {
+    "title": "No scheduled departures",
+    "bodyOnRequest": "This trip runs only when a customer requests it, so it carries no departure calendar.",
+    "bodyCustomQuote": "This trip is quoted per request and carries no departure calendar.",
+    "helper": "Pricing still applies — you set the options and prices below."
+  },
+  "section": {
+    "title": "Departures",
+    "helper": "One row per scheduled occurrence of this trip."
+  },
+  "columns": {
+    "status": "Status",
+    "start": "Start",
+    "end": "End",
+    "capacity": "Capacity",
+    "deadline": "Booking deadline"
+  },
+  "departuresCount": "{{count}} departure",
+  "departuresCount_plural": "{{count}} departures",
+  "create": "New departure",
+  "empty": "No departures for this trip yet.",
+  "loading": "Loading departures…",
+  "loadError": "Could not load departures.",
+  "deadlineNone": "No deadline",
+  "menu": "Departure actions",
+  "edit": "Edit",
+  "prices": "Prices",
+  "cancel": "Cancel departure",
+  "publishedNoOpen": {
+    "title": "This trip is published but has no open departure",
+    "body": "It stays published but cannot be booked until a departure is open. Cancel the last open departure and add a new one here."
+  },
+  "createDialog": {
+    "title": "New departure",
+    "description": "A new departure starts OPEN.",
+    "submit": "Create departure",
+    "success": "Departure created."
+  },
+  "editDialog": {
+    "title": "Edit departure",
+    "description": "Update the schedule, capacity, deadline, notes or status.",
+    "submit": "Save changes",
+    "success": "Departure updated."
+  },
+  "fields": {
+    "startLabel": "Start",
+    "startPlaceholder": "Pick start date and time",
+    "endLabel": "End",
+    "endPlaceholder": "Pick end date and time",
+    "capacityLabel": "Capacity",
+    "deadlineLabel": "Booking deadline",
+    "deadlinePlaceholder": "Pick date and time",
+    "deadlineHelper": "Optional — how late travelers can book.",
+    "statusLabel": "Status",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Internal notes for this departure…"
+  },
+  "confirm": {
+    "cancelTitle": "Cancel {{name}}?",
+    "cancelBody": "This departure is cancelled one-way and stops being bookable. Cancelled departures keep their data and cannot be re-opened."
+  },
+  "notifications": {
+    "cancelled": "Departure cancelled."
+  },
+  "fieldErrors": {
+    "startRequired": "Pick a start date and time.",
+    "startInvalid": "Invalid start date.",
+    "endRequired": "Pick an end date and time.",
+    "endAfterStart": "The end must be after the start.",
+    "capacityRequired": "Enter a capacity.",
+    "capacityInvalid": "Capacity must be a whole number above 0.",
+    "deadlineAfterStart": "The deadline must be on or before the start.",
+    "notesTooLong": "Keep notes to 10000 characters or fewer."
+  },
+  "errors": {
+    "tourNotFound": "This trip is no longer available.",
+    "departureNotFound": "This departure is no longer available.",
+    "alreadyCancelled": "This departure is already cancelled.",
+    "capacityBelowReserved": "Capacity can't go below the number of travelers already booked.",
+    "hasActiveBookings": "This departure has bookings and can't be cancelled.",
+    "network": "Could not reach the server. Check your connection and try again.",
+    "generic": "Something went wrong. Try again."
+  }
+}
