@@ -15,12 +15,13 @@ import {
 import { membersQueryKeys } from '../queries/members.queries.ts';
 import type { MemberInvitationStatus } from '../types.ts';
 
-export function useAgencyMembers(search = '') {
+export function useAgencyMembers(search = '', enabled = true) {
   const { code } = useAgencyContext();
   return useQuery({
     queryKey: membersQueryKeys.list(code, search),
     queryFn: () => requestAgencyMembers(code, search),
     staleTime: 30_000,
+    enabled,
   });
 }
 

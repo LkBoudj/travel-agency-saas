@@ -35,11 +35,14 @@ anonymous travelers, platform operators.
 - frontend/dashboard/    React SPA — agency management only; does NOT render the
                          public storefront.
 - frontend/agency-dashboard-mantine/  Vite 8 + React 19 + Mantine 9 SPA — the
-                         new production-grade agency dashboard (per
-                         improve_dash.md): separate workspace so the old
-                         dashboard stays untouched as reference. Dev port
-                         5175. Foundation + features built incrementally;
-                         see its README and the implementation plan.
+                          new production-grade agency dashboard (per
+                          improve_dash.md): separate workspace so the old
+                          dashboard stays untouched as reference. Dev port
+                          5175. Auth + shell, Members/Team, Customers, Trips
+                          (quick-create + section-nav editor), Departures +
+                          Pricing, Bookings + Travelers and the permission-aware
+                          Overview are complete against the real NestJS backend.
+                          See its `.planning/` and README.
 - frontend/storefront/   Next.js 16.3.5 App Router PUBLIC STOREFRONT — one app,
                          all agencies, all themes. Exists.
 - frontend/marketplace/  PUBLIC web = Marketplace + Trip Details + Agency

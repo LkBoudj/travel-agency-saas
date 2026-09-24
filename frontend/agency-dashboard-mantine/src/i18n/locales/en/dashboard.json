@@ -1,0 +1,24 @@
+{
+  "page": {
+    "title": "Overview",
+    "subtitle": "A live snapshot of your agency",
+    "errorTitle": "Unable to load the overview",
+    "errorBody": "One of the overview sections failed to load. Try again.",
+    "retry": "Retry"
+  },
+  "kpis": {
+    "customers": "Customers",
+    "tours": "Trips",
+    "bookings": "Bookings",
+    "members": "Team",
+    "published": "{{count}} published",
+    "pending": "{{count}} pending",
+    "confirmed": "{{count}} confirmed",
+    "active": "{{count}} active",
+    "viewAll": "Open {{section}}"
+  },
+  "recent": {
+    "title": "Recent bookings",
+    "empty": "No bookings yet. Create one from the Bookings page."
+  }
+}

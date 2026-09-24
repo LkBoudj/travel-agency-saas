@@ -12,12 +12,13 @@ import { toursQueryKeys } from '../queries/tours.queries.ts';
 import type { TripFormValues } from '../schemas/tour.schema.ts';
 import type { TourStatus } from '../types.ts';
 
-export function useTours(search = '', status?: TourStatus) {
+export function useTours(search = '', status?: TourStatus, enabled = true) {
   const { code } = useAgencyContext();
   return useQuery({
     queryKey: toursQueryKeys.list(code, search, status),
     queryFn: () => requestTours(code, search, status),
     staleTime: 30_000,
+    enabled,
   });
 }
 

@@ -19,12 +19,13 @@ import type { BookingStatus, CreateBookingPayload, TravelerWritePayload } from '
  * backend returns every status; cancelled ones stay listed so their history is
  * reachable.
  */
-export function useBookings(search = '', status?: BookingStatus) {
+export function useBookings(search = '', status?: BookingStatus, enabled = true) {
   const { code } = useAgencyContext();
   return useQuery({
     queryKey: bookingsQueryKeys.list(code, search.trim(), status),
     queryFn: () => requestBookings(code, search, status),
     staleTime: 30_000,
+    enabled,
   });
 }
 

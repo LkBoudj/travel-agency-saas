@@ -190,7 +190,9 @@ function PriceLinesCard({ booking }: { booking: BookingDetail }) {
                   <Stack gap={0}>
                     <Text size="sm">{line.quantity}</Text>
                     <Text size="xs" c="dimmed">
-                      {line.basis === 'per_person' ? t('details.basisPerson') : t('details.basisBooking')}
+                      {line.basis === 'per_person'
+                        ? t('details.basisPerson')
+                        : t('details.basisBooking')}
                     </Text>
                   </Stack>
                 </Table.Td>

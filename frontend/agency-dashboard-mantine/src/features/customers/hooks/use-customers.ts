@@ -9,12 +9,13 @@ import {
 import { customersQueryKeys } from '../queries/customers.queries.ts';
 import type { CustomerFormValues } from '../schemas/customer.schema.ts';
 
-export function useCustomers(search = '') {
+export function useCustomers(search = '', enabled = true) {
   const { code } = useAgencyContext();
   return useQuery({
     queryKey: customersQueryKeys.list(code, search),
     queryFn: () => requestCustomers(code, search),
     staleTime: 30_000,
+    enabled,
   });
 }
 

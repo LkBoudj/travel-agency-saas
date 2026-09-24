@@ -88,9 +88,5 @@
   },
   "placeholder": {
     "body": "This section ships in a later iteration of the dashboard."
-  },
-  "overview": {
-    "membership": "Membership",
-    "roles": "Roles"
   }
 }
