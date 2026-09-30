@@ -154,6 +154,14 @@ data/business boundaries → Theme Resolver → active Theme renderer. The publi
 storefront = Agency public profile + published trips + selected theme; themes
 present it only — no business logic, no tenancy, no booking/pricing.
 
+TWO apps implement this concept; do not conflate them. `frontend/storefront/`
+(Next.js) is the original prototype still on a dev demo adapter. `frontend/theme-agency/`
+(Astro + `@astrojs/cloudflare`) is the engine wired to the real backend: it reads
+the published website through `/v1/public/*`, resolves `themeId` from the
+registry per request (runtime theme switching needs no redeploy), serves the
+starter theme, and renders Theme Lab previews through the same render path. Its
+Cloudflare/wrangler deployment is deferred; its local data path is live.
+
 IMPLEMENTED in `frontend/storefront/` (standalone Next.js 16.3.5 App Router
 app): one Home route renders the active Theme against a dev adapter
 (`features/*/demo-data.ts` + `demo-agency.ts` — clearly temporary; a real
@@ -363,9 +371,47 @@ PLATFORM_ADMIN list → create/edit role → assign/remove permissions → reloa
 persistence → assigned-role delete conflict → delete temp role → logout →
 protected-route redirect), with temporary verification data removed.
 
+## [AGENCY_WEBSITE]
+IMPLEMENTED end to end: backend + public boundary + the dashboard editor UI
+(`frontend/agency-dashboard-mantine/features/website/` and `features/themes/`)
++ the theme-agency engine rendering the published result. The public website is
+one publish-gated aggregate per agency, split into two ownership groups that
+never write each other's keys.
+
+- Data: `agency_website` (the live row) + `agency_website_draft` (the editable
+  row), one each per agency, `slug` unique across both tables and written once
+  from the lowercased `agency.code`; a deferred constraint trigger blocks a slug
+  claimed by another tenant (`WEBSITE_SLUG_CONFLICT`).
+- Aggregate: `content` (hero, trustPoints, promotion, testimonials, finalCta,
+  featuredTourCodes) + `branding` + `navigation` + `footer` = agency marketing
+  copy; `themeId` + `themeSettings` = presentation. Edited through separate
+  strict endpoints (`PATCH …/draft/content`, `PATCH …/draft/theme`).
+- Publish is explicit (`POST …/publish`), atomic (one transaction copies draft →
+  published + stamps `publishedAt`) and audited; nothing goes live by editing.
+- Preview: the backend mints a 15-minute signed Theme Lab URL from the shared
+  `PREVIEW_TOKEN_SECRET`; the storefront verifies it per request and always
+  answers `noindex, nofollow` + `no-store`. A missing/tampered/expired token is
+  a hard 404 — never a fallback to published.
+- Read boundary: `GET /v1/public/website/:slug` (published whitelist DTO;
+  unknown slug and never-published site both answer `WEBSITE_NOT_PUBLISHED`) and
+  the token-gated `/:slug/draft`. Tours are composed, never copied: the
+  summary/detail DTOs project `Tour` + `Departure` + `PricingOption`, and a tour
+  with no priced OPEN departure carries `price: null` (rendered as a
+  "request a price" treatment, and omitted from SEO offers).
+- Permissions: `AGENCY_WEBSITE_VIEW` / `_CONTENT_EDIT` / `_THEME_UPDATE` /
+  `_PUBLISH`; agency OWNER and MANAGER presets hold all four. Full-stack proof
+  in `backend/test/website.e2e-spec.ts`,
+  `frontend/theme-agency/tests/integration/` (backend + storefront) and the
+  opt-in `frontend/agency-dashboard-mantine/src/features/website/__tests__/backend.integration.test.ts`
+  (dashboard clients against the live API); the contract and run guide are
+  `frontend/theme-agency/docs/website-api-contract.md`.
+
 ## [THEME_SYSTEM]
 Platform-owned presentation system. Explorer (`explorer`) is the current first
-Theme; Luxe / Minimal are future examples only — not implemented.
+Theme of `frontend/storefront/`; the Astro engine in `frontend/theme-agency/`
+ships one theme, `starter` (`themes/starter/`, contract-complete, SDK-only
+imports), which is also the scaffold source for new themes. Luxe / Minimal are
+future examples only — not implemented.
 
 - Explicit Theme Registry: themes statically imported, keyed by stable id
   (e.g. `explorer`). Ids are validated against the registry — never used to
@@ -412,7 +458,10 @@ a move/copy of the same isolated boundaries.
 Open questions: Q3 currency model · Q4 booking/payment sequencing · Q5 team
 roles · Q6 marketplace-visibility toggle · Q7 app hosting + object-storage
 provider · Q8 email provider · Q9 OAuth timing · contract packaging mechanism ·
-audit/monitoring vendor.
+audit/monitoring vendor · host→slug resolution for the website (the slug is
+written from the agency code today; the Domain feature owns custom domains) and
+the Cloudflare/wrangler deployment of `frontend/theme-agency` (its local data
+path is live).
 Resolved (no longer open): backend framework = NestJS · ORM = Prisma · DB =
 PostgreSQL · managed Postgres = Neon (see [DECISIONS]). Preview strategy = one
 shared public/preview renderer (D13); preview plumbing, `/[locale]` Arabic

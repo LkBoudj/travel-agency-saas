@@ -15,7 +15,9 @@ travel-saas/
 ├── backend/                # NestJS API (auth + platform RBAC, Group 1) — exists
 └── frontend/
     ├── dashboard/          # Agency Dashboard (Vite + React SPA) — exists
+    ├── agency-dashboard-mantine/  # Agency Dashboard (Mantine variant) — exists
     ├── storefront/         # Public storefront (Next 16 App Router) — exists
+    ├── theme-agency/       # Public storefront/theme engine (Astro + Cloudflare) — exists
     └── admin/              # Platform Super Dashboard (Vite + React SPA) — exists
     # marketplace/          # Public marketplace — does NOT exist yet
 ```
@@ -30,6 +32,7 @@ A multi-tenant Travel SaaS platform. These frontend apps exist:
 
 - **Dashboard** — per-agency management (auth, trips, bookings, customers, agency profile, website/theme, team, settings).
 - **Storefront** — one Next.js app serving storefronts for **many** agencies. `agency.themeId` selects a theme from a registry; themes are server components rendered with props only. The platform owns tenant resolution, routing (`/[locale]`), SEO, and preview mode (always noindex). See `frontend/storefront/AGENTS.md`.
+- **Theme Agency** — the Astro storefront/theme engine (`frontend/theme-agency/`): theme registry, schema-driven settings, one shared public + preview render path, and the public read boundary consumed from the backend. It is the storefront implementation wired to real backend data; deployment (Cloudflare/wrangler) is deferred. See its `PROJECT_MAP_THEME_AGENCY.md` and `docs/website-api-contract.md`.
 - **Admin** — Platform Super Dashboard (Vite + React SPA) for platform operators: authenticated shell + Platform Roles & Permissions + Platform Users management (list/create/edit, platform-role assignment, suspend/reactivate) consuming the real backend RBAC and Platform Users APIs.
 
 The backend is a separate system built in this repo under `backend/` (NestJS 12 + Prisma + Neon, REST `/v1`, Swagger at `/docs`). Group 1 (authentication + platform RBAC) and the Platform Users slice (CRUD + platform-role assignment + ACTIVE/SUSPENDED status) are implemented; Agency and agency-side user/membership management are not. Frontend code must **not** invent backend behavior: no fake APIs, no fake auth, no simulated multi-tenancy enforcement in UI logic. Build clean integration boundaries only.
@@ -41,6 +44,8 @@ The backend is a separate system built in this repo under `backend/` (NestJS 12 
 - **No fabricated behavior.** Never simulate authentication, tenants, payments, or API responses. No hardcoded `authenticated = true`, fake JWT/localStorage login, or fake endpoints.
 - **Never invent files or paths.** Verify a file exists before referencing/editing it. Prefer real reuse over assumed structure.
 - **Arabbing/Bidi awareness.** `ar` is a product language. Keep RTL/bidi correctness in mind when present (see `project-comments` / app forms).
+- **Public data leaves through `/v1/public/*` only.** Unauthenticated reads of tenant data live in the explicitly public controller (`backend/src/website/public-website.controller.ts`) and return a whitelisted DTO — never an entity, never an internal DTO. Anything not published is unreachable: drafts are served only behind a signed, expiring, tenant-scoped preview token and fail closed with `WEBSITE_PREVIEW_TOKEN_INVALID`. Error codes must not leak existence (unknown slug and unpublished site both answer `WEBSITE_NOT_PUBLISHED`).
+- **Content vs theme settings never mix.** Marketing copy (`content`, `branding`, `navigation`, `footer`) and presentation (`themeId`, `themeSettings`) are edited through separate, strictly-typed endpoints so neither can write the other's keys; a body that smuggles them is rejected.
 
 ## 4. Standard Workflow
 
@@ -67,7 +72,10 @@ Maps answer "where is X". Agent files answer "how should X be built".
 - Run commands inside the owning app directory (e.g. `workdir: frontend/dashboard`), not the repo root.
 - Confirm a script exists in that app's `package.json` before running it. Do not assume.
 - Dashboard scripts: `npm run lint`, `npm run typecheck`, `npm run build`.
+- Agency Dashboard (Mantine) scripts: `npm test` is the composite gate (typecheck → format check → lint → vitest → build). The website/theme live specs are opt-in and skip without `WEBSITE_TEST_*`; see `docs/website-api-contract.md` §10.
 - Storefront scripts: `npm run lint`, `npm run build` (**no `typecheck` script exists**).
+- Backend scripts: `npm run lint`, `npm test`, `npm run test:e2e`, **and `npm run build`** — vitest and `oxlint --type-aware` both pass code that does not typecheck, so the build is the only gate that catches assignment/type errors.
+- Theme Agency scripts: `npm test`, `npm run lint`, `npm run check`, `npm run build`, `npm run theme:check`, `npm run theme:test`. The full-stack specs need a real backend + database and run only on demand: `node tools/website-integration-test.mjs` (see its env contract; no `package.json` script on purpose).
 
 ## 7. Safety
 
