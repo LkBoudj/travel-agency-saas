@@ -289,6 +289,28 @@ export const RBAC_PERMISSION_CATALOG: ReadonlyArray<PermissionCatalogEntry> = [
     'MANAGE',
   ),
 
+  // AGENCY — public website (content + theme catalog).
+  // Content and theme settings are separated by permission: a content editor
+  // can never touch theme keys and vice versa (distinct PATCH endpoints).
+  permission('AGENCY_WEBSITE_VIEW', 'View website', 'AGENCY', 'WEBSITE', 'VIEW'),
+  permission(
+    'AGENCY_WEBSITE_CONTENT_EDIT',
+    'Edit website content',
+    'AGENCY',
+    'WEBSITE',
+    'CONTENT_EDIT',
+    'Edit the agency\'s public website content (copy, branding, navigation, footer, tour curation)',
+  ),
+  permission(
+    'AGENCY_WEBSITE_THEME_UPDATE',
+    'Update website theme',
+    'AGENCY',
+    'WEBSITE',
+    'THEME_UPDATE',
+    'Select the public website theme and edit its settings',
+  ),
+  permission('AGENCY_WEBSITE_PUBLISH', 'Publish website', 'AGENCY', 'WEBSITE', 'PUBLISH'),
+
   // AGENCY — bookings.
   permission('AGENCY_BOOKING_VIEW', 'View bookings', 'AGENCY', 'BOOKING', 'VIEW'),
   permission('AGENCY_BOOKING_CREATE', 'Create bookings', 'AGENCY', 'BOOKING', 'CREATE'),

@@ -57,6 +57,24 @@ export const envSchema = z.object({
     .default(30)
     .describe('Token redemptions per window, counted per IP'),
   RATE_LIMIT_MEMBER_INVITE_ACCEPT_WINDOW_SECONDS: z.coerce.number().int().positive().default(3600),
+
+  // Agency public website — preview links.
+  // The dashboard mints storefront Theme Lab URLs; STOREFRONT_BASE_URL is the
+  // storefront origin the signed link points at, and PREVIEW_TOKEN_SECRET signs
+  // it so the storefront (which only verifies) can trust the draft it renders.
+  // Both apps must agree on the secret in any deployment. The default matches
+  // the theme-agency server/test fallback so dev preview just works.
+  STOREFRONT_BASE_URL: z
+    .string()
+    .default('http://localhost:4321')
+    .describe('Storefront origin used to build website preview URLs'),
+  PREVIEW_TOKEN_SECRET: z
+    .string()
+    .default('theme-test-secret')
+    .describe(
+      'Secret shared with theme-agency for signing/verifying website preview ' +
+        'tokens — must match its server secret in every deployment',
+    ),
 });
 
 export type Env = z.infer<typeof envSchema>;

@@ -73,7 +73,9 @@ export const ModelName = {
   Booking: 'Booking',
   BookingPriceLine: 'BookingPriceLine',
   BookingStatusHistory: 'BookingStatusHistory',
-  BookingTraveler: 'BookingTraveler'
+  BookingTraveler: 'BookingTraveler',
+  AgencyWebsite: 'AgencyWebsite',
+  AgencyWebsiteDraft: 'AgencyWebsiteDraft'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -442,6 +444,43 @@ export const BookingTravelerScalarFieldEnum = {
 } as const
 
 export type BookingTravelerScalarFieldEnum = (typeof BookingTravelerScalarFieldEnum)[keyof typeof BookingTravelerScalarFieldEnum]
+
+
+export const AgencyWebsiteScalarFieldEnum = {
+  id: 'id',
+  agencyId: 'agencyId',
+  slug: 'slug',
+  locale: 'locale',
+  themeId: 'themeId',
+  themeSettings: 'themeSettings',
+  content: 'content',
+  branding: 'branding',
+  navigation: 'navigation',
+  footer: 'footer',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyWebsiteScalarFieldEnum = (typeof AgencyWebsiteScalarFieldEnum)[keyof typeof AgencyWebsiteScalarFieldEnum]
+
+
+export const AgencyWebsiteDraftScalarFieldEnum = {
+  id: 'id',
+  agencyId: 'agencyId',
+  slug: 'slug',
+  locale: 'locale',
+  themeId: 'themeId',
+  themeSettings: 'themeSettings',
+  content: 'content',
+  branding: 'branding',
+  navigation: 'navigation',
+  footer: 'footer',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyWebsiteDraftScalarFieldEnum = (typeof AgencyWebsiteDraftScalarFieldEnum)[keyof typeof AgencyWebsiteDraftScalarFieldEnum]
 
 
 export const SortOrder = {

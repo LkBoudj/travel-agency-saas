@@ -79,7 +79,15 @@ type InvitationRow = {
   roleIds: bigint[];
 };
 
-const NOW = new Date('2026-09-19T09:00:00.000Z');
+/**
+ * Fixture clock. Anchored to the real current time (not a frozen date) because
+ * seeded invitations expire at NOW + 72h and the acceptance paths assert on
+ * them: a hardcoded anchor silently turns the whole acceptance suite into
+ * 410 GONE once wall-clock time passes it. Tests never assert absolute
+ * timestamps — they compare against NOW (or NOW - 1s for overdue rows) — so
+ * anchoring to now keeps them deterministic in behaviour and immune to rot.
+ */
+const NOW = new Date();
 
 const SAHARA = { id: 10n, code: 'AGY-SAHARA00001', name: 'Sahara Travel', status: 'ACTIVE' };
 const ATLAS = { id: 20n, code: 'AGY-ATLAS000001', name: 'Atlas Tours', status: 'ACTIVE' };

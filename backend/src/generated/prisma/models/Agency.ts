@@ -246,6 +246,8 @@ export type AgencyWhereInput = {
   customers?: Prisma.CustomerListRelationFilter
   tours?: Prisma.TourListRelationFilter
   bookings?: Prisma.BookingListRelationFilter
+  website?: Prisma.XOR<Prisma.AgencyWebsiteNullableScalarRelationFilter, Prisma.AgencyWebsiteWhereInput> | null
+  websiteDraft?: Prisma.XOR<Prisma.AgencyWebsiteDraftNullableScalarRelationFilter, Prisma.AgencyWebsiteDraftWhereInput> | null
 }
 
 export type AgencyOrderByWithRelationInput = {
@@ -263,6 +265,8 @@ export type AgencyOrderByWithRelationInput = {
   customers?: Prisma.CustomerOrderByRelationAggregateInput
   tours?: Prisma.TourOrderByRelationAggregateInput
   bookings?: Prisma.BookingOrderByRelationAggregateInput
+  website?: Prisma.AgencyWebsiteOrderByWithRelationInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftOrderByWithRelationInput
 }
 
 export type AgencyWhereUniqueInput = Prisma.AtLeast<{
@@ -283,6 +287,8 @@ export type AgencyWhereUniqueInput = Prisma.AtLeast<{
   customers?: Prisma.CustomerListRelationFilter
   tours?: Prisma.TourListRelationFilter
   bookings?: Prisma.BookingListRelationFilter
+  website?: Prisma.XOR<Prisma.AgencyWebsiteNullableScalarRelationFilter, Prisma.AgencyWebsiteWhereInput> | null
+  websiteDraft?: Prisma.XOR<Prisma.AgencyWebsiteDraftNullableScalarRelationFilter, Prisma.AgencyWebsiteDraftWhereInput> | null
 }, "id" | "code">
 
 export type AgencyOrderByWithAggregationInput = {
@@ -330,6 +336,8 @@ export type AgencyCreateInput = {
   customers?: Prisma.CustomerCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUncheckedCreateInput = {
@@ -347,6 +355,8 @@ export type AgencyUncheckedCreateInput = {
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourUncheckedCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteUncheckedCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUpdateInput = {
@@ -364,6 +374,8 @@ export type AgencyUpdateInput = {
   customers?: Prisma.CustomerUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyUncheckedUpdateInput = {
@@ -381,6 +393,8 @@ export type AgencyUncheckedUpdateInput = {
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUncheckedUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUncheckedUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyCreateManyInput = {
@@ -553,6 +567,34 @@ export type AgencyUpdateOneRequiredWithoutBookingsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AgencyUpdateToOneWithWhereWithoutBookingsInput, Prisma.AgencyUpdateWithoutBookingsInput>, Prisma.AgencyUncheckedUpdateWithoutBookingsInput>
 }
 
+export type AgencyCreateNestedOneWithoutWebsiteInput = {
+  create?: Prisma.XOR<Prisma.AgencyCreateWithoutWebsiteInput, Prisma.AgencyUncheckedCreateWithoutWebsiteInput>
+  connectOrCreate?: Prisma.AgencyCreateOrConnectWithoutWebsiteInput
+  connect?: Prisma.AgencyWhereUniqueInput
+}
+
+export type AgencyUpdateOneRequiredWithoutWebsiteNestedInput = {
+  create?: Prisma.XOR<Prisma.AgencyCreateWithoutWebsiteInput, Prisma.AgencyUncheckedCreateWithoutWebsiteInput>
+  connectOrCreate?: Prisma.AgencyCreateOrConnectWithoutWebsiteInput
+  upsert?: Prisma.AgencyUpsertWithoutWebsiteInput
+  connect?: Prisma.AgencyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgencyUpdateToOneWithWhereWithoutWebsiteInput, Prisma.AgencyUpdateWithoutWebsiteInput>, Prisma.AgencyUncheckedUpdateWithoutWebsiteInput>
+}
+
+export type AgencyCreateNestedOneWithoutWebsiteDraftInput = {
+  create?: Prisma.XOR<Prisma.AgencyCreateWithoutWebsiteDraftInput, Prisma.AgencyUncheckedCreateWithoutWebsiteDraftInput>
+  connectOrCreate?: Prisma.AgencyCreateOrConnectWithoutWebsiteDraftInput
+  connect?: Prisma.AgencyWhereUniqueInput
+}
+
+export type AgencyUpdateOneRequiredWithoutWebsiteDraftNestedInput = {
+  create?: Prisma.XOR<Prisma.AgencyCreateWithoutWebsiteDraftInput, Prisma.AgencyUncheckedCreateWithoutWebsiteDraftInput>
+  connectOrCreate?: Prisma.AgencyCreateOrConnectWithoutWebsiteDraftInput
+  upsert?: Prisma.AgencyUpsertWithoutWebsiteDraftInput
+  connect?: Prisma.AgencyWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgencyUpdateToOneWithWhereWithoutWebsiteDraftInput, Prisma.AgencyUpdateWithoutWebsiteDraftInput>, Prisma.AgencyUncheckedUpdateWithoutWebsiteDraftInput>
+}
+
 export type AgencyCreateWithoutCustomersInput = {
   id?: bigint | number
   code: string
@@ -567,6 +609,8 @@ export type AgencyCreateWithoutCustomersInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUncheckedCreateWithoutCustomersInput = {
@@ -583,6 +627,8 @@ export type AgencyUncheckedCreateWithoutCustomersInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourUncheckedCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteUncheckedCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyCreateOrConnectWithoutCustomersInput = {
@@ -615,6 +661,8 @@ export type AgencyUpdateWithoutCustomersInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyUncheckedUpdateWithoutCustomersInput = {
@@ -631,6 +679,8 @@ export type AgencyUncheckedUpdateWithoutCustomersInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUncheckedUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUncheckedUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyCreateWithoutApplicationsInput = {
@@ -647,6 +697,8 @@ export type AgencyCreateWithoutApplicationsInput = {
   customers?: Prisma.CustomerCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUncheckedCreateWithoutApplicationsInput = {
@@ -663,6 +715,8 @@ export type AgencyUncheckedCreateWithoutApplicationsInput = {
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourUncheckedCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteUncheckedCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyCreateOrConnectWithoutApplicationsInput = {
@@ -695,6 +749,8 @@ export type AgencyUpdateWithoutApplicationsInput = {
   customers?: Prisma.CustomerUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyUncheckedUpdateWithoutApplicationsInput = {
@@ -711,6 +767,8 @@ export type AgencyUncheckedUpdateWithoutApplicationsInput = {
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUncheckedUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUncheckedUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyCreateWithoutMembersInput = {
@@ -727,6 +785,8 @@ export type AgencyCreateWithoutMembersInput = {
   customers?: Prisma.CustomerCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUncheckedCreateWithoutMembersInput = {
@@ -743,6 +803,8 @@ export type AgencyUncheckedCreateWithoutMembersInput = {
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourUncheckedCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteUncheckedCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyCreateOrConnectWithoutMembersInput = {
@@ -775,6 +837,8 @@ export type AgencyUpdateWithoutMembersInput = {
   customers?: Prisma.CustomerUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyUncheckedUpdateWithoutMembersInput = {
@@ -791,6 +855,8 @@ export type AgencyUncheckedUpdateWithoutMembersInput = {
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUncheckedUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUncheckedUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyCreateWithoutMemberInvitationsInput = {
@@ -807,6 +873,8 @@ export type AgencyCreateWithoutMemberInvitationsInput = {
   customers?: Prisma.CustomerCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUncheckedCreateWithoutMemberInvitationsInput = {
@@ -823,6 +891,8 @@ export type AgencyUncheckedCreateWithoutMemberInvitationsInput = {
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourUncheckedCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteUncheckedCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyCreateOrConnectWithoutMemberInvitationsInput = {
@@ -855,6 +925,8 @@ export type AgencyUpdateWithoutMemberInvitationsInput = {
   customers?: Prisma.CustomerUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyUncheckedUpdateWithoutMemberInvitationsInput = {
@@ -871,6 +943,8 @@ export type AgencyUncheckedUpdateWithoutMemberInvitationsInput = {
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUncheckedUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUncheckedUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyCreateWithoutToursInput = {
@@ -887,6 +961,8 @@ export type AgencyCreateWithoutToursInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutAgencyInput
   customers?: Prisma.CustomerCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUncheckedCreateWithoutToursInput = {
@@ -903,6 +979,8 @@ export type AgencyUncheckedCreateWithoutToursInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutAgencyInput
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutAgencyInput
   bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteUncheckedCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyCreateOrConnectWithoutToursInput = {
@@ -935,6 +1013,8 @@ export type AgencyUpdateWithoutToursInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationUpdateManyWithoutAgencyNestedInput
   customers?: Prisma.CustomerUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyUncheckedUpdateWithoutToursInput = {
@@ -951,6 +1031,8 @@ export type AgencyUncheckedUpdateWithoutToursInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutAgencyNestedInput
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutAgencyNestedInput
   bookings?: Prisma.BookingUncheckedUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUncheckedUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyCreateWithoutBookingsInput = {
@@ -967,6 +1049,8 @@ export type AgencyCreateWithoutBookingsInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutAgencyInput
   customers?: Prisma.CustomerCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyUncheckedCreateWithoutBookingsInput = {
@@ -983,6 +1067,8 @@ export type AgencyUncheckedCreateWithoutBookingsInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutAgencyInput
   customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutAgencyInput
   tours?: Prisma.TourUncheckedCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteUncheckedCreateNestedOneWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedCreateNestedOneWithoutAgencyInput
 }
 
 export type AgencyCreateOrConnectWithoutBookingsInput = {
@@ -1015,6 +1101,8 @@ export type AgencyUpdateWithoutBookingsInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationUpdateManyWithoutAgencyNestedInput
   customers?: Prisma.CustomerUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUpdateOneWithoutAgencyNestedInput
 }
 
 export type AgencyUncheckedUpdateWithoutBookingsInput = {
@@ -1031,6 +1119,184 @@ export type AgencyUncheckedUpdateWithoutBookingsInput = {
   memberInvitations?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutAgencyNestedInput
   customers?: Prisma.CustomerUncheckedUpdateManyWithoutAgencyNestedInput
   tours?: Prisma.TourUncheckedUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUncheckedUpdateOneWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedUpdateOneWithoutAgencyNestedInput
+}
+
+export type AgencyCreateWithoutWebsiteInput = {
+  id?: bigint | number
+  code: string
+  name: string
+  status?: string
+  country?: string | null
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.AgencyMembershipCreateNestedManyWithoutAgencyInput
+  applications?: Prisma.AgencyApplicationCreateNestedManyWithoutAgencyInput
+  memberInvitations?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutAgencyInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutAgencyInput
+  tours?: Prisma.TourCreateNestedManyWithoutAgencyInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftCreateNestedOneWithoutAgencyInput
+}
+
+export type AgencyUncheckedCreateWithoutWebsiteInput = {
+  id?: bigint | number
+  code: string
+  name: string
+  status?: string
+  country?: string | null
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAgencyInput
+  applications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAgencyInput
+  memberInvitations?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutAgencyInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutAgencyInput
+  tours?: Prisma.TourUncheckedCreateNestedManyWithoutAgencyInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutAgencyInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedCreateNestedOneWithoutAgencyInput
+}
+
+export type AgencyCreateOrConnectWithoutWebsiteInput = {
+  where: Prisma.AgencyWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgencyCreateWithoutWebsiteInput, Prisma.AgencyUncheckedCreateWithoutWebsiteInput>
+}
+
+export type AgencyUpsertWithoutWebsiteInput = {
+  update: Prisma.XOR<Prisma.AgencyUpdateWithoutWebsiteInput, Prisma.AgencyUncheckedUpdateWithoutWebsiteInput>
+  create: Prisma.XOR<Prisma.AgencyCreateWithoutWebsiteInput, Prisma.AgencyUncheckedCreateWithoutWebsiteInput>
+  where?: Prisma.AgencyWhereInput
+}
+
+export type AgencyUpdateToOneWithWhereWithoutWebsiteInput = {
+  where?: Prisma.AgencyWhereInput
+  data: Prisma.XOR<Prisma.AgencyUpdateWithoutWebsiteInput, Prisma.AgencyUncheckedUpdateWithoutWebsiteInput>
+}
+
+export type AgencyUpdateWithoutWebsiteInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.AgencyMembershipUpdateManyWithoutAgencyNestedInput
+  applications?: Prisma.AgencyApplicationUpdateManyWithoutAgencyNestedInput
+  memberInvitations?: Prisma.AgencyMemberInvitationUpdateManyWithoutAgencyNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutAgencyNestedInput
+  tours?: Prisma.TourUpdateManyWithoutAgencyNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUpdateOneWithoutAgencyNestedInput
+}
+
+export type AgencyUncheckedUpdateWithoutWebsiteInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAgencyNestedInput
+  applications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAgencyNestedInput
+  memberInvitations?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutAgencyNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutAgencyNestedInput
+  tours?: Prisma.TourUncheckedUpdateManyWithoutAgencyNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutAgencyNestedInput
+  websiteDraft?: Prisma.AgencyWebsiteDraftUncheckedUpdateOneWithoutAgencyNestedInput
+}
+
+export type AgencyCreateWithoutWebsiteDraftInput = {
+  id?: bigint | number
+  code: string
+  name: string
+  status?: string
+  country?: string | null
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.AgencyMembershipCreateNestedManyWithoutAgencyInput
+  applications?: Prisma.AgencyApplicationCreateNestedManyWithoutAgencyInput
+  memberInvitations?: Prisma.AgencyMemberInvitationCreateNestedManyWithoutAgencyInput
+  customers?: Prisma.CustomerCreateNestedManyWithoutAgencyInput
+  tours?: Prisma.TourCreateNestedManyWithoutAgencyInput
+  bookings?: Prisma.BookingCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteCreateNestedOneWithoutAgencyInput
+}
+
+export type AgencyUncheckedCreateWithoutWebsiteDraftInput = {
+  id?: bigint | number
+  code: string
+  name: string
+  status?: string
+  country?: string | null
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  members?: Prisma.AgencyMembershipUncheckedCreateNestedManyWithoutAgencyInput
+  applications?: Prisma.AgencyApplicationUncheckedCreateNestedManyWithoutAgencyInput
+  memberInvitations?: Prisma.AgencyMemberInvitationUncheckedCreateNestedManyWithoutAgencyInput
+  customers?: Prisma.CustomerUncheckedCreateNestedManyWithoutAgencyInput
+  tours?: Prisma.TourUncheckedCreateNestedManyWithoutAgencyInput
+  bookings?: Prisma.BookingUncheckedCreateNestedManyWithoutAgencyInput
+  website?: Prisma.AgencyWebsiteUncheckedCreateNestedOneWithoutAgencyInput
+}
+
+export type AgencyCreateOrConnectWithoutWebsiteDraftInput = {
+  where: Prisma.AgencyWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgencyCreateWithoutWebsiteDraftInput, Prisma.AgencyUncheckedCreateWithoutWebsiteDraftInput>
+}
+
+export type AgencyUpsertWithoutWebsiteDraftInput = {
+  update: Prisma.XOR<Prisma.AgencyUpdateWithoutWebsiteDraftInput, Prisma.AgencyUncheckedUpdateWithoutWebsiteDraftInput>
+  create: Prisma.XOR<Prisma.AgencyCreateWithoutWebsiteDraftInput, Prisma.AgencyUncheckedCreateWithoutWebsiteDraftInput>
+  where?: Prisma.AgencyWhereInput
+}
+
+export type AgencyUpdateToOneWithWhereWithoutWebsiteDraftInput = {
+  where?: Prisma.AgencyWhereInput
+  data: Prisma.XOR<Prisma.AgencyUpdateWithoutWebsiteDraftInput, Prisma.AgencyUncheckedUpdateWithoutWebsiteDraftInput>
+}
+
+export type AgencyUpdateWithoutWebsiteDraftInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.AgencyMembershipUpdateManyWithoutAgencyNestedInput
+  applications?: Prisma.AgencyApplicationUpdateManyWithoutAgencyNestedInput
+  memberInvitations?: Prisma.AgencyMemberInvitationUpdateManyWithoutAgencyNestedInput
+  customers?: Prisma.CustomerUpdateManyWithoutAgencyNestedInput
+  tours?: Prisma.TourUpdateManyWithoutAgencyNestedInput
+  bookings?: Prisma.BookingUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUpdateOneWithoutAgencyNestedInput
+}
+
+export type AgencyUncheckedUpdateWithoutWebsiteDraftInput = {
+  id?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  code?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  country?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  members?: Prisma.AgencyMembershipUncheckedUpdateManyWithoutAgencyNestedInput
+  applications?: Prisma.AgencyApplicationUncheckedUpdateManyWithoutAgencyNestedInput
+  memberInvitations?: Prisma.AgencyMemberInvitationUncheckedUpdateManyWithoutAgencyNestedInput
+  customers?: Prisma.CustomerUncheckedUpdateManyWithoutAgencyNestedInput
+  tours?: Prisma.TourUncheckedUpdateManyWithoutAgencyNestedInput
+  bookings?: Prisma.BookingUncheckedUpdateManyWithoutAgencyNestedInput
+  website?: Prisma.AgencyWebsiteUncheckedUpdateOneWithoutAgencyNestedInput
 }
 
 
@@ -1124,6 +1390,8 @@ export type AgencySelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   customers?: boolean | Prisma.Agency$customersArgs<ExtArgs>
   tours?: boolean | Prisma.Agency$toursArgs<ExtArgs>
   bookings?: boolean | Prisma.Agency$bookingsArgs<ExtArgs>
+  website?: boolean | Prisma.Agency$websiteArgs<ExtArgs>
+  websiteDraft?: boolean | Prisma.Agency$websiteDraftArgs<ExtArgs>
   _count?: boolean | Prisma.AgencyCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agency"]>
 
@@ -1168,6 +1436,8 @@ export type AgencyInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   customers?: boolean | Prisma.Agency$customersArgs<ExtArgs>
   tours?: boolean | Prisma.Agency$toursArgs<ExtArgs>
   bookings?: boolean | Prisma.Agency$bookingsArgs<ExtArgs>
+  website?: boolean | Prisma.Agency$websiteArgs<ExtArgs>
+  websiteDraft?: boolean | Prisma.Agency$websiteDraftArgs<ExtArgs>
   _count?: boolean | Prisma.AgencyCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AgencyIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -1182,6 +1452,8 @@ export type $AgencyPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     customers: Prisma.$CustomerPayload<ExtArgs>[]
     tours: Prisma.$TourPayload<ExtArgs>[]
     bookings: Prisma.$BookingPayload<ExtArgs>[]
+    website: Prisma.$AgencyWebsitePayload<ExtArgs> | null
+    websiteDraft: Prisma.$AgencyWebsiteDraftPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: bigint
@@ -1592,6 +1864,8 @@ export interface Prisma__AgencyClient<T, Null = never, ExtArgs extends runtime.T
   customers<T extends Prisma.Agency$customersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agency$customersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CustomerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tours<T extends Prisma.Agency$toursArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agency$toursArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TourPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bookings<T extends Prisma.Agency$bookingsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agency$bookingsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BookingPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  website<T extends Prisma.Agency$websiteArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agency$websiteArgs<ExtArgs>>): Prisma.Prisma__AgencyWebsiteClient<runtime.Types.Result.GetResult<Prisma.$AgencyWebsitePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  websiteDraft<T extends Prisma.Agency$websiteDraftArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Agency$websiteDraftArgs<ExtArgs>>): Prisma.Prisma__AgencyWebsiteDraftClient<runtime.Types.Result.GetResult<Prisma.$AgencyWebsiteDraftPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2163,6 +2437,44 @@ export type Agency$bookingsArgs<ExtArgs extends runtime.Types.Extensions.Interna
   take?: number
   skip?: number
   distinct?: Prisma.BookingScalarFieldEnum | Prisma.BookingScalarFieldEnum[]
+}
+
+/**
+ * Agency.website
+ */
+export type Agency$websiteArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgencyWebsite
+   */
+  select?: Prisma.AgencyWebsiteSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgencyWebsite
+   */
+  omit?: Prisma.AgencyWebsiteOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgencyWebsiteInclude<ExtArgs> | null
+  where?: Prisma.AgencyWebsiteWhereInput
+}
+
+/**
+ * Agency.websiteDraft
+ */
+export type Agency$websiteDraftArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgencyWebsiteDraft
+   */
+  select?: Prisma.AgencyWebsiteDraftSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgencyWebsiteDraft
+   */
+  omit?: Prisma.AgencyWebsiteDraftOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgencyWebsiteDraftInclude<ExtArgs> | null
+  where?: Prisma.AgencyWebsiteDraftWhereInput
 }
 
 /**

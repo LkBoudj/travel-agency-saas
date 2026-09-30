@@ -313,3 +313,38 @@ export type BookingStatusHistory = Prisma.BookingStatusHistoryModel
  *  * still being prepared, then frozen by confirmation.
  */
 export type BookingTraveler = Prisma.BookingTravelerModel
+/**
+ * Model AgencyWebsite
+ * *
+ *  * An agency's published public website, 1:1 with Agency.
+ *  * The row exists exactly when the site has been published at least once; there
+ *  * is deliberately no `status` column — "not published" is the absence of a row,
+ *  * and an offline/pause toggle is future scope. Publishing is an explicit,
+ *  * guarded action (`AGENCY_WEBSITE_PUBLISH`) that copies the agency's
+ *  * `AgencyWebsiteDraft` into this table atomically and stamps `published_at`; the
+ *  * backend never auto-publishes.
+ *  * The website stores NO business data: `content` is agency-owned marketing copy
+ *  * and the tour curation references (`content.featuredTourCodes`) are codes
+ *  * resolved against `tour` at compose time; derived starting prices come from
+ *  * `departure_price`. `branding`/`navigation`/`footer` are agency-owned site
+ *  * chrome; `theme_id`/`theme_settings` are theme-owned selection, opaque to the
+ *  * backend (theme schemas live in the frontend registry). Content and theme
+ *  * settings are mutated by distinct endpoints with distinct permissions so they
+ *  * can never bleed into each other.
+ *  * `slug` is the public tenant key on the storefront read boundary. Global
+ *  * uniqueness across BOTH website tables is enforced by the deferred constraint
+ *  * trigger `website_slug_global_unique` (not expressible in Prisma PSL).
+ */
+export type AgencyWebsite = Prisma.AgencyWebsiteModel
+/**
+ * Model AgencyWebsiteDraft
+ * *
+ *  * An agency's editable website workspace, 1:1 with Agency.
+ *  * The same aggregate shape as `AgencyWebsite` minus `published_at` (there is
+ *  * nothing to stamp until publishing). The row is ensured on first draft access
+ *  * (`ensure-once`) and is never mutated by publishing — `PUBLISH` copies it.
+ *  * `slug` mirrors the published row's slug; per-agency `agency_id` is unique and
+ *  * the FK cascades. Global slug uniqueness across both tables is enforced by the
+ *  * `website_slug_global_unique` deferred trigger.
+ */
+export type AgencyWebsiteDraft = Prisma.AgencyWebsiteDraftModel

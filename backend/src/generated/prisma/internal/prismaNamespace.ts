@@ -419,7 +419,9 @@ export const ModelName = {
   Booking: 'Booking',
   BookingPriceLine: 'BookingPriceLine',
   BookingStatusHistory: 'BookingStatusHistory',
-  BookingTraveler: 'BookingTraveler'
+  BookingTraveler: 'BookingTraveler',
+  AgencyWebsite: 'AgencyWebsite',
+  AgencyWebsiteDraft: 'AgencyWebsiteDraft'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -435,7 +437,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "appUser" | "role" | "permission" | "rolePermission" | "platformRoleAssignment" | "agency" | "customer" | "agencyApplication" | "agencyMembership" | "agencyRoleAssignment" | "agencyMemberInvitation" | "agencyMemberInvitationRole" | "auditLog" | "tour" | "departure" | "pricingOption" | "departurePrice" | "tourDestination" | "tourItineraryDay" | "booking" | "bookingPriceLine" | "bookingStatusHistory" | "bookingTraveler"
+    modelProps: "appUser" | "role" | "permission" | "rolePermission" | "platformRoleAssignment" | "agency" | "customer" | "agencyApplication" | "agencyMembership" | "agencyRoleAssignment" | "agencyMemberInvitation" | "agencyMemberInvitationRole" | "auditLog" | "tour" | "departure" | "pricingOption" | "departurePrice" | "tourDestination" | "tourItineraryDay" | "booking" | "bookingPriceLine" | "bookingStatusHistory" | "bookingTraveler" | "agencyWebsite" | "agencyWebsiteDraft"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2141,6 +2143,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AgencyWebsite: {
+      payload: Prisma.$AgencyWebsitePayload<ExtArgs>
+      fields: Prisma.AgencyWebsiteFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgencyWebsiteFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgencyWebsiteFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload>
+        }
+        findFirst: {
+          args: Prisma.AgencyWebsiteFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgencyWebsiteFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload>
+        }
+        findMany: {
+          args: Prisma.AgencyWebsiteFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload>[]
+        }
+        create: {
+          args: Prisma.AgencyWebsiteCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload>
+        }
+        createMany: {
+          args: Prisma.AgencyWebsiteCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgencyWebsiteCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload>[]
+        }
+        delete: {
+          args: Prisma.AgencyWebsiteDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload>
+        }
+        update: {
+          args: Prisma.AgencyWebsiteUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload>
+        }
+        deleteMany: {
+          args: Prisma.AgencyWebsiteDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgencyWebsiteUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgencyWebsiteUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload>[]
+        }
+        upsert: {
+          args: Prisma.AgencyWebsiteUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsitePayload>
+        }
+        aggregate: {
+          args: Prisma.AgencyWebsiteAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgencyWebsite>
+        }
+        groupBy: {
+          args: Prisma.AgencyWebsiteGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyWebsiteGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgencyWebsiteCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyWebsiteCountAggregateOutputType> | number
+        }
+      }
+    }
+    AgencyWebsiteDraft: {
+      payload: Prisma.$AgencyWebsiteDraftPayload<ExtArgs>
+      fields: Prisma.AgencyWebsiteDraftFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AgencyWebsiteDraftFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AgencyWebsiteDraftFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload>
+        }
+        findFirst: {
+          args: Prisma.AgencyWebsiteDraftFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AgencyWebsiteDraftFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload>
+        }
+        findMany: {
+          args: Prisma.AgencyWebsiteDraftFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload>[]
+        }
+        create: {
+          args: Prisma.AgencyWebsiteDraftCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload>
+        }
+        createMany: {
+          args: Prisma.AgencyWebsiteDraftCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AgencyWebsiteDraftCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload>[]
+        }
+        delete: {
+          args: Prisma.AgencyWebsiteDraftDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload>
+        }
+        update: {
+          args: Prisma.AgencyWebsiteDraftUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload>
+        }
+        deleteMany: {
+          args: Prisma.AgencyWebsiteDraftDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AgencyWebsiteDraftUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AgencyWebsiteDraftUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload>[]
+        }
+        upsert: {
+          args: Prisma.AgencyWebsiteDraftUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgencyWebsiteDraftPayload>
+        }
+        aggregate: {
+          args: Prisma.AgencyWebsiteDraftAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgencyWebsiteDraft>
+        }
+        groupBy: {
+          args: Prisma.AgencyWebsiteDraftGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyWebsiteDraftGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AgencyWebsiteDraftCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgencyWebsiteDraftCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2532,6 +2682,43 @@ export const BookingTravelerScalarFieldEnum = {
 export type BookingTravelerScalarFieldEnum = (typeof BookingTravelerScalarFieldEnum)[keyof typeof BookingTravelerScalarFieldEnum]
 
 
+export const AgencyWebsiteScalarFieldEnum = {
+  id: 'id',
+  agencyId: 'agencyId',
+  slug: 'slug',
+  locale: 'locale',
+  themeId: 'themeId',
+  themeSettings: 'themeSettings',
+  content: 'content',
+  branding: 'branding',
+  navigation: 'navigation',
+  footer: 'footer',
+  publishedAt: 'publishedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyWebsiteScalarFieldEnum = (typeof AgencyWebsiteScalarFieldEnum)[keyof typeof AgencyWebsiteScalarFieldEnum]
+
+
+export const AgencyWebsiteDraftScalarFieldEnum = {
+  id: 'id',
+  agencyId: 'agencyId',
+  slug: 'slug',
+  locale: 'locale',
+  themeId: 'themeId',
+  themeSettings: 'themeSettings',
+  content: 'content',
+  branding: 'branding',
+  navigation: 'navigation',
+  footer: 'footer',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AgencyWebsiteDraftScalarFieldEnum = (typeof AgencyWebsiteDraftScalarFieldEnum)[keyof typeof AgencyWebsiteDraftScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2864,6 +3051,8 @@ export type GlobalOmitConfig = {
   bookingPriceLine?: Prisma.BookingPriceLineOmit
   bookingStatusHistory?: Prisma.BookingStatusHistoryOmit
   bookingTraveler?: Prisma.BookingTravelerOmit
+  agencyWebsite?: Prisma.AgencyWebsiteOmit
+  agencyWebsiteDraft?: Prisma.AgencyWebsiteDraftOmit
 }
 
 /* Types for Logging */
