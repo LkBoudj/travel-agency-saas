@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Table } from '@mantine/core';
+import { EmptyState } from './empty-state.tsx';
 
 export interface DataTableColumn<T> {
   key: string;
@@ -26,6 +28,8 @@ export function DataTable<T>({
   emptyState,
   onRowClick,
 }: DataTableProps<T>) {
+  const { t } = useTranslation('common');
+
   return (
     <Table.ScrollContainer minWidth={640}>
       <Table>
@@ -51,8 +55,11 @@ export function DataTable<T>({
             ))
           ) : rows.length === 0 ? (
             <Table.Tr>
-              <Table.Td colSpan={columns.length} align="center" py="xl">
-                {emptyState ?? 'Nothing here yet.'}
+              <Table.Td colSpan={columns.length} align="center">
+                {/* Falls back to the shared, translated empty presentation so a
+                    table that has no results never leaks an untranslated string;
+                    pages pass a richer node with the next action when they have one. */}
+                {emptyState ?? <EmptyState title={t('empty')} />}
               </Table.Td>
             </Table.Tr>
           ) : (

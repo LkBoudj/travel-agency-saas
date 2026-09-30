@@ -1,0 +1,48 @@
+{
+  "title": "Themes",
+  "subtitle": "Pick the theme your public website uses and tune its settings.",
+  "publish": "Publish",
+  "preview": "Preview",
+  "customize": "Customize",
+  "activate": "Activate",
+  "current": "Current",
+  "saveLabel": "Save settings",
+  "discard": "Discard",
+  "customizeDrawerTitle": "Theme settings",
+  "emptyCatalog": "No themes could be loaded from the theme registry.",
+  "readOnlyHint": "You can view themes, but your permissions don't allow changing them.",
+  "loadErrorTitle": "Could not load the theme catalog.",
+  "loadErrorBody": "The theme registry is unreachable. Check the backend connection and try again.",
+  "noThemeBody": "No theme is active yet. Activate a theme first, then customize it.",
+  "confirm": {
+    "activateTitle": "Activate this theme?",
+    "activateBody": "Your stored settings are kept; the new theme applies them to the previous theme's values where valid. Publish to make it live.",
+    "publishTitle": "Publish this website?",
+    "publishBody": "Your current draft becomes the live public website, including the active theme and its settings."
+  },
+  "notifications": {
+    "activated": "Theme activated.",
+    "customizationSaved": "Theme settings saved.",
+    "published": "Website published.",
+    "notPublished": "This website is not published yet.",
+    "slugConflict": "Another tenant already uses this website address. Rename the website slug before publishing.",
+    "loadFailed": "The website draft is no longer available.",
+    "unknownError": "Something went wrong. Try again."
+  },
+  "errors": {
+    "network": "Could not reach the server. Check your connection and try again."
+  },
+  "starter": {
+    "name": "Starter",
+    "description": "The default theme: a single-column layout with a hero, featured tours, trust points and a promotion block."
+  },
+  "badgeCurrent": "Current",
+  "badgeLive": "Live",
+  "badgePending": "Not published",
+  "noPreview": "No preview",
+  "unknownTheme": "An unknown theme",
+  "noticeUnpublishedTitle": "Your site is not published yet",
+  "noticeUnpublishedBody": "Visitors cannot see the site until you publish. Activating a theme only changes your draft.",
+  "noticePendingTitle": "Draft differs from the live site",
+  "noticePendingBody": "The live site still serves \"{{liveTheme}}\". Publish to switch the site to the current theme."
+}

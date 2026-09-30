@@ -7,6 +7,7 @@ import { useConfirmDialog } from '../../../components/confirm-dialog.tsx';
 import { DataTable, type DataTableColumn } from '../../../components/data-table.tsx';
 import { ErrorState } from '../../../components/empty-state.tsx';
 import { MoneyText } from '../../../components/money-text.tsx';
+import { useQualifiedKey } from '../../../i18n/hooks/use-qualified-key.ts';
 import { usePricingOverview, usePricingMutations } from '../hooks/use-pricing.ts';
 import { pricingBasisLabelKey } from '../lib/pricing-display.ts';
 import { getPricingErrorMessage } from '../lib/pricing-error-messages.ts';
@@ -35,6 +36,7 @@ export function PricingManager({
   canDeactivate,
 }: PricingManagerProps) {
   const { t } = useTranslation('pricing');
+  const qualifiedKey = useQualifiedKey();
   const confirm = useConfirmDialog();
   const overviewQuery = usePricingOverview(tourCode);
   const { create, update, deactivate } = usePricingMutations(tourCode);
@@ -123,7 +125,9 @@ export function PricingManager({
     {
       key: 'basis',
       header: t('columns.basis'),
-      render: (option) => <Text size="sm">{t(pricingBasisLabelKey(option.basis))}</Text>,
+      // `pricingBasisLabelKey` is fully qualified (`pricing.basis.per_person`),
+      // so it must not be handed to this component's namespace-bound `t`.
+      render: (option) => <Text size="sm">{qualifiedKey(pricingBasisLabelKey(option.basis))}</Text>,
     },
     {
       key: 'currency',

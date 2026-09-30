@@ -1,0 +1,15 @@
+{
+  "group": {
+    "homepage": "أقسام الصفحة الرئيسية"
+  },
+  "starter": {
+    "homepage": {
+      "showFeaturedTours": "إظهار قسم الرحلات المميزة",
+      "showFeaturedDestinations": "إظهار قسم الوجهات المميزة",
+      "showWhyUs": "إظهار قسم «لماذا نحن»",
+      "showPromotion": "إظهار كتلة العروض",
+      "showTestimonials": "إظهار قسم آراء المسافرين",
+      "showFinalCta": "إظهار نداء الإجراء الأخير"
+    }
+  }
+}

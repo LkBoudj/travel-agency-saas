@@ -1,0 +1,123 @@
+{
+  "title": "الموقع الإلكتروني",
+  "subtitle": "الموقع العام لوكالتك الذي يعرضه القالب المحدد.",
+  "publish": "نشر",
+  "saveLabel": "حفظ التغييرات",
+  "readOnlyHint": "يمكنك الاطلاع على هذا الموقع، لكن صلاحياتك لا تسمح بحفظ التغييرات.",
+  "loadError": "تعذّر تحميل الموقع الإلكتروني.",
+  "tabs": {
+    "home": "الرئيسية",
+    "tours": "الرحلات",
+    "navigation": "التنقل",
+    "footer": "التذييل",
+    "branding": "الهوية"
+  },
+  "sections": {
+    "hero": "الواجهة",
+    "trustPoints": "نقاط الثقة",
+    "promotion": "العرض الترويجي",
+    "testimonials": "آراء العملاء",
+    "finalCta": "الدعوة الختامية",
+    "navigation": "روابط التنقل",
+    "footer": "التذييل",
+    "footerColumns": "أعمدة التذييل",
+    "footerLegal": "روابط قانونية",
+    "branding": "الهوية"
+  },
+  "sectionHints": {
+    "hero": "أول ما يراه الزائر. يظهر العنوان والنص الفرعي في واجهة الصفحة الرئيسية.",
+    "trustPoints": "إشارات ثقة قصيرة تحت الواجهة (مثال: «أدلاء معتمدون»).",
+    "promotion": "كتلة حملة ترويجية بين الواجهة وقائمة الرحلات.",
+    "testimonials": "اقتباسات من مسافرين سابقين.",
+    "finalCta": "الدعوة الختامية أسفل الصفحة الرئيسية.",
+    "tours": "اختر رحلات منشورة لتظهر أولاً في الصفحة الرئيسية بالترتيب المحدد.",
+    "navigation": "روابط تظهر في ترويسة الموقع.",
+    "footerDescription": "سطر قصير عن وكالتك أعلى التذييل.",
+    "footerColumns": "أعمدة روابط داخل التذييل.",
+    "footerLegal": "روابط قانونية أسفل التذييل.",
+    "branding": "الهوية الظاهرة في الموقع. يعود الموقع إلى اسم الوكالة تلقائيًا عند الفراغ."
+  },
+  "fields": {
+    "image": "رابط الصورة",
+    "heroTitle": "العنوان",
+    "heroSubtitle": "النص الفرعي",
+    "eyebrow": "السطر التمهيدي",
+    "title": "العنوان",
+    "body": "النص",
+    "subtitle": "النص الفرعي",
+    "ctaLabel": "نص الزر",
+    "ctaHref": "رابط الزر",
+    "featuredTours": "الرحلات المميزة",
+    "footerDescription": "وصف التذييل",
+    "brandName": "اسم الوكالة",
+    "tagline": "الشعار النصي",
+    "logoUrl": "رابط الشعار"
+  },
+  "placeholders": {
+    "image": "https://…",
+    "icon": "الأيقونة",
+    "trustPointTitle": "العنوان",
+    "trustPointText": "الوصف",
+    "quote": "«…»",
+    "author": "الاسم",
+    "location": "الموقع",
+    "href": "/المسار",
+    "navLabel": "التسمية",
+    "columnTitle": "عنوان العمود"
+  },
+  "empty": {
+    "testimonials": "لا توجد آراء بعد. أضف أولها أدناه.",
+    "navigation": "لا توجد روابط بعد. يعرض الموقع رابط الرئيسية فقط.",
+    "tourCatalog": "لا توجد رحلات منشورة بعد. انشر رحلة أولاً — تُختار الرحلات المميزة من كتالوجك المنشور."
+  },
+  "addTrustPoint": "إضافة نقطة ثقة",
+  "removeTrustPoint": "حذف نقطة الثقة",
+  "addTestimonial": "إضافة رأي",
+  "removeTestimonial": "حذف الرأي",
+  "addNavigationLink": "إضافة رابط",
+  "removeNavigationLink": "حذف الرابط",
+  "addFooterColumn": "إضافة عمود",
+  "removeFooterColumn": "حذف العمود",
+  "addFooterLink": "إضافة رابط",
+  "removeFooterLink": "حذف الرابط",
+  "confirm": {
+    "publishTitle": "نشر هذا الموقع؟",
+    "publishBody": "سيصبح مسودتك الحالية الموقع العام المباشر. أي تعديل لاحق يبقى في المسودة حتى تنشر مجددًا."
+  },
+  "notifications": {
+    "saved": "تم حفظ الموقع.",
+    "invalidFields": "بعض الحقول تحتاج إلى تصحيح قبل الحفظ.",
+    "published": "تم نشر الموقع.",
+    "notPublished": "هذا الموقع غير منشور بعد.",
+    "slugConflict": "وكالة أخرى تستخدم هذا العنوان بالفعل. غيّر عنوان الموقع قبل النشر.",
+    "loadFailed": "لم تعد مسودة الموقع متاحة.",
+    "unknownError": "حدث خطأ ما. حاول مجددًا.",
+    "previewFailed": "تعذّر فتح معاينة هذه المسودة.",
+    "noWebsiteUrl": "لا يوجد لهذا الموقع عنوان عام بعد."
+  },
+  "fieldErrors": {
+    "heroTitleRequired": "اكتب عنوانًا للواجهة.",
+    "heroTitleTooLong": "لا يتجاوز العنوان 120 حرفًا.",
+    "valueTooLong": "لا يتجاوز هذا الحقل الحد الأقصى.",
+    "trustPointTitleRequired": "أضف عنوانًا لكل نقطة ثقة.",
+    "trustPointTooMany": "6 نقاط ثقة كحد أقصى.",
+    "testimonialRequired": "يتطلب كل رأي اقتباسًا واسمًا.",
+    "testimonialTooMany": "8 آراء كحد أقصى.",
+    "brandingNameRequired": "أدخل اسم وكالتك.",
+    "brandingNameTooLong": "لا يتجاوز الاسم 120 حرفًا.",
+    "navigationLinkRequired": "يتطلب كل رابط تسمية ومسارًا.",
+    "navigationTooMany": "20 رابط تنقل كحد أقصى.",
+    "footerColumnTitleRequired": "أضف عنوانًا لكل عمود في التذييل.",
+    "footerTooMany": "لا تتجاوز حدود مقاطع التذييل."
+  },
+  "errors": {
+    "network": "تعذّر الوصول إلى الخادم. تحقق من اتصالك وحاول مجددًا."
+  },
+  "viewWebsite": "عرض الموقع المنشور",
+  "previewDraft": "معاينة المسودة",
+  "tooltips": {
+    "live": "يفتح الموقع المنشور في تبويب جديد.",
+    "preview": "الموقع لم يُنشر بعد — يفتح معاينة موقّعة للمسودة.",
+    "devOtherTenant": "في بيئة التطوير يعرض المتجر المحلي موقع «{{tenant}}»، لذا سيعرض التبويب ذلك الموقع."
+  }
+}

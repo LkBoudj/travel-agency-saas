@@ -21,7 +21,10 @@ import arDashboard from './locales/ar/dashboard.json';
 import arDepartures from './locales/ar/departures.json';
 import arMembers from './locales/ar/members.json';
 import arPricing from './locales/ar/pricing.json';
+import arSettings from './locales/ar/settings.json';
+import arThemes from './locales/ar/themes.json';
 import arTrips from './locales/ar/trips.json';
+import arWebsite from './locales/ar/website.json';
 import enAuth from './locales/en/auth.json';
 import enBookings from './locales/en/bookings.json';
 import enCommon from './locales/en/common.json';
@@ -30,7 +33,10 @@ import enDashboard from './locales/en/dashboard.json';
 import enDepartures from './locales/en/departures.json';
 import enMembers from './locales/en/members.json';
 import enPricing from './locales/en/pricing.json';
+import enSettings from './locales/en/settings.json';
+import enThemes from './locales/en/themes.json';
 import enTrips from './locales/en/trips.json';
+import enWebsite from './locales/en/website.json';
 
 export {
   DEFAULT_LOCALE,
@@ -55,6 +61,9 @@ void i18n.use(initReactI18next).init({
       pricing: enPricing,
       bookings: enBookings,
       dashboard: enDashboard,
+      website: enWebsite,
+      themes: enThemes,
+      settings: enSettings,
     },
     ar: {
       common: arCommon,
@@ -66,6 +75,9 @@ void i18n.use(initReactI18next).init({
       pricing: arPricing,
       bookings: arBookings,
       dashboard: arDashboard,
+      website: arWebsite,
+      themes: arThemes,
+      settings: arSettings,
     },
   },
   lng: resolveInitialLocale(readStoredLocale(), window.navigator.language),
@@ -81,6 +93,11 @@ void i18n.use(initReactI18next).init({
     'pricing',
     'bookings',
     'dashboard',
+    'website',
+    'themes',
+    // Declared by the theme registry: a theme's settingsSchema labelKeys are
+    // fully qualified (`settings.<themeId>.<group>.<field>`).
+    'settings',
   ],
   defaultNS: 'common',
   interpolation: { escapeValue: false },

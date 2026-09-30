@@ -16,6 +16,16 @@ export default defineConfig(({ mode }) => {
       // silently blocks every request. strictPort fails loudly instead.
       port: Number(env.VITE_DEV_PORT) || 5175,
       strictPort: true,
+      proxy: {
+        // Theme registry manifest. The browser fetches `<VITE_THEMES_BASE_URL>/themes.json`;
+        // with a dev base of `/themes` this rule rewrites `/themes/themes.json` to the
+        // theme-agency dev server's `/themes.json`, keeping the fetch same-origin.
+        '/themes': {
+          target: 'http://localhost:4321',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/themes/, ''),
+        },
+      },
     },
     resolve: {
       alias: {

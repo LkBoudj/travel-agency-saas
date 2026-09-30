@@ -3,8 +3,10 @@ import {
   IconLayoutGrid,
   IconListCheck,
   IconMap2,
+  IconPalette,
   IconTicket,
   IconUsers,
+  IconWorld,
 } from '@tabler/icons-react';
 import { useAgencyContext } from '../../../features/agency-context/provider/agency-provider.tsx';
 import { dashboardPaths } from '../../router/route-paths.ts';
@@ -51,6 +53,18 @@ const NAV_DEFINITIONS: readonly NavDefinition[] = [
     to: dashboardPaths.members,
     icon: IconListCheck,
     permission: 'AGENCY_MEMBER_VIEW',
+  },
+  {
+    labelKey: 'nav.website',
+    to: dashboardPaths.website,
+    icon: IconWorld,
+    permission: 'AGENCY_WEBSITE_VIEW',
+  },
+  {
+    labelKey: 'nav.themes',
+    to: dashboardPaths.themes,
+    icon: IconPalette,
+    permission: 'AGENCY_WEBSITE_VIEW',
   },
 ];
 

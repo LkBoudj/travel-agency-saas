@@ -1,0 +1,15 @@
+{
+  "group": {
+    "homepage": "Home page sections"
+  },
+  "starter": {
+    "homepage": {
+      "showFeaturedTours": "Show the featured tours section",
+      "showFeaturedDestinations": "Show the featured destinations section",
+      "showWhyUs": "Show the “Why us” section",
+      "showPromotion": "Show the promotion block",
+      "showTestimonials": "Show the testimonials section",
+      "showFinalCta": "Show the final call to action"
+    }
+  }
+}

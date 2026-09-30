@@ -1,0 +1,123 @@
+{
+  "title": "Website",
+  "subtitle": "The public agency website your selected theme renders.",
+  "publish": "Publish",
+  "saveLabel": "Save changes",
+  "readOnlyHint": "You can view this website, but your permissions don't allow saving changes.",
+  "loadError": "Could not load the website.",
+  "tabs": {
+    "home": "Home",
+    "tours": "Tours",
+    "navigation": "Navigation",
+    "footer": "Footer",
+    "branding": "Branding"
+  },
+  "sections": {
+    "hero": "Hero",
+    "trustPoints": "Trust points",
+    "promotion": "Promotion",
+    "testimonials": "Testimonials",
+    "finalCta": "Final call to action",
+    "navigation": "Navigation links",
+    "footer": "Footer",
+    "footerColumns": "Footer columns",
+    "footerLegal": "Legal links",
+    "branding": "Branding"
+  },
+  "sectionHints": {
+    "hero": "The first thing visitors see. Headline and subtitle render on the home page hero.",
+    "trustPoints": "Short trust signals under the hero (for example “Certified guides”).",
+    "promotion": "A highlighted campaign block between the hero and the tour list.",
+    "testimonials": "Quotes from past travellers.",
+    "finalCta": "The closing call to action at the bottom of the home page.",
+    "tours": "Pick published tours to feature first on the home page, in the chosen order.",
+    "navigation": "Links shown in the site header.",
+    "footerDescription": "A short line about your agency at the top of the footer.",
+    "footerColumns": "Link columns in the footer body.",
+    "footerLegal": "Legal links shown at the bottom of the footer.",
+    "branding": "Identity shown across the site. The storefront falls back to your agency name when empty."
+  },
+  "fields": {
+    "image": "Image URL",
+    "heroTitle": "Headline",
+    "heroSubtitle": "Subtitle",
+    "eyebrow": "Eyebrow",
+    "title": "Title",
+    "body": "Text",
+    "subtitle": "Subtitle",
+    "ctaLabel": "Button label",
+    "ctaHref": "Button link",
+    "featuredTours": "Featured tours",
+    "footerDescription": "Footer description",
+    "brandName": "Agency name",
+    "tagline": "Tagline",
+    "logoUrl": "Logo URL"
+  },
+  "placeholders": {
+    "image": "https://…",
+    "icon": "Icon",
+    "trustPointTitle": "Title",
+    "trustPointText": "Description",
+    "quote": "“…”",
+    "author": "Author",
+    "location": "Location",
+    "href": "/path",
+    "navLabel": "Label",
+    "columnTitle": "Column title"
+  },
+  "empty": {
+    "testimonials": "No testimonials yet. Add the first one below.",
+    "navigation": "No navigation links yet. The storefront shows only the home link.",
+    "tourCatalog": "No published tours yet. Publish a trip first — featured tours are picked from your published catalog."
+  },
+  "addTrustPoint": "Add trust point",
+  "removeTrustPoint": "Remove trust point",
+  "addTestimonial": "Add testimonial",
+  "removeTestimonial": "Remove testimonial",
+  "addNavigationLink": "Add link",
+  "removeNavigationLink": "Remove link",
+  "addFooterColumn": "Add column",
+  "removeFooterColumn": "Remove column",
+  "addFooterLink": "Add link",
+  "removeFooterLink": "Remove link",
+  "confirm": {
+    "publishTitle": "Publish this website?",
+    "publishBody": "Your current draft becomes the live public website. Anything edited later stays on the draft until you publish again."
+  },
+  "notifications": {
+    "saved": "Website saved.",
+    "invalidFields": "Some fields need attention before this can be saved.",
+    "published": "Website published.",
+    "notPublished": "This website is not published yet.",
+    "slugConflict": "Another tenant already uses this website address. Rename the website slug before publishing.",
+    "loadFailed": "The website draft is no longer available.",
+    "unknownError": "Something went wrong. Try again.",
+    "previewFailed": "Could not open a preview of this draft.",
+    "noWebsiteUrl": "This website has no public address yet."
+  },
+  "fieldErrors": {
+    "heroTitleRequired": "Give the hero a headline.",
+    "heroTitleTooLong": "Keep the headline to 120 characters or fewer.",
+    "valueTooLong": "Keep this field within its length limit.",
+    "trustPointTitleRequired": "Give each trust point a title.",
+    "trustPointTooMany": "Keep to 6 trust points or fewer.",
+    "testimonialRequired": "Each testimonial needs a quote and an author.",
+    "testimonialTooMany": "Keep to 8 testimonials or fewer.",
+    "brandingNameRequired": "Enter your agency name.",
+    "brandingNameTooLong": "Keep the name to 120 characters or fewer.",
+    "navigationLinkRequired": "Each navigation link needs a label and a path.",
+    "navigationTooMany": "Keep to 20 navigation links or fewer.",
+    "footerColumnTitleRequired": "Give each footer column a title.",
+    "footerTooMany": "Keep footer blocks within their limits."
+  },
+  "errors": {
+    "network": "Could not reach the server. Check your connection and try again."
+  },
+  "viewWebsite": "View live site",
+  "previewDraft": "Preview draft",
+  "tooltips": {
+    "live": "Opens the published website in a new tab.",
+    "preview": "This site is not published yet — opens a signed preview of your draft.",
+    "devOtherTenant": "In development the local storefront serves “{{tenant}}”, so the tab will show that site."
+  }
+}

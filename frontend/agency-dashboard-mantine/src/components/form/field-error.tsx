@@ -8,9 +8,11 @@ export function FieldError({ message }: { message?: ReactNode }) {
     return null;
   }
   return (
-    <Group gap={4} align="center">
-      <IconAlertCircle size={14} color="var(--mantine-color-red-6)" />
-      <Text size="xs" c="red">
+    // Announced on appearance: the message is the only signal, so it must not rely
+    // on colour. Paired with the form-level error summary, not a replacement for it.
+    <Group gap={4} align="center" role="alert">
+      <IconAlertCircle size={14} color="var(--mantine-color-danger-6)" />
+      <Text size="xs" c="danger">
         {message}
       </Text>
     </Group>

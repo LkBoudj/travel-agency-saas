@@ -27,7 +27,7 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
   return (
     <Group h="100%" px="md" justify="space-between" wrap="nowrap">
       <Group gap="sm" wrap="nowrap">
-        <Burger onClick={onToggleNav} hiddenFrom="sm" size="sm" />
+        <Burger onClick={onToggleNav} hiddenFrom="sm" size="sm" aria-label={t('shell.openNav')} />
         <Group gap={8} wrap="nowrap">
           <IconBuildingSkyscraper size={20} color="var(--mantine-color-brand-5)" />
           <Text fw={700} visibleFrom="xs">
@@ -90,7 +90,11 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
             >
               {t('shell.switchAgency')}
             </Menu.Item>
-            <Menu.Item color="red" leftSection={<IconLogout size={15} />} onClick={handleSignOut}>
+            <Menu.Item
+              color="danger"
+              leftSection={<IconLogout size={15} />}
+              onClick={handleSignOut}
+            >
               {t('auth.signOut')}
             </Menu.Item>
           </Menu.Dropdown>

@@ -11,6 +11,11 @@ import { useAgencyMembers } from '../../members/hooks/use-members.ts';
 import { useTripCapabilities } from '../../trips/hooks/use-tour-capabilities.ts';
 import { useTours } from '../../trips/hooks/use-tours.ts';
 import {
+  useViewWebsite,
+  type ViewWebsiteController,
+} from '../../website/hooks/use-view-website.ts';
+import { useWebsiteCapabilities } from '../../website/hooks/use-website-capabilities.ts';
+import {
   countActiveCustomers,
   countActiveMembers,
   countPublishedTours,
@@ -35,6 +40,7 @@ export interface OverviewPageController {
     tours: boolean;
     bookings: boolean;
     members: boolean;
+    website: boolean;
   };
   /** Loading flag for the visible sections. */
   isLoading: boolean;
@@ -47,6 +53,8 @@ export interface OverviewPageController {
   goToBookings: () => void;
   goToMembers: () => void;
   openBooking: (booking: AgencyBooking) => void;
+  /** "View website" header action (absent without `AGENCY_WEBSITE_VIEW`). */
+  viewWebsite: ViewWebsiteController;
 }
 
 /**
@@ -64,11 +72,13 @@ export function useOverviewPage(): OverviewPageController {
   const tripCapabilities = useTripCapabilities();
   const bookingCapabilities = useBookingCapabilities();
   const memberCapabilities = useMemberCapabilities();
+  const websiteCapabilities = useWebsiteCapabilities();
 
   const canViewCustomers = customerCapabilities.canView;
   const canViewTours = tripCapabilities.canView;
   const canViewBookings = bookingCapabilities.canView;
   const canViewMembers = memberCapabilities.canView;
+  const canViewWebsite = websiteCapabilities.canView;
 
   const customersQuery = useCustomers('', canViewCustomers);
   const toursQuery = useTours('', undefined, canViewTours);
@@ -88,6 +98,7 @@ export function useOverviewPage(): OverviewPageController {
       tours: canViewTours,
       bookings: canViewBookings,
       members: canViewMembers,
+      website: canViewWebsite,
     },
     isLoading:
       customersQuery.isPending ||
@@ -121,5 +132,6 @@ export function useOverviewPage(): OverviewPageController {
     goToMembers: () => navigate(dashboardPaths.members(agencyCode)),
     openBooking: (booking: AgencyBooking) =>
       navigate(dashboardPaths.bookingsDetail(agencyCode, booking.code)),
+    viewWebsite: useViewWebsite(canViewWebsite),
   };
 }

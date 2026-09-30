@@ -101,18 +101,41 @@ export const colors: Record<string, MantineColorsTuple> = {
   info,
 };
 
+/**
+ * Single status → semantic-palette map for the whole app. `StatusBadge` is the
+ * only consumer, so a status can never drift between pages. Keys are lowercase
+ * because the API sends uppercase enums and callers pass them through verbatim.
+ *
+ * The system is deliberately green / amber / red / neutral: live and accepted
+ * states are green, waiting-and-recoverable states are amber, only a hard
+ * cancellation is red, and terminal or not-applicable states are neutral.
+ * The `light` badge variant pairs each palette's lightest step with its darkest
+ * step (measured 8.5–10.6:1), which is why these point at the app's own
+ * palettes instead of Mantine's stock colour names.
+ */
 export const STATUS_COLORS: Record<string, string> = {
-  ACTIVE: 'success',
-  SUSPENDED: 'warning',
-  ARCHIVED: 'gray',
-  DRAFT: 'gray',
-  PUBLISHED: 'success',
-  OPEN: 'success',
-  CLOSED: 'gray',
-  CANCELLED: 'danger',
-  PENDING: 'warning',
-  CONFIRMED: 'success',
+  // green — live / accepted
+  active: 'success',
+  published: 'success',
+  open: 'success',
+  confirmed: 'success',
+  accepted: 'success',
+  // amber — waiting, recoverable
+  pending: 'warning',
+  suspended: 'warning',
+  // red — hard negative
+  cancelled: 'danger',
+  // neutral — terminal, draft or not applicable
+  archived: 'gray',
+  draft: 'gray',
+  closed: 'gray',
   deactivated: 'gray',
-  INVITED: 'info',
-  REMOVED: 'danger',
+  inactive: 'gray',
+  expired: 'gray',
+  revoked: 'gray',
 };
+
+/** Resolve a status to its palette name, falling back to neutral for unknown values. */
+export function getStatusColor(status: string): string {
+  return STATUS_COLORS[status.toLowerCase()] ?? 'gray';
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { IconSearch, IconX } from '@tabler/icons-react';
-import { TextInput } from '@mantine/core';
+import { IconSearch } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
+import { InputClearButton, TextInput } from '@mantine/core';
 
 export interface SearchInputProps {
   value: string;
@@ -10,6 +11,7 @@ export interface SearchInputProps {
 }
 
 export function SearchInput({ value, onChange, placeholder, debounceMs = 250 }: SearchInputProps) {
+  const { t } = useTranslation('common');
   const [draft, setDraft] = useState(value);
 
   useEffect(() => {
@@ -27,9 +29,16 @@ export function SearchInput({ value, onChange, placeholder, debounceMs = 250 }: 
       onChange={(event) => setDraft(event.currentTarget.value)}
       placeholder={placeholder}
       leftSection={<IconSearch size={15} />}
+      // Mantine's own clear button instead of a clickable icon: it is a real
+      // button, so it is reachable by keyboard and exposes a name in both
+      // locales. (Mantine 9 dropped the v8 `clearable`/`clearButtonProps` pair.)
       rightSection={
         draft ? (
-          <IconX size={14} style={{ cursor: 'pointer' }} onClick={() => setDraft('')} />
+          <InputClearButton
+            size="sm"
+            aria-label={t('actions.clearSearch')}
+            onClick={() => setDraft('')}
+          />
         ) : null
       }
       w={{ base: '100%', sm: 280 }}

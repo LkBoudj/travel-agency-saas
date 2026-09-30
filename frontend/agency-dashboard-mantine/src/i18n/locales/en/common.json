@@ -9,6 +9,8 @@
     "customers": "Customers",
     "agency": "Agency",
     "team": "Team",
+    "website": "Website",
+    "themes": "Themes",
     "settings": "Settings"
   },
   "actions": {
@@ -22,7 +24,9 @@
     "retry": "Retry",
     "confirm": "Confirm",
     "add": "Add",
-    "remove": "Remove"
+    "remove": "Remove",
+    "clearSearch": "Clear search",
+    "copyCode": "Copy code"
   },
   "statuses": {
     "active": "Active",
@@ -56,7 +60,8 @@
     "memberOf": "Member of",
     "signedAs": "Signed in as",
     "owner": "Owner",
-    "employee": "Employee"
+    "employee": "Employee",
+    "openNav": "Open navigation"
   },
   "lang": {
     "en": "English",
@@ -88,5 +93,6 @@
   },
   "placeholder": {
     "body": "This section ships in a later iteration of the dashboard."
-  }
+  },
+  "empty": "No results yet."
 }

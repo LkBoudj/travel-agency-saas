@@ -17,6 +17,10 @@ export function DashboardSidebar({ onNavigate }: { onNavigate: () => void }) {
           </Text>
           {items.map((item) => {
             const Icon = item.icon;
+            // Prefix match, not equality: a detail route such as
+            // `/bookings/BKG-…` or `/trips/TUR-…` must keep its parent section
+            // highlighted, otherwise no nav item reads as active at all.
+            const isActive = pathname === item.to || pathname.startsWith(`${item.to}/`);
             return (
               <NavLink
                 key={item.to}
@@ -24,7 +28,7 @@ export function DashboardSidebar({ onNavigate }: { onNavigate: () => void }) {
                 to={item.to}
                 label={t(item.labelKey)}
                 leftSection={<Icon size={16} />}
-                active={pathname === item.to}
+                active={isActive}
                 onClick={onNavigate}
                 style={{
                   borderRadius: 'var(--mantine-radius-md)',

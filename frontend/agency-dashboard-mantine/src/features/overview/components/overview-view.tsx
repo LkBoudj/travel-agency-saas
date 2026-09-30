@@ -4,6 +4,7 @@ import { Card, Loader, SimpleGrid, Stack, Text } from '@mantine/core';
 import { ErrorState } from '../../../components/empty-state.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
 import { BookingsTable } from '../../bookings/components/bookings-table.tsx';
+import { ViewWebsiteButton } from '../../website/components/view-website-button.tsx';
 import type { OverviewPageController } from '../hooks/use-overview-page.ts';
 import { KpiCard } from './kpi-card.tsx';
 
@@ -63,7 +64,15 @@ export function OverviewView({ controller }: { controller: OverviewPageControlle
 
   return (
     <Stack gap="md">
-      <PageHeader title={t('page.title')} subtitle={t('page.subtitle')} />
+      <PageHeader
+        title={t('page.title')}
+        subtitle={t('page.subtitle')}
+        actions={
+          controller.canView.website ? (
+            <ViewWebsiteButton controller={controller.viewWebsite} />
+          ) : undefined
+        }
+      />
 
       {kpiCards.length > 0 ? (
         <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">

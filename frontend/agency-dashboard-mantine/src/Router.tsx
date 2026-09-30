@@ -14,8 +14,10 @@ import { CustomersPage } from './features/customers/pages/customers.page.tsx';
 import { DeparturesPage } from './features/departures/pages/departures.page.tsx';
 import { MembersPage } from './features/members/pages/members.page.tsx';
 import { OverviewPage } from './features/overview/pages/overview.page.tsx';
+import { ThemesPage } from './features/themes/pages/themes.page.tsx';
 import { TripsEditorPage } from './features/trips/pages/trips-editor.page.tsx';
 import { TripsPage } from './features/trips/pages/trips.page.tsx';
+import { WebsitePage } from './features/website/pages/website.page.tsx';
 import { StyleGuidePage } from './pages/StyleGuide.page';
 
 const router = createBrowserRouter([
@@ -96,6 +98,22 @@ const router = createBrowserRouter([
                 element: (
                   <RequirePermission permissions={['AGENCY_BOOKING_VIEW']}>
                     <BookingDetailsPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: 'website',
+                element: (
+                  <RequirePermission permissions={['AGENCY_WEBSITE_VIEW']}>
+                    <WebsitePage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: 'themes',
+                element: (
+                  <RequirePermission permissions={['AGENCY_WEBSITE_VIEW']}>
+                    <ThemesPage />
                   </RequirePermission>
                 ),
               },

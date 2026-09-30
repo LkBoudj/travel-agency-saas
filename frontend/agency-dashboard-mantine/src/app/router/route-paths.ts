@@ -14,6 +14,8 @@ export const dashboardPaths = {
   bookings: (agencyCode: string) => `/${agencyCode}/bookings`,
   bookingsDetail: (agencyCode: string, bookingCode: string) =>
     `/${agencyCode}/bookings/${bookingCode}`,
+  website: (agencyCode: string) => `/${agencyCode}/website`,
+  themes: (agencyCode: string) => `/${agencyCode}/themes`,
 } as const;
 
 export type DashboardPathKey = keyof typeof dashboardPaths;
