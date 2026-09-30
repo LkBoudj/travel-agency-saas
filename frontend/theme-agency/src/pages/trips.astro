@@ -1,0 +1,29 @@
+---
+import StorefrontLayout from "../layouts/storefront.astro";
+import { resolveStorefrontDataSource } from "../platform/resolve-data-source.ts";
+import { renderStorefront } from "../platform/render-storefront.ts";
+import { StorefrontDataSourceError } from "../platform/website-data-source.ts";
+import { THEME_REGISTRY } from "../theme-registry.ts";
+
+const dataSource = resolveStorefrontDataSource(import.meta.env, Astro.locals);
+const storefront = await renderStorefront({
+  dataSource,
+  registry: THEME_REGISTRY,
+  tenantSlug: Astro.locals.tenantSlug,
+  page: { kind: "trips" },
+}).catch((error: unknown) => {
+  if (error instanceof StorefrontDataSourceError && error.code === "WEBSITE_NOT_PUBLISHED") {
+    return null;
+  }
+  throw error;
+});
+
+if (!storefront) {
+  return new Response("Not Found", {
+    status: 404,
+    headers: { "content-type": "text/plain; charset=utf-8" },
+  });
+}
+---
+
+<StorefrontLayout {...storefront} />

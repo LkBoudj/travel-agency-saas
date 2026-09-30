@@ -1,0 +1,47 @@
+---
+/**
+ * Resolves icon STRING KEYS from platform content to inline SVGs. Content
+ * never imports icon components (PROJECT_MAP: icons as string keys).
+ */
+interface Props {
+  name: string;
+  size?: number;
+  "aria-hidden"?: boolean | "true" | "false";
+}
+
+const { name, size = 20 } = Astro.props as Props;
+const paths: Record<string, string> = {
+  shield:
+    "M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6l7-3z",
+  star: "M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3z",
+  lock: "M7 10V8a5 5 0 0 1 10 0v2M5 10h14v10H5V10zm7 4v2",
+  compass:
+    "M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zm-2.5-6.5l5-2.5-5-2.5 2.5 5z",
+  headset:
+    "M4 14v-3a8 8 0 0 1 16 0v3M4 14a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H4v-7zm16 0a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h0v-7z",
+  sun: "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 3v2m0 14v2m9-9h-2M5 12H3m15.4-6.4l-1.4 1.4M6.4 17L5 18.4m14 0L18 17M6.4 7L5 5.6",
+  flag: "M5 21V4m0 0s1.5-1.5 6-1.5c2.5 0 3.5 1 6 1 2 0 4-1 4-1v9s-2 1-4 1c-2.5 0-3.5-1-6-1-2.5 0-6 1-6 1",
+  check: "M5 13l4 4L19 7",
+  clock: "M12 21a9 9 0 1 1 0-18 9 9 0 0 1 0 18zm0-13v5l3 2",
+  arrow: "M5 12h14m-6-6l6 6-6 6",
+};
+const d = paths[name];
+---
+{
+  d && (
+    <svg
+      class="theme-icon"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden={Astro.props["aria-hidden"] === false ? undefined : "true"}
+    >
+      <path d={d} />
+    </svg>
+  )
+}

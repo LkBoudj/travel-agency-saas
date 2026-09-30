@@ -1,0 +1,84 @@
+---
+/**
+ * Shared section shell — consistent eyebrow/title/description header pattern
+ * plus a slot. Components use token vars via `is:global` styles keyed by
+ * `.theme-section` classes (theme sections, not framework components).
+ */
+interface Props {
+  id?: string;
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  headingId?: string;
+}
+
+const { id, eyebrow, title, description, headingId } = Astro.props as Props;
+const heading = headingId ?? (id ? `${id}-heading` : undefined);
+---
+
+<section class="theme-section" {...(id ? { id } : {})} {...(heading ? { "aria-labelledby": heading } : {})}>
+  <div class="theme-section-inner">
+    {
+      (eyebrow || title || description) && (
+        <header class="theme-section-header">
+          {eyebrow && <p class="theme-section-eyebrow">{eyebrow}</p>}
+          {title && <h2 class="theme-section-title" {...(heading ? { id: heading } : {})}>{title}</h2>}
+          {description && <p class="theme-section-description">{description}</p>}
+        </header>
+      )
+    }
+    <slot />
+  </div>
+</section>
+
+<style is:global>
+  .theme-section {
+    display: block;
+  }
+
+  .theme-section-inner {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 3rem 1.25rem;
+  }
+
+  .theme-section-header {
+    max-width: 40rem;
+    margin-block-end: 2rem;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .theme-section-eyebrow {
+    margin: 0;
+    color: var(--component-eyebrow-color);
+    font-size: var(--primitive-font-size-sm);
+    font-weight: var(--primitive-font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .theme-section-title {
+    margin: 0;
+    color: var(--semantic-text);
+    font-size: var(--primitive-font-size-2xl);
+    font-weight: var(--primitive-font-weight-bold);
+    line-height: 1.2;
+  }
+
+  .theme-section-description {
+    margin: 0;
+    color: var(--semantic-text-muted);
+    font-size: var(--primitive-font-size-md);
+  }
+
+  @media (min-width: 48rem) {
+    .theme-section-inner {
+      padding-block: 4.5rem;
+    }
+
+    .theme-section-title {
+      font-size: var(--primitive-font-size-4xl);
+    }
+  }
+</style>

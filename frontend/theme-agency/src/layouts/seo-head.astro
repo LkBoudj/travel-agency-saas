@@ -1,0 +1,22 @@
+---
+import type { RenderContext } from "../core/contracts.ts";
+import { buildSeoMeta } from "../core/seo.ts";
+import { renderHeadMarkup } from "../platform/render-head.ts";
+
+/**
+ * Platform-owned head tags (T9).
+ *
+ * Rendered into the `head` slot that every theme Layout exposes, so SEO is
+ * independent of the active theme. The canonical origin is the configured
+ * `site` in production and the request origin in dev/preview.
+ */
+interface Props {
+  context: RenderContext;
+}
+
+const { context } = Astro.props as Props;
+const siteUrl = Astro.site?.origin ?? Astro.url.origin;
+const markup = renderHeadMarkup(buildSeoMeta({ siteUrl, context }));
+---
+
+<Fragment set:html={markup} />

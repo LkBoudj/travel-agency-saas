@@ -1,0 +1,85 @@
+---
+import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
+import { booleanSetting } from "@theme-agency/sdk";
+import Icon from "./Icon.astro";
+import Section from "./Section.astro";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context, settings } = Astro.props as Props;
+const page = context.page;
+const tours = page.kind === "home" ? page.content.tours : [];
+const destinations: string[] = [];
+for (const tour of tours) {
+  for (const name of tour.destinations ?? []) {
+    if (!destinations.includes(name)) destinations.push(name);
+  }
+}
+const show = booleanSetting(settings, "homepage.showFeaturedDestinations", true);
+---
+
+{
+  show && destinations.length > 0 && (
+    <Section
+      id="featured-destinations"
+      eyebrow="Destinations"
+      title="Popular destinations"
+      description="Where our travelers love to go."
+      headingId="featured-destinations-heading"
+    >
+      <ul class="theme-destination-list">
+        {
+          destinations.map((name) => (
+            <li class="theme-destination-item">
+              <a href={context.paths.trips} class="theme-destination-link">
+                <Icon name="compass" size={18} />
+                <span>{name}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </Section>
+  )
+}
+
+<style is:global>
+  .theme-destination-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .theme-destination-item {
+    display: block;
+  }
+
+  .theme-destination-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    background: var(--component-card-bg);
+    border: 1px solid var(--component-card-border);
+    border-radius: var(--primitive-radius-full);
+    color: var(--semantic-text);
+    text-decoration: none;
+    font-size: var(--primitive-font-size-sm);
+    font-weight: var(--primitive-font-weight-medium);
+  }
+
+  .theme-destination-link .theme-icon {
+    color: var(--semantic-brand);
+  }
+
+  .theme-destination-link:hover {
+    border-color: var(--semantic-brand);
+    color: var(--semantic-brand);
+  }
+</style>

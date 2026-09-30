@@ -1,0 +1,191 @@
+---
+import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
+import Icon from "./Icon.astro";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context } = Astro.props as Props;
+const content = context.page.kind === "home" ? context.page.content.hero : null;
+if (!content) {
+  throw new Error(`[starter] hero section requires a home page model (got ${context.page.kind})`);
+}
+---
+
+<section class="theme-hero">
+  <div class="theme-hero-inner">
+    <div class="theme-hero-body">
+      {content.eyebrow && <p class="theme-hero-eyebrow">{content.eyebrow}</p>}
+      <h1 class="theme-hero-title">{content.title}</h1>
+      {content.subtitle && <p class="theme-hero-subtitle">{content.subtitle}</p>}
+      {
+        (content.primaryCta || content.secondaryCta) && (
+          <div class="theme-hero-actions">
+            {content.primaryCta && (
+              <a href={content.primaryCta.href} class="theme-btn theme-btn-primary">
+                {content.primaryCta.label}
+              </a>
+            )}
+            {content.secondaryCta && (
+              <a href={content.secondaryCta.href} class="theme-btn theme-btn-secondary">
+                {content.secondaryCta.label}
+              </a>
+            )}
+          </div>
+        )
+      }
+      {
+        content.trustItems && content.trustItems.length > 0 && (
+          <ul class="theme-hero-trust">
+            {
+              content.trustItems.map((item) => (
+                <li class="theme-hero-trust-item">
+                  <Icon name={item.icon} size={18} />
+                  <span>{item.label}</span>
+                </li>
+              ))
+            }
+          </ul>
+        )
+      }
+    </div>
+    {
+      content.image && (
+        <div class="theme-hero-media">
+          <img
+            src={content.image.src}
+            alt={content.image.alt}
+            class="theme-hero-image"
+            decoding="async"
+          />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style is:global>
+  .theme-hero {
+    background: var(--semantic-surface-muted);
+  }
+
+  .theme-hero-inner {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 3rem 1.25rem;
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr;
+    align-items: center;
+  }
+
+  .theme-hero-body {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .theme-hero-eyebrow {
+    margin: 0;
+    color: var(--component-eyebrow-color);
+    font-size: var(--primitive-font-size-sm);
+    font-weight: var(--primitive-font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .theme-hero-title {
+    margin: 0;
+    color: var(--semantic-text);
+    font-size: var(--primitive-font-size-2xl);
+    font-weight: var(--primitive-font-weight-bold);
+    line-height: 1.15;
+  }
+
+  .theme-hero-subtitle {
+    margin: 0;
+    color: var(--semantic-text-muted);
+    font-size: var(--primitive-font-size-lg);
+    max-width: 34rem;
+  }
+
+  .theme-hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .theme-hero-media {
+    display: flex;
+  }
+
+  .theme-hero-image {
+    width: 100%;
+    max-height: 26rem;
+    object-fit: cover;
+    border-radius: var(--primitive-radius-lg);
+  }
+
+  .theme-hero-trust {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1.5rem;
+  }
+
+  .theme-hero-trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--semantic-text);
+    font-size: var(--primitive-font-size-sm);
+    font-weight: var(--primitive-font-weight-medium);
+  }
+
+  .theme-hero-trust-item .theme-icon {
+    color: var(--semantic-brand);
+  }
+
+  .theme-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--primitive-radius-md);
+    font-size: var(--primitive-font-size-sm);
+    font-weight: var(--primitive-font-weight-semibold);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: opacity 120ms ease;
+  }
+
+  .theme-btn:hover {
+    opacity: 0.9;
+  }
+
+  .theme-btn-primary {
+    background: var(--component-button-bg);
+    color: var(--component-button-fg);
+  }
+
+  .theme-btn-secondary {
+    background: var(--semantic-surface);
+    color: var(--semantic-text);
+    border-color: var(--semantic-border);
+  }
+
+  @media (min-width: 48rem) {
+    .theme-hero-inner {
+      grid-template-columns: 1.1fr 1fr;
+      padding-block: 4.5rem;
+    }
+
+    .theme-hero-title {
+      font-size: var(--primitive-font-size-4xl);
+    }
+  }
+</style>

@@ -1,0 +1,59 @@
+---
+import type { RenderContext, ThemeSettings, TourSummary } from "@theme-agency/sdk";
+import { booleanSetting } from "@theme-agency/sdk";
+import TourCard from "./TourCard.astro";
+import Section from "./Section.astro";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context, settings } = Astro.props as Props;
+const page = context.page;
+const tours: TourSummary[] = page.kind === "home" || page.kind === "trips" ? page.content.tours : [];
+const show = booleanSetting(settings, "homepage.showFeaturedTours", true);
+const isTrips = page.kind === "trips";
+---
+
+{
+  show && tours.length > 0 && (
+    <Section
+      id={isTrips ? "tours" : "featured-tours"}
+      eyebrow={isTrips ? undefined : "Top tours"}
+      title={isTrips ? "All tours" : "Featured tours"}
+      description={isTrips ? undefined : "Handpicked itineraries our travelers love."}
+      headingId={isTrips ? "tours-heading" : "featured-tours-heading"}
+    >
+      <div class="theme-tour-grid">
+        {
+          tours.map((tour) => <TourCard tour={tour} detailHref={context.paths.tripDetail(tour.slug)} />)
+        }
+      </div>
+    </Section>
+  )
+}
+
+<style is:global>
+  .theme-tour-grid {
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  .theme-tour-grid > * {
+    min-width: 0;
+  }
+
+  @media (min-width: 40rem) {
+    .theme-tour-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 60rem) {
+    .theme-tour-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

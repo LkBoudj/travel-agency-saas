@@ -1,0 +1,80 @@
+---
+import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
+import { booleanSetting } from "@theme-agency/sdk";
+import Section from "./Section.astro";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context, settings } = Astro.props as Props;
+const finalCta = context.page.kind === "home" ? context.page.content.finalCta : null;
+const show = booleanSetting(settings, "homepage.showFinalCta", true);
+---
+
+{
+  show && finalCta && (
+    <Section
+      id="final-cta"
+      eyebrow={finalCta.eyebrow}
+      title={finalCta.title}
+      description={finalCta.description}
+      headingId="final-cta-heading"
+    >
+      <div class="theme-finalcta-actions">
+        {
+          finalCta.primaryCta && (
+            <a href={finalCta.primaryCta.href} class="theme-btn theme-btn-primary">
+              {finalCta.primaryCta.label}
+            </a>
+          )
+        }
+        {
+          finalCta.secondaryCta && (
+            <a href={finalCta.secondaryCta.href} class="theme-btn theme-btn-secondary">
+              {finalCta.secondaryCta.label}
+            </a>
+          )
+        }
+      </div>
+    </Section>
+  )
+}
+
+<style is:global>
+  .theme-finalcta-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .theme-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--primitive-radius-md);
+    font-size: var(--primitive-font-size-sm);
+    font-weight: var(--primitive-font-weight-semibold);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: opacity 120ms ease;
+  }
+
+  .theme-btn:hover {
+    opacity: 0.9;
+  }
+
+  .theme-btn-primary {
+    background: var(--component-button-bg);
+    color: var(--component-button-fg);
+  }
+
+  .theme-btn-secondary {
+    background: var(--semantic-surface);
+    color: var(--semantic-text);
+    border-color: var(--semantic-border);
+  }
+</style>

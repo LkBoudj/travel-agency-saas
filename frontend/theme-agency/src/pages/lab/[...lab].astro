@@ -1,0 +1,39 @@
+---
+import StorefrontLayout from "../../layouts/storefront.astro";
+import { resolveStorefrontDataSource } from "../../platform/resolve-data-source.ts";
+import { renderStorefront } from "../../platform/render-storefront.ts";
+import { THEME_REGISTRY } from "../../theme-registry.ts";
+
+/**
+ * Theme Lab preview (internal target of the public `/_lab` URL).
+ *
+ * This is the ONLY route that opts out of prerendering: the signed token is
+ * verified by the middleware per request and must never be baked into a static
+ * file. It renders through the SAME entry as the public pages (D13), only with
+ * draft data plus Theme Lab overrides, so what an agency previews is what ships.
+ */
+export const prerender = false;
+
+const preview = Astro.locals.preview;
+const storefront = preview
+  ? await renderStorefront({
+      dataSource: resolveStorefrontDataSource(import.meta.env, Astro.locals),
+      registry: THEME_REGISTRY,
+      tenantSlug: preview.tenantSlug,
+      page: preview.page,
+      preview: true,
+      themeId: preview.themeId,
+      settingsOverride: preview.settings,
+      dir: preview.dir,
+    }).catch(() => null)
+  : null;
+
+if (!preview || !storefront) {
+  return new Response("Not Found", {
+    status: 404,
+    headers: { "content-type": "text/plain; charset=utf-8" },
+  });
+}
+---
+
+<StorefrontLayout {...storefront} previewToken={preview.token} />

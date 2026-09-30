@@ -1,0 +1,159 @@
+---
+import type { TourSummary } from "@theme-agency/sdk";
+import Icon from "./Icon.astro";
+
+interface Props {
+  tour: TourSummary;
+  detailHref: string;
+}
+
+const { tour, detailHref } = Astro.props as Props;
+---
+
+<article class="theme-tour-card">
+  <a href={detailHref} class="theme-tour-card-link" aria-label={tour.title}>
+    {
+      tour.image ? (
+        <div class="theme-tour-card-media">
+          <img
+            src={tour.image.src}
+            alt={tour.image.alt}
+            class="theme-tour-card-image"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      ) : (
+        <div class="theme-tour-card-media theme-tour-card-media-empty">
+          <Icon name={tour.icon ?? "compass"} size={28} />
+        </div>
+      )
+    }
+    <div class="theme-tour-card-body">
+      <h3 class="theme-tour-card-title">{tour.title}</h3>
+      {tour.excerpt && <p class="theme-tour-card-excerpt">{tour.excerpt}</p>}
+      <dl class="theme-tour-card-meta">
+        <div class="theme-tour-card-meta-item">
+          <dt class="theme-sr">Duration</dt>
+          <dd>{tour.durationDays} days</dd>
+        </div>
+        <div class="theme-tour-card-price">
+          <dt class="theme-sr">Price from</dt>
+          <dd>
+            {
+              tour.price ? (
+                <span class="theme-tour-card-amount">
+                  {tour.price.currency} {tour.price.amount.toLocaleString()}
+                </span>
+              ) : (
+                <span class="theme-tour-card-amount theme-tour-card-amount-na">
+                  Request a price
+                </span>
+              )
+            }
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </a>
+</article>
+
+<style is:global>
+  .theme-tour-card {
+    display: block;
+    height: 100%;
+  }
+
+  .theme-tour-card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--component-card-bg);
+    border: 1px solid var(--component-card-border);
+    border-radius: var(--primitive-radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    color: var(--semantic-text);
+  }
+
+  .theme-tour-card-link:hover .theme-tour-card-title {
+    color: var(--semantic-brand);
+  }
+
+  .theme-tour-card-media {
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--semantic-surface-muted);
+  }
+
+  .theme-tour-card-media-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--semantic-text-muted);
+  }
+
+  .theme-tour-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .theme-tour-card-body {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1rem 1.25rem 1.25rem;
+    flex: 1;
+  }
+
+  .theme-tour-card-title {
+    margin: 0;
+    font-size: var(--primitive-font-size-lg);
+    font-weight: var(--primitive-font-weight-semibold);
+    line-height: 1.25;
+  }
+
+  .theme-tour-card-excerpt {
+    margin: 0;
+    color: var(--semantic-text-muted);
+    font-size: var(--primitive-font-size-sm);
+  }
+
+  .theme-tour-card-meta {
+    margin: 0.5rem 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--semantic-text-muted);
+    font-size: var(--primitive-font-size-sm);
+    font-weight: var(--primitive-font-weight-medium);
+  }
+
+  .theme-tour-card-price {
+    text-align: inline-end;
+  }
+
+  .theme-tour-card-amount {
+    color: var(--semantic-brand);
+    font-weight: var(--primitive-font-weight-bold);
+  }
+
+  .theme-tour-card-amount-na {
+    color: var(--semantic-text-muted);
+    font-weight: var(--primitive-font-weight-medium);
+  }
+
+  .theme-sr {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>

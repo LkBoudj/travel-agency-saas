@@ -1,0 +1,61 @@
+---
+import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
+import { booleanSetting } from "@theme-agency/sdk";
+import Section from "./Section.astro";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context, settings } = Astro.props as Props;
+const promotion = context.page.kind === "home" ? context.page.content.promotion : null;
+const show = booleanSetting(settings, "homepage.showPromotion", true);
+---
+
+{
+  show && promotion && (
+    <Section
+      id="promotion"
+      eyebrow={promotion.eyebrow}
+      title={promotion.title}
+      description={promotion.description}
+      headingId="promotion-heading"
+    >
+      {
+        promotion.cta && (
+          <p>
+            <a href={promotion.cta.href} class="theme-btn theme-btn-accent">
+              {promotion.cta.label}
+            </a>
+          </p>
+        )
+      }
+    </Section>
+  )
+}
+
+<style is:global>
+  .theme-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--primitive-radius-md);
+    font-size: var(--primitive-font-size-sm);
+    font-weight: var(--primitive-font-weight-semibold);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: opacity 120ms ease;
+  }
+
+  .theme-btn:hover {
+    opacity: 0.9;
+  }
+
+  .theme-btn-accent {
+    background: var(--component-button-accent-bg);
+    color: var(--semantic-brand-fg);
+  }
+</style>

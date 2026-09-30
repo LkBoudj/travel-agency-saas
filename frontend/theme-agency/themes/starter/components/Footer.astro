@@ -1,0 +1,136 @@
+---
+import type { RenderContext } from "@theme-agency/sdk";
+
+interface Props {
+  context: RenderContext;
+}
+
+const { context } = Astro.props as Props;
+---
+
+<footer class="site-footer">
+  <div class="site-footer-inner">
+    <div class="site-footer-top">
+      <div class="site-footer-brand">
+        <span class="site-footer-name">{context.branding.name}</span>
+        {context.footer.description && (
+          <p class="site-footer-description">{context.footer.description}</p>
+        )}
+      </div>
+      <div class="site-footer-columns">
+        {
+          context.footer.columns.map((column) => (
+            <div class="site-footer-column">
+              <h3 class="site-footer-heading">{column.title}</h3>
+              <ul class="site-footer-list">
+                {column.links.map((link) => (
+                  <li>
+                    <a href={link.href} class="site-footer-link">{link.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+    {
+      context.footer.legal && context.footer.legal.length > 0 && (
+        <div class="site-footer-legal">
+          {
+            context.footer.legal.map((link) => (
+              <a href={link.href} class="site-footer-link">{link.label}</a>
+            ))
+          }
+        </div>
+      )
+    }
+  </div>
+</footer>
+
+<style is:global>
+  .site-footer {
+    background: var(--component-footer-bg);
+    color: var(--component-footer-text);
+    border-block-start: 1px solid var(--component-header-border);
+  }
+
+  .site-footer-inner {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-block: 2.5rem 1.75rem;
+    padding-inline: 1.25rem;
+  }
+
+  .site-footer-top {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  .site-footer-brand {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .site-footer-name {
+    font-weight: var(--primitive-font-weight-semibold);
+    color: var(--semantic-text);
+    font-size: var(--primitive-font-size-lg);
+  }
+
+  .site-footer-description {
+    margin: 0;
+    color: inherit;
+    max-width: 24rem;
+  }
+
+  .site-footer-columns {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  }
+
+  .site-footer-heading {
+    margin: 0 0 0.75rem;
+    font-size: var(--primitive-font-size-sm);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--semantic-text);
+  }
+
+  .site-footer-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .site-footer-link {
+    color: inherit;
+    text-decoration: none;
+    font-size: var(--primitive-font-size-sm);
+  }
+
+  .site-footer-link:hover {
+    color: var(--semantic-brand);
+    text-decoration: underline;
+  }
+
+  .site-footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-block-start: 1.5rem;
+    padding-block-start: 1.25rem;
+    border-block-start: 1px solid var(--semantic-border);
+    font-size: var(--primitive-font-size-sm);
+  }
+
+  @media (min-width: 40rem) {
+    .site-footer-top {
+      grid-template-columns: 1.4fr 1fr;
+    }
+  }
+</style>

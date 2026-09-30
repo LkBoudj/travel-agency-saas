@@ -1,0 +1,18 @@
+---
+import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
+import FeaturedTours from "../components/FeaturedTours.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context, settings } = Astro.props as Props;
+if (context.page.kind !== "trips") {
+  throw new Error(`[starter] trips template received ${context.page.kind} page model`);
+}
+---
+
+<FeaturedTours context={context} settings={settings} />
+<Footer context={context} />

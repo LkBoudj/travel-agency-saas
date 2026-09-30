@@ -1,0 +1,79 @@
+---
+import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
+import Header from "./components/Header.astro";
+import { buildStarterTokenCss } from "./tokens";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context } = Astro.props as Props;
+const { css: tokenCss } = buildStarterTokenCss(context.branding);
+void tokenCss;
+---
+
+<!doctype html>
+<html lang={context.locale} dir={context.dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <!-- Platform-owned SEO tags; themes must keep this slot. -->
+    <slot name="head" />
+    <style is:inline set:html={tokenCss}></style>
+  </head>
+  <body class={`theme-${context.themeId}`}>
+    <a class="theme-skip-link" href="#main">Skip to content</a>
+    <Header context={context} />
+    <main id="main">
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--primitive-font-family-sans);
+    color: var(--semantic-text);
+    background: var(--semantic-surface);
+  }
+
+  a {
+    color: var(--semantic-brand);
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  .theme-skip-link {
+    position: absolute;
+    inset-block-start: 0.5rem;
+    inset-inline-start: 0.5rem;
+    z-index: 100;
+    transform: translateY(-150%);
+    background: var(--semantic-brand);
+    color: var(--semantic-brand-fg);
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--primitive-radius-sm);
+    font-size: var(--primitive-font-size-sm);
+  }
+
+  .theme-skip-link:focus {
+    transform: none;
+  }
+</style>

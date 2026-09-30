@@ -1,0 +1,31 @@
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+*.log
+
+# environment variables
+.env
+.env.production
+.env.local
+
+# cloudflare / wrangler
+.wrangler/
+.dev.vars
+
+# typescript
+*.tsbuildinfo
+
+# playwright
+test-results/
+playwright-report/
+
+# editor / os
+.DS_Store

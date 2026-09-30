@@ -1,0 +1,30 @@
+---
+import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
+import Hero from "../components/Hero.astro";
+import FeaturedTours from "../components/FeaturedTours.astro";
+import FeaturedDestinations from "../components/FeaturedDestinations.astro";
+import WhyUs from "../components/WhyUs.astro";
+import PromotionalBanner from "../components/PromotionalBanner.astro";
+import Testimonials from "../components/Testimonials.astro";
+import FinalCta from "../components/FinalCta.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context, settings } = Astro.props as Props;
+if (context.page.kind !== "home") {
+  throw new Error(`[starter] home template received ${context.page.kind} page model`);
+}
+---
+
+<Hero context={context} settings={settings} />
+<FeaturedTours context={context} settings={settings} />
+<FeaturedDestinations context={context} settings={settings} />
+<WhyUs context={context} settings={settings} />
+<PromotionalBanner context={context} settings={settings} />
+<Testimonials context={context} settings={settings} />
+<FinalCta context={context} settings={settings} />
+<Footer context={context} />

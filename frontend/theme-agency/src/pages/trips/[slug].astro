@@ -1,0 +1,51 @@
+---
+import StorefrontLayout from "../../layouts/storefront.astro";
+import { resolveStorefrontDataSource } from "../../platform/resolve-data-source.ts";
+import {
+  renderStorefront,
+  StorefrontPageNotFoundError,
+} from "../../platform/render-storefront.ts";
+import { StorefrontDataSourceError } from "../../platform/website-data-source.ts";
+import { THEME_REGISTRY } from "../../theme-registry.ts";
+
+/**
+ * Trip detail renders on demand, like the Theme Lab route. Its slugs come from
+ * the tenant's published tours, so a prerendered path list can only ever cover
+ * whatever a build happened to see — a real agency's `TUR-…` codes would 404
+ * with a fixture-derived list. Resolving per request also means `astro build`
+ * never needs a live backend for this route.
+ */
+export const prerender = false;
+
+const slug = Astro.params.slug ?? "";
+
+/**
+ * Per-request rendering resolves the configured website source (the real
+ * backend when `WEBSITE_API_URL`/`STORE_URL` is set, the demo fixtures
+ * otherwise) through the same render entry as the other pages.
+ */
+const dataSource = resolveStorefrontDataSource(import.meta.env, Astro.locals);
+const storefront = await renderStorefront({
+  dataSource,
+  registry: THEME_REGISTRY,
+  tenantSlug: Astro.locals.tenantSlug,
+  page: { kind: "trip-detail", slug },
+}).catch((error: unknown) => {
+  if (error instanceof StorefrontDataSourceError && error.code === "WEBSITE_NOT_PUBLISHED") {
+    return null;
+  }
+  if (error instanceof StorefrontPageNotFoundError) {
+    return null;
+  }
+  throw error;
+});
+
+if (!storefront) {
+  return new Response("Not Found", {
+    status: 404,
+    headers: { "content-type": "text/plain; charset=utf-8" },
+  });
+}
+---
+
+<StorefrontLayout {...storefront} />

@@ -1,0 +1,52 @@
+---
+import LabToolbar from "../islands/LabToolbar.tsx";
+import SeoHead from "./seo-head.astro";
+import { LAB_PUBLIC_PREFIX } from "../platform/preview.ts";
+import type { PageModel } from "../core/contracts.ts";
+import type { StorefrontRenderResult } from "../platform/render-storefront.ts";
+
+interface Props extends StorefrontRenderResult {
+  /** Present only on Theme Lab (preview) requests. */
+  previewToken?: string;
+}
+
+const { theme, settings, context, previewToken } = Astro.props as Props;
+const Layout = theme.Layout;
+const Page = theme.pages[context.page.kind];
+
+function labPageSegment(page: PageModel): string {
+  return page.kind === "trip-detail"
+    ? `trip-detail/${encodeURIComponent(page.slug)}`
+    : page.kind;
+}
+
+const labToken = context.preview ? previewToken : undefined;
+const labPath = labToken
+  ? `${LAB_PUBLIC_PREFIX}${context.themeId}/${labPageSegment(context.page)}`
+  : null;
+---
+
+<Layout context={context} settings={settings}>
+  <SeoHead slot="head" context={context} />
+  {labPath && labToken && (
+    <Fragment>
+      <style is:global>
+        html[data-lab-device] body {
+          max-width: var(--lab-device-width, 100%);
+          margin-inline: auto;
+          box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12);
+        }
+      </style>
+      <LabToolbar
+        client:load
+        themeId={context.themeId}
+        pagePath={labPath}
+        token={labToken}
+        schema={theme.settings.schema}
+        settings={settings}
+        dir={context.dir}
+      />
+    </Fragment>
+  )}
+  <Page context={context} settings={settings} />
+</Layout>

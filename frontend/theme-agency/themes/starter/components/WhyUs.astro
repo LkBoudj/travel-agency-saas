@@ -1,0 +1,97 @@
+---
+import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
+import { booleanSetting } from "@theme-agency/sdk";
+import Icon from "./Icon.astro";
+import Section from "./Section.astro";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context, settings } = Astro.props as Props;
+const trustPoints = context.page.kind === "home" ? context.page.content.trustPoints : [];
+const show = booleanSetting(settings, "homepage.showWhyUs", true);
+---
+
+{
+  show && trustPoints.length > 0 && (
+    <Section
+      id="why-us"
+      eyebrow="Why choose us"
+      title="Travel with confidence"
+      description="We make every journey simpler, safer, and more personal."
+      headingId="why-us-heading"
+    >
+      <ul class="theme-why-grid">
+        {
+          trustPoints.map((point) => (
+            <li class="theme-why-card">
+              <span class="theme-why-icon">
+                <Icon name={point.icon} size={22} />
+              </span>
+              <h3 class="theme-why-title">{point.title}</h3>
+              <p class="theme-why-description">{point.description}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </Section>
+  )
+}
+
+<style is:global>
+  .theme-why-grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 1.25rem;
+    grid-template-columns: 1fr;
+  }
+
+  .theme-why-card {
+    display: grid;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    background: var(--component-card-bg);
+    border: 1px solid var(--component-card-border);
+    border-radius: var(--primitive-radius-lg);
+  }
+
+  .theme-why-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border-radius: var(--primitive-radius-md);
+    background: var(--semantic-brand-soft);
+    color: var(--semantic-brand);
+  }
+
+  .theme-why-title {
+    margin: 0;
+    font-size: var(--primitive-font-size-lg);
+    font-weight: var(--primitive-font-weight-semibold);
+    color: var(--semantic-text);
+  }
+
+  .theme-why-description {
+    margin: 0;
+    color: var(--semantic-text-muted);
+    font-size: var(--primitive-font-size-sm);
+  }
+
+  @media (min-width: 40rem) {
+    .theme-why-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-why-grid {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+</style>

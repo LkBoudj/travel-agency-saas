@@ -1,0 +1,341 @@
+---
+import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
+import BookingCta from "@theme-agency/islands/booking-cta";
+import Icon from "../components/Icon.astro";
+import Footer from "../components/Footer.astro";
+
+interface Props {
+  context: RenderContext;
+  settings: ThemeSettings;
+}
+
+const { context } = Astro.props as Props;
+if (context.page.kind !== "trip-detail") {
+  throw new Error(`[starter] trip-detail template received ${context.page.kind} page model`);
+}
+const { tour } = context.page.content;
+---
+
+<section class="theme-trip">
+  <div class="theme-trip-inner">
+    <nav class="theme-trip-breadcrumb" aria-label="Breadcrumb">
+      <a href={context.paths.home}>Home</a>
+      <span aria-hidden="true">/</span>
+      <a href={context.paths.trips}>Tours</a>
+      <span aria-hidden="true">/</span>
+      <span>{tour.title}</span>
+    </nav>
+
+    <header class="theme-trip-header">
+      <h1 class="theme-trip-title">{tour.title}</h1>
+      <p class="theme-trip-excerpt">{tour.excerpt}</p>
+      <dl class="theme-trip-meta">
+        <div>
+          <dt>Duration</dt>
+          <dd><Icon name="clock" size={16} /> {tour.durationDays} days</dd>
+        </div>
+        {tour.destinations && tour.destinations.length > 0 && (
+          <div>
+            <dt>Destinations</dt>
+            <dd><Icon name="compass" size={16} /> {tour.destinations.join(", ")}</dd>
+          </div>
+        )}
+        <div>
+          <dt>Price from</dt>
+          <dd>
+            {
+              tour.price ? (
+                <strong class="theme-trip-price">
+                  {tour.price.currency} {tour.price.amount.toLocaleString()}
+                </strong>
+              ) : (
+                <strong class="theme-trip-price theme-trip-price-na">Request a price</strong>
+              )
+            }
+          </dd>
+        </div>
+      </dl>
+    </header>
+
+    {tour.image && (
+      <div class="theme-trip-media">
+        <img src={tour.image.src} alt={tour.image.alt} class="theme-trip-image" decoding="async" />
+      </div>
+    )}
+
+    <div class="theme-trip-body">
+      <div class="theme-trip-primary">
+        <h2 class="theme-trip-subheading">About this tour</h2>
+        <p class="theme-trip-description">{tour.description}</p>
+
+        <h2 class="theme-trip-subheading">Highlights</h2>
+        <ul class="theme-trip-list theme-trip-highlights">
+          {tour.highlights.map((highlight) => (
+            <li><Icon name="check" size={16} />{highlight}</li>
+          ))}
+        </ul>
+      </div>
+
+      <aside class="theme-trip-secondary">
+        <BookingCta
+          client:visible
+          title="Ready to book?"
+          description="Check availability for your travel dates."
+          ctaLabel="Check availability"
+          note="No payment is taken here."
+          successMessage="Thanks — an agent will confirm your dates shortly."
+        />
+        <h2 class="theme-trip-subheading">Includes</h2>
+        <ul class="theme-trip-list">
+          {tour.includes.map((item) => (
+            <li><Icon name="check" size={16} />{item}</li>
+          ))}
+        </ul>
+        {tour.excludes && tour.excludes.length > 0 && (
+          <>
+            <h2 class="theme-trip-subheading">Not included</h2>
+            <ul class="theme-trip-list">
+              {tour.excludes.map((item) => (
+                <li><Icon name="shield" size={16} />{item}</li>
+              ))}
+            </ul>
+          </>
+        )}
+      </aside>
+    </div>
+
+    <h2 class="theme-trip-subheading">Itinerary</h2>
+    <ol class="theme-trip-itinerary">
+      {tour.itinerary.map((day) => (
+        <li class="theme-trip-day">
+          <span class="theme-trip-day-label">Day {day.day}</span>
+          <div>
+            <h3 class="theme-trip-day-title">{day.title}</h3>
+            <p class="theme-trip-day-description">{day.description}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+<Footer context={context} />
+
+<style is:global>
+  .theme-trip-inner {
+    max-width: 80rem;
+    margin-inline: auto;
+    padding: 2rem 1.25rem 4rem;
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .theme-trip-breadcrumb {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    color: var(--semantic-text-muted);
+    font-size: var(--primitive-font-size-sm);
+  }
+
+  .theme-trip-breadcrumb a {
+    color: var(--semantic-text-muted);
+    text-decoration: none;
+  }
+
+  .theme-trip-breadcrumb a:hover {
+    color: var(--semantic-brand);
+  }
+
+  .theme-trip-header {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .theme-trip-title {
+    margin: 0;
+    color: var(--semantic-text);
+    font-size: var(--primitive-font-size-2xl);
+    font-weight: var(--primitive-font-weight-bold);
+  }
+
+  .theme-trip-excerpt {
+    margin: 0;
+    color: var(--semantic-text-muted);
+    font-size: var(--primitive-font-size-lg);
+  }
+
+  .theme-trip-meta {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+  }
+
+  .theme-trip-meta div {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .theme-trip-meta dt {
+    color: var(--semantic-text-muted);
+    font-size: var(--primitive-font-size-sm);
+  }
+
+  .theme-trip-meta dd {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--semantic-text);
+    font-weight: var(--primitive-font-weight-medium);
+  }
+
+  .theme-trip-meta dd .theme-icon {
+    color: var(--semantic-brand);
+  }
+
+  .theme-trip-price {
+    color: var(--semantic-brand);
+  }
+
+  .theme-trip-price-na {
+    color: var(--semantic-text-muted);
+    font-weight: var(--primitive-font-weight-medium);
+  }
+
+  .theme-trip-media {
+    overflow: hidden;
+    border-radius: var(--primitive-radius-lg);
+  }
+
+  .theme-trip-image {
+    width: 100%;
+    max-height: 28rem;
+    object-fit: cover;
+    display: block;
+  }
+
+  .theme-trip-body {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr;
+  }
+
+  .theme-trip-subheading {
+    margin: 0.75rem 0 0.5rem;
+    color: var(--semantic-text);
+    font-size: var(--primitive-font-size-xl);
+    font-weight: var(--primitive-font-weight-semibold);
+  }
+
+  .theme-trip-primary .theme-trip-subheading:first-child {
+    margin-block-start: 0;
+  }
+
+  .theme-trip-description {
+    margin: 0;
+    color: var(--semantic-text-muted);
+    line-height: 1.6;
+  }
+
+  .theme-trip-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .theme-trip-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: var(--semantic-text);
+    font-size: var(--primitive-font-size-sm);
+  }
+
+  .theme-trip-list li > .theme-icon {
+    flex-shrink: 0;
+    margin-block-start: 0.15rem;
+    color: var(--semantic-brand);
+  }
+
+  .theme-trip-secondary {
+    padding: 1.25rem;
+    border: 1px solid var(--component-card-border);
+    border-radius: var(--primitive-radius-lg);
+    background: var(--component-card-bg);
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+  }
+
+  .theme-trip-secondary .theme-trip-subheading {
+    margin-block: 0.5rem 0.25rem;
+  }
+
+  .theme-trip-secondary .theme-trip-subheading:first-child {
+    margin-block-start: 0;
+  }
+
+  .theme-trip-itinerary {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .theme-trip-day {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--component-card-border);
+    border-radius: var(--primitive-radius-md);
+    background: var(--component-card-bg);
+  }
+
+  .theme-trip-day-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 3.5rem;
+    block-size: 2rem;
+    padding-inline: 0.5rem;
+    border-radius: var(--primitive-radius-full);
+    background: var(--semantic-brand-soft);
+    color: var(--semantic-brand);
+    font-size: var(--primitive-font-size-sm);
+    font-weight: var(--primitive-font-weight-semibold);
+  }
+
+  .theme-trip-day-title {
+    margin: 0;
+    color: var(--semantic-text);
+    font-size: var(--primitive-font-size-md);
+    font-weight: var(--primitive-font-weight-semibold);
+  }
+
+  .theme-trip-day-description {
+    margin: 0.25rem 0 0;
+    color: var(--semantic-text-muted);
+    font-size: var(--primitive-font-size-sm);
+  }
+
+  @media (min-width: 48rem) {
+    .theme-trip-inner {
+      padding-block-start: 3rem;
+    }
+
+    .theme-trip-title {
+      font-size: var(--primitive-font-size-4xl);
+    }
+
+    .theme-trip-body {
+      grid-template-columns: 1.6fr 1fr;
+    }
+  }
+</style>

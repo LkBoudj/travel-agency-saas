@@ -1,0 +1,146 @@
+/*
+ * Shared island styles (T11).
+ *
+ * Islands are platform-owned presentation, so their classes are prefixed
+ * `island-` instead of `theme-` to keep theme and island styling separable.
+ * Everything reads the three-layer tokens (`--semantic-*`, `--component-*`,
+ * `--primitive-*`) and uses logical properties only, so an island is correct in
+ * both LTR and RTL without a mirrored stylesheet.
+ */
+
+.island-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.island-label {
+  color: var(--semantic-text);
+  font-size: var(--primitive-font-size-sm);
+  font-weight: var(--primitive-font-weight-semibold);
+}
+
+.island-input {
+  inline-size: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--semantic-border);
+  border-radius: var(--primitive-radius-sm);
+  background: var(--semantic-surface);
+  color: var(--semantic-text);
+  font: inherit;
+  font-size: var(--primitive-font-size-sm);
+}
+
+.island-input:focus-visible,
+.island-button:focus-visible {
+  outline: 2px solid var(--semantic-brand);
+  outline-offset: 2px;
+}
+
+.island-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid transparent;
+  border-radius: var(--primitive-radius-full);
+  background: var(--component-button-bg);
+  color: var(--component-button-fg);
+  font: inherit;
+  font-size: var(--primitive-font-size-sm);
+  font-weight: var(--primitive-font-weight-semibold);
+  cursor: pointer;
+}
+
+.island-button:disabled {
+  background: var(--semantic-surface-muted);
+  color: var(--semantic-text-muted);
+  cursor: not-allowed;
+}
+
+.island-count,
+.island-summary,
+.island-status {
+  margin: 0;
+  color: var(--semantic-text-muted);
+  font-size: var(--primitive-font-size-sm);
+}
+
+.island-empty {
+  margin: 0;
+  color: var(--semantic-text-muted);
+  font-size: var(--primitive-font-size-sm);
+}
+
+.island-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.island-list-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--component-card-border);
+  border-radius: var(--primitive-radius-sm);
+  background: var(--component-card-bg);
+}
+
+.island-list-label {
+  color: var(--semantic-text);
+  font-size: var(--primitive-font-size-sm);
+}
+
+.island-list-meta {
+  color: var(--semantic-card-suffix);
+  font-size: var(--primitive-font-size-sm);
+}
+
+.island-link {
+  color: var(--semantic-brand);
+  text-decoration: none;
+}
+
+.island-link:hover {
+  text-decoration: underline;
+}
+
+.island-cta {
+  display: grid;
+  gap: 0.6rem;
+  justify-items: start;
+  padding: 1.1rem;
+  border: 1px solid var(--component-card-border);
+  border-radius: var(--primitive-radius-md);
+  background: var(--component-card-bg);
+}
+
+.island-cta-title {
+  margin: 0;
+  color: var(--semantic-text);
+  font-size: var(--primitive-font-size-lg);
+  font-weight: var(--primitive-font-weight-semibold);
+}
+
+.island-cta-description {
+  margin: 0;
+  color: var(--semantic-text-muted);
+  font-size: var(--primitive-font-size-sm);
+  line-height: 1.5;
+}
+
+.island-date-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 30rem) {
+  .island-date-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
