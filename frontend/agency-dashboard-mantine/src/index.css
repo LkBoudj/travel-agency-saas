@@ -55,6 +55,30 @@ body {
   outline: 2px solid var(--app-focus-ring);
   outline-offset: 2px;
 }
+
+/* The navigation rail: the one dark surface in a light workspace. Painted by an
+   explicit rule keyed off a data attribute rather than a component-level style
+   object, so the rail's four colours live in the token layer with the rest of the
+   shell and a component file stays free of styling. `border-inline-end` rather
+   than `border-right` so the divider swaps edges with the document direction. */
+[data-shell-nav] {
+  background-color: var(--app-surface-nav);
+  border-inline-end-color: var(--app-nav-border);
+}
+
+/* Nav scrolls, footer is pinned: without the flex column the account block would
+   scroll away with the links and stop being a fixed "signed in as" anchor. The
+   nav is the only child allowed to grow, and it is the one that scrolls. */
+.app-shell-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-sm);
+}
+
+.app-shell-rail > nav {
+  flex: 1 1 auto;
+  min-height: 0;
+}
 /* Keyboard-only shortcut to the page body. `.skip-link` keeps it in the tab
    order while pushing it out of view; `:focus-visible` pulls it back over the
    header. `inset-inline-start` so it lands on the correct edge in ar/RTL. */

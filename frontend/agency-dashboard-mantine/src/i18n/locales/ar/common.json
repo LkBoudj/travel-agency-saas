@@ -71,7 +71,9 @@
     "employee": "موظف",
     "openNav": "فتح قائمة التنقل",
     "skipToContent": "تخطَّ إلى المحتوى",
-    "mainNav": "التنقل الرئيسي"
+    "mainNav": "التنقل الرئيسي",
+    "breadcrumb": "مسار التنقل",
+    "openAccount": "الحساب"
   },
   "lang": {
     "en": "English",

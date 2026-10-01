@@ -21,8 +21,16 @@
   --app-heading-h6: 0.8125rem;
 
   /* Shell metrics other layers need to reason about: a sticky table header has
-     to start below the header, not behind it. */
-  --app-header-height: 60px;
+     to start below the header, not behind it. The header is a 44px strip — the
+     reference's top band — because identity, language, and account all live in
+     the rail footer now, so the band has nothing else to carry. */
+  --app-header-height: 44px;
+
+  /* The rail's width. The reference measures ~202px at 1536px wide (13.2%); this
+     is 220px so the Arabic labels and the uppercase group headings still fit
+     without truncation. Narrower than the old fixed 260px, which spent 29% of a
+     1440px screen on chrome instead of data. */
+  --app-rail-width: 220px;
 
   /* Media height for catalog cards (Themes today). A token because the image
      and the no-preview placeholder must stay the same height. */

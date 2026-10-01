@@ -71,7 +71,9 @@
     "employee": "Employee",
     "openNav": "Open navigation",
     "skipToContent": "Skip to content",
-    "mainNav": "Main navigation"
+    "mainNav": "Main navigation",
+    "breadcrumb": "Breadcrumb",
+    "openAccount": "Account"
   },
   "lang": {
     "en": "English",

@@ -93,3 +93,38 @@ Light-surface tertiary text uses `gray-7`, with size and weight carrying hierarc
 Deferred to T3: the rail is still light; the nav tokens exist but nothing paints
 `--app-surface-nav` until the shell is restructured.
 
+
+## T3 — AppShell / sidebar / top utilities (complete)
+
+Tests first: 11 of the new `dashboard-layout.test.tsx` cases failed, then passed.
+
+| Change | File |
+|---|---|
+| Rail 260px → `--app-rail-width` 220px, `[data-shell-nav]` paint, flex column | `app/layouts/dashboard-layout.tsx`, `index.css` |
+| Active item = `#252525` fill + white label; accent border removed | `app/layouts/dashboard-sidebar.tsx` |
+| New `SidebarFooter`: agency identity, locale, account, roles, switch/sign out | `app/layouts/sidebar-footer.tsx` |
+| `use-dashboard-header.ts` → `use-sidebar-footer.ts` (controller renamed to match its only consumer) | `app/layouts/hooks/` |
+| Header = 44px, route-derived breadcrumb + burger only | `app/layouts/dashboard-header.tsx` |
+| `useActiveNavLocation()` — longest-prefix nav match, `null` off-nav | `app/layouts/hooks/use-nav-items.ts` |
+| `shell.breadcrumb`, `shell.openAccount` | `i18n/locales/{en,ar}/common.json` |
+
+Live-browser verification:
+
+| Probe | Before | After |
+|---|---|---|
+| rail width | 260px | 220px |
+| rail background | `rgb(255,255,255)` | `rgb(11,11,11)` |
+| rail border-inline-end | `#E4E8EC` | `rgb(31,31,31)` |
+| header height | 60px | 44px |
+| header contents | icon + agency + code + locale + account | breadcrumb only |
+| active item fill / label | brand tint / brand-9 | `rgb(37,37,37)` / white |
+| `h1` count per page | 1 | 1 |
+
+Gate: `npm test` — 80 files passed / 1 skipped, 345 tests passed / 6 skipped
+(+10), build clean. Screenshots: `.artifacts/t3-shell/` (44), rail 220 / header 44
+on all 14 page-locale pairs, no overflow.
+
+Decision: Mantine's `NavLink` active colour is derived from the primary palette,
+which is now near-black, so it would be invisible on the dark rail. Active and
+hover states are therefore set explicitly from `--app-nav-*`.
+

@@ -13,9 +13,9 @@ without changing any architecture, API, permission, or business logic.
 
 ## Next Step
 
-T3: paint the AppShell navbar with `--app-surface-nav`, move agency identity +
-locale + account into a bottom-pinned `SidebarFooter`, drop the header to ~44px, and
-re-capture the shell states.
+T4: restyle the shared primitives against the new tokens, add a shared `Panel` to
+replace the remaining `Card` wrappers, and remove the hardcoded English fallbacks in
+`empty-state.tsx` / `error-state.tsx`.
 
 ## Current Phase
 
@@ -128,7 +128,27 @@ Phase 3
 
 ### Phase 2: Shell & Primitives
 
-#### T3 — AppShell / sidebar / top utilities
+#### T3 — AppShell / sidebar / top utilities — COMPLETE
+
+- **Files:** `app/layouts/dashboard-layout.tsx`, `dashboard-sidebar.tsx`,
+  `dashboard-header.tsx`, new `sidebar-footer.tsx`, `hooks/use-nav-items.ts`,
+  `hooks/use-dashboard-header.ts` → `hooks/use-sidebar-footer.ts`, `index.css`,
+  `theme/tokens.css`, both `common.json` locales, `dashboard-layout.test.tsx`.
+- **Result:** rail 260px → `--app-rail-width` 220px painted `#0B0B0B` by a
+  `[data-shell-nav]` rule; active item is a `#252525` fill with a white label and no
+  start-edge accent border; rail is a flex column so the nav scrolls and the footer
+  is pinned. Agency identity, language, and account moved into the new
+  `SidebarFooter`; the header dropped to 44px and now carries only a
+  route-derived breadcrumb plus the mobile burger. Active state uses explicit
+  colours because Mantine's own `active` colour now derives from the near-black
+  primary palette and would be dark-on-dark.
+- **Verified live:** rail 220px / `#0B0B0B` / border `#1F1F1F` / `display:flex`,
+  header 44px, breadcrumb "Operations/Bookings", active `#252525` with white label,
+  exactly one `h1` per page, zero overflow at 1440 in both directions.
+- **Gate:** 80 files passed / 1 skipped, 345 tests passed / 6 skipped (+10).
+- **Note:** the breadcrumb is not a heading — `PageHeader` owns the single `h1`.
+
+#### T3 — AppShell / sidebar / top utilities (detail)
 
 - **Problem:** The sidebar is light with a green-tinted active pill and a
   start-edge accent border; agency identity, locale, and account sit in the header,

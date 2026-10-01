@@ -4,6 +4,7 @@ import { AppShell } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DashboardHeader } from './dashboard-header.tsx';
 import { DashboardSidebar } from './dashboard-sidebar.tsx';
+import { SidebarFooter } from './sidebar-footer.tsx';
 
 export function DashboardLayout() {
   const { t } = useTranslation('common');
@@ -13,7 +14,7 @@ export function DashboardLayout() {
     <AppShell
       header={{ height: 'var(--app-header-height)' }}
       navbar={{
-        width: { base: 260 },
+        width: { base: 'var(--app-rail-width)' },
         breakpoint: 'sm',
         collapsed: { mobile: !navOpened },
       }}
@@ -25,11 +26,23 @@ export function DashboardLayout() {
       <a className="skip-link" href="#main">
         {t('shell.skipToContent')}
       </a>
-      <AppShell.Header style={{ borderBottom: '1px solid var(--app-border-subtle)' }}>
+      <AppShell.Header
+        data-shell-header
+        style={{ borderBottom: '1px solid var(--app-border-subtle)' }}
+      >
         <DashboardHeader onToggleNav={toggle} />
       </AppShell.Header>
-      <AppShell.Navbar p="md" style={{ borderInlineEnd: '1px solid var(--app-border-subtle)' }}>
+      {/* The rail is a flex column: the nav scrolls, the footer is pinned to the
+          bottom edge. Without this the account block would scroll away with the
+          links and stop being a stable "where am I logged in" anchor. */}
+      <AppShell.Navbar
+        data-shell-nav
+        p="md"
+        className="app-shell-rail"
+        style={{ borderInlineEnd: '1px solid var(--app-nav-border)' }}
+      >
         <DashboardSidebar onNavigate={close} />
+        <SidebarFooter />
       </AppShell.Navbar>
       <AppShell.Main id="main" tabIndex={-1}>
         <Outlet />

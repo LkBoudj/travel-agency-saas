@@ -8,6 +8,7 @@ import {
   IconUsers,
   IconWorld,
 } from '@tabler/icons-react';
+import { useLocation } from 'react-router-dom';
 import { useAgencyContext } from '../../../features/agency-context/provider/agency-provider.tsx';
 import { dashboardPaths } from '../../router/route-paths.ts';
 
@@ -112,4 +113,35 @@ export function useNavGroups(): DashboardNavGroup[] {
       .filter((item) => !item.permission || can(item.permission))
       .map((item) => ({ labelKey: item.labelKey, to: item.to(code), icon: item.icon })),
   })).filter((group) => group.items.length > 0);
+}
+
+export interface ActiveNavLocation {
+  groupLabelKey: string;
+  itemLabelKey: string;
+}
+
+/**
+ * Which nav entry the current route belongs to, for the header breadcrumb.
+ *
+ * Matched longest-prefix first so a detail route resolves to its own section
+ * (`/bookings/BKG-…` → Bookings) and never to a shorter sibling that happens to
+ * share a prefix. Built from the same `useNavGroups()` output the sidebar renders,
+ * so the breadcrumb cannot name a section the member is not allowed to open.
+ *
+ * Returns `null` for a route outside the nav — a login page, an agency switcher,
+ * an unknown URL — so the caller can render nothing rather than a dangling crumb.
+ */
+export function useActiveNavLocation(): ActiveNavLocation | null {
+  const { pathname } = useLocation();
+  const groups = useNavGroups();
+
+  const match = groups
+    .flatMap((group) => group.items.map((item) => ({ group, item })))
+    .filter(({ item }) => pathname === item.to || pathname.startsWith(`${item.to}/`))
+    .sort((a, b) => b.item.to.length - a.item.to.length)[0];
+
+  if (!match) {
+    return null;
+  }
+  return { groupLabelKey: match.group.labelKey, itemLabelKey: match.item.labelKey };
 }

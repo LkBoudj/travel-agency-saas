@@ -8,7 +8,7 @@ import type { AppLocale } from '../../../i18n/locales.ts';
 import { useSwitchAgency } from '../../router/hooks/use-switch-agency.ts';
 import { routePaths } from '../../router/route-paths.ts';
 
-export interface DashboardHeaderController {
+export interface SidebarFooterController {
   agencyName: string;
   agencyCode: string;
   membershipLabel: string;
@@ -19,7 +19,7 @@ export interface DashboardHeaderController {
   handleSwitchAgency: () => void;
 }
 
-export function useDashboardHeader(): DashboardHeaderController {
+export function useSidebarFooter(): SidebarFooterController {
   const { t } = useTranslation('common');
   const navigate = useNavigate();
   const logout = useLogout();
