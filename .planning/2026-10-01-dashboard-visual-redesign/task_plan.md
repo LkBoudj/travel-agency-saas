@@ -13,12 +13,13 @@ without changing any architecture, API, permission, or business logic.
 
 ## Next Step
 
-T2: rewrite the gray ramp, add the `ink` primary palette, add the nav tokens, and cap
-the heading scale — then extend `theme/contrast.test.ts` to pin every new pair.
+T3: paint the AppShell navbar with `--app-surface-nav`, move agency identity +
+locale + account into a bottom-pinned `SidebarFooter`, drop the header to ~44px, and
+re-capture the shell states.
 
 ## Current Phase
 
-Phase 2
+Phase 3
 
 ## Constraints
 
@@ -80,7 +81,28 @@ Phase 2
 - **Tests:** none (no source change). Gate: script exits 0.
 - **Screenshots:** this task *is* the baseline.
 
-#### T2 — Semantic tokens + light workspace
+#### T2 — Semantic tokens + light workspace — COMPLETE
+
+- **Files:** `theme/colors.ts`, `theme/tokens.css`, `theme/theme.ts`, `theme/radius.ts`,
+  `theme/shadows.ts`, `index.css`, `contrast.test.ts`, `tokens.test.ts`,
+  `dashboard-sidebar.tsx` (token consumption only).
+- **Result:** warm neutral gray ramp (`#F6F6F7` page / `#F7F7F7` sunken / `#E3E3E3` +
+  `#D8D8D8` borders / `#1A1A1A` text) with a ≤2/255 channel-spread assertion; new
+  `ink` palette is `primaryColor` at shade 8; focus ring is neutral ink, not brand;
+  radius capped at 8px with `md` = 6px; shadows neutral and ≤12% black; document
+  body paints `--app-surface-page`; heading scale capped at 26/18px.
+- **Verified in-browser:** filled buttons resolve to `rgb(26,26,26)` with a white
+  label; all button radii 6px; card border `rgb(227,227,227)`; body `rgb(246,246,247)`;
+  `h1` 26px. Screenshots in `.artifacts/t2-tokens/`.
+- **Gate:** 80 files passed / 1 skipped, 335 tests passed / 6 skipped (was 317).
+- **Deliberately deferred to T3:** the rail is still light — the nav tokens exist but
+  nothing paints `--app-surface-nav` until the shell is restructured.
+- **Conflict resolved:** the spec's tertiary text `#8A8A8A` is 3.45:1 on white and
+  fails AA, so it is quarantined to the dark rail (5.7:1 there) and to non-text
+  graphics. Tertiary light-surface text uses `gray-7` with size/weight carrying the
+  hierarchy instead.
+
+#### T2 — Semantic tokens + light workspace (detail)
 
 - **Problem:** The gray ramp is cool and light (`#F8FAFB` page, `#E4E8EC` borders),
   primary actions are brand green, and headings are too large
@@ -328,8 +350,8 @@ Phase 2
 ## Phase Status
 
 - **Phase 1:** complete
-- **Phase 2:** in_progress
-- **Phase 3:** pending
+- **Phase 2:** complete
+- **Phase 3:** in_progress
 - **Phase 4:** pending
 - **Phase 5:** pending
 

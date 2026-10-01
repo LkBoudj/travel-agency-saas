@@ -53,6 +53,11 @@ const HEX_ALLOWLIST = new Set([
   path.join(SRC, 'theme/colors.ts'),
   path.join(SRC, 'theme/contrast.test.ts'),
   path.join(SRC, 'theme/theme.ts'),
+  // The token layer is where a literal belongs: it is the one file every colour
+  // is funnelled through, so a hex here is a decision, not a shortcut. The dark
+  // navigation rail has no Mantine palette behind it and so has to spell its four
+  // steps out; everything else must still reach them through `var(--app-*)`.
+  path.join(SRC, 'theme/tokens.css'),
   path.join(SRC, 'features/themes/lib/settings-map.ts'),
   path.join(SRC, 'features/themes/lib/settings-map.test.ts'),
   path.join(SRC, 'features/themes/components/schema-form/schema-settings-renderer.tsx'),

@@ -26,17 +26,53 @@ export const dark: MantineColorsTuple = [
   '#060B14',
 ];
 
+/**
+ * The workspace neutrals.
+ *
+ * A warm, hue-free gray: R≈G≈B on every step, so the workspace never reads cool
+ * or tinted next to the near-black sidebar. Step 0 is the page, 1 the sunken
+ * surface (table header, toolbar), 2 the skeleton wash, 3/4 the two border
+ * weights, and 7/9 the secondary and primary text.
+ *
+ * Step 1 is *lighter* than step 0 on purpose — the sunken surface is a table
+ * header sitting on a white card, so it has to be darker than white without
+ * becoming darker than the page behind it.
+ */
 export const gray: MantineColorsTuple = [
-  '#F8FAFB',
-  '#F1F4F6',
-  '#E4E8EC',
-  '#D3D9DF',
-  '#B4BEC7',
-  '#94A0AB',
-  '#6B7886',
-  '#4A5664',
-  '#2F3945',
-  '#1B222C',
+  '#F6F6F7',
+  '#F7F7F7',
+  '#F1F1F3',
+  '#E3E3E3',
+  '#D8D8D8',
+  '#A3A3A3',
+  '#8A8A8A',
+  '#616161',
+  '#3D3D3D',
+  '#1A1A1A',
+];
+
+/**
+ * The primary-action palette: near-black fills with a white label.
+ *
+ * The app's chrome is neutral, so the action that matters most is the one with
+ * the most contrast against it. `primaryShade.light` is 8 — a filled button is
+ * `#1A1A1A`, which holds 17.4:1 against its own white label.
+ *
+ * This is deliberately not called `dark`: that name already exists for the cool
+ * slate ramp used by nothing but legacy overrides, and reusing it would make
+ * "dark" mean two different things in the same theme.
+ */
+export const ink: MantineColorsTuple = [
+  '#F5F5F5',
+  '#E5E5E5',
+  '#D4D4D4',
+  '#A3A3A3',
+  '#737373',
+  '#525252',
+  '#404040',
+  '#262626',
+  '#1A1A1A',
+  '#0A0A0A',
 ];
 
 export const success: MantineColorsTuple = [
@@ -95,6 +131,7 @@ export const colors: Record<string, MantineColorsTuple> = {
   brand,
   dark,
   gray,
+  ink,
   success,
   warning,
   danger,

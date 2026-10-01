@@ -13,7 +13,7 @@ export function DashboardSidebar({ onNavigate }: { onNavigate: () => void }) {
       <Stack gap="lg">
         {groups.map((group) => (
           <Stack key={group.labelKey} gap={2} role="group" aria-label={t(group.labelKey)}>
-            <Text size="xs" fw={600} c="dimmed" tt="uppercase" px="xs" pb={4}>
+            <Text size="xs" fw={600} c="var(--app-nav-text-muted)" tt="uppercase" px="xs" pb={4}>
               {t(group.labelKey)}
             </Text>
             {group.items.map((item) => {
@@ -32,17 +32,21 @@ export function DashboardSidebar({ onNavigate }: { onNavigate: () => void }) {
                   active={isActive}
                   onClick={onNavigate}
                   fw={isActive ? 500 : 400}
+                  // The rail is dark, so the active item is identified by its fill
+                  // plus a brighter label — not by Mantine's own active colour,
+                  // which is derived from the (now near-black) primary palette and
+                  // would therefore be dark-on-dark.
                   styles={{
                     root: {
                       borderRadius: 'var(--mantine-radius-md)',
-                      // A 2px logical border that is transparent when inactive, so
-                      // the active item gets a start-edge indicator without the
-                      // label shifting sideways as the user moves through pages.
-                      borderInlineStart: isActive
-                        ? '2px solid var(--app-accent-border)'
-                        : '2px solid transparent',
-                      '--nl-bg': 'var(--app-nav-active-bg)',
-                      '--nl-hover': 'var(--app-nav-active-hover)',
+                      '--nl-bg': 'var(--app-nav-active)',
+                      '--nl-hover': 'var(--app-nav-hover)',
+                    },
+                    label: {
+                      color: isActive ? 'var(--app-nav-text-active)' : 'var(--app-nav-text)',
+                    },
+                    section: {
+                      color: isActive ? 'var(--app-nav-text-active)' : 'var(--app-nav-text-muted)',
                     },
                   }}
                 />

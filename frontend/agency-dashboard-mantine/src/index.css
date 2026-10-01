@@ -24,7 +24,10 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--mantine-color-body);
+  /* The workspace colour is the document's, not a wrapper's: a full-height
+     scroll container that paints its own background leaves the overscroll and the
+     area behind a collapsed sidebar showing white. */
+  background-color: var(--app-surface-page);
   color: var(--mantine-color-text);
 }
 

@@ -36,13 +36,16 @@ export const cssVariablesResolver: CSSVariablesResolver = (resolvedTheme) => {
 
 export const theme = createTheme({
   colors,
-  primaryColor: 'brand',
-  // Shade 7 (#15803D) is the lightest brand step that keeps white label text at
-  // 5.02:1 — WCAG AA needs 4.5:1 at the 13px button size. Shade 6 measured 3.30:1
-  // and the previous dark shade 5 measured 2.28:1. The dashboard renders the light
-  // scheme, so `light` is what applies; `dark` is kept in step so re-introducing a
-  // dark scheme cannot silently reintroduce the failure. Hover lands on shade 8 (7.13:1).
-  primaryShade: { light: 7, dark: 7 },
+  // Primary actions are near-black fills with a white label, not a brand hue:
+  // the workspace and the sidebar are both neutral, so the action that matters
+  // most is the one with the most contrast against them. `brand` survives as an
+  // accent and as the green behind every success state — it is simply no longer
+  // what "primary" means.
+  primaryColor: 'ink',
+  // Shade 8 (`#1A1A1A`) holds 17.4:1 against its own white label; shade 9 is the
+  // hover. Pinned per scheme so re-introducing a dark scheme cannot shift the
+  // fill out from under its label.
+  primaryShade: { light: 8, dark: 8 },
   autoContrast: true,
   fontFamily,
   fontFamilyMonospace,
