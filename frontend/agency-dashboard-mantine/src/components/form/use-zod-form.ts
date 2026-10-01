@@ -28,7 +28,7 @@ export function useZodForm<Values extends object>({
 }: UseZodFormOptions<Values>): UseFormReturnType<Values> {
   const fieldKeys = fieldErrorKeys as Partial<Record<string, FieldValidationKeys>>;
 
-  return useForm<Values>({
+  const form = useForm<Values>({
     initialValues,
     validateInputOnBlur: true,
     validate: (values) => {
@@ -40,4 +40,6 @@ export function useZodForm<Values extends object>({
       return getFieldErrors(result.error, toMessage);
     },
   });
+
+  return form;
 }

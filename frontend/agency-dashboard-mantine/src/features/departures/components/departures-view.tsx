@@ -1,9 +1,11 @@
-import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Badge, Button, Card, Group, Loader, Select, Stack, Text } from '@mantine/core';
+import { Button, Card, Loader, Select, Stack, Text } from '@mantine/core';
+import { ContentContainer } from '../../../components/content-container.tsx';
 import { EmptyState } from '../../../components/empty-state.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
+import { useIsRtl } from '../../../i18n/hooks/use-is-rtl.ts';
 import { PricingManager } from '../../pricing/components/pricing-manager.tsx';
 import { tourLabel } from '../../trips/lib/tour-display.ts';
 import type { AvailabilityMode } from '../../trips/types.ts';
@@ -28,6 +30,8 @@ function buildManagerProps(controller: DeparturesPageController) {
 
 export function DeparturesView({ controller }: DeparturesViewProps) {
   const { t } = useTranslation('departures');
+  // The back arrow is directional: it turns with the reading direction.
+  const isRtl = useIsRtl();
 
   if (controller.toursPending) {
     return (
@@ -42,24 +46,26 @@ export function DeparturesView({ controller }: DeparturesViewProps) {
 
   if (controller.toursEmpty) {
     return (
-      <Stack gap="md">
-        <PageHeader title={t('title')} subtitle={t('subtitle')} />
-        <Card withBorder>
-          <EmptyState
-            title={t('noTours')}
-            description={t('noToursBody')}
-            action={
-              <Button
-                variant="light"
-                leftSection={<IconArrowLeft size={16} />}
-                onClick={controller.goToTrips}
-              >
-                {t('goToTrips')}
-              </Button>
-            }
-          />
-        </Card>
-      </Stack>
+      <ContentContainer>
+        <Stack gap="lg">
+          <PageHeader title={t('title')} subtitle={t('subtitle')} />
+          <Card withBorder>
+            <EmptyState
+              title={t('noTours')}
+              description={t('noToursBody')}
+              action={
+                <Button
+                  variant="light"
+                  leftSection={isRtl ? <IconArrowRight size={16} /> : <IconArrowLeft size={16} />}
+                  onClick={controller.goToTrips}
+                >
+                  {t('goToTrips')}
+                </Button>
+              }
+            />
+          </Card>
+        </Stack>
+      </ContentContainer>
     );
   }
 
@@ -73,55 +79,54 @@ export function DeparturesView({ controller }: DeparturesViewProps) {
   const showDepartures = availabilityMode === 'scheduled';
 
   return (
-    <Stack gap="md">
-      <PageHeader title={t('title')} subtitle={t('subtitle')} />
+    <ContentContainer>
+      <Stack gap="lg">
+        <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
-      <Card withBorder p="md">
-        <Stack gap="md">
-          <Select
-            label={t('tourSelectLabel')}
-            placeholder={t('tourSelectPlaceholder')}
-            data={controller.tours.map((tour) => ({
-              value: tour.code,
-              label: `${tourLabel(tour)} (${tour.code})`,
-            }))}
-            value={selected.code}
-            onChange={controller.selectTour}
-            searchable
-            allowDeselect={false}
-            withAsterisk={false}
-            styles={{ root: { maxWidth: 420 } }}
-          />
-
-          <Group gap="sm">
-            <StatusBadge status={selected.status} />
-            <Badge variant="light" color="gray" tt="none">
-              {t(`availability.${availabilityMode}`)}
-            </Badge>
-          </Group>
-
-          {showDepartures ? (
-            <DeparturesManager
-              tourCode={selected.code}
-              tourStatus={selected.status}
-              {...managerProps}
-              tourModeKey={availabilityMode}
+        <Card withBorder p="md">
+          <Stack gap="md">
+            <Select
+              label={t('tourSelectLabel')}
+              placeholder={t('tourSelectPlaceholder')}
+              data={controller.tours.map((tour) => ({
+                value: tour.code,
+                label: `${tourLabel(tour)} (${tour.code})`,
+              }))}
+              value={selected.code}
+              onChange={controller.selectTour}
+              searchable
+              allowDeselect={false}
+              withAsterisk={false}
+              styles={{ root: { maxWidth: 420 } }}
             />
-          ) : (
-            <AvailabilityInfo mode={availabilityMode} />
-          )}
-        </Stack>
-      </Card>
 
-      <Card withBorder p="md">
-        <PricingManager
-          tourCode={selected.code}
-          canCreate={controller.pricing.canManage}
-          canEdit={controller.pricing.canManage}
-          canDeactivate={controller.pricing.canManage}
-        />
-      </Card>
-    </Stack>
+            {/* Status and availability are one shared badge now, so the pair can
+              never drift apart the way two hand-written chips did. */}
+            <StatusBadge status={selected.status} mode={availabilityMode} />
+
+            {showDepartures ? (
+              <DeparturesManager
+                tourCode={selected.code}
+                tourStatus={selected.status}
+                {...managerProps}
+                tourModeKey={availabilityMode}
+              />
+            ) : (
+              <AvailabilityInfo mode={availabilityMode} />
+            )}
+          </Stack>
+        </Card>
+
+        <Card withBorder p="md">
+          <PricingManager
+            tourCode={selected.code}
+            canCreate={controller.pricing.canManage}
+            canEdit={controller.pricing.canManage}
+            canDeactivate={controller.pricing.canManage}
+          />
+        </Card>
+      </Stack>
+    </ContentContainer>
   );
 }
 

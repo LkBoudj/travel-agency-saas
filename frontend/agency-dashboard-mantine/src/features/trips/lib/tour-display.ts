@@ -39,6 +39,26 @@ export function knownDestinationPlaces(
   return results;
 }
 
+/**
+ * How long a trip runs, as the two facts the schema actually stores.
+ *
+ * `days` and `hours` are mutually exclusive in practice: a day excursion can
+ * be hours-only, so reading `days ?? hours` and printing one "d" suffix
+ * labelled an 8-hour trip as an 8-day one.
+ */
+export function tourDurationParts(tour: { days: number | null; hours: number | null }): {
+  kind: 'days' | 'hours' | 'none';
+  value: number | null;
+} {
+  if (tour.days != null) {
+    return { kind: 'days', value: tour.days };
+  }
+  if (tour.hours != null) {
+    return { kind: 'hours', value: tour.hours };
+  }
+  return { kind: 'none', value: null };
+}
+
 export function tourListRowAmount(row: TourListRow): { kind: string; value: number | null } {
   if (row.startingPrice == null) {
     return { kind: 'pending', value: null };

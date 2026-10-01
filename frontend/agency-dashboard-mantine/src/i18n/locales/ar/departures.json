@@ -6,7 +6,7 @@
   "noTours": "لا توجد رحلات بعد",
   "noToursBody": "أنشئ رحلة أولاً — تُربط المغادرات برحلة مجدولة.",
   "goToTrips": "الانتقال إلى الرحلات",
-  "loading": "جارٍ تحميل الرحلات…",
+  "loading": "جارٍ تحميل المغادرات…",
   "availability": {
     "scheduled": "مجدولة",
     "on_request": "عند الطلب",
@@ -27,13 +27,11 @@
     "start": "البداية",
     "end": "النهاية",
     "capacity": "السعة",
-    "deadline": "آخر موعد للحجز"
+    "deadline": "آخر موعد للحجز",
+    "tableCaption": "المغادرة"
   },
-  "departuresCount": "{{count}} مغادرة",
-  "departuresCount_plural": "{{count}} مغادرات",
   "create": "إضافة مغادرة",
   "empty": "لا توجد مغادرات لهذه الرحلة بعد.",
-  "loading": "جارٍ تحميل المغادرات…",
   "loadError": "تعذر تحميل المغادرات.",
   "deadlineNone": "بدون موعد",
   "menu": "إجراءات المغادرة",
@@ -94,5 +92,12 @@
     "hasActiveBookings": "توجد حجوزات على هذه المغادرة ولا يمكن إلغاؤها.",
     "network": "تعذر الوصول إلى الخادم. تحقق من اتصالك وحاول مجددًا.",
     "generic": "حدث خطأ ما. حاول مجددًا."
-  }
+  },
+  "departuresCount_zero": "مغادرات",
+  "departuresCount_one": "مغادرة واحدة",
+  "departuresCount_two": "مغادرتان",
+  "departuresCount_few": "{{count}} مغادرات",
+  "departuresCount_many": "{{count}} مغادرة",
+  "departuresCount_other": "{{count}} مغادرة",
+  "openRow": "فتح مغادرة {{code}}"
 }

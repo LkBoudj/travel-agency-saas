@@ -1,7 +1,9 @@
+import type { CSSProperties, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Group, Stack, Text } from '@mantine/core';
+import { Text } from '@mantine/core';
+import { CellStack } from '../../../components/cell-stack.tsx';
 import { DataTable, type DataTableColumn } from '../../../components/data-table.tsx';
-import { ErrorState } from '../../../components/empty-state.tsx';
+import { EmptyState, ErrorState } from '../../../components/empty-state.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import { useAppLocale } from '../../../i18n/hooks/use-app-locale.ts';
 import { getIntlLocale } from '../../../i18n/locales.ts';
@@ -12,12 +14,18 @@ import {
 } from '../lib/booking-display.ts';
 import type { AgencyBooking } from '../types.ts';
 
+/** Figures that sit in a column must not shift width as they change. */
+const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
+
 export interface BookingsTableProps {
   bookings: AgencyBooking[];
   loading?: boolean;
+  skeletonRows?: number;
   isError?: boolean;
   onRetry?: () => void;
   onViewDetails: (booking: AgencyBooking) => void;
+  /** The next action for the empty listing; the page owns the handler. */
+  emptyAction?: ReactNode;
 }
 
 /**
@@ -29,9 +37,11 @@ export interface BookingsTableProps {
 export function BookingsTable({
   bookings,
   loading,
+  skeletonRows,
   isError,
   onRetry,
   onViewDetails,
+  emptyAction,
 }: BookingsTableProps) {
   const { t } = useTranslation('bookings');
   const intlLocale = getIntlLocale(useAppLocale());
@@ -42,51 +52,40 @@ export function BookingsTable({
       header: t('columns.code'),
       w: '30%',
       render: (booking) => (
-        <Group gap="sm" wrap="nowrap">
-          <Stack gap={0} style={{ minWidth: 0 }}>
-            <Text fw={500} ff="monospace" size="sm" truncate>
-              {booking.code}
-            </Text>
-            <Text size="xs" c="dimmed" truncate>
-              {booking.tour.name}
-            </Text>
-          </Stack>
-        </Group>
+        <CellStack
+          primary={booking.code}
+          secondary={booking.tour.name}
+          primaryProps={{ ff: 'monospace', size: 'sm' }}
+        />
       ),
     },
     {
       key: 'customer',
       header: t('columns.customer'),
       render: (booking) => (
-        <Stack gap={0} style={{ minWidth: 0 }}>
-          <Text size="sm" truncate>
-            {bookingCustomerName(booking.customer)}
-          </Text>
-          <Text size="xs" c="dimmed" truncate>
-            {booking.customer.code}
-          </Text>
-        </Stack>
+        <CellStack
+          primary={bookingCustomerName(booking.customer)}
+          secondary={booking.customer.code}
+          primaryProps={{ size: 'sm' }}
+        />
       ),
     },
     {
       key: 'departure',
       header: t('columns.departure'),
       render: (booking) => (
-        <Stack gap={0} style={{ minWidth: 0 }}>
-          <Text size="sm" textWrap="nowrap">
-            {formatBookingDate(booking.departure.startAt, intlLocale)}
-          </Text>
-          <Text size="xs" c="dimmed" ff="monospace">
-            {booking.departure.code}
-          </Text>
-        </Stack>
+        <CellStack
+          primary={formatBookingDate(booking.departure.startAt, intlLocale)}
+          secondary={booking.departure.code}
+          secondaryProps={{ ff: 'monospace' }}
+        />
       ),
     },
     {
       key: 'seats',
       header: t('columns.seats'),
       render: (booking) => (
-        <Text size="sm" ta="right" tabular-nums>
+        <Text size="sm" ta="end" style={TABULAR}>
           {booking.reservedSeats}
         </Text>
       ),
@@ -95,7 +94,7 @@ export function BookingsTable({
       key: 'total',
       header: t('columns.total'),
       render: (booking) => (
-        <Text size="sm" ff="monospace" ta="right" textWrap="nowrap">
+        <Text size="sm" ff="monospace" ta="end" textWrap="nowrap">
           {formatBookingAmount(booking.totalAmount, booking.currency, intlLocale)}
         </Text>
       ),
@@ -116,9 +115,21 @@ export function BookingsTable({
       rows={bookings}
       columns={columns}
       keyOf={(booking) => booking.code}
+      caption={t('columns.tableCaption')}
+      minWidth={880}
+      stickyHeader
       loading={loading}
+      skeletonRows={skeletonRows}
       onRowClick={onViewDetails}
-      emptyState={t('page.empty')}
+      rowLabel={(booking) => t('page.openRow', { code: booking.code })}
+      emptyState={
+        // An empty listing states what to do next, not just that it is empty.
+        <EmptyState
+          title={t('page.empty')}
+          description={t('page.emptyBody')}
+          action={emptyAction}
+        />
+      }
     />
   );
 }

@@ -58,7 +58,7 @@ export function AgencyAccessFailureScreen({
   return (
     <Center mih="60dvh">
       <Stack align="center" gap={4} maw={440} ta="center">
-        <Icon size={40} stroke={1.5} color="var(--mantine-color-red-6)" />
+        <Icon size={40} stroke={1.5} color="var(--app-icon-danger)" />
         <Title order={4}>{t(titleKey)}</Title>
         <Text c="dimmed" size="sm">
           {t(bodyKey)}

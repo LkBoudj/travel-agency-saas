@@ -20,5 +20,21 @@
   "recent": {
     "title": "Recent bookings",
     "empty": "No bookings yet. Create one from the Bookings page."
+  },
+  "sections": {
+    "snapshot": "At a glance"
+  },
+  "actions": {
+    "newBooking": "New booking",
+    "addCustomer": "Add customer",
+    "newTrip": "New trip",
+    "inviteMember": "Invite member"
+  },
+  "site": {
+    "title": "Site status",
+    "published": "Published",
+    "draft": "Not published",
+    "publishedBody": "Your public site is live and serving this agency's themes.",
+    "draftBody": "Publish from the Website page to send the public site live."
   }
 }

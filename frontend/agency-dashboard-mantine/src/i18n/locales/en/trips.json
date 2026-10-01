@@ -4,6 +4,13 @@
   "searchPlaceholder": "Search trips…",
   "create": "New trip",
   "tripsEmpty": "No trips found.",
+  "tripsEmptyBody": "Create your first trip to start quoting departures.",
+  "duration": {
+    "days_one": "1 day",
+    "days_other": "{{count}} days",
+    "hours_one": "1 hour",
+    "hours_other": "{{count}} hours"
+  },
   "loadError": "Could not load trips.",
   "menu": "Trip actions",
   "edit": "Edit",
@@ -23,7 +30,8 @@
     "schedule": "Schedule",
     "status": "Status",
     "price": "Starting price",
-    "created": "Created"
+    "created": "Created",
+    "tableCaption": "Trips"
   },
   "confirm": {
     "publishTitle": "Publish {{name}}?",
@@ -279,5 +287,6 @@
       "camp": "Camp",
       "mixed": "Mixed"
     }
-  }
+  },
+  "openTourRow": "Open trip {{name}}"
 }

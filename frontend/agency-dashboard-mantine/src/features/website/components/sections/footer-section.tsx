@@ -1,11 +1,48 @@
-import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Box, Button, Card, Group, Stack, TextInput, Textarea } from '@mantine/core';
+import { Button, Card, Group, Stack, Textarea } from '@mantine/core';
+import { EmptyState } from '../../../../components/empty-state.tsx';
 import { FormSection } from '../../../../components/form/form-section.tsx';
 import type { WebsiteForm } from '../../hooks/use-website-form.ts';
+import { FooterColumnRow, FooterLegalRow, FooterLinkRow } from '../repeating-rows.tsx';
 
 export interface FooterSectionProps {
   form: WebsiteForm;
+}
+
+/** A footer column: its own heading, plus the links nested under it. */
+function FooterColumn({ form, columnIndex }: { form: WebsiteForm; columnIndex: number }) {
+  const { t } = useTranslation('website');
+  const links = form.values.footer.columns[columnIndex]?.links ?? [];
+
+  return (
+    <Stack gap="sm">
+      <FooterColumnRow form={form} columnIndex={columnIndex} />
+
+      <Stack gap={6} ps="md">
+        {links.map((_link, linkIndex) => (
+          <FooterLinkRow
+            key={`link-${columnIndex}-${linkIndex}`}
+            form={form}
+            columnIndex={columnIndex}
+            linkIndex={linkIndex}
+          />
+        ))}
+        <Group>
+          <Button
+            variant="default"
+            size="xs"
+            leftSection={<IconPlus size={14} />}
+            onClick={() =>
+              form.insertListItem(`footer.columns.${columnIndex}.links`, { label: '', href: '' })
+            }
+          >
+            {t('addFooterLink')}
+          </Button>
+        </Group>
+      </Stack>
+    </Stack>
+  );
 }
 
 export function FooterSection({ form }: FooterSectionProps) {
@@ -31,76 +68,13 @@ export function FooterSection({ form }: FooterSectionProps) {
           description={t('sectionHints.footerColumns')}
         >
           <Stack gap="md">
+            {form.values.footer.columns.length === 0 ? (
+              <EmptyState compact title={t('empty.footerColumns')} />
+            ) : null}
             {form.values.footer.columns.map((_column, columnIndex) => (
-              <Stack key={`col-${columnIndex}`} gap="sm">
-                <Group gap="sm" align="flex-end" wrap="nowrap">
-                  <TextInput
-                    placeholder={t('placeholders.columnTitle')}
-                    style={{ flex: 1 }}
-                    {...form.getInputProps(`footer.columns.${columnIndex}.title`)}
-                  />
-                  <ActionIcon
-                    variant="subtle"
-                    color="red"
-                    aria-label={t('removeFooterColumn')}
-                    onClick={() => form.removeListItem('footer.columns', columnIndex)}
-                  >
-                    <IconTrash size={16} />
-                  </ActionIcon>
-                </Group>
-                <Stack gap={6} pl="md">
-                  {form.values.footer.columns[columnIndex].links.map((_link, linkIndex) => (
-                    <Group
-                      key={`link-${columnIndex}-${linkIndex}`}
-                      gap="sm"
-                      align="flex-end"
-                      wrap="nowrap"
-                    >
-                      <TextInput
-                        placeholder={t('placeholders.navLabel')}
-                        style={{ flex: 1 }}
-                        {...form.getInputProps(
-                          `footer.columns.${columnIndex}.links.${linkIndex}.label`
-                        )}
-                      />
-                      <TextInput
-                        placeholder={t('placeholders.href')}
-                        style={{ flex: 1 }}
-                        {...form.getInputProps(
-                          `footer.columns.${columnIndex}.links.${linkIndex}.href`
-                        )}
-                      />
-                      <ActionIcon
-                        variant="subtle"
-                        color="red"
-                        aria-label={t('removeFooterLink')}
-                        onClick={() =>
-                          form.removeListItem(`footer.columns.${columnIndex}.links`, linkIndex)
-                        }
-                      >
-                        <IconTrash size={16} />
-                      </ActionIcon>
-                    </Group>
-                  ))}
-                  <Box>
-                    <Button
-                      variant="default"
-                      size="xs"
-                      leftSection={<IconPlus size={14} />}
-                      onClick={() =>
-                        form.insertListItem(`footer.columns.${columnIndex}.links`, {
-                          label: '',
-                          href: '',
-                        })
-                      }
-                    >
-                      {t('addFooterLink')}
-                    </Button>
-                  </Box>
-                </Stack>
-              </Stack>
+              <FooterColumn key={`col-${columnIndex}`} form={form} columnIndex={columnIndex} />
             ))}
-            <Box>
+            <Group>
               <Button
                 variant="default"
                 size="xs"
@@ -109,7 +83,7 @@ export function FooterSection({ form }: FooterSectionProps) {
               >
                 {t('addFooterColumn')}
               </Button>
-            </Box>
+            </Group>
           </Stack>
         </FormSection>
       </Card>
@@ -117,29 +91,13 @@ export function FooterSection({ form }: FooterSectionProps) {
       <Card withBorder radius="md">
         <FormSection title={t('sections.footerLegal')} description={t('sectionHints.footerLegal')}>
           <Stack gap="sm">
+            {form.values.footer.legal.length === 0 ? (
+              <EmptyState compact title={t('empty.footerLegal')} />
+            ) : null}
             {form.values.footer.legal.map((_row, index) => (
-              <Group key={`legal-${index}`} gap="sm" align="flex-end" wrap="nowrap">
-                <TextInput
-                  placeholder={t('placeholders.navLabel')}
-                  style={{ flex: 1 }}
-                  {...form.getInputProps(`footer.legal.${index}.label`)}
-                />
-                <TextInput
-                  placeholder={t('placeholders.href')}
-                  style={{ flex: 1 }}
-                  {...form.getInputProps(`footer.legal.${index}.href`)}
-                />
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  aria-label={t('removeFooterLink')}
-                  onClick={() => form.removeListItem('footer.legal', index)}
-                >
-                  <IconTrash size={16} />
-                </ActionIcon>
-              </Group>
+              <FooterLegalRow key={`legal-${index}`} form={form} index={index} />
             ))}
-            <Box>
+            <Group>
               <Button
                 variant="default"
                 size="xs"
@@ -148,7 +106,7 @@ export function FooterSection({ form }: FooterSectionProps) {
               >
                 {t('addFooterLink')}
               </Button>
-            </Box>
+            </Group>
           </Stack>
         </FormSection>
       </Card>

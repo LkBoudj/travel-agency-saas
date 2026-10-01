@@ -3,6 +3,10 @@
   "subtitle": "The public agency website your selected theme renders.",
   "publish": "Publish",
   "saveLabel": "Save changes",
+  "saveBar": {
+    "unsaved": "Unsaved changes",
+    "upToDate": "Everything is saved."
+  },
   "readOnlyHint": "You can view this website, but your permissions don't allow saving changes.",
   "loadError": "Could not load the website.",
   "tabs": {
@@ -11,6 +15,13 @@
     "navigation": "Navigation",
     "footer": "Footer",
     "branding": "Branding"
+  },
+  "tabHints": {
+    "home": "Hero, trust points, promotion, testimonials and the closing call to action.",
+    "tours": "Which published tours the home page features, and in which order.",
+    "navigation": "The links shown in the site header.",
+    "footer": "Agency line, link columns and legal links at the bottom of the site.",
+    "branding": "Logo, colors and identity shown across the storefront."
   },
   "sections": {
     "hero": "Hero",
@@ -68,7 +79,11 @@
   "empty": {
     "testimonials": "No testimonials yet. Add the first one below.",
     "navigation": "No navigation links yet. The storefront shows only the home link.",
-    "tourCatalog": "No published tours yet. Publish a trip first — featured tours are picked from your published catalog."
+    "noFeaturedToursTitle": "Nothing to feature yet.",
+    "tourCatalog": "No published tours yet. Publish a trip first — featured tours are picked from your published catalog.",
+    "trustPoints": "No trust points yet. These become the strip under the hero.",
+    "footerColumns": "No footer columns yet. A column groups related links.",
+    "footerLegal": "No legal links yet. Most storefronts link privacy and terms here."
   },
   "addTrustPoint": "Add trust point",
   "removeTrustPoint": "Remove trust point",

@@ -1,6 +1,5 @@
 {
   "langName": "العربية",
-  "brand": "مكتب السفر",
   "nav": {
     "overview": "نظرة عامة",
     "trips": "الرحلات",
@@ -11,7 +10,13 @@
     "team": "الفريق",
     "website": "الموقع الإلكتروني",
     "themes": "القوالب",
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "groups": {
+      "workspace": "مساحة العمل",
+      "operations": "العمليات",
+      "team": "الفريق",
+      "presence": "الحضور الإلكتروني"
+    }
   },
   "actions": {
     "save": "حفظ",
@@ -26,7 +31,10 @@
     "add": "إضافة",
     "remove": "إزالة",
     "clearSearch": "مسح البحث",
-    "copyCode": "نسخ الرمز"
+    "copyCode": "نسخ الرمز",
+    "rowMenu": "إجراءات الصف",
+    "actions": "الإجراءات",
+    "openRecord": "فتح {{name}}"
   },
   "statuses": {
     "active": "نشط",
@@ -61,7 +69,9 @@
     "signedAs": "مسجّل الدخول باسم",
     "owner": "مالك",
     "employee": "موظف",
-    "openNav": "فتح قائمة التنقل"
+    "openNav": "فتح قائمة التنقل",
+    "skipToContent": "تخطَّ إلى المحتوى",
+    "mainNav": "التنقل الرئيسي"
   },
   "lang": {
     "en": "English",
@@ -94,5 +104,16 @@
   "placeholder": {
     "body": "يصل هذا القسم في إصدار لاحق من لوحة التحكم."
   },
-  "empty": "لا توجد نتائج بعد."
+  "empty": "لا توجد نتائج بعد.",
+  "form": {
+    "errorSummary": "صحّح الحقول المميّزة للمتابعة."
+  },
+  "list": {
+    "results_zero": "لا نتائج",
+    "results_one": "نتيجة واحدة",
+    "results_two": "نتيجتان",
+    "results_few": "{{count}} نتائج",
+    "results_many": "{{count}} نتيجة",
+    "results_other": "{{count}} نتيجة"
+  }
 }

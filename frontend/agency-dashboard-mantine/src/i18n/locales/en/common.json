@@ -1,6 +1,5 @@
 {
   "langName": "English",
-  "brand": "Travel Desk",
   "nav": {
     "overview": "Overview",
     "trips": "Trips",
@@ -11,7 +10,13 @@
     "team": "Team",
     "website": "Website",
     "themes": "Themes",
-    "settings": "Settings"
+    "settings": "Settings",
+    "groups": {
+      "workspace": "Workspace",
+      "operations": "Operations",
+      "team": "Team",
+      "presence": "Online presence"
+    }
   },
   "actions": {
     "save": "Save",
@@ -26,7 +31,10 @@
     "add": "Add",
     "remove": "Remove",
     "clearSearch": "Clear search",
-    "copyCode": "Copy code"
+    "copyCode": "Copy code",
+    "rowMenu": "Row actions",
+    "actions": "Actions",
+    "openRecord": "Open {{name}}"
   },
   "statuses": {
     "active": "Active",
@@ -61,7 +69,9 @@
     "signedAs": "Signed in as",
     "owner": "Owner",
     "employee": "Employee",
-    "openNav": "Open navigation"
+    "openNav": "Open navigation",
+    "skipToContent": "Skip to content",
+    "mainNav": "Main navigation"
   },
   "lang": {
     "en": "English",
@@ -94,5 +104,12 @@
   "placeholder": {
     "body": "This section ships in a later iteration of the dashboard."
   },
-  "empty": "No results yet."
+  "empty": "No results yet.",
+  "form": {
+    "errorSummary": "Fix the highlighted fields to continue."
+  },
+  "list": {
+    "results_one": "{{count}} result",
+    "results_other": "{{count}} results"
+  }
 }

@@ -9,6 +9,7 @@ import type { EntityOption } from '../../../components/entity-picker/entity-opti
 import { splitKeywordIntoPersonName } from '../../../components/entity-picker/quick-create-flow.ts';
 import { QuickCreateDialog } from '../../../components/entity-picker/quick-create.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { ModalFormShell } from '../../../components/form/modal-form-shell.tsx';
 import { useAppLocale } from '../../../i18n/hooks/use-app-locale.ts';
 import { getIntlLocale } from '../../../i18n/locales.ts';
@@ -153,6 +154,7 @@ function CreateBookingBody({ onClose }: { onClose: () => void }) {
     <>
       <form onSubmit={onSubmit} noValidate>
         <Stack gap="lg">
+          <FormErrorSummary errors={form.errors} />
           <Text size="sm" c="dimmed">
             {t('createDialog.description')}
           </Text>

@@ -1,6 +1,7 @@
 import { IconAlertCircle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Button, PasswordInput, Stack, TextInput } from '@mantine/core';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { useLoginForm } from '../hooks/use-login-form.ts';
 
 export function LoginForm() {
@@ -10,6 +11,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} noValidate>
       <Stack gap="md">
+        <FormErrorSummary errors={form.errors} />
         <TextInput
           label={t('login.email')}
           placeholder={t('login.emailPlaceholder')}

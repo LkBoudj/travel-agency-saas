@@ -1,6 +1,8 @@
 {
   "group": {
-    "homepage": "أقسام الصفحة الرئيسية"
+    "homepage": "الصفحة الرئيسية",
+    "layout": "التخطيط",
+    "brand": "الهوية البصرية"
   },
   "starter": {
     "homepage": {

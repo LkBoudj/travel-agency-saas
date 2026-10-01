@@ -1,8 +1,10 @@
-import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Box, Button, Group, Stack, Text, TextInput } from '@mantine/core';
+import { Button, Card, Group, Stack } from '@mantine/core';
+import { EmptyState } from '../../../../components/empty-state.tsx';
 import { FormSection } from '../../../../components/form/form-section.tsx';
 import type { WebsiteForm } from '../../hooks/use-website-form.ts';
+import { NavigationLinkRow } from '../repeating-rows.tsx';
 
 export interface NavigationSectionProps {
   form: WebsiteForm;
@@ -12,46 +14,27 @@ export function NavigationSection({ form }: NavigationSectionProps) {
   const { t } = useTranslation('website');
 
   return (
-    <FormSection title={t('sections.navigation')} description={t('sectionHints.navigation')}>
-      <Stack gap="sm">
-        {form.values.navigation.length === 0 ? (
-          <Text size="sm" c="dimmed">
-            {t('empty.navigation')}
-          </Text>
-        ) : null}
-        {form.values.navigation.map((_row, index) => (
-          <Group key={`nav-${index}`} gap="sm" align="flex-end" wrap="nowrap">
-            <TextInput
-              placeholder={t('placeholders.navLabel')}
-              style={{ flex: 1 }}
-              {...form.getInputProps(`navigation.${index}.label`)}
-            />
-            <TextInput
-              placeholder={t('placeholders.href')}
-              style={{ flex: 1 }}
-              {...form.getInputProps(`navigation.${index}.href`)}
-            />
-            <ActionIcon
-              variant="subtle"
-              color="red"
-              aria-label={t('removeNavigationLink')}
-              onClick={() => form.removeListItem('navigation', index)}
+    <Card withBorder radius="md">
+      <FormSection title={t('sections.navigation')} description={t('sectionHints.navigation')}>
+        <Stack gap="sm">
+          {form.values.navigation.length === 0 ? (
+            <EmptyState compact title={t('empty.navigation')} />
+          ) : null}
+          {form.values.navigation.map((_row, index) => (
+            <NavigationLinkRow key={`nav-${index}`} form={form} index={index} />
+          ))}
+          <Group>
+            <Button
+              variant="default"
+              size="xs"
+              leftSection={<IconPlus size={14} />}
+              onClick={() => form.insertListItem('navigation', { label: '', href: '' })}
             >
-              <IconTrash size={16} />
-            </ActionIcon>
+              {t('addNavigationLink')}
+            </Button>
           </Group>
-        ))}
-        <Box>
-          <Button
-            variant="default"
-            size="xs"
-            leftSection={<IconPlus size={14} />}
-            onClick={() => form.insertListItem('navigation', { label: '', href: '' })}
-          >
-            {t('addNavigationLink')}
-          </Button>
-        </Box>
-      </Stack>
-    </FormSection>
+        </Stack>
+      </FormSection>
+    </Card>
   );
 }

@@ -39,7 +39,7 @@ function ColorScale({ name }: { name: string }) {
               height: 40,
               borderRadius: 'var(--mantine-radius-sm)',
               backgroundColor: value,
-              border: '1px solid var(--mantine-color-gray-3)',
+              border: '1px solid var(--app-border-subtle)',
             }}
           />
         ))}
@@ -179,7 +179,7 @@ export function StyleGuidePage() {
                   height: 28,
                   borderRadius: 'var(--mantine-radius-sm)',
                   backgroundColor: gradientColor(color, index),
-                  border: '1px solid var(--mantine-color-gray-3)',
+                  border: '1px solid var(--app-border-subtle)',
                 }}
               />
             ))}

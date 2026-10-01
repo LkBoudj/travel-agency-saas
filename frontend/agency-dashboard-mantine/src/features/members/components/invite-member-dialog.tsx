@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Checkbox, Group, Loader, Stack, Text, TextInput } from '@mantine/core';
 import { FieldError } from '../../../components/form/field-error.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { FormSection } from '../../../components/form/form-section.tsx';
 import { ModalFormShell } from '../../../components/form/modal-form-shell.tsx';
 import { useInviteMemberForm } from '../hooks/use-invite-member-form.ts';
@@ -32,6 +33,7 @@ export function InviteMemberDialog({
   return (
     <ModalFormShell opened onClose={onClose} title={t('inviteDialog.title')} size="md">
       <form onSubmit={handleSubmit}>
+        <FormErrorSummary errors={form.errors} />
         <Stack gap="lg">
           <FormSection title={t('inviteDialog.email')}>
             <TextInput

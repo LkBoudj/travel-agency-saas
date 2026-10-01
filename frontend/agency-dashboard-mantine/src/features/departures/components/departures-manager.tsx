@@ -1,18 +1,13 @@
-import { useState } from 'react';
-import {
-  IconAlertTriangle,
-  IconCoins,
-  IconDots,
-  IconPencil,
-  IconPlus,
-  IconX,
-} from '@tabler/icons-react';
+import { useState, type CSSProperties } from 'react';
+import { IconAlertTriangle, IconCoins, IconPencil, IconPlus, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Alert, Button, Group, Menu, Stack, Text, Title } from '@mantine/core';
+import { Alert, Button, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useConfirmDialog } from '../../../components/confirm-dialog.tsx';
 import { DataTable, type DataTableColumn } from '../../../components/data-table.tsx';
-import { ErrorState } from '../../../components/empty-state.tsx';
+import { EmptyState, ErrorState } from '../../../components/empty-state.tsx';
+import { RowActionsMenu } from '../../../components/row-actions-menu.tsx';
+import { SectionHeader } from '../../../components/section-header.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import { useAppLocale } from '../../../i18n/hooks/use-app-locale.ts';
 import { getIntlLocale } from '../../../i18n/locales.ts';
@@ -25,6 +20,9 @@ import { openDepartureCount } from '../lib/departure-payloads.ts';
 import type { DepartureFormValues } from '../schemas/departure.schema.ts';
 import type { Departure, DepartureStatus } from '../types.ts';
 import { DepartureFormDialog } from './departure-form-dialog.tsx';
+
+/** Figures that sit in a column must not shift width as they change. */
+const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
 interface DeparturesManagerProps {
   tourCode: string;
@@ -46,6 +44,7 @@ export function DeparturesManager({
   tourModeKey,
 }: DeparturesManagerProps) {
   const { t } = useTranslation('departures');
+  const { t: tCommon } = useTranslation('common');
   const amai = getIntlLocale(useAppLocale());
   const confirmRp = useConfirmDialog();
 
@@ -148,7 +147,7 @@ export function DeparturesManager({
       key: 'capacity',
       header: t('columns.capacity'),
       render: (departure) => (
-        <Text size="sm" ta="right" tabular-nums>
+        <Text size="sm" ta="end" style={TABULAR}>
           {departure.capacity}
         </Text>
       ),
@@ -179,44 +178,42 @@ export function DeparturesManager({
           return null;
         }
         return (
-          <Menu withinPortal position="bottom-end" shadow="md" width={200}>
-            <Menu.Target>
-              <ActionIcon
-                variant="subtle"
-                color="gray"
-                aria-label={`${t('menu')} ${departure.code}`}
-              >
-                <IconDots size={16} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              {canUpdate ? (
-                <Menu.Item
-                  leftSection={<IconPencil size={16} />}
-                  onClick={() => openEdit(departure)}
-                >
-                  {t('edit')}
-                </Menu.Item>
-              ) : null}
-              {canManagePrices ? (
-                <Menu.Item
-                  leftSection={<IconCoins size={16} />}
-                  onClick={() => setPricing(departure)}
-                >
-                  {t('prices')}
-                </Menu.Item>
-              ) : null}
-              {canCancel ? (
-                <Menu.Item
-                  leftSection={<IconX size={16} />}
-                  color="red"
-                  onClick={() => confirmCancel(departure)}
-                >
-                  {t('cancel')}
-                </Menu.Item>
-              ) : null}
-            </Menu.Dropdown>
-          </Menu>
+          <RowActionsMenu
+            label={`${t('menu')} ${departure.code}`}
+            actions={[
+              ...(canUpdate
+                ? [
+                    {
+                      key: 'edit',
+                      label: t('edit'),
+                      icon: <IconPencil size={16} />,
+                      onClick: () => openEdit(departure),
+                    },
+                  ]
+                : []),
+              ...(canManagePrices
+                ? [
+                    {
+                      key: 'prices',
+                      label: t('prices'),
+                      icon: <IconCoins size={16} />,
+                      onClick: () => setPricing(departure),
+                    },
+                  ]
+                : []),
+              ...(canCancel
+                ? [
+                    {
+                      key: 'cancel',
+                      label: t('cancel'),
+                      icon: <IconX size={16} />,
+                      color: 'red',
+                      onClick: () => confirmCancel(departure),
+                    },
+                  ]
+                : []),
+            ]}
+          />
         );
       },
     },
@@ -224,19 +221,22 @@ export function DeparturesManager({
 
   return (
     <Stack gap="md">
-      <Group justify="space-between" align="flex-end" wrap="wrap" gap="sm">
-        <Stack gap={2}>
-          <Title order={3}>{t('title')}</Title>
-          <Text size="sm" c="dimmed">
-            {t('subtitle')} · {t(`availability.${tourModeKey}`)}
+      <SectionHeader
+        title={t('title')}
+        description={`${t('subtitle')} · ${t(`availability.${tourModeKey}`)}`}
+        count={
+          <Text size="sm" c="dimmed" aria-live="polite">
+            {tCommon('list.results', { count: departures.length })}
           </Text>
-        </Stack>
-        {canCreate ? (
-          <Button leftSection={<IconPlus size={16} />} size="sm" onClick={openCreate}>
-            {t('create')}
-          </Button>
-        ) : null}
-      </Group>
+        }
+        actions={
+          canCreate ? (
+            <Button leftSection={<IconPlus size={16} />} size="sm" onClick={openCreate}>
+              {t('create')}
+            </Button>
+          ) : null
+        }
+      />
 
       {showNoOpenWarning ? (
         <Alert
@@ -256,19 +256,23 @@ export function DeparturesManager({
           rows={departures}
           columns={columns}
           keyOf={(departure) => departure.code}
+          caption={t('columns.tableCaption')}
+          minWidth={900}
+          stickyHeader
           loading={departuresQuery.isPending}
+          skeletonRows={4}
           emptyState={
-            <Stack align="center" gap="sm" py="sm">
-              <Text size="sm" c="dimmed">
-                {t('empty')}
-              </Text>
-              {canCreate ? (
-                <Button size="sm" onClick={openCreate}>
-                  <IconPlus size={16} />
-                  {t('create')}
-                </Button>
-              ) : null}
-            </Stack>
+            <EmptyState
+              compact
+              title={t('empty')}
+              action={
+                canCreate ? (
+                  <Button size="sm" leftSection={<IconPlus size={16} />} onClick={openCreate}>
+                    {t('create')}
+                  </Button>
+                ) : null
+              }
+            />
           }
         />
       )}

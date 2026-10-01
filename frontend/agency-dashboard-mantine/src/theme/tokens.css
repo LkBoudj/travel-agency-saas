@@ -1,0 +1,64 @@
+/**
+ * The app's token layer.
+ *
+ * Everything the product paints — page/raised/sunken surfaces, borders, row
+ * hover, skeleton, focus ring, accent — resolves through one of these, so a
+ * palette change lands in one file and no component reaches into Mantine's
+ * ramps. Values alias Mantine's own variables; the ramps themselves live in
+ * `theme/colors.ts` and are guarded by `theme/contrast.test.ts`.
+ */
+
+:root {
+  --app-heading-h1: clamp(1.5rem, 2vw + 1rem, 2rem);
+  --app-heading-h2: clamp(1.25rem, 1.5vw + 0.75rem, 1.625rem);
+  --app-heading-h3: 1.375rem;
+  --app-heading-h4: 1.125rem;
+  --app-heading-h5: 1rem;
+  --app-heading-h6: 0.875rem;
+
+  /* Shell metrics other layers need to reason about: a sticky table header has
+     to start below the header, not behind it. */
+  --app-header-height: 60px;
+
+  /* Media height for catalog cards (Themes today). A token because the image
+     and the no-preview placeholder must stay the same height. */
+  --app-theme-card-media-height: 160px;
+
+  --app-surface-page: var(--mantine-color-gray-0);
+  --app-surface-raised: var(--mantine-color-white);
+  --app-surface-sunken: var(--mantine-color-gray-1);
+  --app-border-subtle: var(--mantine-color-gray-3);
+  --app-border-strong: var(--mantine-color-gray-4);
+  --app-row-hover: var(--mantine-color-gray-0);
+  --app-skeleton: var(--mantine-color-gray-2);
+  --app-focus-ring: var(--mantine-color-brand-6);
+  --app-accent-border: var(--mantine-color-brand-6);
+
+  /* Status iconography. Same steps the `light` status badge pairs with its
+     background, so an icon and its chip never disagree about severity. */
+  --app-icon-danger: var(--mantine-color-danger-6);
+  --app-icon-brand: var(--mantine-color-brand-5);
+  --app-icon-success: var(--mantine-color-success-6);
+  --app-icon-pending: var(--mantine-color-gray-5);
+
+  /* The failed-submit summary: danger-9 label on the danger-0 wash measures
+     10.43:1, the icon 4.44:1 as a non-text graphic (WCAG 1.4.11 needs 3:1). */
+  --app-surface-danger: var(--mantine-color-danger-light);
+  --app-border-danger: var(--mantine-color-danger-4);
+  --app-text-danger: var(--mantine-color-danger-9);
+
+  /* Sidebar active item: a solid brand tint, not a translucent one, so it reads
+     the same over any navbar surface. The label keeps Mantine's own active
+     colour (brand-9, 12.4:1 on this tint) — the previous brand-0 label on an 18%
+     brand-5 wash measured under 1.2:1 and was effectively invisible. */
+  --app-nav-active-bg: color-mix(
+    in srgb,
+    var(--mantine-color-brand-6) 10%,
+    var(--mantine-color-white)
+  );
+  --app-nav-active-hover: color-mix(
+    in srgb,
+    var(--mantine-color-brand-6) 18%,
+    var(--mantine-color-white)
+  );
+}

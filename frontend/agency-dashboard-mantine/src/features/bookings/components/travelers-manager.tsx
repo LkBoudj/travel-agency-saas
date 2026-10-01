@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, Group, Stack, Text, TextInput, Textarea, Badge } from '@mantine/core';
+import { Badge, Button, Card, Group, Stack, Text, Textarea, TextInput, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { ErrorState } from '../../../components/empty-state.tsx';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { useBookingMutations } from '../hooks/use-bookings.ts';
 import { useTravelerForm, travelerFormInitialValues } from '../hooks/use-traveler-form.ts';
 import { useTravelers } from '../hooks/use-travelers.ts';
@@ -48,7 +49,9 @@ export function TravelersManager({ booking, capabilities }: TravelersManagerProp
   return (
     <Stack gap="xs">
       <Group justify="space-between" align="baseline">
-        <Text fw={600}>{t('travelers.title')}</Text>
+        <Title order={2} fz="md">
+          {t('travelers.title')}
+        </Title>
         <Group gap="xs">
           <Badge variant="light" color="gray">
             {t('travelers.manifest', { count: travelers.length, seats: booking.reservedSeats })}
@@ -107,7 +110,7 @@ export function TravelersManager({ booking, capabilities }: TravelersManagerProp
             size="xs"
             variant="light"
             mt="sm"
-            ml="xs"
+            ms="xs"
             leftSection={<IconPlus size={14} />}
             onClick={() => setAdding(true)}
           >
@@ -226,7 +229,8 @@ function TravelerForm({
 
   return (
     <form onSubmit={onSubmit} noValidate>
-      <Card withBorder radius="md" bg="var(--mantine-color-gray-0)" p="sm">
+      <FormErrorSummary errors={form.errors} />
+      <Card withBorder radius="md" bg="var(--app-surface-page)" p="sm">
         <Stack gap="sm">
           <Group gap="sm" grow>
             <TextInput

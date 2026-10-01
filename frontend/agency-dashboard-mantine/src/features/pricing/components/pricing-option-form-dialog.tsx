@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Grid, Select, Stack, Text, TextInput, Textarea } from '@mantine/core';
 import { FormActions } from '../../../components/form/form-actions.tsx';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { ModalFormShell } from '../../../components/form/modal-form-shell.tsx';
 import {
   pricingOptionFormInitialValues,
@@ -43,6 +44,7 @@ export function PricingOptionFormDialog({
     >
       <form onSubmit={handleSubmit}>
         <Stack gap="lg">
+          <FormErrorSummary errors={form.errors} />
           <Text size="sm" c="dimmed">
             {t(isEditing ? 'editDialog.description' : 'createDialog.description')}
           </Text>

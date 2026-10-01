@@ -1,9 +1,10 @@
 import dayjs from 'dayjs';
-import { IconDots, IconTrash, IconUserCheck, IconUserOff, IconUsers } from '@tabler/icons-react';
+import { IconTrash, IconUserCheck, IconUserOff, IconUsers } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Avatar, Badge, Group, Menu, Stack, Text, Tooltip } from '@mantine/core';
+import { Avatar, Badge, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { DataTable, type DataTableColumn } from '../../../components/data-table.tsx';
 import { ErrorState } from '../../../components/empty-state.tsx';
+import { RowActionsMenu, type RowAction } from '../../../components/row-actions-menu.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import {
   canManageMemberRoles,
@@ -49,7 +50,7 @@ export function MembersTable({
       w: '40%',
       render: (member) => (
         <Group gap="sm" wrap="nowrap">
-          <Avatar color="blue" radius="xl" size="md">
+          <Avatar color="brand" radius="xl" size="md">
             {memberInitials(member)}
           </Avatar>
           <Stack gap={0} style={{ minWidth: 0 }}>
@@ -58,7 +59,7 @@ export function MembersTable({
                 {memberDisplayName(member)}
               </Text>
               {member.code === currentUserCode ? (
-                <Badge size="xs" variant="light" color="blue">
+                <Badge size="xs" variant="light" color="brand">
                   {t('you')}
                 </Badge>
               ) : null}
@@ -76,7 +77,7 @@ export function MembersTable({
       render: (member) => (
         <Group gap={4}>
           {member.membershipType === 'OWNER' ? (
-            <Badge color="blue" variant="light" size="sm">
+            <Badge color="brand" variant="light" size="sm">
               {t('owner')}
             </Badge>
           ) : null}
@@ -117,54 +118,45 @@ export function MembersTable({
         const showManageRoles = canRoleManage && canManageMemberRoles(member);
         const showToggleStatus = canUpdate && canToggleMemberStatus(member);
         const showRemove = canRemove && canRemoveMember(member);
+        const isActive = member.membershipStatus === 'ACTIVE';
 
-        if (!showManageRoles && !showToggleStatus && !showRemove) {
-          return null;
-        }
+        const actions: RowAction[] = [
+          ...(showManageRoles
+            ? [
+                {
+                  key: 'roles',
+                  label: t('manageRoles'),
+                  icon: <IconUsers size={16} />,
+                  onClick: () => onManageRoles(member),
+                },
+              ]
+            : []),
+          ...(showToggleStatus
+            ? [
+                {
+                  key: 'status',
+                  label: isActive ? t('suspend') : t('reactivate'),
+                  icon: isActive ? <IconUserOff size={16} /> : <IconUserCheck size={16} />,
+                  // Suspending is a caution; re-admitting is a recovery.
+                  color: isActive ? 'warning' : 'success',
+                  onClick: () => onToggleStatus(member),
+                },
+              ]
+            : []),
+          ...(showRemove
+            ? [
+                {
+                  key: 'remove',
+                  label: t('remove'),
+                  icon: <IconTrash size={16} />,
+                  color: 'danger',
+                  onClick: () => onRemove(member),
+                },
+              ]
+            : []),
+        ];
 
-        return (
-          <Menu withinPortal position="bottom-end" shadow="md" width={200}>
-            <Menu.Target>
-              <ActionIcon variant="subtle" color="gray" aria-label={t('menu')}>
-                <IconDots size={16} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              {showManageRoles ? (
-                <Menu.Item
-                  leftSection={<IconUsers size={16} />}
-                  onClick={() => onManageRoles(member)}
-                >
-                  {t('manageRoles')}
-                </Menu.Item>
-              ) : null}
-              {showToggleStatus ? (
-                <Menu.Item
-                  leftSection={
-                    member.membershipStatus === 'ACTIVE' ? (
-                      <IconUserOff size={16} />
-                    ) : (
-                      <IconUserCheck size={16} />
-                    )
-                  }
-                  color={member.membershipStatus === 'ACTIVE' ? 'orange' : 'teal'}
-                  onClick={() => onToggleStatus(member)}
-                >
-                  {member.membershipStatus === 'ACTIVE' ? t('suspend') : t('reactivate')}
-                </Menu.Item>
-              ) : null}
-              {showRemove ? (
-                <Menu.Item
-                  leftSection={<IconTrash size={16} />}
-                  color="red"
-                  onClick={() => onRemove(member)}
-                >
-                  {t('remove')}
-                </Menu.Item>
-              ) : null}
-            </Menu.Dropdown>
-          </Menu>
-        );
+        return <RowActionsMenu actions={actions} label={t('menu')} />;
       },
     },
   ];

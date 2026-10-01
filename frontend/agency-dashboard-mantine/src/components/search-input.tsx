@@ -7,10 +7,21 @@ export interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  /** Overrides the default "Search" name when a page wants a specific one. */
+  ariaLabel?: string;
   debounceMs?: number;
+  /** Lets a list toolbar size the field instead of taking the fixed default. */
+  w?: string | number | { base?: string | number; sm?: string | number };
 }
 
-export function SearchInput({ value, onChange, placeholder, debounceMs = 250 }: SearchInputProps) {
+export function SearchInput({
+  value,
+  onChange,
+  placeholder,
+  ariaLabel,
+  debounceMs = 250,
+  w = { base: '100%', sm: 280 },
+}: SearchInputProps) {
   const { t } = useTranslation('common');
   const [draft, setDraft] = useState(value);
 
@@ -28,6 +39,9 @@ export function SearchInput({ value, onChange, placeholder, debounceMs = 250 }: 
       value={draft}
       onChange={(event) => setDraft(event.currentTarget.value)}
       placeholder={placeholder}
+      // A placeholder disappears while typing and is not an accessible name;
+      // the field needs one in both locales or it is announced as "edit text".
+      aria-label={ariaLabel ?? t('actions.search')}
       leftSection={<IconSearch size={15} />}
       // Mantine's own clear button instead of a clickable icon: it is a real
       // button, so it is reachable by keyboard and exposes a name in both
@@ -41,7 +55,9 @@ export function SearchInput({ value, onChange, placeholder, debounceMs = 250 }: 
           />
         ) : null
       }
-      w={{ base: '100%', sm: 280 }}
+      // Full width below `sm` so it stacks with the filters, and a fixed field
+      // above it so it lines up with the table instead of stretching.
+      w={w}
     />
   );
 }

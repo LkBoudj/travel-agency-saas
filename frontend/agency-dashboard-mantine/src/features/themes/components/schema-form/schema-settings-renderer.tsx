@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { ColorInput, NumberInput, Select, Stack, Switch, Text, TextInput } from '@mantine/core';
 import { useQualifiedKey } from '../../../../i18n/hooks/use-qualified-key.ts';
 import { groupSettingsFields } from '../../lib/settings-map.ts';
@@ -25,13 +26,21 @@ export function SchemaSettingsRenderer({
   const setField = (key: string) => (next: SettingsMap[typeof key]) => {
     onChange({ ...value, [key]: next });
   };
+  // `settings` is requested here so the shared group labels are loaded before
+  // they are resolved — otherwise the resolver cannot ask for them and every
+  // heading would fall back to the raw key.
+  useTranslation(['themes', 'settings']);
+  const labelKey = useQualifiedKey();
 
   return (
     <Stack gap="lg">
       {groupSettingsFields(schema).map(({ group, fields }) => (
         <Stack key={group} gap="sm">
-          <Text fw={600} size="sm" tt="capitalize">
-            {group}
+          {/* `tt="capitalize"` uppercased a raw theme-supplied group id, which
+              is English-only and wrong for Arabic. Groups the catalog names get
+              a real label; one it does not still reads as words, not as a key. */}
+          <Text fw={600} size="sm" tt="none">
+            {groupHeading(group, labelKey)}
           </Text>
           {fields.map((field) => (
             <FieldInput
@@ -46,6 +55,16 @@ export function SchemaSettingsRenderer({
       ))}
     </Stack>
   );
+}
+
+/** `settings.group.<group>` when the catalog names it, otherwise humanized words. */
+function groupHeading(group: string, labelKey: (key: string) => string): string {
+  const key = `settings.group.${group}`;
+  const resolved = labelKey(key);
+  if (resolved !== key) {
+    return resolved;
+  }
+  return group.replace(/[-_]+/g, ' ').replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function FieldInput({

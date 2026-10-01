@@ -1,8 +1,9 @@
 import dayjs from 'dayjs';
 import { IconSend2, IconX } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Badge, Group, Text, Tooltip } from '@mantine/core';
+import { Badge, Group, Text, Tooltip } from '@mantine/core';
 import { DataTable, type DataTableColumn } from '../../../components/data-table.tsx';
+import { RowActionsMenu } from '../../../components/row-actions-menu.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import type { MemberInvitation } from '../types.ts';
 
@@ -76,16 +77,18 @@ export function InvitationsTable({
       w: 48,
       render: (invitation) =>
         canRevoke && invitation.status === 'PENDING' ? (
-          <Tooltip label={t('revoke')}>
-            <ActionIcon
-              variant="subtle"
-              color="red"
-              aria-label={t('revoke')}
-              onClick={() => onRevoke(invitation)}
-            >
-              <IconX size={16} />
-            </ActionIcon>
-          </Tooltip>
+          <RowActionsMenu
+            label={t('revoke')}
+            actions={[
+              {
+                key: 'revoke',
+                label: t('revoke'),
+                icon: <IconX size={16} />,
+                color: 'danger',
+                onClick: () => onRevoke(invitation),
+              },
+            ]}
+          />
         ) : null,
     },
   ];

@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
-import { Badge, Button, Card, Group, Image, Stack, Text } from '@mantine/core';
+import { Button, Card, Group, Image, Stack, Text, Title } from '@mantine/core';
 import type { ThemeCardState } from '../lib/theme-card-state.ts';
+import { ThemeStateBadge } from './theme-state-badge.tsx';
 
 export interface ThemeCardProps {
   themeId: string;
@@ -22,10 +23,14 @@ export interface ThemeCardProps {
  * One theme in the catalog. Presentational only: the page owns the data, the
  * draft/live state and the mutations; this card renders them.
  *
- * The current theme is marked by a heavier border *and* a badge, so the
- * selection never depends on colour alone, and the live theme keeps its own
- * badge while a different theme is staged — that gap is exactly what the
- * page-level publish notice explains.
+ * The selection is never carried by colour alone: the current theme gets a
+ * heavier border, a `data-current` hook and the Current badge from
+ * `ThemeStateBadge`, while the live theme keeps its own badge — the gap between
+ * the two is exactly what the page-level publish notice explains.
+ *
+ * Actions follow one hierarchy on every card: **Activate** is the filled primary
+ * (only when the theme is not selected), **Customize** is the light secondary
+ * (only when it is), and **Preview** is the subtle tertiary, always available.
  */
 export function ThemeCard({
   name,
@@ -40,21 +45,32 @@ export function ThemeCard({
   onActivate,
 }: ThemeCardProps) {
   const { t } = useTranslation('themes');
-  const { isCurrent, isLive, isPendingPublish } = state;
+  const { isCurrent } = state;
 
   return (
     <Card
       withBorder
       radius="md"
       p="lg"
-      style={isCurrent ? { borderColor: 'var(--mantine-color-teal-6)', borderWidth: 2 } : undefined}
+      data-current={isCurrent}
+      style={isCurrent ? { borderColor: 'var(--app-accent-border)', borderWidth: 2 } : undefined}
     >
       <Stack gap="sm">
         <Card.Section>
           {previewUrl ? (
-            <Image src={previewUrl} alt={name} height={160} fit="cover" />
+            <Image
+              src={previewUrl}
+              alt={name}
+              height="var(--app-theme-card-media-height)"
+              fit="cover"
+            />
           ) : (
-            <Stack align="center" justify="center" h={160} bg="var(--mantine-color-default-hover)">
+            <Stack
+              align="center"
+              justify="center"
+              h="var(--app-theme-card-media-height)"
+              bg="var(--app-surface-sunken)"
+            >
               <Text size="xs" c="dimmed">
                 {t('noPreview')}
               </Text>
@@ -62,36 +78,24 @@ export function ThemeCard({
           )}
         </Card.Section>
 
-        <Group justify="space-between" wrap="nowrap" gap="xs">
-          <Text fw={600} size="md">
-            {name}
+        {/* The card is a destination a user scans for, so its name is the h2
+            below the page title rather than plain bold text. */}
+        <Title order={2} fz="md" fw={600} lineClamp={2}>
+          {name}
+        </Title>
+        <Text size="sm">{description}</Text>
+
+        {/* One footer row per card, so version and state sit on the same
+            baseline across the grid no matter how long a name or description is. */}
+        <Group justify="space-between" align="center" gap="xs" wrap="nowrap">
+          <Text size="xs" c="dimmed" tt="uppercase">
+            v{version}
           </Text>
-          <Group gap={6} wrap="nowrap">
-            {isCurrent ? (
-              <Badge variant="filled" color="teal" size="sm">
-                {t('badgeCurrent')}
-              </Badge>
-            ) : null}
-            {isLive ? (
-              <Badge variant="outline" color="teal" size="sm">
-                {t('badgeLive')}
-              </Badge>
-            ) : null}
-            {isPendingPublish ? (
-              <Badge variant="light" color="yellow" size="sm">
-                {t('badgePending')}
-              </Badge>
-            ) : null}
-          </Group>
+          <ThemeStateBadge state={state} />
         </Group>
 
-        <Text size="sm">{description}</Text>
-        <Text size="xs" c="dimmed" tt="uppercase">
-          v{version}
-        </Text>
-
         {canEdit ? (
-          <Group gap="xs" wrap="nowrap">
+          <Group gap="xs">
             <Button variant="subtle" size="sm" loading={busy} onClick={onPreview}>
               {t('preview')}
             </Button>
@@ -100,7 +104,7 @@ export function ThemeCard({
                 {t('customize')}
               </Button>
             ) : (
-              <Button variant="default" size="sm" loading={busy} onClick={onActivate}>
+              <Button variant="filled" size="sm" loading={busy} onClick={onActivate}>
                 {t('activate')}
               </Button>
             )}

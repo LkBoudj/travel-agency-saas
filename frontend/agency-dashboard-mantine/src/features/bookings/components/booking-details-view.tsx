@@ -1,12 +1,13 @@
-import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Badge, Button, Card, Divider, Group, Stack, Table, Text } from '@mantine/core';
+import { Badge, Button, Card, Divider, Group, Stack, Table, Text, Title } from '@mantine/core';
 import { dashboardPaths } from '../../../app/router/route-paths.ts';
 import { ErrorState } from '../../../components/empty-state.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import { useAppLocale } from '../../../i18n/hooks/use-app-locale.ts';
+import { useIsRtl } from '../../../i18n/hooks/use-is-rtl.ts';
 import { getIntlLocale } from '../../../i18n/locales.ts';
 import type { BookingDetailsPageController } from '../hooks/use-booking-details-page.ts';
 import { bookingRowActions } from '../lib/booking-actions.ts';
@@ -31,6 +32,8 @@ export function BookingDetailsView({
   controller: BookingDetailsPageController;
 }) {
   const { t } = useTranslation('bookings');
+  // The back arrow is directional: it turns with the reading direction.
+  const isRtl = useIsRtl();
   const bookingQuery = controller.booking;
   const booking = bookingQuery.data ?? null;
   const capabilities = controller.capabilities;
@@ -48,7 +51,7 @@ export function BookingDetailsView({
           component="span"
           style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
         >
-          <IconArrowLeft size={14} />
+          {isRtl ? <IconArrowRight size={14} /> : <IconArrowLeft size={14} />}
           {t('details.backToList')}
         </Text>
       </Link>
@@ -100,9 +103,9 @@ function SummaryCard({ booking }: { booking: BookingDetail }) {
     <Card withBorder radius="md" p="md">
       <Group justify="space-between" align="center" wrap="nowrap">
         <Stack gap={2}>
-          <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+          <Title order={2} fz="xs" c="dimmed" tt="uppercase" fw={600}>
             {t('details.sectionSummary')}
-          </Text>
+          </Title>
           <Text size="sm" c="dimmed">
             {t('details.seatCount', { count: booking.reservedSeats })}
           </Text>
@@ -157,9 +160,9 @@ function PriceLinesCard({ booking }: { booking: BookingDetail }) {
 
   return (
     <Card withBorder radius="md" p="md">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="sm">
+      <Title order={2} fz="xs" c="dimmed" tt="uppercase" fw={600} mb="sm">
         {t('details.sectionPricing')}
-      </Text>
+      </Title>
       {booking.priceLines.length === 0 ? (
         <Text size="sm" c="dimmed">
           {t('details.pricingEmpty')}
@@ -221,9 +224,9 @@ function StatusHistoryCard({ booking }: { booking: BookingDetail }) {
 
   return (
     <Card withBorder radius="md" p="md">
-      <Text size="xs" c="dimmed" tt="uppercase" fw={600} mb="sm">
+      <Title order={2} fz="xs" c="dimmed" tt="uppercase" fw={600} mb="sm">
         {t('details.sectionHistory')}
-      </Text>
+      </Title>
       {booking.statusHistory.length === 0 ? (
         <Text size="sm" c="dimmed">
           {t('details.historyEmpty')}
@@ -283,7 +286,7 @@ function Row({ label, value }: { label: string; value: string }) {
       <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
         {label}
       </Text>
-      <Text size="sm" ta="right" style={{ minWidth: 0 }}>
+      <Text size="sm" ta="end" style={{ minWidth: 0 }}>
         {value}
       </Text>
     </Group>

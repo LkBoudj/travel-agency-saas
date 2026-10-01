@@ -15,7 +15,8 @@ import type { AppLocale } from '../i18n';
 import { useAppLocale } from '../i18n/hooks/use-app-locale';
 import { useIsRtl } from '../i18n/hooks/use-is-rtl';
 import { ApiError } from '../services/api';
-import { theme } from './theme';
+import { cssVariablesResolver, theme } from './theme';
+import './tokens.css';
 
 const DATE_SETTINGS: Record<AppLocale, DatesProviderSettings> = {
   en: { locale: 'en', firstDayOfWeek: 0, weekendDays: [0, 6] },
@@ -46,7 +47,11 @@ export function AppProviders({ children }: { children: ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <MantineProvider theme={theme} forceColorScheme="dark">
+      <MantineProvider
+        theme={theme}
+        defaultColorScheme="light"
+        cssVariablesResolver={cssVariablesResolver}
+      >
         <DatesProvider settings={DATE_SETTINGS[locale]}>
           <ModalsProvider
             labels={{ confirm: t('actions.confirm'), cancel: t('actions.cancel') }}

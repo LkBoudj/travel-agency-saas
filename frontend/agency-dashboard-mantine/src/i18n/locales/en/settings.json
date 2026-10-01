@@ -1,6 +1,8 @@
 {
   "group": {
-    "homepage": "Home page sections"
+    "homepage": "Homepage",
+    "layout": "Layout",
+    "brand": "Brand"
   },
   "starter": {
     "homepage": {

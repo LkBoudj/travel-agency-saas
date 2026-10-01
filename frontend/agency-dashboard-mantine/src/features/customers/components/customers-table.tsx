@@ -1,10 +1,15 @@
-import dayjs from 'dayjs';
-import { IconArchive, IconDots, IconPencil } from '@tabler/icons-react';
+import type { ReactNode } from 'react';
+import { IconArchive, IconPencil } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Avatar, Group, Menu, Stack, Text } from '@mantine/core';
+import { Avatar, Group, Text } from '@mantine/core';
+import { CellStack } from '../../../components/cell-stack.tsx';
 import { DataTable, type DataTableColumn } from '../../../components/data-table.tsx';
-import { ErrorState } from '../../../components/empty-state.tsx';
+import { EmptyState, ErrorState } from '../../../components/empty-state.tsx';
+import { RowActionsMenu } from '../../../components/row-actions-menu.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
+import { useAppLocale } from '../../../i18n/hooks/use-app-locale.ts';
+import { getIntlLocale } from '../../../i18n/locales.ts';
+import { formatShortDate } from '../../../lib/format-date.ts';
 import { customerDisplayName, customerInitials } from '../lib/customer-display.ts';
 import type { Customer } from '../types.ts';
 
@@ -17,6 +22,8 @@ export interface CustomersTableProps {
   onRetry?: () => void;
   onEdit: (customer: Customer) => void;
   onArchive: (customer: Customer) => void;
+  /** The next action for the empty listing; the page owns the handler. */
+  emptyAction?: ReactNode;
 }
 
 export function CustomersTable({
@@ -28,8 +35,10 @@ export function CustomersTable({
   onRetry,
   onEdit,
   onArchive,
+  emptyAction,
 }: CustomersTableProps) {
   const { t } = useTranslation('customers');
+  const intlLocale = getIntlLocale(useAppLocale());
 
   const columns: DataTableColumn<Customer>[] = [
     {
@@ -41,14 +50,10 @@ export function CustomersTable({
           <Avatar color="violet" radius="xl" size="md">
             {customerInitials(customer)}
           </Avatar>
-          <Stack gap={0} style={{ minWidth: 0 }}>
-            <Text fw={500} truncate>
-              {customerDisplayName(customer)}
-            </Text>
-            <Text size="xs" c="dimmed" truncate>
-              {customer.email ?? customer.code}
-            </Text>
-          </Stack>
+          <CellStack
+            primary={customerDisplayName(customer)}
+            secondary={customer.email ?? customer.code}
+          />
         </Group>
       ),
     },
@@ -71,7 +76,7 @@ export function CustomersTable({
       header: t('columns.created'),
       render: (customer) => (
         <Text size="sm" c="dimmed">
-          {dayjs(customer.createdAt).format('ll')}
+          {formatShortDate(customer.createdAt, intlLocale)}
         </Text>
       ),
     },
@@ -85,29 +90,31 @@ export function CustomersTable({
         }
 
         return (
-          <Menu withinPortal position="bottom-end" shadow="md" width={200}>
-            <Menu.Target>
-              <ActionIcon variant="subtle" color="gray" aria-label={t('menu')}>
-                <IconDots size={16} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              {canUpdate ? (
-                <Menu.Item leftSection={<IconPencil size={16} />} onClick={() => onEdit(customer)}>
-                  {t('edit')}
-                </Menu.Item>
-              ) : null}
-              {canArchive ? (
-                <Menu.Item
-                  leftSection={<IconArchive size={16} />}
-                  color="red"
-                  onClick={() => onArchive(customer)}
-                >
-                  {t('archive')}
-                </Menu.Item>
-              ) : null}
-            </Menu.Dropdown>
-          </Menu>
+          <RowActionsMenu
+            actions={[
+              ...(canUpdate
+                ? [
+                    {
+                      key: 'edit',
+                      label: t('edit'),
+                      icon: <IconPencil size={16} />,
+                      onClick: () => onEdit(customer),
+                    },
+                  ]
+                : []),
+              ...(canArchive
+                ? [
+                    {
+                      key: 'archive',
+                      label: t('archive'),
+                      icon: <IconArchive size={16} />,
+                      color: 'red',
+                      onClick: () => onArchive(customer),
+                    },
+                  ]
+                : []),
+            ]}
+          />
         );
       },
     },
@@ -122,8 +129,20 @@ export function CustomersTable({
       rows={customers}
       columns={columns}
       keyOf={(customer) => customer.code}
+      caption={t('columns.tableCaption')}
+      minWidth={820}
+      stickyHeader
       loading={loading}
-      emptyState={t('customersEmpty')}
+      skeletonRows={5}
+      rowLabel={(customer) => t('openRow', { name: customerDisplayName(customer) })}
+      emptyState={
+        // An empty listing states what to do next, not just that it is empty.
+        <EmptyState
+          title={t('customersEmpty')}
+          description={t('customersEmptyBody')}
+          action={emptyAction}
+        />
+      }
     />
   );
 }

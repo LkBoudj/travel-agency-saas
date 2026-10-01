@@ -8,7 +8,9 @@
     "emptyBody": "Bookings appear here once customers reserve seats on a departure.",
     "noMatches": "No matches.",
     "loadError": "Could not load bookings.",
-    "loading": "Loading…"
+    "loading": "Loading…",
+    "statusFilterLabel": "Filter by status",
+    "openRow": "Open booking {{code}}"
   },
   "columns": {
     "code": "Booking",
@@ -18,7 +20,8 @@
     "seats": "Seats",
     "total": "Total",
     "status": "Status",
-    "created": "Created"
+    "created": "Created",
+    "tableCaption": "Bookings"
   },
   "statusFilter": {
     "all": "All statuses",
@@ -48,8 +51,6 @@
     "cancelled": "Cancelled",
     "cancellationReason": "Cancellation reason",
     "cancellationReasonEmpty": "No reason given.",
-    "seatCount": "{{count}} seat",
-    "seatCount_plural": "{{count}} seats",
     "actions": "Actions",
     "cancel": "Cancel booking",
     "confirm": "Confirm booking",
@@ -57,7 +58,9 @@
     "historyEmpty": "No status changes recorded (the booking was created in its current state).",
     "historyFrom": "from {{status}}",
     "basisPerson": "Per person",
-    "basisBooking": "Per booking"
+    "basisBooking": "Per booking",
+    "seatCount_one": "{{count}} seat",
+    "seatCount_other": "{{count}} seats"
   },
   "createDialog": {
     "title": "New booking",

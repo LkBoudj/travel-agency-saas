@@ -71,9 +71,9 @@ export function TripReadinessPanel({
         {readiness.items.map((item) => (
           <Group key={item.key} gap="xs" wrap="nowrap" align="flex-start">
             {item.complete ? (
-              <IconCircleCheck size={18} color="var(--mantine-color-teal-6)" aria-hidden />
+              <IconCircleCheck size={18} color="var(--app-icon-success)" aria-hidden />
             ) : (
-              <IconCircleDashed size={18} color="var(--mantine-color-gray-5)" aria-hidden />
+              <IconCircleDashed size={18} color="var(--app-icon-pending)" aria-hidden />
             )}
             <Text size="sm" c={item.complete ? undefined : 'dimmed'}>
               {t(readinessItemLabelKey(item.key))}

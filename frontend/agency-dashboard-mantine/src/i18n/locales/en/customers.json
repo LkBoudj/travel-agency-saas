@@ -4,12 +4,14 @@
   "searchPlaceholder": "Search customers…",
   "create": "Add customer",
   "customersEmpty": "No customers found.",
+  "customersEmptyBody": "Add the people you quote and book trips for.",
   "loadError": "Could not load customers.",
   "columns": {
     "customer": "Customer",
     "status": "Status",
     "contact": "Contact",
-    "created": "Created"
+    "created": "Created",
+    "tableCaption": "Customers"
   },
   "menu": "Customer actions",
   "edit": "Edit",
@@ -47,5 +49,12 @@
     "emailInvalid": "Enter a valid email address.",
     "network": "Could not reach the server. Check your connection and try again.",
     "generic": "Something went wrong. Try again."
-  }
+  },
+  "statusFilter": {
+    "label": "Status filter",
+    "all": "All statuses",
+    "active": "Active",
+    "archived": "Archived"
+  },
+  "openRow": "Open customer {{name}}"
 }

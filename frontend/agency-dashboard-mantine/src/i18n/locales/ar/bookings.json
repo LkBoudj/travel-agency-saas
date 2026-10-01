@@ -8,7 +8,9 @@
     "emptyBody": "تظهر الحجوزات هنا بمجرد حجز العملاء مقاعد على مغادرة.",
     "noMatches": "لا توجد نتائج.",
     "loadError": "تعذر تحميل الحجوزات.",
-    "loading": "جارٍ التحميل…"
+    "loading": "جارٍ التحميل…",
+    "statusFilterLabel": "تصفية حسب الحالة",
+    "openRow": "فتح حجز {{code}}"
   },
   "columns": {
     "code": "الحجز",
@@ -18,7 +20,8 @@
     "seats": "المقاعد",
     "total": "الإجمالي",
     "status": "الحالة",
-    "created": "تاريخ الإنشاء"
+    "created": "تاريخ الإنشاء",
+    "tableCaption": "الحجوزات"
   },
   "statusFilter": {
     "all": "كل الحالات",
@@ -48,8 +51,6 @@
     "cancelled": "تاريخ الإلغاء",
     "cancellationReason": "سبب الإلغاء",
     "cancellationReasonEmpty": "لم يُذكر سبب.",
-    "seatCount": "{{count}} مقعد",
-    "seatCount_plural": "{{count}} مقاعد",
     "actions": "إجراءات",
     "cancel": "إلغاء الحجز",
     "confirm": "تأكيد الحجز",
@@ -57,7 +58,13 @@
     "historyEmpty": "لا تغييرات مسجلة على الحالة (أُنشئ الحجز في حالته الحالية).",
     "historyFrom": "من {{status}}",
     "basisPerson": "للشخص الواحد",
-    "basisBooking": "لكل حجز"
+    "basisBooking": "لكل حجز",
+    "seatCount_zero": "مقاعد",
+    "seatCount_one": "مقعد واحد",
+    "seatCount_two": "مقعدان",
+    "seatCount_few": "{{count}} مقاعد",
+    "seatCount_many": "{{count}} مقعدًا",
+    "seatCount_other": "{{count}} مقعد"
   },
   "createDialog": {
     "title": "حجز جديد",

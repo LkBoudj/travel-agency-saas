@@ -10,15 +10,17 @@
     "basis": "Basis",
     "currency": "Currency",
     "pricedDepartures": "Priced",
-    "status": "Status"
+    "status": "Status",
+    "tableCaption": "Pricing options"
   },
   "summary": {
-    "optionsCount": "{{count}} option",
-    "optionsCount_plural": "{{count}} options",
+    "optionsCount_one": "{{count}} option",
+    "optionsCount_other": "{{count}} options",
     "startingPrice": "Starting price",
     "noPrice": "No price yet",
-    "pricedDepartures": "{{count}} priced open departure",
-    "pricedDepartures_plural": "{{count}} priced open departures"
+    "pricedDepartures_one": "{{count}} priced open departure",
+    "pricedDepartures_other": "{{count}} priced open departures",
+    "optionsLabel": "Options"
   },
   "create": "New option",
   "empty": "No pricing options yet. Add the first one to start pricing departures.",
@@ -89,5 +91,6 @@
     "departureCancelled": "Cancelled departures can't be priced.",
     "network": "Could not reach the server. Check your connection and try again.",
     "generic": "Something went wrong. Try again."
-  }
+  },
+  "openRow": "Open pricing option {{name}}"
 }

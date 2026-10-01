@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { dashboardPaths } from '../../../app/router/route-paths.ts';
 import { useAgencyContext } from '../../agency-context/provider/agency-provider.tsx';
@@ -15,6 +16,7 @@ import {
   type ViewWebsiteController,
 } from '../../website/hooks/use-view-website.ts';
 import { useWebsiteCapabilities } from '../../website/hooks/use-website-capabilities.ts';
+import { usePublishedWebsite, useWebsiteDraft } from '../../website/hooks/use-website.ts';
 import {
   countActiveCustomers,
   countActiveMembers,
@@ -22,6 +24,9 @@ import {
   recentBookings,
   tallyBookings,
 } from '../lib/overview-stats.ts';
+
+/** How many bookings the overview lists before deferring to the list page. */
+const RECENT_BOOKINGS = 8;
 
 export interface OverviewKpis {
   customers: number;
@@ -31,6 +36,21 @@ export interface OverviewKpis {
   pendingBookings: number;
   confirmedBookings: number;
   members: number;
+}
+
+/** A permission-gated, navigation-only shortcut for the page header. */
+export interface OverviewQuickAction {
+  key: string;
+  label: string;
+  run: () => void;
+}
+
+/** The public-site state the overview reports. Read-only; nothing mutates here. */
+export interface OverviewSiteStatus {
+  isLoading: boolean;
+  isPublished: boolean;
+  slug: string | null;
+  themeId: string | null;
 }
 
 export interface OverviewPageController {
@@ -48,6 +68,10 @@ export interface OverviewPageController {
   refetchVisible: () => void;
   kpis: OverviewKpis;
   bookings: AgencyBooking[];
+  /** Header shortcuts to the sections the member can open. Navigation only. */
+  quickActions: OverviewQuickAction[];
+  /** Public-site state for the status card. */
+  site: OverviewSiteStatus;
   goToCustomers: () => void;
   goToTours: () => void;
   goToBookings: () => void;
@@ -64,8 +88,12 @@ export interface OverviewPageController {
  * call. Each query is gated by that feature's view permission, so a member
  * who cannot see customers never fires (or renders) that section. The recent
  * bookings slice is the newest-first list bounded client-side.
+ *
+ * The hook composes; it renders nothing. Which shortcuts appear, which sections
+ * exist and what they say are decided here so the page stays a layout.
  */
 export function useOverviewPage(): OverviewPageController {
+  const { t } = useTranslation('dashboard');
   const navigate = useNavigate();
   const { code: agencyCode } = useAgencyContext();
   const customerCapabilities = useCustomerCapabilities();
@@ -85,12 +113,33 @@ export function useOverviewPage(): OverviewPageController {
   const bookingsQuery = useBookings('', undefined, canViewBookings);
   const membersQuery = useAgencyMembers('', canViewMembers);
 
+  // Same query keys as `useViewWebsite`, so this adds no request of its own.
+  const siteDraftQuery = useWebsiteDraft(canViewWebsite);
+  const sitePublishedQuery = usePublishedWebsite(canViewWebsite);
+
   const customers = customersQuery.data ?? [];
   const tours = toursQuery.data ?? [];
   const bookings = bookingsQuery.data ?? [];
   const members = membersQuery.data ?? [];
 
   const tally = tallyBookings(bookings);
+
+  const goToCustomers = () => navigate(dashboardPaths.customers(agencyCode));
+  const goToTours = () => navigate(dashboardPaths.trips(agencyCode));
+  const goToBookings = () => navigate(dashboardPaths.bookings(agencyCode));
+  const goToMembers = () => navigate(dashboardPaths.members(agencyCode));
+
+  // Navigation only: an overview shortcut takes the member to the list where the
+  // real work happens. It never opens a create dialog on a page that has no
+  // form to submit.
+  const quickActions: OverviewQuickAction[] = [
+    canViewBookings ? { key: 'bookings', label: t('actions.newBooking'), run: goToBookings } : null,
+    canViewCustomers
+      ? { key: 'customers', label: t('actions.addCustomer'), run: goToCustomers }
+      : null,
+    canViewTours ? { key: 'tours', label: t('actions.newTrip'), run: goToTours } : null,
+    canViewMembers ? { key: 'members', label: t('actions.inviteMember'), run: goToMembers } : null,
+  ].filter((action): action is OverviewQuickAction => action !== null);
 
   return {
     canView: {
@@ -125,11 +174,18 @@ export function useOverviewPage(): OverviewPageController {
       confirmedBookings: tally.CONFIRMED,
       members: countActiveMembers(members),
     },
-    bookings: recentBookings(bookings, 5),
-    goToCustomers: () => navigate(dashboardPaths.customers(agencyCode)),
-    goToTours: () => navigate(dashboardPaths.trips(agencyCode)),
-    goToBookings: () => navigate(dashboardPaths.bookings(agencyCode)),
-    goToMembers: () => navigate(dashboardPaths.members(agencyCode)),
+    bookings: recentBookings(bookings, RECENT_BOOKINGS),
+    quickActions,
+    site: {
+      isLoading: siteDraftQuery.isPending || sitePublishedQuery.isPending,
+      isPublished: sitePublishedQuery.isSuccess,
+      slug: siteDraftQuery.data?.slug ?? null,
+      themeId: sitePublishedQuery.data?.themeId ?? siteDraftQuery.data?.themeId ?? null,
+    },
+    goToCustomers,
+    goToTours,
+    goToBookings,
+    goToMembers,
     openBooking: (booking: AgencyBooking) =>
       navigate(dashboardPaths.bookingsDetail(agencyCode, booking.code)),
     viewWebsite: useViewWebsite(canViewWebsite),

@@ -10,13 +10,25 @@
     "basis": "الأساس",
     "currency": "العملة",
     "pricedDepartures": "المسعّرة",
-    "status": "الحالة"
+    "status": "الحالة",
+    "tableCaption": "خيارات التسعير"
   },
   "summary": {
-    "optionsCount": "{{count}} خيار",
     "startingPrice": "سعر البداية",
     "noPrice": "لا يوجد سعر بعد",
-    "pricedDepartures": "{{count}} مغادرة مفتوحة مسعّرة"
+    "optionsCount_zero": "خيارات",
+    "optionsCount_one": "خيار واحد",
+    "optionsCount_two": "خياران",
+    "optionsCount_few": "{{count}} خيارات",
+    "optionsCount_many": "{{count}} خيارًا",
+    "optionsCount_other": "{{count}} خيار",
+    "pricedDepartures_zero": "مغادرات مفتوحة مسعّرة",
+    "pricedDepartures_one": "مغادرة مفتوحة مسعّرة واحدة",
+    "pricedDepartures_two": "مغادرتان مفتوحتان مسعّرتان",
+    "pricedDepartures_few": "{{count}} مغادرات مفتوحة مسعّرة",
+    "pricedDepartures_many": "{{count}} مغادرة مفتوحة مسعّرة",
+    "pricedDepartures_other": "{{count}} مغادرة مفتوحة مسعّرة",
+    "optionsLabel": "الخيارات"
   },
   "create": "إضافة خيار",
   "empty": "لا توجد خيارات تسعير بعد. أضف الأول لتبدأ تسعير المغادرات.",
@@ -87,5 +99,6 @@
     "departureCancelled": "لا يمكن تسعير المغادرات الملغاة.",
     "network": "تعذر الوصول إلى الخادم. تحقق من اتصالك وحاول مجددًا.",
     "generic": "حدث خطأ ما. حاول مجددًا."
-  }
+  },
+  "openRow": "فتح خيار تسعير {{name}}"
 }

@@ -10,6 +10,7 @@
   "discard": "Discard",
   "customizeDrawerTitle": "Theme settings",
   "emptyCatalog": "No themes could be loaded from the theme registry.",
+  "emptyCatalogTitle": "No themes available",
   "readOnlyHint": "You can view themes, but your permissions don't allow changing them.",
   "loadErrorTitle": "Could not load the theme catalog.",
   "loadErrorBody": "The theme registry is unreachable. Check the backend connection and try again.",

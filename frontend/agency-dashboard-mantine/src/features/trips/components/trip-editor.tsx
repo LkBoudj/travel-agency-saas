@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Badge, Box, Divider, Group, Stack, Text } from '@mantine/core';
 import { EntityCode } from '../../../components/entity-code.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import { tripToFormValues, useTripForm } from '../hooks/use-tour-form.ts';
 import type { TripFormValues } from '../schemas/tour.schema.ts';
@@ -83,6 +84,9 @@ export function TripEditor({
     <Box maw={1240} mx="auto">
       <form onSubmit={handleSubmit}>
         <Stack gap={0}>
+          <Box px="md" pt="md">
+            <FormErrorSummary errors={form.errors} />
+          </Box>
           <Group justify="space-between" py="md" wrap="nowrap">
             <Stack gap={2}>
               <Text fw={600} size="md" lineClamp={1}>
@@ -107,8 +111,12 @@ export function TripEditor({
 
           <Divider />
 
-          <Group align="flex-start" wrap="nowrap" gap="lg" py="md">
-            <Box w={190} style={{ position: 'sticky', top: 0 }}>
+          {/* The two side rails are fixed-width by design on a laptop, but
+              190 + 290 is wider than a 375px phone, so `.app-editor-columns`
+              wraps them below `md`. The rule lives in index.css because Mantine's
+              `wrap` prop takes no breakpoint value. */}
+          <Group className="app-editor-columns" align="flex-start" gap="lg" py="md">
+            <Box w={{ base: '100%', md: 190 }} style={{ position: 'sticky', top: 0 }}>
               <TripEditorNav active={section} onChange={setSection} />
             </Box>
 
@@ -129,7 +137,7 @@ export function TripEditor({
               )}
             </Stack>
 
-            <Box w={290} style={{ position: 'sticky', top: 0 }}>
+            <Box w={{ base: '100%', md: 290 }} style={{ position: 'sticky', top: 0 }}>
               <TripReadinessPanel
                 tour={tour}
                 values={form.values}

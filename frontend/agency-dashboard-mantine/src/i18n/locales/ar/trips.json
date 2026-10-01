@@ -4,6 +4,21 @@
   "searchPlaceholder": "ابحث عن رحلات…",
   "create": "رحلة جديدة",
   "tripsEmpty": "لا توجد رحلات.",
+  "tripsEmptyBody": "أنشئ أول رحلة لتبدأ بتسعير المغادرات.",
+  "duration": {
+    "days_zero": "أيام",
+    "days_one": "يوم واحد",
+    "days_two": "يومان",
+    "days_few": "{{count}} أيام",
+    "days_many": "{{count}} يومًا",
+    "days_other": "{{count}} يوم",
+    "hours_zero": "ساعات",
+    "hours_one": "ساعة واحدة",
+    "hours_two": "ساعتان",
+    "hours_few": "{{count}} ساعات",
+    "hours_many": "{{count}} ساعة",
+    "hours_other": "{{count}} ساعة"
+  },
   "loadError": "تعذّر تحميل الرحلات.",
   "menu": "إجراءات الرحلة",
   "edit": "تعديل",
@@ -23,7 +38,8 @@
     "schedule": "الجدول",
     "status": "الحالة",
     "price": "سعر البداية",
-    "created": "أُنشئت"
+    "created": "أُنشئت",
+    "tableCaption": "الرحلات"
   },
   "confirm": {
     "publishTitle": "نشر «{{name}}»؟",
@@ -279,5 +295,6 @@
       "camp": "مخيم",
       "mixed": "مختلطة"
     }
-  }
+  },
+  "openTourRow": "فتح رحلة {{name}}"
 }

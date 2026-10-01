@@ -15,7 +15,7 @@ export function TripsEditorPage() {
   if (controller.isError || controller.tour === null) {
     return (
       <Stack gap="lg" align="flex-start" py="lg">
-        <Button variant="subtle" pl={0} onClick={controller.onBack}>
+        <Button variant="subtle" ps={0} onClick={controller.onBack}>
           {t('editor.backLabel')}
         </Button>
         <ErrorState

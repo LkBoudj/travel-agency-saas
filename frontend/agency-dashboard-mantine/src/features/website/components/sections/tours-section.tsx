@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { Loader, MultiSelect, Stack, Text } from '@mantine/core';
+import { Loader, MultiSelect, Stack } from '@mantine/core';
+import { EmptyState } from '../../../../components/empty-state.tsx';
 import type { WebsiteForm } from '../../hooks/use-website-form.ts';
 import type { TourCatalogItem } from '../../types.ts';
 
@@ -17,9 +18,11 @@ export function ToursSection({ form, catalog, catalogPending }: ToursSectionProp
       {catalogPending ? (
         <Loader size="sm" />
       ) : catalog.length === 0 ? (
-        <Text size="sm" c="dimmed">
-          {t('empty.tourCatalog')}
-        </Text>
+        <EmptyState
+          compact
+          title={t('empty.noFeaturedToursTitle')}
+          description={t('empty.tourCatalog')}
+        />
       ) : (
         <MultiSelect
           label={t('fields.featuredTours')}

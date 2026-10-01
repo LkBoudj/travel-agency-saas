@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Button, Group, Loader, SimpleGrid, Stack, Text } from '@mantine/core';
-import { ErrorState } from '../../../components/empty-state.tsx';
+import { Alert, Button, Card, Group, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
+import { EmptyState, ErrorState } from '../../../components/empty-state.tsx';
 import { DrawerFormShell } from '../../../components/form/drawer-form-shell.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
@@ -39,7 +39,22 @@ export function ThemesPage() {
   };
 
   if (controller.manifestPending || controller.draftPending) {
-    return <Loader size="sm" />;
+    // Skeleton cards, not a spinner: the page is about to show a grid of theme
+    // cards, and reserving their space keeps the page from jumping.
+    return (
+      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+        {Array.from({ length: 6 }, (_, index) => (
+          <Card key={index} withBorder radius="md" p="lg">
+            <Skeleton height="var(--app-theme-card-media-height)" radius="sm" />
+            <Stack gap="xs" mt="sm">
+              <Skeleton height="1rem" width="55%" />
+              <Skeleton height="0.75rem" />
+              <Skeleton height="0.75rem" width="80%" />
+            </Stack>
+          </Card>
+        ))}
+      </SimpleGrid>
+    );
   }
 
   if (controller.manifestError || controller.draft === null) {
@@ -81,11 +96,9 @@ export function ThemesPage() {
       ) : null}
 
       {controller.manifest.length === 0 ? (
-        <Text size="sm" c="dimmed">
-          {t('emptyCatalog')}
-        </Text>
+        <EmptyState title={t('emptyCatalogTitle')} description={t('emptyCatalog')} />
       ) : (
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="lg">
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
           {controller.manifest.map((theme) => (
             <ThemeCard
               key={theme.themeId}

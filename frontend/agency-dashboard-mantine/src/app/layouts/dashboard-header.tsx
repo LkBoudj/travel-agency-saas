@@ -25,11 +25,11 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
   } = useDashboardHeader();
 
   return (
-    <Group h="100%" px="md" justify="space-between" wrap="nowrap">
+    <Group h="100%" px={{ base: 'sm', sm: 'lg' }} justify="space-between" wrap="nowrap">
       <Group gap="sm" wrap="nowrap">
         <Burger onClick={onToggleNav} hiddenFrom="sm" size="sm" aria-label={t('shell.openNav')} />
         <Group gap={8} wrap="nowrap">
-          <IconBuildingSkyscraper size={20} color="var(--mantine-color-brand-5)" />
+          <IconBuildingSkyscraper size={20} color="var(--app-icon-brand)" />
           <Text fw={700} visibleFrom="xs">
             {agencyName}
           </Text>

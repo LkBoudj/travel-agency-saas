@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Checkbox, Group, Loader, Stack, Text } from '@mantine/core';
 import { FieldError } from '../../../components/form/field-error.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { FormSection } from '../../../components/form/form-section.tsx';
 import { ModalFormShell } from '../../../components/form/modal-form-shell.tsx';
 import { useManageRolesForm } from '../hooks/use-manage-roles-form.ts';
@@ -35,6 +36,7 @@ export function ManageRolesDialog({
   return (
     <ModalFormShell opened onClose={onClose} title={t('rolesDialog.title')} size="md">
       <form onSubmit={handleSubmit}>
+        <FormErrorSummary errors={form.errors} />
         <FormSection title={memberDisplayName(member)} description={t('rolesDialog.description')}>
           {rolesPending ? (
             <Group justify="center" py="md">

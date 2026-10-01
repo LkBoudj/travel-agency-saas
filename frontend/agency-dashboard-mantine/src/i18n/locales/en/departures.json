@@ -6,7 +6,7 @@
   "noTours": "No trips yet",
   "noToursBody": "Create a trip first — departures attach to a scheduled trip.",
   "goToTrips": "Go to trips",
-  "loading": "Loading trips…",
+  "loading": "Loading departures…",
   "availability": {
     "scheduled": "Scheduled",
     "on_request": "On request",
@@ -27,13 +27,11 @@
     "start": "Start",
     "end": "End",
     "capacity": "Capacity",
-    "deadline": "Booking deadline"
+    "deadline": "Booking deadline",
+    "tableCaption": "Departures"
   },
-  "departuresCount": "{{count}} departure",
-  "departuresCount_plural": "{{count}} departures",
   "create": "New departure",
   "empty": "No departures for this trip yet.",
-  "loading": "Loading departures…",
   "loadError": "Could not load departures.",
   "deadlineNone": "No deadline",
   "menu": "Departure actions",
@@ -94,5 +92,8 @@
     "hasActiveBookings": "This departure has bookings and can't be cancelled.",
     "network": "Could not reach the server. Check your connection and try again.",
     "generic": "Something went wrong. Try again."
-  }
+  },
+  "departuresCount_one": "{{count}} departure",
+  "departuresCount_other": "{{count}} departures",
+  "openRow": "Open departure {{code}}"
 }

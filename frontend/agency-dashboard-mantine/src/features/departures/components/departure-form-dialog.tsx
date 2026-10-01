@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Grid, NumberInput, Select, Stack, Text, Textarea } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 import { FormActions } from '../../../components/form/form-actions.tsx';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { ModalFormShell } from '../../../components/form/modal-form-shell.tsx';
 import { departureFormInitialValues, useDepartureForm } from '../hooks/use-departure-form.ts';
 import type { DepartureFormValues } from '../schemas/departure.schema.ts';
@@ -47,6 +48,7 @@ export function DepartureFormDialog({
     >
       <form onSubmit={handleSubmit}>
         <Stack gap="lg">
+          <FormErrorSummary errors={form.errors} />
           <Text size="sm" c="dimmed">
             {t(isEditing ? 'editDialog.description' : 'createDialog.description')}
           </Text>

@@ -1,18 +1,17 @@
-import dayjs from 'dayjs';
-import {
-  IconArchive,
-  IconDots,
-  IconPencil,
-  IconPlayerPause,
-  IconPlayerPlay,
-} from '@tabler/icons-react';
+import type { ReactNode } from 'react';
+import { IconArchive, IconPencil, IconPlayerPause, IconPlayerPlay } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Avatar, Group, Menu, Stack, Text } from '@mantine/core';
+import { Avatar, Group, Text } from '@mantine/core';
+import { CellStack } from '../../../components/cell-stack.tsx';
 import { DataTable, type DataTableColumn } from '../../../components/data-table.tsx';
-import { ErrorState } from '../../../components/empty-state.tsx';
+import { EmptyState, ErrorState } from '../../../components/empty-state.tsx';
 import { MoneyText } from '../../../components/money-text.tsx';
+import { RowActionsMenu } from '../../../components/row-actions-menu.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
-import { tourDestinationsSummary, tourLabel } from '../lib/tour-display.ts';
+import { useAppLocale } from '../../../i18n/hooks/use-app-locale.ts';
+import { getIntlLocale } from '../../../i18n/locales.ts';
+import { formatShortDate } from '../../../lib/format-date.ts';
+import { tourDestinationsSummary, tourDurationParts, tourLabel } from '../lib/tour-display.ts';
 import type { TourListRow } from '../types.ts';
 
 export interface ToursTableProps {
@@ -27,6 +26,8 @@ export interface ToursTableProps {
   onPublish: (tour: TourListRow) => void;
   onUnpublish: (tour: TourListRow) => void;
   onArchive: (tour: TourListRow) => void;
+  /** The next action for the empty listing; the page owns the handler. */
+  emptyAction?: ReactNode;
 }
 
 export function ToursTable({
@@ -41,13 +42,17 @@ export function ToursTable({
   onPublish,
   onUnpublish,
   onArchive,
+  emptyAction,
 }: ToursTableProps) {
   const { t } = useTranslation('trips');
+  const intlLocale = getIntlLocale(useAppLocale());
 
   const columns: DataTableColumn<TourListRow>[] = [
     {
       key: 'tour',
       header: t('columns.tour'),
+      // This table carries seven columns; below ~980px the cells start
+      // truncating content the member needs, so it scrolls instead.
       w: '34%',
       render: (tour) => (
         <Group gap="sm" wrap="nowrap">
@@ -60,14 +65,7 @@ export function ToursTable({
           >
             {tourLabel(tour).charAt(0).toUpperCase()}
           </Avatar>
-          <Stack gap={0} style={{ minWidth: 0 }}>
-            <Text fw={500} truncate>
-              {tourLabel(tour)}
-            </Text>
-            <Text size="xs" c="dimmed" truncate>
-              {tour.code}
-            </Text>
-          </Stack>
+          <CellStack primary={tourLabel(tour)} secondary={tour.code} />
         </Group>
       ),
     },
@@ -87,10 +85,17 @@ export function ToursTable({
       key: 'schedule',
       header: t('columns.schedule'),
       render: (tour) => {
-        const days = tour.days ?? tour.hours;
+        const { kind, value } = tourDurationParts(tour);
+        if (kind === 'none' || value == null) {
+          return (
+            <Text size="sm" c="dimmed">
+              —
+            </Text>
+          );
+        }
         return (
           <Text size="sm" c="dimmed">
-            {days == null ? '—' : `${days}d`}
+            {t(`duration.${kind}`, { count: value })}
           </Text>
         );
       },
@@ -98,7 +103,7 @@ export function ToursTable({
     {
       key: 'status',
       header: t('columns.status'),
-      render: (tour) => <StatusBadge status={tour.status} />,
+      render: (tour) => <StatusBadge status={tour.status} mode={tour.availabilityMode} />,
     },
     {
       key: 'price',
@@ -117,7 +122,7 @@ export function ToursTable({
       header: t('columns.created'),
       render: (tour) => (
         <Text size="sm" c="dimmed">
-          {dayjs(tour.createdAt).format('ll')}
+          {formatShortDate(tour.createdAt, intlLocale)}
         </Text>
       ),
     },
@@ -131,45 +136,51 @@ export function ToursTable({
         }
 
         return (
-          <Menu withinPortal position="bottom-end" shadow="md" width={200}>
-            <Menu.Target>
-              <ActionIcon variant="subtle" color="gray" aria-label={t('menu')}>
-                <IconDots size={16} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              {canUpdate ? (
-                <Menu.Item leftSection={<IconPencil size={16} />} onClick={() => onEdit(tour)}>
-                  {t('edit')}
-                </Menu.Item>
-              ) : null}
-              {canPublish && tour.status === 'DRAFT' ? (
-                <Menu.Item
-                  leftSection={<IconPlayerPlay size={16} />}
-                  onClick={() => onPublish(tour)}
-                >
-                  {t('publish')}
-                </Menu.Item>
-              ) : null}
-              {canPublish && tour.status === 'PUBLISHED' ? (
-                <Menu.Item
-                  leftSection={<IconPlayerPause size={16} />}
-                  onClick={() => onUnpublish(tour)}
-                >
-                  {t('unpublish')}
-                </Menu.Item>
-              ) : null}
-              {canArchive && tour.status !== 'ARCHIVED' ? (
-                <Menu.Item
-                  leftSection={<IconArchive size={16} />}
-                  color="red"
-                  onClick={() => onArchive(tour)}
-                >
-                  {t('archive')}
-                </Menu.Item>
-              ) : null}
-            </Menu.Dropdown>
-          </Menu>
+          <RowActionsMenu
+            actions={[
+              ...(canUpdate
+                ? [
+                    {
+                      key: 'edit',
+                      label: t('edit'),
+                      icon: <IconPencil size={16} />,
+                      onClick: () => onEdit(tour),
+                    },
+                  ]
+                : []),
+              ...(canPublish && tour.status === 'DRAFT'
+                ? [
+                    {
+                      key: 'publish',
+                      label: t('publish'),
+                      icon: <IconPlayerPlay size={16} />,
+                      onClick: () => onPublish(tour),
+                    },
+                  ]
+                : []),
+              ...(canPublish && tour.status === 'PUBLISHED'
+                ? [
+                    {
+                      key: 'unpublish',
+                      label: t('unpublish'),
+                      icon: <IconPlayerPause size={16} />,
+                      onClick: () => onUnpublish(tour),
+                    },
+                  ]
+                : []),
+              ...(canArchive && tour.status !== 'ARCHIVED'
+                ? [
+                    {
+                      key: 'archive',
+                      label: t('archive'),
+                      icon: <IconArchive size={16} />,
+                      color: 'red',
+                      onClick: () => onArchive(tour),
+                    },
+                  ]
+                : []),
+            ]}
+          />
         );
       },
     },
@@ -184,8 +195,20 @@ export function ToursTable({
       rows={tours}
       columns={columns}
       keyOf={(tour) => tour.code}
+      caption={t('tableCaption')}
+      minWidth={980}
+      stickyHeader
       loading={loading}
-      emptyState={t('tripsEmpty')}
+      skeletonRows={5}
+      rowLabel={(tour) => t('openTourRow', { name: tourLabel(tour) })}
+      emptyState={
+        // An empty listing states what to do next, not just that it is empty.
+        <EmptyState
+          title={t('tripsEmpty')}
+          description={t('tripsEmptyBody')}
+          action={emptyAction}
+        />
+      }
     />
   );
 }

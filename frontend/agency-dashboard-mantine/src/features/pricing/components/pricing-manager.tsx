@@ -1,12 +1,17 @@
-import { useState } from 'react';
-import { IconDots, IconPencil, IconPlus, IconPower } from '@tabler/icons-react';
+import { useState, type CSSProperties } from 'react';
+import { IconPencil, IconPlus, IconPower } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { ActionIcon, Badge, Button, Group, Menu, Stack, Text, Title } from '@mantine/core';
+import { Button, SimpleGrid, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { CellStack } from '../../../components/cell-stack.tsx';
 import { useConfirmDialog } from '../../../components/confirm-dialog.tsx';
 import { DataTable, type DataTableColumn } from '../../../components/data-table.tsx';
-import { ErrorState } from '../../../components/empty-state.tsx';
+import { EmptyState, ErrorState } from '../../../components/empty-state.tsx';
 import { MoneyText } from '../../../components/money-text.tsx';
+import { RowActionsMenu } from '../../../components/row-actions-menu.tsx';
+import { SectionHeader } from '../../../components/section-header.tsx';
+import { StatCard } from '../../../components/stat-card.tsx';
+import { StatusBadge } from '../../../components/status-badge.tsx';
 import { useQualifiedKey } from '../../../i18n/hooks/use-qualified-key.ts';
 import { usePricingOverview, usePricingMutations } from '../hooks/use-pricing.ts';
 import { pricingBasisLabelKey } from '../lib/pricing-display.ts';
@@ -14,6 +19,9 @@ import { getPricingErrorMessage } from '../lib/pricing-error-messages.ts';
 import type { PricingOptionFormValues } from '../schemas/pricing-option.schema.ts';
 import type { PricingOption } from '../types.ts';
 import { PricingOptionFormDialog } from './pricing-option-form-dialog.tsx';
+
+/** Figures that sit in a column must not shift width as they change. */
+const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
 
 interface PricingManagerProps {
   tourCode: string;
@@ -110,16 +118,11 @@ export function PricingManager({
       key: 'option',
       header: t('columns.option'),
       render: (option) => (
-        <Stack gap={2}>
-          <Text size="sm" fw={600}>
-            {option.name}
-          </Text>
-          {option.description ? (
-            <Text size="xs" c="dimmed" lineClamp={1}>
-              {option.description}
-            </Text>
-          ) : null}
-        </Stack>
+        <CellStack
+          primary={option.name}
+          secondary={option.description}
+          primaryProps={{ fw: 600 }}
+        />
       ),
     },
     {
@@ -127,30 +130,30 @@ export function PricingManager({
       header: t('columns.basis'),
       // `pricingBasisLabelKey` is fully qualified (`pricing.basis.per_person`),
       // so it must not be handed to this component's namespace-bound `t`.
-      render: (option) => <Text size="sm">{qualifiedKey(pricingBasisLabelKey(option.basis))}</Text>,
+      render: (option) => <CellStack primary={qualifiedKey(pricingBasisLabelKey(option.basis))} />,
     },
     {
       key: 'currency',
       header: t('columns.currency'),
-      render: (option) => <Text size="sm">{option.currency}</Text>,
+      render: (option) => <CellStack primary={option.currency} />,
     },
     {
       key: 'pricedDepartures',
       header: t('columns.pricedDepartures'),
       render: (option) => (
-        <Text size="sm" ta="right" tabular-nums>
-          {option.pricedDepartureCount}
-        </Text>
+        <CellStack
+          align="end"
+          primary={option.pricedDepartureCount}
+          primaryProps={{ ta: 'right', style: TABULAR }}
+        />
       ),
     },
     {
       key: 'status',
       header: t('columns.status'),
-      render: (option) => (
-        <Badge color={option.status === 'ACTIVE' ? 'green' : 'gray'} variant="light" tt="none">
-          {t(`statuses.${option.status.toLowerCase()}`, { ns: 'common' })}
-        </Badge>
-      ),
+      // The lifecycle status is shared with the other lists, so it goes through
+      // the same badge rather than a hand-picked colour here.
+      render: (option) => <StatusBadge status={option.status} />,
     },
     {
       key: 'actions',
@@ -164,29 +167,32 @@ export function PricingManager({
           return null;
         }
         return (
-          <Menu withinPortal position="bottom-end" shadow="md" width={200}>
-            <Menu.Target>
-              <ActionIcon variant="subtle" color="gray" aria-label={`${t('menu')} ${option.name}`}>
-                <IconDots size={16} />
-              </ActionIcon>
-            </Menu.Target>
-            <Menu.Dropdown>
-              {canEdit ? (
-                <Menu.Item leftSection={<IconPencil size={16} />} onClick={() => openEdit(option)}>
-                  {t('edit')}
-                </Menu.Item>
-              ) : null}
-              {canDeactivate ? (
-                <Menu.Item
-                  leftSection={<IconPower size={16} />}
-                  color="red"
-                  onClick={() => confirmDeactivate(option)}
-                >
-                  {t('deactivate')}
-                </Menu.Item>
-              ) : null}
-            </Menu.Dropdown>
-          </Menu>
+          <RowActionsMenu
+            label={`${t('menu')} ${option.name}`}
+            actions={[
+              ...(canEdit
+                ? [
+                    {
+                      key: 'edit',
+                      label: t('edit'),
+                      icon: <IconPencil size={16} />,
+                      onClick: () => openEdit(option),
+                    },
+                  ]
+                : []),
+              ...(canDeactivate
+                ? [
+                    {
+                      key: 'deactivate',
+                      label: t('deactivate'),
+                      icon: <IconPower size={16} />,
+                      color: 'red',
+                      onClick: () => confirmDeactivate(option),
+                    },
+                  ]
+                : []),
+            ]}
+          />
         );
       },
     },
@@ -198,50 +204,43 @@ export function PricingManager({
 
   return (
     <Stack gap="md">
-      <Group justify="space-between" align="flex-end" wrap="wrap" gap="sm">
-        <Stack gap={2}>
-          <Title order={3}>{t('section.title')}</Title>
-          <Text size="sm" c="dimmed">
-            {t('section.helper')}
-          </Text>
-        </Stack>
-        {canCreate ? (
-          <Button leftSection={<IconPlus size={16} />} size="sm" onClick={openCreate}>
-            {t('create')}
-          </Button>
-        ) : null}
-      </Group>
+      <SectionHeader
+        title={t('section.title')}
+        description={t('section.helper')}
+        actions={
+          canCreate ? (
+            <Button leftSection={<IconPlus size={16} />} size="sm" onClick={openCreate}>
+              {t('create')}
+            </Button>
+          ) : null
+        }
+      />
 
-      <Group gap="lg">
-        <Stack gap={0}>
-          <Text size="xs" tt="uppercase" c="dimmed" fw={600}>
-            {t('columns.option')}
-          </Text>
-          <Text size="lg" fw={700}>
-            {t('summary.optionsCount', { count: options.length })}
-          </Text>
-        </Stack>
-        <Stack gap={0}>
-          <Text size="xs" tt="uppercase" c="dimmed" fw={600}>
-            {t('summary.startingPrice')}
-          </Text>
-          {startingPrice != null && tourCurrency ? (
-            <MoneyText amount={startingPrice} currency={tourCurrency} />
-          ) : (
-            <Text size="lg" fw={700}>
-              {t('summary.noPrice')}
-            </Text>
-          )}
-        </Stack>
-        <Stack gap={0}>
-          <Text size="xs" tt="uppercase" c="dimmed" fw={600}>
-            {t('columns.pricedDepartures')}
-          </Text>
-          <Text size="lg" fw={700}>
-            {t('summary.pricedDepartures', { count: pricedDepartures })}
-          </Text>
-        </Stack>
-      </Group>
+      {/* The three numbers are the same "one number, one label" shape as the
+          overview tiles, at the in-page scale. */}
+      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+        <StatCard
+          compact
+          label={t('summary.optionsLabel')}
+          value={t('summary.optionsCount', { count: options.length })}
+        />
+        <StatCard
+          compact
+          label={t('summary.startingPrice')}
+          value={
+            startingPrice != null && tourCurrency ? (
+              <MoneyText amount={startingPrice} currency={tourCurrency} />
+            ) : (
+              t('summary.noPrice')
+            )
+          }
+        />
+        <StatCard
+          compact
+          label={t('columns.pricedDepartures')}
+          value={t('summary.pricedDepartures', { count: pricedDepartures })}
+        />
+      </SimpleGrid>
 
       {overviewQuery.isError ? (
         <ErrorState title={t('loadError')} onRetry={() => void overviewQuery.refetch()} />
@@ -250,19 +249,24 @@ export function PricingManager({
           rows={options}
           columns={columns}
           keyOf={(option) => option.code}
+          caption={t('columns.tableCaption')}
+          minWidth={760}
+          stickyHeader
           loading={overviewQuery.isPending}
+          skeletonRows={3}
+          rowLabel={(option) => t('openRow', { name: option.name })}
           emptyState={
-            <Stack align="center" gap="sm" py="sm">
-              <Text size="sm" c="dimmed">
-                {t('empty')}
-              </Text>
-              {canCreate ? (
-                <Button size="sm" onClick={openCreate}>
-                  <IconPlus size={16} />
-                  {t('create')}
-                </Button>
-              ) : null}
-            </Stack>
+            <EmptyState
+              compact
+              title={t('empty')}
+              action={
+                canCreate ? (
+                  <Button size="sm" leftSection={<IconPlus size={16} />} onClick={openCreate}>
+                    {t('create')}
+                  </Button>
+                ) : null
+              }
+            />
           }
         />
       )}

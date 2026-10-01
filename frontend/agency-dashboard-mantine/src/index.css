@@ -5,18 +5,8 @@
 @import '@fontsource/fira-sans/700.css';
 @import '@fontsource-variable/fira-code';
 
-:root {
-  --app-heading-h1: clamp(1.5rem, 2vw + 1rem, 2rem);
-  --app-heading-h2: clamp(1.25rem, 1.5vw + 0.75rem, 1.625rem);
-  --app-heading-h3: 1.375rem;
-  --app-heading-h4: 1.125rem;
-  --app-heading-h5: 1rem;
-  --app-heading-h6: 0.875rem;
-
-  --app-glass-bg: rgb(15 23 42 / 0.72);
-  --app-glass-blur: blur(14px) saturate(140%);
-  --app-glass-border: rgb(148 163 184 / 0.16);
-}
+/* The `--app-*` token layer lives in `theme/tokens.css`; this file styles the
+   document element and the scrollbar only. */
 
 *,
 *::before,
@@ -34,7 +24,7 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: var(--mantine-color-dark-7);
+  background-color: var(--mantine-color-body);
   color: var(--mantine-color-text);
 }
 
@@ -48,13 +38,82 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--mantine-color-dark-4);
+  background-color: var(--app-border-strong);
   border-radius: var(--mantine-radius-md);
   border: 2px solid transparent;
   background-clip: content-box;
 }
 
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--mantine-color-gray-5);
+}
+
 :focus-visible {
-  outline: 2px solid var(--mantine-color-brand-6);
+  outline: 2px solid var(--app-focus-ring);
   outline-offset: 2px;
+}
+/* Keyboard-only shortcut to the page body. `.skip-link` keeps it in the tab
+   order while pushing it out of view; `:focus-visible` pulls it back over the
+   header. `inset-inline-start` so it lands on the correct edge in ar/RTL. */
+.skip-link {
+  position: absolute;
+  inset-inline-start: -9999px;
+  top: 0;
+  z-index: 300;
+  padding: var(--mantine-spacing-xs) var(--mantine-spacing-md);
+  background-color: var(--mantine-color-white);
+  color: var(--mantine-color-brand-9);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 600;
+  border-end-end-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-md);
+}
+
+.skip-link:focus-visible {
+  inset-inline-start: var(--mantine-spacing-md);
+}
+
+/* How much room the bottom save bar needs at the end of a scrollport. A sticky
+   bar floats over the content it is sticky inside, so without reserved scroll
+   padding the last fields of a long form scroll to rest *behind* it and a
+   keyboard user tabs onto a control they cannot see. One token so the padding
+   and the bar stay in step. */
+:root {
+  --app-sticky-save-bar-clearance: 76px;
+}
+
+html,
+.mantine-AppShell-main {
+  scroll-padding-block-end: var(--app-sticky-save-bar-clearance);
+}
+
+/* Trip editor columns: a 190px section nav and a 290px readiness panel beside
+   the form on a laptop, stacked full-width on a phone. A `wrap` prop cannot
+   express the breakpoint (Mantine takes no responsive value there), so the
+   media query does it. */
+.app-editor-columns {
+  flex-wrap: wrap;
+}
+
+@media (min-width: 62em) {
+  .app-editor-columns {
+    flex-wrap: nowrap;
+  }
+}
+
+/* Bottom save bar for long edit forms (Website today). `sticky` + `bottom: 0`
+   pins it to the viewport while the form is taller than the screen, so Save is
+   reachable from the top and still sits flush with the end of the form when the
+   content is short. A class rather than an inline style so the offset and
+   surface stay in one place and the component files keep zero style objects. */
+.app-sticky-save-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 100;
+  margin-block-start: var(--mantine-spacing-lg);
+  padding: var(--mantine-spacing-sm) var(--mantine-spacing-md);
+  background-color: var(--app-surface-raised);
+  border: 1px solid var(--app-border-subtle);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: var(--mantine-shadow-sm);
 }

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Autocomplete, Group, Select, Stack, Text, TextInput } from '@mantine/core';
 import { DrawerFormShell } from '../../../components/form/drawer-form-shell.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { useZodForm } from '../../../components/form/use-zod-form.ts';
 import {
   emptyQuickCreateFormValues,
@@ -61,6 +62,7 @@ export function QuickCreateDrawer({
     <DrawerFormShell opened={opened} onClose={onClose} title={t('createDrawer.title')} size="sm">
       <form onSubmit={handleSubmit}>
         <Stack gap="md" py="md">
+          <FormErrorSummary errors={form.errors} />
           <Text size="sm" fw={600} c="brand" tt="uppercase">
             {t('createDrawer.step', { current: 1, total: 2 })}
           </Text>
@@ -148,12 +150,12 @@ export function QuickCreateDrawer({
           <Stack
             gap={6}
             p="md"
-            bg="var(--mantine-color-default-hover)"
+            bg="var(--app-surface-sunken)"
             style={{ borderRadius: 'var(--mantine-radius-md)' }}
           >
             <Group gap="xs">
               {nameReady ? (
-                <IconCircleCheck size={16} color="var(--mantine-color-teal-6)" />
+                <IconCircleCheck size={16} color="var(--app-icon-success)" />
               ) : (
                 <IconCircle size={16} color="var(--mantine-color-dimmed)" />
               )}
@@ -161,7 +163,7 @@ export function QuickCreateDrawer({
             </Group>
             <Group gap="xs">
               {destinationReady ? (
-                <IconCircleCheck size={16} color="var(--mantine-color-teal-6)" />
+                <IconCircleCheck size={16} color="var(--app-icon-success)" />
               ) : (
                 <IconCircle size={16} color="var(--mantine-color-dimmed)" />
               )}

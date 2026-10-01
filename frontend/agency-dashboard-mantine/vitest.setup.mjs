@@ -19,6 +19,21 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 });
 
+// jsdom ships no FontFaceSet, and Mantine's autosize <Textarea> subscribes to
+// `document.fonts` on mount — without this, any test rendering one throws
+// "cannot read addEventListener of undefined" instead of testing the component.
+Object.defineProperty(document, 'fonts', {
+  configurable: true,
+  value: {
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    load: () => Promise.resolve([]),
+    check: () => true,
+    ready: Promise.resolve(),
+    status: 'loaded',
+  },
+});
+
 class ResizeObserver {
   observe() {}
   unobserve() {}

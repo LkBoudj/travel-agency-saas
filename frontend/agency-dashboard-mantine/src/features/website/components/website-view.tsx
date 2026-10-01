@@ -1,14 +1,17 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, Divider, Group, Stack, Tabs, Text } from '@mantine/core';
+import { Button, Group, Stack, Tabs, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { EntityCode } from '../../../components/entity-code.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
+import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
+import { SectionHeader } from '../../../components/section-header.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import type { ViewWebsiteController } from '../hooks/use-view-website.ts';
 import { useWebsiteForm } from '../hooks/use-website-form.ts';
 import { websiteToFormValues } from '../lib/website-defaults.ts';
+import { isWebsiteFormDirty } from '../lib/website-dirty.ts';
 import { firstWebsiteTabWithErrors, type WebsiteTabId } from '../lib/website-validation.ts';
 import type { WebsiteFormValues } from '../schemas/website.schema.ts';
 import type { WebsiteDraftResponse, TourCatalogItem } from '../types.ts';
@@ -50,6 +53,11 @@ export function WebsiteView({
   const form = useWebsiteForm(websiteToFormValues(draft));
   const [tab, setTab] = useState<WebsiteTabId>('home');
 
+  // One baseline derived from the server draft: the form starts equal to it, so
+  // this is false until the user actually changes something, and it goes back to
+  // false when the saved draft round-trips into `draft`.
+  const isDirty = isWebsiteFormDirty(form.values, websiteToFormValues(draft));
+
   // A rejected submit must never look like a no-op: jump to the tab that owns
   // the first failing field and say so.
   const onInvalid = (errors: Record<string, unknown>) => {
@@ -80,11 +88,15 @@ export function WebsiteView({
       <PageHeader
         title={t('title')}
         subtitle={t('subtitle')}
+        meta={
+          <Group gap="xs">
+            <StatusBadge status={isPublished ? 'published' : 'draft'} />
+            <EntityCode code={draft.slug} />
+          </Group>
+        }
         actions={
           <Group gap="xs">
-            <EntityCode code={draft.slug} />
             <ViewWebsiteButton controller={viewWebsite} />
-            <StatusBadge status={isPublished ? 'published' : 'draft'} />
             {canPublish ? (
               <Button loading={isPublishing} onClick={onPublish}>
                 {t('publish')}
@@ -105,14 +117,26 @@ export function WebsiteView({
               <Tabs.Tab value="branding">{t('tabs.branding')}</Tabs.Tab>
             </Tabs.List>
             <Tabs.Panel value={tab} pt="lg">
-              {renderSection()}
+              <Stack gap="lg">
+                <SectionHeader title={t(`tabs.${tab}`)} description={t(`tabHints.${tab}`)} />
+                {renderSection()}
+              </Stack>
             </Tabs.Panel>
           </Tabs>
 
-          <Divider />
+          <FormErrorSummary errors={form.errors} />
 
           {canEditContent ? (
-            <FormActions submitLabel={t('saveLabel')} submitting={isSaving} />
+            /* Sticky at the bottom of the viewport: Save is reachable from the
+               top of a long form and lands flush with the end of a short one. */
+            <div className="app-sticky-save-bar">
+              <Group justify="space-between" align="center" gap="sm" wrap="wrap">
+                <Text size="sm" c={isDirty ? 'brand.7' : 'dimmed'} fw={isDirty ? 600 : 400}>
+                  {isDirty ? t('saveBar.unsaved') : t('saveBar.upToDate')}
+                </Text>
+                <FormActions submitLabel={t('saveLabel')} submitting={isSaving} />
+              </Group>
+            </div>
           ) : (
             <Text size="sm" c="dimmed">
               {t('readOnlyHint')}

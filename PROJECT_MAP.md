@@ -202,6 +202,30 @@ self-declared and clearly not verified. Algeria legal compliance (Loi
 18-05 Art. 8 & 11 tourist-activity licence requirements) is a FUTURE
 backend-enforced gate, not a Dashboard claim.
 
+## [DASHBOARD DESIGN SYSTEM]
+The Agency Dashboard (Mantine variant) has one shared visual layer instead of
+per-page invention. Tokens live in `src/theme/tokens.css` (`--app-*` surfaces,
+borders, row hover, focus ring, status iconography, navbar active tint, sticky
+save-bar clearance, theme-card media height) and are wired through
+`src/theme/theme.ts`; `src/theme/component-defaults.ts` sets app-wide component
+defaults, including overlay transitions that drop to zero duration under
+`prefers-reduced-motion`. `src/theme/colors.ts` owns the `brand`, `gray` and
+`dark` palettes plus the `STATUS_COLORS` vocabulary every status chip, badge and
+row action maps to (semantic `success`/`warning`/`danger`, never hand-picked
+hues). The shell (`src/app/layouts/dashboard-layout.tsx`) provides the single
+`h1` per page, a skip link as the first focusable element and the navbar.
+List pages compose the same primitives from `src/components/`: `PageHeader`
+(h1 + actions + meta), `SectionHeader` (h2 band heading), `DataToolbar`
+(search/filters/actions contract), `SearchInput`, `DataTable` (keyboard-operable
+rows inside a horizontal scroll container), `RowActionsMenu` (the one row action
+shell), `StatusBadge`, `StatCard`, `CellStack`, `EmptyState` and
+`FormErrorSummary`. Every primitive takes its copy from i18n (en + ar) and uses
+logical properties only, so the RTL layout is a direction flip rather than a
+second design. A `StyleGuide.page.tsx` renders the tokens and primitives in both
+locales. Website editing adds one feature-local rule on top: `.app-sticky-save-bar`
+pins long forms' Save with reserved scroll padding so keyboard focus is never
+parked behind it.
+
 ## [CUSTOMERS]
 Agency business customer records — first agency business slice, vertical
 (backend + Dashboard). A Customer is NOT an identity: no `app_user` link, no
@@ -405,6 +429,11 @@ never write each other's keys.
   opt-in `frontend/agency-dashboard-mantine/src/features/website/__tests__/backend.integration.test.ts`
   (dashboard clients against the live API); the contract and run guide are
   `frontend/theme-agency/docs/website-api-contract.md`.
+- **View Website** (dashboard): the public address is resolved by the pure
+  `features/website/lib/website-url.ts` — `customDomain` > `VITE_STOREFRONT_BASE_URL`
+  (single-tenant dev) > `slug` + `VITE_PLATFORM_DOMAIN` (production). Unresolvable
+  → the signed draft preview, never a dead link. Unit-tested; env contract in
+  `frontend/theme-agency/docs/website-api-contract.md`.
 
 ## [THEME_SYSTEM]
 Platform-owned presentation system. Explorer (`explorer`) is the current first
@@ -419,9 +448,15 @@ future examples only — not implemented.
 - Theme Resolver: `agency.themeId` → registry → settings → context; unknown or
   missing ids fall back to the default Theme (a storefront never fails on a
   bad theme id).
-- Typed Theme contract: manifest (id, name, version) + settings schema +
-  Layout / Home / Trips / TripDetail templates; themes are pure renderers
-  receiving a resolved platform context and settings as props.
+- Typed Theme contract: manifest (id, name, version, `previewImage`) + settings
+  schema + Layout / Home / Trips / TripDetail templates; themes are pure
+  renderers receiving a resolved platform context and settings as props.
+- **Theme preview images** are real captures shipped in
+  `frontend/theme-agency/public/demo/themes/` (`starter-home`, `starter-trips`,
+  `starter-trip-detail`, `starter-home-narrow`); the dashboard Themes page
+  renders them via `VITE_THEMES_BASE_URL`. Manifest `nameKey`/`descriptionKey`
+  are fully-qualified keys resolved through the `themes`/`settings`
+  namespaces with a raw-key fallback — a manifest never shows its own key as UI.
 - Theme ≠ Branding. Theme controls layout, page composition, Hero structure,
   card presentation, Header/Footer treatment, section composition. Branding
   controls agency identity: logo, primary/secondary color, identity assets.
@@ -453,6 +488,28 @@ run the same code path; the dashboard boundary was moved (/move-copy, never a
 reimplementation) into the standalone `frontend/storefront` app, then the
 storefront feature was removed from the dashboard. Future marketplace reuse is
 a move/copy of the same isolated boundaries.
+
+## [DEMO DATA CONVENTIONS]
+The demo tenant `AGY-0C937B377B89` ("hichem traveling", `agency.id = 91`) holds the
+hand-built demo dataset used to exercise every dashboard page: 5 published tours,
+8 open departures, 9 pricing options, 19 departure prices, 5 customers, 4
+bookings (mixed statuses) and a published website.
+
+- **Everything is created through the authenticated `/v1` API** as `hichem@mail.com`
+  (Agency Owner) — never direct SQL, so Zod validation, RBAC and `audit_log` apply.
+  The only exception is the one-time zeroing of the tenant's business rows, which
+  SQL did because the API has no `DELETE` verb for any business aggregate (lifecycle
+  transitions are one-way by design).
+- **Images stay remote URLs** (Unsplash CDN) — no binaries in git, and they resolve
+  from both the dashboard and the storefront origin.
+- `audit_log` is append-only and was never reset; resetting business data does not
+  erase the history of that reset.
+- Creating a tenant: the API has **no agency `DELETE`** either, so a throwaway
+  tenant (e.g. the integration-test agency) is removed with a **single scoped
+  `DELETE FROM agency`** — one statement, and every child disappears through
+  `onDelete: CASCADE`. `app_user`, `role`, `permission`, `role_permission` and
+  `audit_log` are never touched, so a throwaway login survives as an orphan with
+  no tenant access, and the tenant's own audit rows stay on record.
 
 ## [ORPHANS & PENDING]
 Open questions: Q3 currency model · Q4 booking/payment sequencing · Q5 team

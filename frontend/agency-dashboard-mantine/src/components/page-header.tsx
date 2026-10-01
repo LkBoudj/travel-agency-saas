@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Box, Group, Stack, Title, type TitleProps } from '@mantine/core';
+import { Group, Stack, Text, Title, type TitleProps } from '@mantine/core';
 
 /**
  * Page-level header. Renders the document's single `h1` by default — every route
@@ -10,11 +10,18 @@ import { Box, Group, Stack, Title, type TitleProps } from '@mantine/core';
 export function PageHeader({
   title,
   subtitle,
+  meta,
   actions,
   h,
 }: {
   title: ReactNode;
   subtitle?: ReactNode;
+  /**
+   * Tertiary metadata rendered on its own line under the subtitle — a status
+   * badge, an entity code, a slug. It belongs to the title block, not to
+   * `actions`, so the action row stays a strict primary → secondary hierarchy.
+   */
+  meta?: ReactNode;
   actions?: ReactNode;
   h?: TitleProps['order'];
 }) {
@@ -23,10 +30,11 @@ export function PageHeader({
       <Stack gap={2}>
         <Title order={h ?? 1}>{title}</Title>
         {subtitle ? (
-          <Box c="dimmed" size="sm">
+          <Text c="dimmed" size="sm">
             {subtitle}
-          </Box>
+          </Text>
         ) : null}
+        {meta}
       </Stack>
       {actions ? <Group gap="sm">{actions}</Group> : null}
     </Group>

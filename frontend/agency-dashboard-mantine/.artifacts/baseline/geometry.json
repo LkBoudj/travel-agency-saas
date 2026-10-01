@@ -1,0 +1,156 @@
+{
+  "overview--en": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "ltr",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "trips--en": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "ltr",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "departures--en": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "ltr",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "bookings--en": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "ltr",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "customers--en": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "ltr",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "themes--en": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "ltr",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "website--en": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "ltr",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "overview--ar": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "rtl",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "trips--ar": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "rtl",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "departures--ar": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "rtl",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "bookings--ar": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "rtl",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "customers--ar": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "rtl",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "themes--ar": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "rtl",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  },
+  "website--ar": {
+    "sidebarWidth": 260,
+    "headerHeight": 60,
+    "mainGutter": "260px",
+    "bodyBackground": "rgb(255, 255, 255)",
+    "bodyColor": "rgb(0, 0, 0)",
+    "direction": "rtl",
+    "htmlFontSize": "16px",
+    "scrollWidth": 1440,
+    "clientWidth": 1440
+  }
+}

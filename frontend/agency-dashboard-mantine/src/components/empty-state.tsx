@@ -7,15 +7,18 @@ export function EmptyState({
   title,
   description,
   action,
+  compact = false,
 }: {
   title?: ReactNode;
   description?: ReactNode;
   action?: ReactNode;
+  /** Tighter vertical rhythm for an empty state inside a section band. */
+  compact?: boolean;
 }) {
   return (
-    <Box py="xl">
+    <Box py={compact ? 'md' : 'xl'}>
       <Stack align="center" gap={4} c="dimmed">
-        <IconInbox size={32} stroke={1.5} />
+        <IconInbox size={compact ? 22 : 32} stroke={1.5} />
         <Text size="sm" fw={600}>
           {title ?? 'Nothing here yet.'}
         </Text>
@@ -42,7 +45,7 @@ export function ErrorState({
     // settles; a coloured border alone is not perceivable to a screen reader.
     <Box py="xl" role="alert">
       <Stack align="center" gap={4}>
-        <IconAlertTriangle size={32} stroke={1.5} color="var(--mantine-color-danger-6)" />
+        <IconAlertTriangle size={32} stroke={1.5} color="var(--app-icon-danger)" />
         <Title order={5} tt="none">
           {title ?? 'Something went wrong'}
         </Title>

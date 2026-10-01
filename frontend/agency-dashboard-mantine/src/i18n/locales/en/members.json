@@ -2,6 +2,7 @@
   "title": "Team",
   "subtitle": "Manage who works in this agency and what they can do.",
   "searchPlaceholder": "Search members…",
+  "membersTitle": "Members",
   "invite": "Invite member",
   "membersEmpty": "No members found.",
   "loadError": "Could not load members.",

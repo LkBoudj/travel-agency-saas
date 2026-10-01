@@ -1,19 +1,10 @@
-import { IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import {
-  ActionIcon,
-  Avatar,
-  Box,
-  Button,
-  Card,
-  Group,
-  Stack,
-  Text,
-  TextInput,
-  Textarea,
-} from '@mantine/core';
+import { Avatar, Button, Card, Group, Stack, TextInput, Textarea } from '@mantine/core';
+import { EmptyState } from '../../../../components/empty-state.tsx';
 import { FormSection } from '../../../../components/form/form-section.tsx';
 import type { WebsiteForm } from '../../hooks/use-website-form.ts';
+import { TestimonialRow, TrustPointRow } from '../repeating-rows.tsx';
 
 export interface HomeSectionProps {
   form: WebsiteForm;
@@ -53,34 +44,13 @@ export function HomeSection({ form }: HomeSectionProps) {
       <Card withBorder radius="md">
         <FormSection title={t('sections.trustPoints')} description={t('sectionHints.trustPoints')}>
           <Stack gap="sm">
+            {form.values.trustPoints.length === 0 ? (
+              <EmptyState compact title={t('empty.trustPoints')} />
+            ) : null}
             {form.values.trustPoints.map((_point, index) => (
-              <Group key={`trust-${index}`} gap="sm" align="flex-end" wrap="nowrap">
-                <TextInput
-                  placeholder={t('placeholders.icon')}
-                  w="14%"
-                  {...form.getInputProps(`trustPoints.${index}.icon`)}
-                />
-                <TextInput
-                  placeholder={t('placeholders.trustPointTitle')}
-                  w="28%"
-                  {...form.getInputProps(`trustPoints.${index}.title`)}
-                />
-                <TextInput
-                  placeholder={t('placeholders.trustPointText')}
-                  style={{ flex: 1 }}
-                  {...form.getInputProps(`trustPoints.${index}.text`)}
-                />
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  aria-label={t('removeTrustPoint')}
-                  onClick={() => form.removeListItem('trustPoints', index)}
-                >
-                  <IconTrash size={16} />
-                </ActionIcon>
-              </Group>
+              <TrustPointRow key={`trust-${index}`} form={form} index={index} />
             ))}
-            <Box>
+            <Group>
               <Button
                 variant="default"
                 size="xs"
@@ -91,7 +61,7 @@ export function HomeSection({ form }: HomeSectionProps) {
               >
                 {t('addTrustPoint')}
               </Button>
-            </Box>
+            </Group>
           </Stack>
         </FormSection>
       </Card>
@@ -125,39 +95,12 @@ export function HomeSection({ form }: HomeSectionProps) {
         >
           <Stack gap="sm">
             {form.values.testimonials.length === 0 ? (
-              <Text size="sm" c="dimmed">
-                {t('empty.testimonials')}
-              </Text>
+              <EmptyState compact title={t('empty.testimonials')} />
             ) : null}
             {form.values.testimonials.map((_row, index) => (
-              <Group key={`test-${index}`} gap="sm" align="flex-end" wrap="nowrap">
-                <Textarea
-                  placeholder={t('placeholders.quote')}
-                  autosize
-                  style={{ flex: 1 }}
-                  {...form.getInputProps(`testimonials.${index}.quote`)}
-                />
-                <TextInput
-                  placeholder={t('placeholders.author')}
-                  w="22%"
-                  {...form.getInputProps(`testimonials.${index}.author`)}
-                />
-                <TextInput
-                  placeholder={t('placeholders.location')}
-                  w="18%"
-                  {...form.getInputProps(`testimonials.${index}.location`)}
-                />
-                <ActionIcon
-                  variant="subtle"
-                  color="red"
-                  aria-label={t('removeTestimonial')}
-                  onClick={() => form.removeListItem('testimonials', index)}
-                >
-                  <IconTrash size={16} />
-                </ActionIcon>
-              </Group>
+              <TestimonialRow key={`test-${index}`} form={form} index={index} />
             ))}
-            <Box>
+            <Group>
               <Button
                 variant="default"
                 size="xs"
@@ -168,7 +111,7 @@ export function HomeSection({ form }: HomeSectionProps) {
               >
                 {t('addTestimonial')}
               </Button>
-            </Box>
+            </Group>
           </Stack>
         </FormSection>
       </Card>
