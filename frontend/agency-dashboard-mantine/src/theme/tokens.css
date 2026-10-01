@@ -36,6 +36,20 @@
      and the no-preview placeholder must stay the same height. */
   --app-theme-card-media-height: 160px;
 
+  /* One control height for the whole app. Mantine's own `sm` is 36px, which is
+     sized for a standalone marketing form; against a 13px table row it left a
+     visible step between a control and the row it filters. 32px puts every
+     button, input, and select on the same line as its neighbours. Row-level
+     actions step down again — see `--app-control-height-compact`. */
+  --app-control-height: 32px;
+
+  /* The row-action step: 26px, which is exactly Mantine's built-in `compact-sm`
+     (`1.625rem`). Declared here rather than left to Mantine because the theme
+     pins `sm` on `ActionIcon`'s root, which would otherwise flatten every size
+     back to the control height; keeping our own token means the step stays
+     visible in one place and cannot drift from the framework's value. */
+  --app-control-height-compact: 26px;
+
   --app-surface-page: var(--mantine-color-gray-0);
   --app-surface-raised: var(--mantine-color-white);
   --app-surface-sunken: var(--mantine-color-gray-1);

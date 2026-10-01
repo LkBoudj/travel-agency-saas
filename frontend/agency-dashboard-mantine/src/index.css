@@ -66,6 +66,18 @@ body {
   border-inline-end-color: var(--app-nav-border);
 }
 
+/* The white surface a section is built on. A 1px `--app-border-subtle`
+   hairline and no shadow: two panels stacked on the gray-0 page each casting
+   a shadow read as two objects floating above the workspace rather than two
+   regions of one page. The radius is `md` so the panel, the table inside it,
+   and the buttons on it share one corner. */
+[data-shell-panel] {
+  background-color: var(--app-surface-raised);
+  border: 1px solid var(--app-border-subtle);
+  border-radius: var(--mantine-radius-md);
+  box-shadow: none;
+}
+
 /* Nav scrolls, footer is pinned: without the flex column the account block would
    scroll away with the links and stop being a fixed "signed in as" anchor. The
    nav is the only child allowed to grow, and it is the one that scrolls. */

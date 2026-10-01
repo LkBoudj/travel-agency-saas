@@ -128,3 +128,49 @@ Decision: Mantine's `NavLink` active colour is derived from the primary palette,
 which is now near-black, so it would be invisible on the dark rail. Active and
 hover states are therefore set explicitly from `--app-nav-*`.
 
+
+## T4 — Shared primitives (complete)
+
+Tests first: 5 of the new `panel.test.tsx` cases failed, then passed.
+
+| Change | File |
+|---|---|
+| New `Panel`: white, 1px gray-3 hairline, 6px radius, no shadow | `components/panel.tsx`, `index.css` |
+| Shared empty/error copy translated instead of hardcoded English | `components/empty-state.tsx`, both `common.json` |
+| One control height: 32px controls, 26px row triggers | `theme/component-defaults.ts`, `theme/tokens.css` |
+| 9 generic `Card withBorder` containers → `Panel` | 4 feature components |
+
+Three findings worth keeping, all caught by measuring rather than reading:
+
+1. **`theme.components.X.sizes` no longer exists in Mantine 9.** `createVarsResolver`
+   is now the identity function and `MantineThemeComponent` is only
+   `classNames`/`styles`/`vars`/`defaultProps`, so a named size cannot be declared
+   in the theme at all. The height is pinned through `styles` instead.
+2. **The height is not on the same slot everywhere.** On `Button`/`ActionIcon` the
+   root *is* the control; on a text input the root is a wrapper around a separate
+   `input` element (`Input` declares `rootSelector: "wrapper"`). Pinning the
+   wrapper alone produced a 32px box around a 36px input.
+3. **`.mantine-Input-input` carries `min-height: var(--input-height)`.**
+   `min-height` clamps `height`, so the inline `height` was silently ignored and
+   the field stayed 36px until `minHeight` was set alongside it. jsdom would not
+   have caught this — it computes no styles.
+
+Also: pinning `sm` on `ActionIcon`'s root flattens *every* size to the control
+height, including `compact-sm`. The row trigger therefore keeps
+`size="compact-sm"` for Mantine's padding and font scale and sets its box from
+`--app-control-height-compact` (26px, equal to Mantine's own `1.625rem`).
+
+Verified live on Trips, Departures, Customers, Bookings, Overview:
+
+| Probe | Value |
+|---|---|
+| input / wrapper / select / button height | 32 / 32 / 32 / 32 |
+| row trigger box | 26 × 26 |
+| inputs overflowing their wrapper | 0 |
+| panel | white, `1px solid rgb(227,227,227)`, 6px, `box-shadow: none` |
+| page errors | none |
+
+Gate: `npm test` — 81 files passed / 1 skipped, 358 tests passed / 6 skipped
+(+13). Screenshots: `.artifacts/t4-primitives/` (44); rail 220 / header 44 / no
+overflow on all 14 page-locale pairs.
+

@@ -107,6 +107,8 @@
     "body": "This section ships in a later iteration of the dashboard."
   },
   "empty": "No results yet.",
+  "emptyDefault": "Nothing here yet.",
+  "errorTitle": "Something went wrong",
   "form": {
     "errorSummary": "Fix the highlighted fields to continue."
   },

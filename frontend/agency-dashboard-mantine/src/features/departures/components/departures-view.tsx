@@ -1,9 +1,10 @@
 import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, Loader, Select, Stack, Text } from '@mantine/core';
+import { Button, Loader, Select, Stack, Text } from '@mantine/core';
 import { ContentContainer } from '../../../components/content-container.tsx';
 import { EmptyState } from '../../../components/empty-state.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
+import { Panel } from '../../../components/panel.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import { useIsRtl } from '../../../i18n/hooks/use-is-rtl.ts';
 import { PricingManager } from '../../pricing/components/pricing-manager.tsx';
@@ -49,7 +50,7 @@ export function DeparturesView({ controller }: DeparturesViewProps) {
       <ContentContainer>
         <Stack gap="lg">
           <PageHeader title={t('title')} subtitle={t('subtitle')} />
-          <Card withBorder>
+          <Panel>
             <EmptyState
               title={t('noTours')}
               description={t('noToursBody')}
@@ -63,7 +64,7 @@ export function DeparturesView({ controller }: DeparturesViewProps) {
                 </Button>
               }
             />
-          </Card>
+          </Panel>
         </Stack>
       </ContentContainer>
     );
@@ -83,7 +84,7 @@ export function DeparturesView({ controller }: DeparturesViewProps) {
       <Stack gap="lg">
         <PageHeader title={t('title')} subtitle={t('subtitle')} />
 
-        <Card withBorder p="md">
+        <Panel>
           <Stack gap="md">
             <Select
               label={t('tourSelectLabel')}
@@ -115,16 +116,16 @@ export function DeparturesView({ controller }: DeparturesViewProps) {
               <AvailabilityInfo mode={availabilityMode} />
             )}
           </Stack>
-        </Card>
+        </Panel>
 
-        <Card withBorder p="md">
+        <Panel>
           <PricingManager
             tourCode={selected.code}
             canCreate={controller.pricing.canManage}
             canEdit={controller.pricing.canManage}
             canDeactivate={controller.pricing.canManage}
           />
-        </Card>
+        </Panel>
       </Stack>
     </ContentContainer>
   );

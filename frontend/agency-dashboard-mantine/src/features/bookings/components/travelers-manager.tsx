@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Badge, Button, Card, Group, Stack, Text, Textarea, TextInput, Title } from '@mantine/core';
+import { Badge, Button, Group, Stack, Text, Textarea, TextInput, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { ErrorState } from '../../../components/empty-state.tsx';
 import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
+import { Panel } from '../../../components/panel.tsx';
 import { useBookingMutations } from '../hooks/use-bookings.ts';
 import { useTravelerForm, travelerFormInitialValues } from '../hooks/use-traveler-form.ts';
 import { useTravelers } from '../hooks/use-travelers.ts';
@@ -64,7 +65,7 @@ export function TravelersManager({ booking, capabilities }: TravelersManagerProp
         </Group>
       </Group>
 
-      <Card withBorder radius="md" p="xs">
+      <Panel p="xs">
         {travelersQuery.isPending ? (
           <Text size="sm" c="dimmed" p="xs">
             {t('page.loading')}
@@ -117,7 +118,7 @@ export function TravelersManager({ booking, capabilities }: TravelersManagerProp
             {t('travelers.add')}
           </Button>
         ) : null}
-      </Card>
+      </Panel>
     </Stack>
   );
 }
@@ -230,7 +231,7 @@ function TravelerForm({
   return (
     <form onSubmit={onSubmit} noValidate>
       <FormErrorSummary errors={form.errors} />
-      <Card withBorder radius="md" bg="var(--app-surface-page)" p="sm">
+      <Panel bg="var(--app-surface-page)" p="sm">
         <Stack gap="sm">
           <Group gap="sm" grow>
             <TextInput
@@ -277,7 +278,7 @@ function TravelerForm({
             </Button>
           </Group>
         </Stack>
-      </Card>
+      </Panel>
     </form>
   );
 }

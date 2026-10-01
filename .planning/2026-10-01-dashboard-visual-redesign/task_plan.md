@@ -13,9 +13,10 @@ without changing any architecture, API, permission, or business logic.
 
 ## Next Step
 
-T4: restyle the shared primitives against the new tokens, add a shared `Panel` to
-replace the remaining `Card` wrappers, and remove the hardcoded English fallbacks in
-`empty-state.tsx` / `error-state.tsx`.
+T5: restyle the Overview page against the new shell — the four stat tiles, the
+recent-activity table, and the site-status panel — with the compact row rhythm T4
+established. No fabricated agency-wide Departures KPI: `use-departures.ts` is
+per-tour.
 
 ## Current Phase
 
@@ -172,7 +173,31 @@ Phase 3
   detail routes, group labels).
 - **Screenshots:** shell open/closed × `en`/`ar`.
 
-#### T4 — Shared UI primitives
+#### T4 — Shared UI primitives — COMPLETE
+
+- **Files:** new `components/panel.tsx` + `panel.test.tsx`,
+  `theme/component-defaults.ts`, `theme/tokens.css`, `index.css`,
+  `components/empty-state.tsx`, `components/row-actions-menu.tsx`, both
+  `common.json` locales, and the `Card` → `Panel` swap in `departures-view.tsx`,
+  `booking-details-view.tsx`, `travelers-manager.tsx`, `site-status-card.tsx`.
+- **`Panel`:** a plain white surface — `--app-surface-raised`, a 1px
+  `--app-border-subtle` hairline, `radius.md`, `box-shadow: none`. Declared once
+  in `index.css` under `[data-shell-panel]` rather than as a prop soup, matching
+  the `[data-shell-nav]` pattern from T3. A `div` with an `aria-label` is not a
+  landmark, so it promotes to `<section>` only when the caller names it.
+- **Cards kept as cards:** `stat-card`, `theme-card` (media tile, and its skeleton
+  grid, which must keep matching it), `agency-card` (a button you pick), and the
+  website-builder section previews — those depict the customer's own site, not
+  dashboard chrome.
+- **English literals removed:** `EmptyState` hardcoded "Nothing here yet." and
+  `ErrorState` "Something went wrong"; both now read `common:emptyDefault` /
+  `common:errorTitle`, added in EN and AR.
+- **Control rhythm:** `--app-control-height: 32px` (was Mantine's 36px `sm`) and
+  `--app-control-height-compact: 26px` for row triggers.
+- **Gate:** 81 files passed / 1 skipped, 358 tests passed / 6 skipped (+13).
+- Screenshots: `.artifacts/t4-primitives/` (44); geometry unchanged.
+
+#### T4 — Shared UI primitives (detail)
 
 - **Problem:** Card wrappers and per-page styling diverge across views; several
   shared components hardcode English fallbacks.

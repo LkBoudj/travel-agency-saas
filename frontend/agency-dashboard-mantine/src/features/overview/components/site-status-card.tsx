@@ -1,6 +1,7 @@
 import { IconWorld } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Box, Card, Group, Skeleton, Stack, Text, Title } from '@mantine/core';
+import { Box, Group, Skeleton, Stack, Text, Title } from '@mantine/core';
+import { Panel } from '../../../components/panel.tsx';
 import { ViewWebsiteButton } from '../../website/components/view-website-button.tsx';
 import type { ViewWebsiteController } from '../../website/hooks/use-view-website.ts';
 import type { OverviewSiteStatus } from '../hooks/use-overview-page.ts';
@@ -23,7 +24,7 @@ export function SiteStatusCard({
   const { t } = useTranslation('dashboard');
 
   return (
-    <Card withBorder radius="md" p="lg" h="100%">
+    <Panel p="lg" h="100%">
       <Stack gap="md">
         <Group justify="space-between" align="center" wrap="nowrap">
           <Title order={2} fz="md">
@@ -64,6 +65,6 @@ export function SiteStatusCard({
           <ViewWebsiteButton controller={viewWebsite} />
         </Group>
       </Stack>
-    </Card>
+    </Panel>
   );
 }

@@ -1,10 +1,11 @@
 import { IconArrowLeft, IconArrowRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Badge, Button, Card, Divider, Group, Stack, Table, Text, Title } from '@mantine/core';
+import { Badge, Button, Divider, Group, Stack, Table, Text, Title } from '@mantine/core';
 import { dashboardPaths } from '../../../app/router/route-paths.ts';
 import { ErrorState } from '../../../components/empty-state.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
+import { Panel } from '../../../components/panel.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import { useAppLocale } from '../../../i18n/hooks/use-app-locale.ts';
 import { useIsRtl } from '../../../i18n/hooks/use-is-rtl.ts';
@@ -100,7 +101,7 @@ function SummaryCard({ booking }: { booking: BookingDetail }) {
   const intlLocale = getIntlLocale(useAppLocale());
 
   return (
-    <Card withBorder radius="md" p="md">
+    <Panel>
       <Group justify="space-between" align="center" wrap="nowrap">
         <Stack gap={2}>
           <Title order={2} fz="xs" c="dimmed" tt="uppercase" fw={600}>
@@ -150,7 +151,7 @@ function SummaryCard({ booking }: { booking: BookingDetail }) {
           <Row label={t('details.cancellationReason')} value={booking.cancellationReason} />
         ) : null}
       </Stack>
-    </Card>
+    </Panel>
   );
 }
 
@@ -159,7 +160,7 @@ function PriceLinesCard({ booking }: { booking: BookingDetail }) {
   const intlLocale = getIntlLocale(useAppLocale());
 
   return (
-    <Card withBorder radius="md" p="md">
+    <Panel>
       <Title order={2} fz="xs" c="dimmed" tt="uppercase" fw={600} mb="sm">
         {t('details.sectionPricing')}
       </Title>
@@ -214,7 +215,7 @@ function PriceLinesCard({ booking }: { booking: BookingDetail }) {
           </Table.Tbody>
         </Table>
       )}
-    </Card>
+    </Panel>
   );
 }
 
@@ -223,7 +224,7 @@ function StatusHistoryCard({ booking }: { booking: BookingDetail }) {
   const intlLocale = getIntlLocale(useAppLocale());
 
   return (
-    <Card withBorder radius="md" p="md">
+    <Panel>
       <Title order={2} fz="xs" c="dimmed" tt="uppercase" fw={600} mb="sm">
         {t('details.sectionHistory')}
       </Title>
@@ -238,7 +239,7 @@ function StatusHistoryCard({ booking }: { booking: BookingDetail }) {
           ))}
         </Stack>
       )}
-    </Card>
+    </Panel>
   );
 }
 

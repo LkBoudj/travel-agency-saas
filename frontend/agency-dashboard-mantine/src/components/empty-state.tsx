@@ -15,12 +15,14 @@ export function EmptyState({
   /** Tighter vertical rhythm for an empty state inside a section band. */
   compact?: boolean;
 }) {
+  const { t } = useTranslation('common');
+
   return (
     <Box py={compact ? 'md' : 'xl'}>
       <Stack align="center" gap={4} c="dimmed">
         <IconInbox size={compact ? 22 : 32} stroke={1.5} />
         <Text size="sm" fw={600}>
-          {title ?? 'Nothing here yet.'}
+          {title ?? t('emptyDefault')}
         </Text>
         {description ? <Text size="sm">{description}</Text> : null}
         {action ? <Box mt="sm">{action}</Box> : null}
@@ -47,7 +49,7 @@ export function ErrorState({
       <Stack align="center" gap={4}>
         <IconAlertTriangle size={32} stroke={1.5} color="var(--app-icon-danger)" />
         <Title order={5} tt="none">
-          {title ?? 'Something went wrong'}
+          {title ?? t('errorTitle')}
         </Title>
         {description ? (
           <Text size="sm" c="dimmed" ta="center">
