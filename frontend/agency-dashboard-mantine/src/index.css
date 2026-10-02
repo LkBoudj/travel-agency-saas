@@ -156,3 +156,18 @@ html,
   border-radius: var(--mantine-radius-md);
   box-shadow: var(--mantine-shadow-sm);
 }
+
+/* A sticky table header has to carry its own background or the rows scrolling
+   underneath show through it, so Mantine paints it `--mantine-color-body` —
+   white. That is right for its default theme and wrong for ours: the header band
+   is `--app-table-header-surface`, so a sticky header would otherwise snap to
+   white the moment the page scrolled and the one surface every table shares
+   would stop being shared.
+
+   Specificity is the whole reason this is a stylesheet rule and not a theme
+   override. Mantine's rule strips its inner selectors with `:where()`, leaving
+   `.m_b242d975[data-sticky]` at (0,2,0); `thead[data-sticky] th` below reaches
+   (0,1,2) from the attribute plus the element, and wins. */
+thead[data-sticky] th {
+  background-color: var(--app-table-header-surface);
+}

@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Table } from '@mantine/core';
 import { EmptyState } from './empty-state.tsx';
@@ -33,16 +33,18 @@ export interface DataTableProps<T> {
 }
 
 /**
- * A sticky header cell has to carry its own background, otherwise the rows
- * scrolling underneath show through it. The offset is the app shell's header:
- * a sticky cell at `top: 0` disappears behind the shell header.
+ * The sticky offset is the shell header, and it is read with no fallback value.
+ * A sticky header sitting at `top: 0` disappears behind the shell header; one
+ * hardcoding its own number silently decouples the moment the header resizes,
+ * which is exactly how a 60px literal outlived a 44px header.
+ *
+ * Mantine's own `stickyHeader` is used rather than a per-cell
+ * `position: sticky`, because `border-collapse: collapse` drops borders on sticky
+ * cells and Mantine only redraws them under `[data-sticky]`. The hand-rolled
+ * version kept the position and lost the separator line under the header while
+ * the page scrolled.
  */
-const STICKY_CELL: CSSProperties = {
-  position: 'sticky',
-  top: 'var(--app-header-height, 60px)',
-  zIndex: 1,
-  background: 'var(--app-surface-raised)',
-};
+const STICKY_HEADER_OFFSET = 'var(--app-header-height)';
 
 export function DataTable<T>({
   rows,
@@ -73,17 +75,16 @@ export function DataTable<T>({
 
   return (
     <Table.ScrollContainer minWidth={minWidth}>
-      <Table aria-label={caption}>
+      <Table
+        aria-label={caption}
+        stickyHeader={stickyHeader}
+        stickyHeaderOffset={stickyHeader ? STICKY_HEADER_OFFSET : undefined}
+      >
         {caption ? <Table.Caption>{caption}</Table.Caption> : null}
         <Table.Thead>
           <Table.Tr>
             {columns.map((column) => (
-              <Table.Th
-                key={column.key}
-                w={column.w}
-                className={column.className}
-                style={stickyHeader ? STICKY_CELL : undefined}
-              >
+              <Table.Th key={column.key} w={column.w} className={column.className}>
                 {column.header}
               </Table.Th>
             ))}

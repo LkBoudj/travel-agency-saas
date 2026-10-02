@@ -48,3 +48,53 @@ describe('overlay transitions', () => {
     expect(defaults.Drawer?.defaultProps?.transitionProps).toMatchObject({ duration: 0 });
   });
 });
+
+/**
+ * The table contract.
+ *
+ * Every table in the product — bookings, customers, departures, invitations,
+ * members, pricing, tours, plus the price-line table on a booking's detail view —
+ * renders through `Table`, so this one block is what makes them look like one
+ * system. The value under test is not taste: it is that a table cannot quietly
+ * acquire its own header colour or separator. Each key is asserted against the
+ * token it must name, because a hardcoded hex or a `gray-N` step would pass a
+ * shape check while reintroducing the cast the redesign removes.
+ */
+describe('table contract', () => {
+  async function tableDefaults() {
+    const defaults = await defaultsWithReducedMotion(false);
+    return defaults.Table!;
+  }
+
+  test('the header band is the neutral token, not a palette step', async () => {
+    const table = await tableDefaults();
+
+    expect(table.styles?.th).toMatchObject({
+      backgroundColor: 'var(--app-table-header-surface)',
+    });
+  });
+
+  test('the separator is the neutral token', async () => {
+    const table = await tableDefaults();
+
+    // `borderColor` drives `--table-border-color`, which Mantine draws as the
+    // `tr` border-bottom. Unset, it falls back to gray-3 and the separator
+    // arrives blue-tinted.
+    expect(table.defaultProps?.borderColor).toBe('var(--app-table-separator)');
+  });
+
+  test('row hover resolves through the token the product already declares', async () => {
+    const table = await tableDefaults();
+
+    expect(table.defaultProps?.highlightOnHover).toBe(true);
+    expect(table.defaultProps?.highlightOnHoverColor).toBe('var(--app-row-hover)');
+  });
+
+  test('separators stay bottom-only, with no column grid', async () => {
+    const table = await tableDefaults();
+
+    expect(table.defaultProps?.withRowBorders).toBe(true);
+    expect(table.defaultProps?.withColumnBorders).toBe(false);
+    expect(table.defaultProps?.withTableBorder).toBeUndefined();
+  });
+});

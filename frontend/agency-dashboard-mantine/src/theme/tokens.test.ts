@@ -131,6 +131,19 @@ describe('token layer', () => {
     expect(layer).toMatch(/--app-tile-label-size:\s*0\.8125rem/); // 13px
     expect(layer).toMatch(/--app-tile-value-size:\s*1\.5rem/); // 24px
   });
+
+  test('pins the table contract to the two neutral literals the reference measures', () => {
+    // Mantine's gray ramp is blue-tinted: gray-1 (`#f1f3f5`) and gray-3
+    // (`#dee2e6`) are the closest steps, and both read as tinted against a
+    // neutral page. The header band and the separator are therefore spelled out
+    // as literals here — the same reason the nav rail spells out its four steps —
+    // and the theme reads only these tokens. A `gray-N` fallback would silently
+    // reintroduce the cast the redesign is removing.
+    const layer = TOKEN_LAYER_FILES.map(read).join('\n');
+
+    expect(layer).toMatch(/--app-table-header-surface:\s*#f7f7f7/i);
+    expect(layer).toMatch(/--app-table-separator:\s*#e3e3e3/i);
+  });
 });
 
 describe('palette discipline', () => {

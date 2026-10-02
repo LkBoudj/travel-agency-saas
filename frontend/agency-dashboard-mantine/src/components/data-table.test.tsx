@@ -102,14 +102,22 @@ describe('DataTable structure', () => {
   test('only sticks the header when the table asks for it', () => {
     const { container, rerender } = renderTable({ stickyHeader: true });
 
-    const stuck = container.querySelector('th');
-    expect(stuck?.style.position).toBe('sticky');
-    // Offset by the shell header, or the header slides behind it.
-    expect(stuck?.style.getPropertyValue('top')).toBe('var(--app-header-height, 60px)');
-    expect(stuck?.style.background).toBe('var(--app-surface-raised)');
+    // Mantine's own `stickyHeader`, not a hand-rolled `position: sticky` per
+    // cell. It matters for more than tidiness: with `border-collapse: collapse`
+    // a sticky cell drops its borders, and Mantine only redraws them with a
+    // box-shadow under `[data-sticky]`. An inline sticky header keeps the
+    // position but loses the separator line underneath it while scrolling.
+    const head = container.querySelector('thead');
+    expect(head).toHaveAttribute('data-sticky');
+    // Offset by the shell header, or the header slides behind it. The token is
+    // read directly with no fallback: a stale literal here is how the offset
+    // silently decouples from the real header height.
+    expect(
+      container.querySelector('table')?.style.getPropertyValue('--table-sticky-header-offset')
+    ).toBe('var(--app-header-height)');
 
     rerender(<DataTable rows={ROWS} columns={COLUMNS} keyOf={(row) => row.code} />);
-    expect(container.querySelector('th')?.style.position).toBe('');
+    expect(container.querySelector('thead')).not.toHaveAttribute('data-sticky');
   });
 
   test('keeps a wide table scrollable rather than squashed', () => {

@@ -59,6 +59,15 @@
   --app-tile-label-size: 0.8125rem;
   --app-tile-value-size: 1.5rem;
 
+  /* The table contract, in the two neutrals the reference measures. Mantine's
+     gray ramp is blue-tinted: the nearest steps, gray-1 (`#f1f3f5`) and gray-3
+     (`#dee2e6`), both read as cast against an untinted page, so the header band
+     and the row separator are spelled out here instead — the same reason the nav
+     rail spells out its four steps. One contract for every table in the product;
+     `component-defaults.ts` reads only these, and `tokens.test.ts` pins both. */
+  --app-table-header-surface: #f7f7f7;
+  --app-table-separator: #e3e3e3;
+
   --app-surface-page: var(--mantine-color-gray-0);
   --app-surface-raised: var(--mantine-color-white);
   --app-surface-sunken: var(--mantine-color-gray-1);

@@ -59,6 +59,17 @@ const MANTINE_TEXT = '#000000';
 
 const gray = colors.gray;
 
+const tokens = readFileSync(path.resolve(import.meta.dirname, 'tokens.css'), 'utf8');
+
+/** Reads a literal-valued `--app-*` token straight out of the token layer. */
+function tableToken(name: string): string {
+  const match = tokens.match(new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})`));
+  if (!match) {
+    throw new Error(`${name} is not declared as a literal in tokens.css`);
+  }
+  return match[1];
+}
+
 /**
  * The theme as `MantineProvider` hands it to the CSS-variable resolver: Mantine
  * defaults merged under the app theme, with the active scheme applied.
@@ -103,6 +114,15 @@ describe('secondary text on the surfaces the app renders', () => {
     expect(resolved.variables['--mantine-primary-color-filled']).toContain('ink');
     expect(resolved.light['--mantine-color-body']).toBe(DEFAULT_THEME.white);
     expect(resolved.light['--mantine-color-text']).toBe(DEFAULT_THEME.black);
+  });
+
+  test('secondary text clears AA on the table header surface', () => {
+    // The header moved off `--app-surface-sunken` onto its own literal. A lighter
+    // band means *less* contrast against muted text, so the pair has to be
+    // re-measured rather than assumed to carry over from gray-1.
+    expect(contrast(gray[7], tableToken('--app-table-header-surface'))).toBeGreaterThanOrEqual(
+      AA_TEXT
+    );
   });
 });
 
@@ -191,7 +211,6 @@ describe('primary action is a dark filled button', () => {
 describe('dark navigation surface', () => {
   // Read from the token layer rather than a duplicated literal, so the hex the
   // sidebar paints is the hex these numbers are about.
-  const tokens = readFileSync(path.resolve(import.meta.dirname, 'tokens.css'), 'utf8');
   const navToken = (name: string): string =>
     tokens.match(new RegExp(`${name}:\\s*(#[0-9a-fA-F]{6})`))?.[1] ?? '';
 
