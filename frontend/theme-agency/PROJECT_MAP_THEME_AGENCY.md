@@ -58,6 +58,13 @@ Playwright (`@playwright/test`) for visual/RTL/responsive verification ·
 - `tests/integration/`    — Playwright specs against a REAL backend + database
 - `docs/`                 — `website-api-contract.md` (the backend contract this
                             app consumes) and its run guide
+- `public/demo/themes/`   — real `starter` preview captures used by
+                            `themes/starter/manifest.ts` (`previewImage`) and
+                            rendered on the dashboard Themes page:
+                            `starter-home.jpg`, `starter-trips.jpg`,
+                            `starter-trip-detail.jpg`, `starter-home-narrow.jpg`
+                            (1440 + narrow). Regenerate with the already-installed
+                            Playwright against a local storefront run — no new dependency.
 
 ## [CORE BOUNDARIES]
 - Themes never import `prisma`, the database, NestJS internals, auth internals,

@@ -174,6 +174,27 @@ VITE_API_BASE_URL=http://localhost:3000 VITE_THEMES_BASE_URL=http://localhost:43
 ```
 `frontend/dashboard` is the same product on the older stack (port 5173). Dev CORS allows `5173`, `5174` (admin) and `5175` (mantine dashboard) — anything else needs `CORS_ORIGINS` in `backend/.env`. `VITE_THEMES_BASE_URL` is where the dashboard fetches `themes.json` (§4's storefront); the dev server can also proxy it.
 
+### Dashboard storefront env (`View Website`, T7)
+
+The Website page's **View Website** action resolves the public address through the pure
+`src/features/website/lib/website-url.ts` — no hardcoded origin. Precedence, first match wins:
+
+1. `customDomain` — the shape a future Domain feature will provide; nothing stores or maps one today.
+2. `VITE_STOREFRONT_BASE_URL` — the single-tenant dev storefront origin; the dev Astro server
+   resolves ONE agency, so its origin *is* that agency's live site.
+3. `slug` + `VITE_PLATFORM_DOMAIN` — the production per-tenant form `https://<slug>.<domain>/`.
+
+| Variable | Required | Shape |
+| --- | --- | --- |
+| `VITE_STOREFRONT_BASE_URL` | optional | http(s) origin, no path, no trailing slash |
+| `VITE_STOREFRONT_TENANT_SLUG` | optional | dev-only; shows a warning when the dev storefront's tenant is not this agency |
+| `VITE_PLATFORM_DOMAIN` | optional | host suffix, e.g. `example.com` |
+
+Anything that cannot resolve honestly returns `null` → the action offers the signed draft
+**preview** instead of opening a URL that would 404 or point at another tenant. A published site
+opens the live URL; an unpublished one never does. Resolution is pure and unit-tested
+(`website-url.test.ts`).
+
 ## 10. Verification
 
 - **Backend e2e** (`backend/test/website.e2e-spec.ts`, real PostgreSQL): permission matrix, ensure-once, publish atomicity + audit, slug isolation, public-boundary whitelist, token-gated draft.

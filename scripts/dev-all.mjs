@@ -17,13 +17,13 @@ const APPS = [
     url: "http://localhost:3000",
     color: "\x1b[36m",
   },
-  {
-    name: "dashboard",
-    dir: "frontend/dashboard",
-    run: "dev",
-    url: "http://localhost:5173",
-    color: "\x1b[32m",
-  },
+  // {
+  //   name: "dashboard",
+  //   dir: "frontend/dashboard",
+  //   run: "dev",
+  //   url: "http://localhost:5173",
+  //   color: "\x1b[32m",
+  // },
   {
     name: "admin",
     dir: "frontend/admin",
@@ -31,21 +31,28 @@ const APPS = [
     url: "http://localhost:5174",
     color: "\x1b[33m",
   },
-  {
-    name: "storefront",
-    dir: "frontend/storefront",
-    run: "dev",
-    // Port 3000 belongs to the API, so the storefront runs on 3001 under `all`.
-    // Running it standalone (`npm run dev` in its own folder) still uses 3000.
-    args: ["--", "-p", "3001"],
-    url: "http://localhost:3001",
-    color: "\x1b[35m",
-  },
+  // {
+  //   name: "storefront",
+  //   dir: "frontend/storefront",
+  //   run: "dev",
+  //   // Port 3000 belongs to the API, so the storefront runs on 3001 under `all`.
+  //   // Running it standalone (`npm run dev` in its own folder) still uses 3000.
+  //   args: ["--", "-p", "3001"],
+  //   url: "http://localhost:3001",
+  //   color: "\x1b[35m",
+  // },
   {
     name: "agency-ui",
     dir: "frontend/agency-dashboard-mantine",
     run: "dev",
     url: "http://localhost:5175",
+    color: "\x1b[34m",
+  },
+  {
+    name: "website-ui",
+    dir: "frontend/theme-agency",
+    run: "dev",
+    url: "http://localhost:5176",
     color: "\x1b[34m",
   },
 ];
