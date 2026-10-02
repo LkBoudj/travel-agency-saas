@@ -227,3 +227,28 @@ Gate: `npm test` — 81 files passed / 1 skipped, 365 tests passed / 6 skipped
    Members API does exist, and no brand-green wash ever existed on the site
    card. Measured rather than assumed, in both directions.
 
+## Follow-up: retired apps removed from root docs
+
+`e7f8bef` deleted `frontend/dashboard/` (shadcn SPA) and `frontend/storefront/`
+(Next.js prototype). Both were confirmed retired by the user — a superseded
+approach, not an accident. That left the repo's own agent instructions pointing
+at directories that no longer exist, which breaks the "never invent files or
+paths" invariant for every future session.
+
+Fixed in a forward commit (no history rewrite):
+- `AGENTS.md` — dropped the two apps from the topology tree and from §2, removed
+  their verification-script lines, retargeted the `workdir` example to
+  `frontend/agency-dashboard-mantine`, and marked the removals as "do not
+  recreate".
+- `PROJECT_MAP.md` — removed the app entries and their tech-stack lines,
+  corrected `scripts/dev-all.mjs` ports (dashboard :5173 and storefront :3001
+  no longer start), and repointed the Customers / Tours / Bookings feature
+  sections from `frontend/dashboard` to `frontend/agency-dashboard-mantine/src/features/*`,
+  which is where those features actually live.
+
+Every surviving mention of the two paths is now explicitly a REMOVED/historical
+note rather than an existence claim.
+
+Two things left deliberately: the `explorer` theme id and the
+`scripts/dev-all.mjs` commented-out blocks for the deleted apps are retained as
+historical record, not as instructions to rebuild.

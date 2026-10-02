@@ -32,42 +32,35 @@ anonymous travelers, platform operators.
                   backend_PROJECT_MAP.md [AGENCY_AUTHORIZATION],
                   [AGENCY_MEMBERS], [MEMBER_INVITATIONS], [CUSTOMERS] and
                   [AGENCY_TOURS].
-- frontend/dashboard/    React SPA — agency management only; does NOT render the
-                         public storefront.
-- frontend/agency-dashboard-mantine/  Vite 8 + React 19 + Mantine 9 SPA — the
-                          new production-grade agency dashboard (per
-                          improve_dash.md): separate workspace so the old
-                          dashboard stays untouched as reference. Dev port
-                          5175. Auth + shell, Members/Team, Customers, Trips
-                          (quick-create + section-nav editor), Departures +
-                          Pricing, Bookings + Travelers and the permission-aware
-                          Overview are complete against the real NestJS backend.
-                          See its `.planning/` and README.
-- frontend/storefront/   Next.js 16.3.5 App Router PUBLIC STOREFRONT — one app,
-                         all agencies, all themes. Exists.
-- frontend/marketplace/  PUBLIC web = Marketplace + Trip Details + Agency
+ - frontend/agency-dashboard-mantine/  Vite 8 + React 19 + Mantine 9 SPA — the
+                          agency dashboard. Dev port 5175. Auth + shell,
+                          Members/Team, Customers, Trips (quick-create +
+                          section-nav editor), Departures + Pricing, Bookings +
+                          Travelers and the permission-aware Overview are
+                          complete against the real NestJS backend.
+ - frontend/marketplace/  PUBLIC web = Marketplace + Trip Details + Agency
                          Profiles (future; will reuse the storefront renderer
                          for `{slug}.platform.com`). Does NOT exist yet.
-- frontend/admin/        Platform Super Dashboard — authenticated shell +
+ - frontend/admin/        Platform Super Dashboard — authenticated shell +
                          Roles & Permissions (platform RBAC UI) + Platform Users
                          management + Agencies (list, create, details, edit,
                          suspend/reactivate). Overview is an honest placeholder.
                          Exists.
-- Root `package.json` +   One command (`npm run all` / `npm run dev`) starts every
-  `scripts/dev-all.mjs`   app's dev server with prefixed output: backend :3000,
-                          dashboard :5173, admin :5174, storefront :3001 (3000 is
-                          the API), agency-dashboard-mantine :5175. Apps without
-                          `node_modules` are skipped with the exact install
-                          command printed.
+ - REMOVED: `frontend/dashboard/` (shadcn React SPA) and `frontend/storefront/`
+            (Next.js App Router public storefront) were a superseded approach and
+            have been deleted. `frontend/theme-agency/` is the storefront/theme
+            engine; `frontend/agency-dashboard-mantine/` is the dashboard.
+ - Root `package.json` +   One command (`npm run all` / `npm run dev`) starts every
+   `scripts/dev-all.mjs`   app's dev server with prefixed output: backend :3000,
+                           admin :5174, agency-dashboard-mantine :5175,
+                           theme-agency :5176. Apps without `node_modules` are
+                           skipped with the exact install command printed.
 
 ## [TECH_STACK]
-- dashboard: React19+TS+Vite+RR7+Tailwind4+shadcn(@base-ui)+TSQuery/Table+
-             Zustand+RHF+Zod3+Recharts+Lucide — CONFIRMED, keep locked.
-- storefront: Next.js 16.3.5 + React 19.2.8 + TypeScript + Tailwind CSS v4 —
-              EXISTS, one app for every agency. Platform owns theme resolution,
-              tenant resolution, locale, SEO, preview, not-found; themes are
-              server components fed via props only.
-- marketplace: future, undrafted.
+ - storefront (theme-agency): Astro + Cloudflare — the storefront/theme engine.
+              Platform owns theme resolution, tenant resolution, locale, SEO,
+              preview, not-found; themes are rendered from props only.
+ - marketplace: future, undrafted.
 - admin: Vite+React19+TS+RR7+Tailwind4+shadcn(base-nova/@base-ui)+TSQuery+
          RHF+Zod3+Lucide — CONFIRMED. Consumes the backend RBAC API with cookie
          sessions.
@@ -154,32 +147,14 @@ data/business boundaries → Theme Resolver → active Theme renderer. The publi
 storefront = Agency public profile + published trips + selected theme; themes
 present it only — no business logic, no tenancy, no booking/pricing.
 
-TWO apps implement this concept; do not conflate them. `frontend/storefront/`
-(Next.js) is the original prototype still on a dev demo adapter. `frontend/theme-agency/`
-(Astro + `@astrojs/cloudflare`) is the engine wired to the real backend: it reads
-the published website through `/v1/public/*`, resolves `themeId` from the
-registry per request (runtime theme switching needs no redeploy), serves the
-starter theme, and renders Theme Lab previews through the same render path. Its
-Cloudflare/wrangler deployment is deferred; its local data path is live.
-
-IMPLEMENTED in `frontend/storefront/` (standalone Next.js 16.3.5 App Router
-app): one Home route renders the active Theme against a dev adapter
-(`features/*/demo-data.ts` + `demo-agency.ts` — clearly temporary; a real
-backend/API boundary replaces it). Theme platform implemented: typed
-StorefrontTheme contract (`themes/contracts.ts`: manifest id/name/version,
-settings schema + defaults, Layout + Home/Trips/TripDetail templates), explicit
-Theme Registry (`themes/registry.ts`, keyed by stable id `explorer`; unknown
-ids fall back to default), Theme Resolver (`themes/resolver.ts`) and settings
-validation (`themes/settings.ts`). Root layout renders the active Theme
-(Layout: Header/Footer) with branding→CSS-vars; content is a platform
-view-model (ThemeRenderContext / StorefrontContent) passed via props — the same
-code path renders public and preview, they never fork.
-
-Explorer Theme (id `explorer`, v1.0.0 — the current first Theme): complete Home
-(discovery-first hero + search panel, featured tours, destinations, trust
-points, promotion, traveler stories, final CTA). Trips and Trip-detail
-templates are contract-complete but their routes are NOT wired yet (honest
-placeholders, no fabricated listing data).
+`frontend/theme-agency/` (Astro + `@astrojs/cloudflare`) is the storefront/theme
+engine: it reads the published website through `/v1/public/*`, resolves `themeId`
+from the registry per request (runtime theme switching needs no redeploy),
+serves the starter theme, and renders Theme Lab previews through the same render
+path. Its Cloudflare/wrangler deployment is deferred; its local data path is
+live. The earlier Next.js prototype (`frontend/storefront/`) was a superseded
+approach and has been deleted — do not conflate the two or recreate it. See
+`frontend/theme-agency/PROJECT_MAP_THEME_AGENCY.md` for the theme internals.
 
 NOT YET in the storefront: `/[locale]` routes + middleware, Arabic/i18n of
 system UI, SEO metadata (static title/description only today), preview mode
@@ -243,7 +218,8 @@ null, email normalized), partial update (null clears), one-way archive
 Every mutation is audited (`AGENCY_CUSTOMER_CREATED/UPDATED/ARCHIVED`) and
 documented in Swagger.
 
-Dashboard (`frontend/dashboard` customers feature): list + search + shared
+Dashboard (`frontend/agency-dashboard-mantine` customers feature,
+`src/features/customers/`): list + search + shared
 create/edit dialog, details route keyed by the customer code, one-way archive
 with confirmation. Controls are gated on the `AGENCY_CUSTOMER_*` permissions
 (UX only; backend guards authoritative). UI is a dedicated `customers` i18n
@@ -282,7 +258,8 @@ is one-way and never changes `tour.status`. Contract: `TOUR_NOT_FOUND`,
 `TOUR_ALREADY_ARCHIVED`, `DEPARTURE_ALREADY_CANCELLED` (409). Every mutation
 audited + in Swagger. See `backend/backend_PROJECT_MAP.md` [AGENCY_DEPARTURES].
 
-Dashboard (`frontend/dashboard` trips feature): list wired to the real API
+Dashboard (`frontend/agency-dashboard-mantine` tours feature,
+`src/features/tours/`): list wired to the real API
 (search + status server-driven; format/scope/destination client-side), create
 drawer, editor keyed by `TUR-` code (`/trips/:tourCode`). Load = GET, Save =
 PUT aggregate + explicit publish/unpublish/archive transition; a failed
@@ -334,8 +311,8 @@ Swagger: `BOOKING_TRAVELERS_REQUIRED`, `BOOKING_ALREADY_CANCELLED`,
 `BOOKING_CURRENCY_MISMATCH`, `BOOKING_DEPARTURE_CLOSED`. 34 controller specs +
 concurrency e2e; Module I gates green before the Dashboard slice.
 
-Dashboard (`frontend/dashboard` bookings feature, IMPLEMENTED — replaces the
-M0 `Bookings` placeholder route): list page (server-driven search + status
+Dashboard (`frontend/agency-dashboard-mantine` bookings feature,
+`src/features/bookings/`, IMPLEMENTED): list page (server-driven search + status
 filter), details route keyed by the `BKG-` code with the frozen price-line
 breakdown, currency, lifecycle status history, traveler manifest summary, and cancel with optional
 reason;
@@ -436,11 +413,11 @@ never write each other's keys.
   `frontend/theme-agency/docs/website-api-contract.md`.
 
 ## [THEME_SYSTEM]
-Platform-owned presentation system. Explorer (`explorer`) is the current first
-Theme of `frontend/storefront/`; the Astro engine in `frontend/theme-agency/`
+Platform-owned presentation system. The Astro engine in `frontend/theme-agency/`
 ships one theme, `starter` (`themes/starter/`, contract-complete, SDK-only
 imports), which is also the scaffold source for new themes. Luxe / Minimal are
-future examples only — not implemented.
+future examples only — not implemented. (`explorer` belonged to the deleted
+`frontend/storefront/` prototype and is gone with it.)
 
 - Explicit Theme Registry: themes statically imported, keyed by stable id
   (e.g. `explorer`). Ids are validated against the registry — never used to
@@ -485,9 +462,8 @@ storage · D11 capacity via row locks in tx · D12 booking price snapshot ·
 dashboard stack locked as-is · D13 shared public/preview renderer — the theme
 engine (context + resolver + registry) is implemented ONCE and public + preview
 run the same code path; the dashboard boundary was moved (/move-copy, never a
-reimplementation) into the standalone `frontend/storefront` app, then the
-storefront feature was removed from the dashboard. Future marketplace reuse is
-a move/copy of the same isolated boundaries.
+reimplementation) out of the dashboard into a standalone app. Future marketplace
+reuse is a move/copy of the same isolated boundaries.
 
 ## [DEMO DATA CONVENTIONS]
 The demo tenant `AGY-0C937B377B89` ("hichem traveling", `agency.id = 91`) holds the
