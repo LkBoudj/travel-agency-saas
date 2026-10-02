@@ -83,6 +83,8 @@ Baseline: `frontend/agency-dashboard-mantine/.artifacts/baseline/` (44 PNGs + `g
 | Credentials read from repo-root `.env` (`WEBSITE_TEST_*`) | Never hardcoded, never logged, never committed (`.gitignore:22` covers `.env`) |
 | `geometry.json` emitted alongside the PNGs | A pixel diff cannot prove geometry; recording widths/heights/direction makes the delta table measurable |
 | Overview keeps 4 KPIs, no Departures | No agency-wide departures query exists |
+| Overview keeps the **Team** tile | The task brief said "no Members API"; `requestAgencyMembers` exists and the tile is permission-gated off otherwise. Measured, then kept |
+| Stat-tile sizes become tokens, not literals | 13px is the row height `data-table.tsx` settled on, so it is an app-wide decision; jsdom cannot resolve it inline, so the px value is pinned in `tokens.test.ts` |
 | Trips drops the next-departure column | `TourListRow` has no such date |
 | Proceed from written spec + measured pixel geometry | The reference PNG could not be visually perceived in-session; composition claims are avoided and only measurable facts are used |
 
@@ -96,6 +98,24 @@ Baseline: `frontend/agency-dashboard-mantine/.artifacts/baseline/` (44 PNGs + `g
 | Login selector `input[type="text"]` never matched | Mantine leaves the email input's `type` **attribute** unset, so the DOM property reads `text` but the CSS attribute selector matches nothing |
 | Login selector `input.mantine-PasswordInput-input` never matched | The real class is `mantine-PasswordInput-innerInput` |
 | Fixed selector | Used the `autocomplete` values the form itself declares: `input[autocomplete="email"]` and `input[autocomplete="current-password"]` — stable and semantically meaningful |
+
+## Mantine 9 facts this redesign keeps re-learning
+
+- **`Button` has no variant class.** `variant="filled"` and `variant="default"`
+  both render `mantine-Button-root`; the difference is the inline
+  `--button-bg` / `--button-color` / `--button-bd` custom properties. Any test
+  asserting a button's prominence must read those, not a class.
+- **Numeric `fz` is scaled.** `fz={13}` emits
+  `calc(0.8125rem * var(--mantine-scale))`, never `13px`.
+- **jsdom resolves no custom property.** A component test can prove that an
+  element points at a token; it cannot prove the token's value. That assertion
+  belongs in `tokens.test.ts`.
+- **`Grid.Col` renders zero-width spacers.** `Grid-root > Grid-inner` contains
+  the real columns *plus* empty siblings, so `[...grid.children].map(measure)`
+  returns phantom 0px entries. Walk up to the first ancestor with ≥2 children and
+  skip the empties, or read the col's own bounding box.
+- **`.mantine-Input-input` carries `min-height`.** `min-height` clamps `height`,
+  so setting `height` alone is silently ignored (found in T4, still the trap).
 
 ## Resources
 

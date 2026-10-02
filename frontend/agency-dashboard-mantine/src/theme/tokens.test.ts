@@ -121,6 +121,16 @@ describe('token layer', () => {
     );
     expect(undeclared).toEqual([]);
   });
+
+  test('pins the stat-tile anatomy to a 13px label over a 24px value', () => {
+    // A component test can only assert that the tile points at these tokens;
+    // jsdom resolves no custom property. This is where 13px and 24px are
+    // actually enforced, so the anatomy cannot drift back to Mantine's defaults.
+    const layer = TOKEN_LAYER_FILES.map(read).join('\n');
+
+    expect(layer).toMatch(/--app-tile-label-size:\s*0\.8125rem/); // 13px
+    expect(layer).toMatch(/--app-tile-value-size:\s*1\.5rem/); // 24px
+  });
 });
 
 describe('palette discipline', () => {

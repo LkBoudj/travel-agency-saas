@@ -10,10 +10,16 @@ const TABULAR: CSSProperties = { fontVariantNumeric: 'tabular-nums' };
  * One number with its label and an optional sub-line.
  *
  * The hierarchy is deliberate and is the reason this is a shared component: a
- * label you can read at arm's length (12px, uppercase, muted), a value that
- * dominates the tile (30px, tabular so a changing count does not shift the
+ * label you can read at arm's length (`--app-tile-label-size`, 13px, uppercase,
+ * muted), a value that dominates the tile (`--app-tile-value-size`, 24px
+ * compact / 30px default, tabular so a changing count does not shift the
  * layout), and a sub-line that qualifies it. `compact` keeps the same order at
- * a smaller scale for in-page panels.
+ * the in-page scale the pricing summary uses.
+ *
+ * The two sizes are tokens rather than literals because they are a decision the
+ * whole app inherits: 13px is the row height `data-table.tsx` settled on, so a
+ * tile that labels itself a step smaller than the rows it summarizes reads as a
+ * caption rather than as a summary.
  *
  * Hairline border, no shadow: four tiles in a row with shadows read as four
  * objects floating; with hairlines they read as one row of a table.
@@ -50,10 +56,15 @@ export function StatCard({
       <Card withBorder radius="md" p={compact ? 'md' : 'lg'} h="100%">
         <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
           <Stack gap={compact ? 2 : 4} style={{ minWidth: 0 }}>
-            <Text size="xs" c="dimmed" tt="uppercase" fw={600} truncate>
+            <Text fz="var(--app-tile-label-size)" c="dimmed" tt="uppercase" fw={600} truncate>
               {label}
             </Text>
-            <Text fz={compact ? 24 : 30} fw={600} lh={1.15} style={TABULAR}>
+            <Text
+              fz={compact ? 'var(--app-tile-value-size)' : 30}
+              fw={600}
+              lh={1.15}
+              style={TABULAR}
+            >
               {value}
             </Text>
             {sub ? (
@@ -69,7 +80,10 @@ export function StatCard({
                   bg="var(--app-surface-sunken)"
                   c="dimmed"
                   p={6}
-                  style={{ borderRadius: 'var(--mantine-radius-md)', display: 'flex' }}
+                  style={{
+                    borderRadius: 'var(--mantine-radius-md)',
+                    display: 'flex',
+                  }}
                 >
                   {icon}
                 </Box>

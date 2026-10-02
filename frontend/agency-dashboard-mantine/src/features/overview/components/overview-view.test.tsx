@@ -19,9 +19,16 @@ function booking(index: number): AgencyBooking {
   return {
     code: `BKG-0C937B377B8${index}`,
     status: index % 2 === 0 ? 'CONFIRMED' : 'PENDING',
-    customer: { code: `CUS-00000000000${index}`, firstName: `Amina${index}`, lastName: 'Belaid' },
+    customer: {
+      code: `CUS-00000000000${index}`,
+      firstName: `Amina${index}`,
+      lastName: 'Belaid',
+    },
     tour: { code: `TUR-00000000000${index}`, name: `Atlas ${index}` },
-    departure: { code: `DEP-00000000000${index}`, startAt: '2026-03-04T09:00:00.000Z' },
+    departure: {
+      code: `DEP-00000000000${index}`,
+      startAt: '2026-03-04T09:00:00.000Z',
+    },
     reservedSeats: 2,
     currency: 'DZD',
     totalAmount: 48000,
@@ -29,18 +36,20 @@ function booking(index: number): AgencyBooking {
   } as AgencyBooking;
 }
 
+const BASE_KPIS = {
+  customers: 5,
+  tours: 5,
+  publishedTours: 5,
+  bookings: 4,
+  pendingBookings: 1,
+  confirmedBookings: 3,
+  members: 1,
+};
+
 /** Composition only: a controller literal proves the headings and actions. */
 function controller(overrides: Partial<OverviewPageController> = {}) {
   return {
-    kpis: {
-      customers: 5,
-      tours: 5,
-      publishedTours: 5,
-      bookings: 4,
-      pendingBookings: 1,
-      confirmedBookings: 3,
-      members: 1,
-    },
+    kpis: BASE_KPIS,
     canView: {
       customers: true,
       tours: true,
@@ -51,6 +60,7 @@ function controller(overrides: Partial<OverviewPageController> = {}) {
     quickActions: [
       { key: 'bookings', label: 'New booking', run: () => {} },
       { key: 'customers', label: 'Add customer', run: () => {} },
+      { key: 'tours', label: 'New trip', run: () => {} },
     ],
     bookings: [],
     isLoading: false,
@@ -67,7 +77,10 @@ function controller(overrides: Partial<OverviewPageController> = {}) {
       slug: 'atlas-travel',
       themeId: 'safari',
     },
-    viewWebsite: { mode: 'preview', open: () => {} } as OverviewPageController['viewWebsite'],
+    viewWebsite: {
+      mode: 'preview',
+      open: () => {},
+    } as OverviewPageController['viewWebsite'],
     ...overrides,
   } as unknown as OverviewPageController;
 }
@@ -123,7 +136,12 @@ describe('OverviewView structure', () => {
     render(
       <OverviewView
         controller={controller({
-          site: { isLoading: false, isPublished: true, slug: 'atlas', themeId: null },
+          site: {
+            isLoading: false,
+            isPublished: true,
+            slug: 'atlas',
+            themeId: null,
+          },
           viewWebsite: {
             mode: 'live',
             url: 'https://atlas.example',
@@ -170,7 +188,12 @@ describe('OverviewView structure', () => {
             website: false,
           },
           quickActions: [],
-          site: { isLoading: false, isPublished: false, slug: null, themeId: null },
+          site: {
+            isLoading: false,
+            isPublished: false,
+            slug: null,
+            themeId: null,
+          },
         })}
       />
     );
@@ -183,7 +206,91 @@ describe('OverviewView structure', () => {
   test('surfaces a failing section with a retry', () => {
     render(<OverviewView controller={controller({ isError: true })} />);
 
-    const alert = within(screen.getByRole('alert')).getByRole('button', { name: 'Retry' });
+    const alert = within(screen.getByRole('alert')).getByRole('button', {
+      name: 'Retry',
+    });
     expect(alert).toBeInTheDocument();
+  });
+});
+
+describe('OverviewView information design', () => {
+  test('orders the tiles Customers, Trips, Bookings, Team', () => {
+    render(<OverviewView controller={controller()} />);
+
+    const labels = within(screen.getByTestId('kpi-tiles'))
+      .getAllByRole('button')
+      .map((tile) => (tile.textContent ?? '').split(/\d/)[0].trim());
+
+    expect(labels).toEqual(['Customers', 'Trips', 'Bookings', 'Team']);
+  });
+
+  test('shows one tile per KPI the member may view', () => {
+    render(
+      <OverviewView
+        controller={controller({
+          canView: {
+            customers: true,
+            tours: true,
+            bookings: false,
+            members: false,
+            website: false,
+          },
+          quickActions: [],
+          site: {
+            isLoading: false,
+            isPublished: false,
+            slug: null,
+            themeId: null,
+          },
+        })}
+      />
+    );
+
+    const tiles = within(screen.getByTestId('kpi-tiles')).getAllByRole('button');
+    expect(tiles).toHaveLength(2);
+  });
+
+  test('gives a tile a 13px label above a 24px number, both semibold', () => {
+    render(<OverviewView controller={controller({ kpis: { ...BASE_KPIS, customers: 12 } })} />);
+
+    // The sizes are tokens; `tokens.test.ts` is what pins them to 13px and 24px.
+    expect(screen.getByText('Customers')).toHaveStyle({
+      fontSize: 'var(--app-tile-label-size)',
+      fontWeight: '600',
+    });
+    expect(screen.getByText('12')).toHaveStyle({
+      fontSize: 'var(--app-tile-value-size)',
+      fontWeight: '600',
+    });
+  });
+
+  test('keeps exactly one primary action in the page header', () => {
+    render(<OverviewView controller={controller()} />);
+
+    const actions = within(screen.getByTestId('page-actions')).getAllByRole('button');
+    expect(actions).toHaveLength(1);
+    expect(actions[0]).toHaveTextContent('New booking');
+    // Mantine 9 expresses the variant as a custom property, not a class: the
+    // primary is the one painting the near-black ink fill.
+    expect(actions[0].getAttribute('style')).toContain('--mantine-color-ink-filled');
+  });
+
+  test('moves the remaining shortcuts below the header instead of crowding it', () => {
+    render(<OverviewView controller={controller()} />);
+
+    const shortcuts = within(screen.getByTestId('quick-actions')).getAllByRole('button');
+    expect(shortcuts.map((button) => button.textContent)).toEqual(['Add customer', 'New trip']);
+    // Only the promoted primary stays in the header; the rest are secondary.
+    for (const shortcut of shortcuts) {
+      expect(screen.getByTestId('page-actions')).not.toContainElement(shortcut);
+    }
+  });
+
+  test('offers the site action once, from the site panel', () => {
+    render(<OverviewView controller={controller()} />);
+
+    const preview = screen.getAllByRole('button', { name: /preview draft/i });
+    expect(preview).toHaveLength(1);
+    expect(within(screen.getByTestId('site-status')).getByRole('button')).toBe(preview[0]);
   });
 });

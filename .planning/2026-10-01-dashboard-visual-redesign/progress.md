@@ -174,3 +174,56 @@ Gate: `npm test` — 81 files passed / 1 skipped, 358 tests passed / 6 skipped
 (+13). Screenshots: `.artifacts/t4-primitives/` (44); rail 220 / header 44 / no
 overflow on all 14 page-locale pairs.
 
+
+## T5 — Overview (complete)
+
+Tests first: all six new `overview-view.test.tsx` cases failed for the right
+reason, then passed. Two earlier drafts of two of them failed for *test* reasons
+(a regex that also matched "Open Bookings", and an ambiguous `getByText('5')`
+that matched a value and its sub-line) — fixed before counting the RED.
+
+| Change | File |
+|---|---|
+| Tiles switched to `compact` (dense anatomy); grid `cols={{ base: 2, lg: 4 }}` + `data-testid="kpi-tiles"` | `features/overview/components/overview-view.tsx` |
+| Header keeps one action — the first shortcut, `variant="filled"`; the rest in a `quick-actions` row below | `features/overview/components/overview-view.tsx` |
+| Header `ViewWebsiteButton` removed — the site panel already offered it | `features/overview/components/overview-view.tsx` |
+| Bookings/site split 8/4 → 9/3 | `features/overview/components/overview-view.tsx` |
+| `--app-tile-label-size: 0.8125rem` / `--app-tile-value-size: 1.5rem` | `theme/tokens.css` |
+| `StatCard` label 12px → token; compact value 24px literal → token | `components/stat-card.tsx` |
+| `data-page-actions=""` → `data-testid="page-actions"` (uncommitted scaffold from the previous session) | `components/page-header.tsx` |
+| `data-testid="site-status"` | `features/overview/components/site-status-card.tsx` |
+| New token-anatomy pin | `theme/tokens.test.ts` |
+
+Live-browser verification (`.artifacts/t5-overview/`, 6 PNGs +
+`t5-measurements.json`; en + ar at 1440 and 375):
+
+| Probe | Value |
+|---|---|
+| tile label / value | `13px`/`600` over `24px`/`600` |
+| tile columns | 4 at 1440, **2** at 375 |
+| header action count | 1 — `rgb(26,26,26)` fill, `rgb(255,255,255)` label |
+| shortcut row | 3 buttons, all `rgb(255,255,255)` |
+| bookings / site widths | `888` / `288` of `1188` = **9/3** |
+| tile + site panel background | `rgb(255,255,255)`, hairline `rgb(227,227,227)` |
+| horizontal overflow | 0 at 1440 and 375, both locales |
+
+Gate: `npm test` — 81 files passed / 1 skipped, 365 tests passed / 6 skipped
+(+7), build clean.
+
+### Three findings worth keeping
+
+1. **Mantine 9 has no `Button` variant class.** A `variant="filled"` button
+   carries `mantine-Button-root` and nothing else; the variant lives entirely in
+   the inline custom property `--button-bg`. `toHaveClass('mantine-Button-filled')`
+   therefore fails against a correct implementation. The primary-action test
+   asserts `--mantine-color-ink-filled` instead — the property that actually
+   paints it.
+2. **`fz={13}` does not produce `font-size: 13px`.** Mantine scales numeric font
+   sizes, so it emits `calc(0.8125rem * var(--mantine-scale))`. jsdom cannot
+   resolve a custom property either, so a component test can only assert that
+   the tile *points at* a token; `tokens.test.ts` is where 13px and 24px are
+   actually enforced. Two pins, one number.
+3. **Two of this task's premises were false** (see `task_plan.md` → T5): a
+   Members API does exist, and no brand-green wash ever existed on the site
+   card. Measured rather than assumed, in both directions.
+

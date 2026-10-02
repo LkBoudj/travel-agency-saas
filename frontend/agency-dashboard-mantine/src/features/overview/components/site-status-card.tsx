@@ -24,7 +24,7 @@ export function SiteStatusCard({
   const { t } = useTranslation('dashboard');
 
   return (
-    <Panel p="lg" h="100%">
+    <Panel p="lg" h="100%" data-testid="site-status">
       <Stack gap="md">
         <Group justify="space-between" align="center" wrap="nowrap">
           <Title order={2} fz="md">
@@ -34,7 +34,10 @@ export function SiteStatusCard({
             bg="var(--app-surface-sunken)"
             c="dimmed"
             p={6}
-            style={{ borderRadius: 'var(--mantine-radius-md)', display: 'flex' }}
+            style={{
+              borderRadius: 'var(--mantine-radius-md)',
+              display: 'flex',
+            }}
           >
             <IconWorld size={16} stroke={1.5} aria-hidden />
           </Box>

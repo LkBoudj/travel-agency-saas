@@ -176,14 +176,16 @@ describe('StatCard', () => {
   test('the value dominates the tile', () => {
     render(<StatCard label="Customers" value={12} />);
 
-    // 30px (1.875rem) against a 12px label: the count is the point of the tile.
+    // 30px (1.875rem) against a 13px label: the count is the point of the tile.
     expect(screen.getByText('12').style.fontSize).toBe('calc(1.875rem * var(--mantine-scale))');
+    expect(screen.getByText('Customers').style.fontSize).toBe('var(--app-tile-label-size)');
   });
 
   test('compact keeps the same hierarchy at a smaller scale', () => {
     render(<StatCard label="Customers" value={12} compact />);
 
-    expect(screen.getByText('12').style.fontSize).toBe('calc(1.5rem * var(--mantine-scale))');
+    // The token, pinned to 24px by `tokens.test.ts`.
+    expect(screen.getByText('12').style.fontSize).toBe('var(--app-tile-value-size)');
   });
 
   test('becomes a button that navigates when it is clickable', () => {

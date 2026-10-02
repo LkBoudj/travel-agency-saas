@@ -36,7 +36,13 @@ export function PageHeader({
         ) : null}
         {meta}
       </Stack>
-      {actions ? <Group gap="sm">{actions}</Group> : null}
+      {/* Marked so a page's "exactly one primary action" rule is testable
+          without depending on the header's internal DOM shape. */}
+      {actions ? (
+        <Group gap="sm" data-testid="page-actions">
+          {actions}
+        </Group>
+      ) : null}
     </Group>
   );
 }

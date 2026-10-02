@@ -1,0 +1,138 @@
+{
+  "en--1440": {
+    "tileCount": 4,
+    "tileColumns": 4,
+    "tileLabel": {
+      "fontSize": "13px",
+      "fontWeight": "600"
+    },
+    "tileValue": {
+      "fontSize": "24px",
+      "fontWeight": "600"
+    },
+    "tileBackground": "rgb(255, 255, 255)",
+    "pageActionCount": 1,
+    "pageActionLabel": "New booking",
+    "pageActionBackground": "rgb(26, 26, 26)",
+    "pageActionColor": "rgb(255, 255, 255)",
+    "quickActionLabels": [
+      "Add customer",
+      "New trip",
+      "Invite member"
+    ],
+    "quickActionBackgrounds": [
+      "rgb(255, 255, 255)",
+      "rgb(255, 255, 255)",
+      "rgb(255, 255, 255)"
+    ],
+    "splitWidths": [
+      1188
+    ],
+    "sitePanelBackground": "rgb(255, 255, 255)",
+    "sitePanelBorder": "rgb(227, 227, 227)",
+    "bodyBackground": "rgb(246, 246, 247)",
+    "overflow": 0
+  },
+  "en--375": {
+    "tileCount": 4,
+    "tileColumns": 2,
+    "tileLabel": {
+      "fontSize": "13px",
+      "fontWeight": "600"
+    },
+    "tileValue": {
+      "fontSize": "24px",
+      "fontWeight": "600"
+    },
+    "tileBackground": "rgb(255, 255, 255)",
+    "pageActionCount": 1,
+    "pageActionLabel": "New booking",
+    "pageActionBackground": "rgb(26, 26, 26)",
+    "pageActionColor": "rgb(255, 255, 255)",
+    "quickActionLabels": [
+      "Add customer",
+      "New trip",
+      "Invite member"
+    ],
+    "quickActionBackgrounds": [
+      "rgb(255, 255, 255)",
+      "rgb(255, 255, 255)",
+      "rgb(255, 255, 255)"
+    ],
+    "splitWidths": [
+      351
+    ],
+    "sitePanelBackground": "rgb(255, 255, 255)",
+    "sitePanelBorder": "rgb(227, 227, 227)",
+    "bodyBackground": "rgb(246, 246, 247)",
+    "overflow": 0
+  },
+  "ar--1440": {
+    "tileCount": 4,
+    "tileColumns": 4,
+    "tileLabel": {
+      "fontSize": "13px",
+      "fontWeight": "600"
+    },
+    "tileValue": {
+      "fontSize": "24px",
+      "fontWeight": "600"
+    },
+    "tileBackground": "rgb(255, 255, 255)",
+    "pageActionCount": 1,
+    "pageActionLabel": "حجز جديد",
+    "pageActionBackground": "rgb(26, 26, 26)",
+    "pageActionColor": "rgb(255, 255, 255)",
+    "quickActionLabels": [
+      "إضافة عميل",
+      "رحلة جديدة",
+      "دعوة عضو"
+    ],
+    "quickActionBackgrounds": [
+      "rgb(255, 255, 255)",
+      "rgb(255, 255, 255)",
+      "rgb(255, 255, 255)"
+    ],
+    "splitWidths": [
+      1188
+    ],
+    "sitePanelBackground": "rgb(255, 255, 255)",
+    "sitePanelBorder": "rgb(227, 227, 227)",
+    "bodyBackground": "rgb(246, 246, 247)",
+    "overflow": 0
+  },
+  "ar--375": {
+    "tileCount": 4,
+    "tileColumns": 2,
+    "tileLabel": {
+      "fontSize": "13px",
+      "fontWeight": "600"
+    },
+    "tileValue": {
+      "fontSize": "24px",
+      "fontWeight": "600"
+    },
+    "tileBackground": "rgb(255, 255, 255)",
+    "pageActionCount": 1,
+    "pageActionLabel": "حجز جديد",
+    "pageActionBackground": "rgb(26, 26, 26)",
+    "pageActionColor": "rgb(255, 255, 255)",
+    "quickActionLabels": [
+      "إضافة عميل",
+      "رحلة جديدة",
+      "دعوة عضو"
+    ],
+    "quickActionBackgrounds": [
+      "rgb(255, 255, 255)",
+      "rgb(255, 255, 255)",
+      "rgb(255, 255, 255)"
+    ],
+    "splitWidths": [
+      351
+    ],
+    "sitePanelBackground": "rgb(255, 255, 255)",
+    "sitePanelBorder": "rgb(227, 227, 227)",
+    "bodyBackground": "rgb(246, 246, 247)",
+    "overflow": 0
+  }
+}

@@ -50,6 +50,15 @@
      visible in one place and cannot drift from the framework's value. */
   --app-control-height-compact: 26px;
 
+  /* The stat-tile anatomy: a label you can read at arm's length above a number
+     that dominates. 13px is the row height the whole app settled on, so a tile
+     labels itself at the same size as the rows it summarizes instead of a step
+     below them; the compact value is 24px, which stays inside the 32px control
+     rhythm without the tile becoming the loudest object on the page. Pinned by
+     `tokens.test.ts` so neither can drift back to Mantine's defaults. */
+  --app-tile-label-size: 0.8125rem;
+  --app-tile-value-size: 1.5rem;
+
   --app-surface-page: var(--mantine-color-gray-0);
   --app-surface-raised: var(--mantine-color-white);
   --app-surface-sunken: var(--mantine-color-gray-1);

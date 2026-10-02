@@ -13,10 +13,10 @@ without changing any architecture, API, permission, or business logic.
 
 ## Next Step
 
-T5: restyle the Overview page against the new shell — the four stat tiles, the
-recent-activity table, and the site-status panel — with the compact row rhythm T4
-established. No fabricated agency-wide Departures KPI: `use-departures.ts` is
-per-tour.
+T6: the shared table/list contract. Eight tables disagree about header weight,
+separators, hover and row density, and the sticky offset still targets the old
+60px header. Replace with one `#F7F7F7` header, `#E3E3E3` bottom-only
+separators, 1px row hover, and a sticky offset derived from `--app-header-height`.
 
 ## Current Phase
 
@@ -216,7 +216,47 @@ Phase 3
   no English literal remains in a shared component.
 - **Tests:** per-primitive class and content assertions.
 
-#### T5 — Overview
+#### T5 — Overview — COMPLETE
+
+- **Problem:** Four equal tiles compete for attention; quick actions crowd the
+  header; the site card uses a brand-green wash.
+- **Result:** tiles use the dense anatomy (13px/600 label over 24px/600 value,
+  as `--app-tile-label-size` / `--app-tile-value-size`) and `cols={{ base: 2, lg: 4 }}`.
+  The header now carries **one** action — the first shortcut promoted to
+  `variant="filled"` — with the remaining three demoted to a `default` row
+  directly beneath it. The bookings/site split went 8/4 → **9/3**.
+  The duplicated `ViewWebsiteButton` was removed from the header: the site panel
+  already owns it, so the same control no longer renders twice on one screen.
+- **Corrections to this task's brief (both were wrong):**
+  1. *"the Members tile is not shown because there is no Members API"* — a Members
+     API exists (`requestAgencyMembers`, `features/members/api/members.api.ts`)
+     and the Team tile is fed by it, so the tile **stays**. Removing working,
+     permission-gated functionality on a false premise is not a redesign.
+  2. *"the site card uses a brand-green wash"* — no green existed:
+     `rg 'brand|green' src/features/overview/` returned nothing before or after.
+     The panel was already `--app-surface-raised` with a `--app-border-subtle`
+     hairline. Recorded as already-satisfied rather than "fixed".
+- **Verified live** (`.artifacts/t5-overview/`, 6 PNGs + `t5-measurements.json`),
+  en + ar at 1440 and 375:
+
+  | Probe | Value |
+  |---|---|
+  | tile label / value | `13px`/`600` over `24px`/`600` |
+  | tile columns | 4 at 1440, **2** at 375 |
+  | header action count | 1, `rgb(26,26,26)` fill, white label |
+  | shortcut row | 3 buttons, all `rgb(255,255,255)` |
+  | bookings / site widths | `888` / `288` of `1188` = **9/3** |
+  | tile + site panel background | `rgb(255,255,255)` — no brand wash |
+  | horizontal overflow | 0 at 1440 and 375, both directions |
+
+- **Gate:** 81 files passed / 1 skipped, 365 tests passed / 6 skipped (+7).
+- **Tests:** `overview-view.test.tsx` gains an `information design` block (tile
+  order, one-tile-per-permission, tile anatomy, one primary action, shortcuts
+  demoted, single site action) plus a `tokens.test.ts` case pinning the two tile
+  sizes to 13px and 24px — jsdom resolves no custom property, so the component
+  test can only prove the tile *points at* the tokens.
+
+#### T5 — Overview (detail)
 
 - **Problem:** Four equal tiles compete for attention; quick actions crowd the
   header; the site card uses a brand-green wash.
