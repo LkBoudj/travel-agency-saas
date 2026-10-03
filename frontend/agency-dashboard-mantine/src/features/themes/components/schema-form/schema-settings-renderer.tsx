@@ -110,6 +110,7 @@ function FieldInput({
         <ColorInput
           label={labelKey(field.labelKey)}
           format="hex"
+          // app-allow-raw-hex: the value a member picked, not chrome.
           value={typeof currentValue === 'string' ? currentValue : '#000000'}
           disabled={disabled}
           onChange={(next) => onChange(next as SettingsMap[string])}

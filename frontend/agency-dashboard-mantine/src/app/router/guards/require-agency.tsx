@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
-import { AgencyAccessFailureScreen } from '../../../components/agency-failure-screen.tsx';
 import { FullPageLoader } from '../../../components/full-page-loader.tsx';
+import { AgencyAccessFailureScreen } from '../../../features/agency-context/components/agency-access-failure-screen.tsx';
 import { AgencyProvider } from '../../../features/agency-context/provider/agency-provider.tsx';
 import { useRequireAgency } from '../hooks/use-require-agency.ts';
 

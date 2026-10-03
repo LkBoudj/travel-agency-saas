@@ -45,6 +45,7 @@ function fallbackFor(field: SettingsField): boolean | string | number {
     case 'text':
       return '';
     case 'color':
+      // app-allow-raw-hex: a colour setting's stored value, not chrome.
       return '#000000';
     case 'number':
       return field.min ?? 0;

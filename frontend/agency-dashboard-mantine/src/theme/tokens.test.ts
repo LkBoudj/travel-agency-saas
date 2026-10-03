@@ -44,9 +44,12 @@ const PALETTE_STEP =
   /var\(--mantine-color-(?:brand|gray|dark|success|warning|danger|info|red|orange|yellow|green|teal|cyan|blue|grape|violet|pink|indigo|lime)-\d/g;
 
 /**
- * Files allowed to contain a raw hex. `theme/colors.ts` owns the palettes; the
- * themes feature carries user-picked colours as data (`#000000` is a form value,
- * not chrome); the style guide documents the palettes by printing them.
+ * Files allowed to contain a raw hex. `theme/colors.ts` owns the palettes and the
+ * style guide documents them by printing them.
+ *
+ * A file that holds user-picked colour *data* is not on this list; it declares
+ * itself with `RAW_HEX_EXEMPT` instead, because the theme layer cannot name the
+ * files that qualify without depending on feature internals.
  */
 const HEX_ALLOWLIST = new Set([
   path.join(SRC, 'favicon.svg'),
@@ -58,11 +61,18 @@ const HEX_ALLOWLIST = new Set([
   // navigation rail has no Mantine palette behind it and so has to spell its four
   // steps out; everything else must still reach them through `var(--app-*)`.
   path.join(SRC, 'theme/tokens.css'),
-  path.join(SRC, 'features/themes/lib/settings-map.ts'),
-  path.join(SRC, 'features/themes/lib/settings-map.test.ts'),
-  path.join(SRC, 'features/themes/components/schema-form/schema-settings-renderer.tsx'),
   path.join(SRC, 'pages/StyleGuide.page.tsx'),
 ]);
+
+/**
+ * A file opts out of the raw-hex ban by naming this marker in a comment. The rule
+ * is about chrome, not about data: a colour *value* a member picks for a theme
+ * setting is stored exactly as written, and is not expressible as a token. The
+ * exemption travels with the file instead of being listed here, the way a lint
+ * suppression does — the token layer states the convention, never the consumer.
+ */
+const RAW_HEX_EXEMPT = /app-allow-raw-hex/;
+
 
 /** The tokens the whole product is built on; losing one breaks pages, not just styling. */
 const FOUNDATION_TOKENS = [
@@ -157,7 +167,7 @@ describe('palette discipline', () => {
 
   test('no raw hex outside the allowlist', () => {
     const offenders = collect(
-      FILES.filter((file) => !HEX_ALLOWLIST.has(file)),
+      FILES.filter((file) => !HEX_ALLOWLIST.has(file) && !RAW_HEX_EXEMPT.test(read(file))),
       /#[0-9a-fA-F]{3,8}\b/g
     );
     expect(offenders).toEqual([]);

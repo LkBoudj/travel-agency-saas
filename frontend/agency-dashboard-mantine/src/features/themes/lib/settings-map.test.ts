@@ -8,6 +8,7 @@ import {
   initialSettingsMap,
 } from './settings-map.ts';
 
+// app-allow-raw-hex: these fixtures assert the colour values a member picks.
 const schema: SettingsSchema = {
   fields: [
     { key: 'homepage.showFeaturedTours', type: 'boolean', group: 'homepage', labelKey: 'l1' },

@@ -7,7 +7,7 @@ import {
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Button, Center, Stack, Text, Title } from '@mantine/core';
-import type { AgencyAccessFailure } from '../features/agency-context/lib/agency-access.ts';
+import type { AgencyAccessFailure } from '../lib/agency-access.ts';
 
 const CONFIG: Record<
   AgencyAccessFailure,
