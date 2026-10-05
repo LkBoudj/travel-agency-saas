@@ -4,41 +4,32 @@ import '@mantine/notifications/styles.css';
 
 import 'dayjs/locale/ar-dz';
 import { useState, type ReactNode } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useTranslation } from 'react-i18next';
 import { MantineProvider } from '@mantine/core';
 import { DatesProvider, type DatesProviderSettings } from '@mantine/dates';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
-import type { AppLocale } from '../i18n';
-import { useAppLocale } from '../i18n/hooks/use-app-locale';
-import { useIsRtl } from '../i18n/hooks/use-is-rtl';
-import { ApiError } from '../services/api';
-import { cssVariablesResolver, theme } from './theme';
-import './tokens.css';
+import { useAppLocale } from '../../i18n/hooks/use-app-locale.ts';
+import { useIsRtl } from '../../i18n/hooks/use-is-rtl.ts';
+import type { AppLocale } from '../../i18n/index.ts';
+import { cssVariablesResolver, theme } from '../../theme/theme.ts';
+import { buildQueryClient } from './query-client.ts';
+import '../../theme/tokens.css';
 
 const DATE_SETTINGS: Record<AppLocale, DatesProviderSettings> = {
   en: { locale: 'en', firstDayOfWeek: 0, weekendDays: [0, 6] },
   ar: { locale: 'ar-dz', firstDayOfWeek: 1, weekendDays: [0, 6] },
 };
 
-export function buildQueryClient(): QueryClient {
-  return new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 30_000,
-        refetchOnWindowFocus: false,
-        retry: (failureCount, error) =>
-          error instanceof ApiError && error.status < 500 ? false : failureCount < 2,
-      },
-      mutations: {
-        retry: false,
-      },
-    },
-  });
-}
-
+/**
+ * The application shell's provider stack, outermost first.
+ *
+ * Query client → Mantine → dates → modals → notifications. Mantine's CSS is
+ * imported for side effects above the tree so it lands before any rendered
+ * component; `theme` itself stays a pure token/config module.
+ */
 export function AppProviders({ children }: { children: ReactNode }) {
   const [queryClient] = useState(buildQueryClient);
   const locale = useAppLocale();

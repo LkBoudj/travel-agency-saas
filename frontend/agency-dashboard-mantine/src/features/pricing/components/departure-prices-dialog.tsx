@@ -6,7 +6,6 @@ import { notifications } from '@mantine/notifications';
 import { ErrorState } from '../../../components/empty-state.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
 import { ModalFormShell } from '../../../components/form/modal-form-shell.tsx';
-import type { Departure } from '../../departures/types.ts';
 import {
   useDeparturePrices,
   usePricingOverview,
@@ -19,10 +18,11 @@ import {
   type DeparturePriceRow,
 } from '../lib/pricing-payloads.ts';
 import { departurePricesSchema } from '../schemas/departure-prices.schema.ts';
+import type { DepartureSummary } from '../types/departure-summary.ts';
 
 export interface DeparturePricesDialogProps {
   tourCode: string;
-  departure: Departure;
+  departure: DepartureSummary;
   onClose: () => void;
 }
 

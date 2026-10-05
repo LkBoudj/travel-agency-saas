@@ -171,4 +171,8 @@ html,
 thead[data-sticky] th {
   background-color: var(--app-table-header-surface);
 }
-.tabular-end { font-variant-numeric: tabular-nums; text-align: end; }
+
+.tabular-end {
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}

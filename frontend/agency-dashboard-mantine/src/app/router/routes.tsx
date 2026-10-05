@@ -1,26 +1,24 @@
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
-import { AuthLayout } from './app/layouts/auth-layout.tsx';
-import { DashboardLayout } from './app/layouts/dashboard-layout.tsx';
-import { GuestOnlyGuard } from './app/router/guards/guest-only.tsx';
-import { RequireAgency } from './app/router/guards/require-agency.tsx';
-import { RequireAuth } from './app/router/guards/require-auth.tsx';
-import { RequirePermission } from './app/router/guards/require-permission.tsx';
-import { RootRedirect } from './app/router/guards/root-redirect.tsx';
-import { AgencyChooserPage } from './features/agency-context/pages/agency-chooser.page.tsx';
-import { LoginPage } from './features/auth/pages/login-page.tsx';
-import { BookingDetailsPage } from './features/bookings/pages/booking-details.page.tsx';
-import { BookingsPage } from './features/bookings/pages/bookings.page.tsx';
-import { CustomersPage } from './features/customers/pages/customers.page.tsx';
-import { DeparturesPage } from './features/departures/pages/departures.page.tsx';
-import { MembersPage } from './features/members/pages/members.page.tsx';
-import { OverviewPage } from './features/overview/pages/overview.page.tsx';
-import { ThemesPage } from './features/themes/pages/themes.page.tsx';
-import { TripsEditorPage } from './features/trips/pages/trips-editor.page.tsx';
-import { TripsPage } from './features/trips/pages/trips.page.tsx';
-import { WebsitePage } from './features/website/pages/website.page.tsx';
-import { StyleGuidePage } from './pages/StyleGuide.page';
+import { createBrowserRouter, Navigate, RouterProvider, type RouteObject } from 'react-router-dom';
+import { AgencyChooserPage } from '../../features/agency-context/index.ts';
+import { LoginPage } from '../../features/auth/index.ts';
+import { BookingDetailsPage, BookingsPage } from '../../features/bookings/index.ts';
+import { CustomersPage } from '../../features/customers/index.ts';
+import { DeparturesPage } from '../../features/departures/index.ts';
+import { MembersPage } from '../../features/members/index.ts';
+import { OverviewPage } from '../../features/overview/index.ts';
+import { ThemesPage } from '../../features/themes/index.ts';
+import { TripsEditorPage, TripsPage } from '../../features/trips/index.ts';
+import { WebsitePage } from '../../features/website/index.ts';
+import { StyleGuidePage } from '../../pages/StyleGuide.page.tsx';
+import { AuthLayout } from '../layouts/auth-layout.tsx';
+import { DashboardLayout } from '../layouts/dashboard-layout.tsx';
+import { GuestOnlyGuard } from './guards/guest-only.tsx';
+import { RequireAgency } from './guards/require-agency.tsx';
+import { RequireAuth } from './guards/require-auth.tsx';
+import { RequirePermission } from './guards/require-permission.tsx';
+import { RootRedirect } from './guards/root-redirect.tsx';
 
-const router = createBrowserRouter([
+export const routes: RouteObject[] = [
   {
     path: '/login',
     element: (
@@ -131,7 +129,9 @@ const router = createBrowserRouter([
         },
       ]
     : []),
-]);
+];
+
+const router = createBrowserRouter(routes);
 
 export function Router() {
   return <RouterProvider router={router} />;

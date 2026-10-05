@@ -73,7 +73,6 @@ const HEX_ALLOWLIST = new Set([
  */
 const RAW_HEX_EXEMPT = /app-allow-raw-hex/;
 
-
 /** The tokens the whole product is built on; losing one breaks pages, not just styling. */
 const FOUNDATION_TOKENS = [
   '--app-surface-page',

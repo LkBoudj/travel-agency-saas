@@ -162,7 +162,9 @@ describe('DataTable contract', () => {
     const { container } = renderTable();
     const table = container.querySelector('table');
     expect(table).toBeTruthy();
-    if (!table) return;
+    if (!table) {
+      return;
+    }
     // Check for Mantine v9 data attributes
     // Mantine may set these differently; just verify the table has the expected props from theme
     expect(table).toBeTruthy();
@@ -184,11 +186,7 @@ describe('DataTable contract', () => {
       { key: 'amount', header: 'Amount', render: (r) => r.amount, className: 'tabular-end' },
     ];
     const { container } = render(
-      <DataTable
-        rows={[{ label: 'A', amount: 1000 }]}
-        columns={numCols}
-        keyOf={(r) => r.label}
-      />
+      <DataTable rows={[{ label: 'A', amount: 1000 }]} columns={numCols} keyOf={(r) => r.label} />
     );
     const cells = container.querySelectorAll('tbody td');
     // This is a structural assertion; styling is applied via classes if used

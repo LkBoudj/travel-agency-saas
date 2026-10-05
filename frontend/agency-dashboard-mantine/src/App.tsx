@@ -1,5 +1,5 @@
-import { Router } from './Router';
-import { AppProviders } from './theme/provider';
+import { AppProviders } from './app/providers/app-providers.tsx';
+import { Router } from './app/router/routes.tsx';
 
 export default function App() {
   return (
