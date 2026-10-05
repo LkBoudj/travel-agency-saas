@@ -1243,10 +1243,12 @@ describe('POST /v1/agencies/:agencyCode/bookings', () => {
     expect(JSON.stringify(res.body)).not.toContain('"agencyId"');
   });
 
-  it('supports a zero-selection booking in the default currency', async () => {
+  it('rejects a booking with zero valid pricing selections', async () => {
     const tour = addTour(SAHARA.id);
     const departure = addDeparture(tour.id);
     const customer = addCustomer(SAHARA.id);
+    const adult = addPricingOption(tour.id, { name: 'Adult', basis: 'per_person' });
+    addDeparturePrice(departure.id, adult.id, 96000);
 
     const res = await request(app.getHttpServer())
       .post(`${base()}/bookings`)
@@ -1257,11 +1259,9 @@ describe('POST /v1/agencies/:agencyCode/bookings', () => {
         reservedSeats: 1,
         pricingSelections: [],
       })
-      .expect(201);
+      .expect(409);
 
-    expect(res.body.currency).toBe('DZD');
-    expect(res.body.totalAmount).toBe(0);
-    expect(DB.priceLines).toHaveLength(0);
+    expect(res.body.errorCode).toBe('BOOKING_INVALID_PRICING');
   });
 
   it('400 when the client tries to set the status or a total amount', async () => {

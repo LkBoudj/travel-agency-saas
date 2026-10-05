@@ -51,6 +51,15 @@ PENDING for the backend.
   one-way deactivate, with a live Dashboard PricingManager + per-departure
   price dialogs and a real `startingPrice` — see [AGENCY_PRICING].
 
+- Payments vertical slice (backend only, Module K): agency-scoped manual
+  payment ledger — `payment` table, `PAY-…` codes resolving through their
+  booking (so tenancy is inherited and no `agency_id` is stored), REST
+  read/record under
+  `/v1/agencies/:agencyCode/bookings/:bookingCode/payments`, server-derived
+  `paidAmount`/`remainingAmount`, overpayment rejected under a booking row
+  lock, append-only ledger (no update/delete, triggers + `RESTRICT` FK) — see
+  [AGENCY_PAYMENTS]. No Dashboard surface and no payment gateway.
+
 ### Group 1 closure verification (verified reality)
 
 The former M1 baseline checks are now executed and passing:
@@ -65,8 +74,9 @@ The former M1 baseline checks are now executed and passing:
   (`test/bookings-concurrency.e2e-spec.ts`)
 - seed idempotency — `npx prisma db seed` run twice, both succeed
 - migration status — `npx prisma migrate status` reports "Database schema is
-  up to date!" (21 migrations — Tours, Departures, Pricing and Bookings module
-  migrations applied to the live Neon dev database)
+  up to date!" (26 migrations — Customers, Tours, Departures, Pricing,
+  Bookings and Payments module migrations applied to the live Neon dev
+  database)
 - ownership invariants verified directly against the Neon dev database: 19/19
   checks, every scenario inside a rolled-back transaction with
   `SET CONSTRAINTS ALL IMMEDIATE` so the deferred triggers really run
@@ -244,7 +254,8 @@ Nest routes
   `20260919191328_agency_customers`,
   `20260920100000_tours_module`,
   `20260920101000_tour_origin`,
-  `20260920120000_departures_module`.
+  `20260920120000_departures_module`,
+  `20261004090000_payments_module`.
   Customized migration history:
   manually adds `CREATE EXTENSION IF NOT EXISTS citext;` and the
   `role_scope_check` / `permission_scope_check` CHECK constraints
@@ -800,6 +811,79 @@ tour invariant.
 NOT in this slice: seat consumption / sold-out states (Bookings module),
 promotions and exchange-rate logic (explicitly out of MVP), Tour publish-gate
 integration.
+
+## [AGENCY_PAYMENTS]
+
+IMPLEMENTED (backend only) — Module K of the MVP roadmap, PRD §23. Records
+MANUAL payments against a booking. There is no external payment gateway in the
+MVP and none is planned; refunds are a separate module and deliberately do not
+reuse this table.
+
+Database (migration `20261004090000_payments_module`, see [PRISMA]):
+`payment` (code `PAY-…`, `booking_id`, `amount DECIMAL(12,2) > 0`, `currency`
+frozen from the booking, `method` ∈ CASH | BANK_TRANSFER | CARD | CHECK |
+OTHER, `reference`, `note`, `paid_at`, `recorded_by_code`, `created_at`). A
+payment resolves through its Booking, so tenancy is INHERITED and the row
+deliberately carries no `agency_id` — cross-tenant posting is structurally
+impossible rather than merely unauthorized.
+
+The ledger is APPEND-ONLY, enforced by triggers that reject every UPDATE and
+DELETE, and the booking FK is `RESTRICT` (not CASCADE) so deleting a booking
+can never silently destroy the financial record of what was paid. CHECK
+constraints pin the sign of `amount`, the currency shape, the method vocabulary
+and the "no blank stub" rule.
+
+Routes (`backend/src/payments/`):
+`GET|POST /v1/agencies/:agencyCode/bookings/:bookingCode/payments`, guarded by
+`AgencyPermissionGuard` on the pre-existing `AGENCY_PAYMENT_VIEW` /
+`AGENCY_PAYMENT_RECORD` permissions (no RBAC catalog change). `GET` returns the
+ledger newest-first; `POST` records one payment and returns the resulting
+ledger. A foreign `BKG-` code is a 404 (`BOOKING_NOT_FOUND`).
+
+Money is server-authoritative (PRD §23 "security / accounting integrity"):
+
+- the strict zod body accepts ONLY `amount` (positive, ≤ 2 decimals, ≤
+  `DECIMAL(12,2)`), optional `method` / `reference` / `paidAt` / `note` — a
+  body smuggling `currency`, `paidAmount` or `remainingAmount` is rejected;
+- `currency` is copied from the booking, so one booking is settled in exactly
+  one currency by construction, not by validation;
+- `totalAmount` / `paidAmount` / `remainingAmount` are always derived
+  server-side as `totalAmount − Σ(payments)`;
+- sums run in INTEGER MINOR UNITS (`sumPayments`), so fractional amounts stay
+  exact (0.1 + 0.2 = 0.3) instead of drifting on floats;
+- overpayment → 409 `PAYMENT_OVERPAYMENT`, checked under a booking row lock
+  (`SELECT … FOR UPDATE`) inside the recording transaction. That lock is the
+  serialization point: concurrent payments queue on it and each re-reads the
+  committed ledger, so a check-then-insert outside a lock could not stop two
+  simultaneous payments jointly overpaying a booking;
+- a CANCELLED booking → 409 `PAYMENT_BOOKING_CANCELLED` (PENDING and CONFIRMED
+  both settle; a cancelled booking's ledger is read-only);
+- every write is audited as `AGENCY_PAYMENT_RECORDED`.
+
+Verified by 21 controller specs (`backend/src/payments/payments.controller.spec.ts`,
+in-memory Prisma double) covering the 120,000 → 50,000 → 70,000 PRD
+arithmetic, accumulation, exact settlement to zero, fractional-sum exactness,
+the zero/negative/sub-cent/over-precision rejections, the smuggling
+rejections, overpayment (including by one cent and on an already-paid
+booking), the cancelled-booking conflict, tenant-scoped 404, and 401/403
+authz. `backend/test/payments.e2e-spec.ts` additionally proves it against live
+PostgreSQL (executed: 10/10 pass, migration
+`20261004090000_payments_module` applied to the Neon dev DB): the same
+arithmetic over HTTP, the append-only triggers under raw SQL, the CHECK
+constraints, cross-tenant 404 on BOTH the read and the write path, and a 4×
+concurrent-payment burst on a 120,000 booking where exactly 2 succeed.
+
+Teardown is the one deliberate exception to append-only, and only in the
+e2e: `RESTRICT` plus the delete trigger means a recorded payment can never be
+erased while its booking exists, so the agency cascade cannot complete either.
+`purgeSeededRows` disables the delete trigger inside a single transaction —
+PostgreSQL DDL is transactional, so a throw or a crash restores the guard — and
+the trigger was confirmed `tgenabled = 79` (ENABLED) afterwards on the shared
+dev database.
+
+NOT in this slice: any Dashboard payments UI, gateway integration, refunds /
+negative adjustments, payment edits or deletions, and multi-currency
+settlement.
 
 ## [AGENCY_AUTHORIZATION]
 

@@ -15,3 +15,11 @@ export const loginSchema = z.object({
 });
 
 export type LoginBody = z.infer<typeof loginSchema>;
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1),
+  newPassword: z.string().min(8).max(72),
+});
+
+export type ChangePasswordBody = z.infer<typeof changePasswordSchema>;
+

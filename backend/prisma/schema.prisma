@@ -699,6 +699,7 @@ model Booking {
   priceLines    BookingPriceLine[]
   statusHistory BookingStatusHistory[]
   travelers     BookingTraveler[]
+  payments      Payment[]
 
   @@index([agencyId])
   @@index([customerId])
@@ -798,6 +799,57 @@ model BookingTraveler {
 }
 
 /**
+ * One manual payment recorded against a Booking (Module K).
+ * There is NO external payment gateway in the MVP: a payment is a fact an
+ * agency asserts about money it actually received (cash handed over, a bank
+ * transfer it saw land), so the row is an append-only ledger entry, never a
+ * mutable "current balance". The client never computes money: `amount` and
+ * `currency` are stored facts, and the booking's remaining balance is always
+ * derived server-side as `booking.totalAmount - SUM(payment.amount)`.
+ * The ledger is APPEND-ONLY and is protected at the database by the module
+ * migration's triggers: UPDATE and DELETE are rejected unconditionally, so a
+ * correction is recorded as a new row, never as an edit of history. For the
+ * same accounting reason the booking FK is `Restrict`, not `Cascade`: deleting
+ * a booking must never silently destroy the financial record of what was paid.
+ * Tenancy is inherited through the Booking (`:agencyCode` + `:bookingCode`
+ * route), so a payment row carries no `agency_id` of its own — a cross-tenant
+ * posting is structurally impossible because the service resolves the booking
+ * through the caller's agency on every write.
+ * `currency` is copied from the Booking at record time and a payment whose
+ * currency differs from its booking is rejected, so a booking is settled in
+ * exactly one currency. `method` is a free-form-but-constrained label
+ * (CHECK in the migration) and `reference` holds whatever the agency uses to
+ * trace the money (receipt number, transfer id).
+ */
+model Payment {
+  id             BigInt   @id @default(autoincrement())
+  // Backend-generated, immutable external identifier (`PAY-...`).
+  code           String   @unique @db.VarChar(24)
+  bookingId      BigInt   @map("booking_id")
+  // Strictly positive: a payment records money RECEIVED, never a negative
+  // adjustment (refunds are a separate Module L concern) and never zero.
+  amount         Decimal  @db.Decimal(12, 2)
+  // Frozen copy of the booking's currency (3-letter ISO-4217, CHECK in the migration).
+  currency       String   @db.VarChar(3)
+  // CASH | BANK_TRANSFER | CARD | CHECK | OTHER (CHECK in the migration).
+  method         String?  @db.VarChar(32)
+  // Agency-side trace of the money: receipt number, transfer id, cheque number.
+  reference      String?  @db.VarChar(120)
+  note           String?  @db.Text
+  // When the money was actually received; defaults to the recording instant.
+  paidAt         DateTime @default(now()) @map("paid_at") @db.Timestamptz()
+  // Public code of the AppUser that recorded the entry, for the audit trail.
+  recordedByCode String?  @map("recorded_by_code") @db.VarChar(24)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@index([bookingId])
+  @@index([bookingId, paidAt])
+  @@map("payment")
+}
+
+/**
  * An agency's published public website, 1:1 with Agency.
  * The row exists exactly when the site has been published at least once; there
  * is deliberately no `status` column — "not published" is the absence of a row,
@@ -827,7 +879,7 @@ model AgencyWebsite {
   // Theme selection, opaque to the backend (frontend-owned registry).
   themeId       String?  @map("theme_id") @db.VarChar(64)
   // Theme-owned settings map (flat string|boolean|number values).
-  themeSettings Json     @map("theme_settings") @default("{}")
+  themeSettings Json     @default("{}") @map("theme_settings")
   // Agency-owned marketing copy (hero/trustPoints/promotion/testimonials/
   // finalCta + featuredTourCodes[]).
   content       Json     @default("{}")
@@ -858,7 +910,7 @@ model AgencyWebsiteDraft {
   slug          String   @unique @db.VarChar(120)
   locale        String   @default("en") @db.VarChar(10)
   themeId       String?  @map("theme_id") @db.VarChar(64)
-  themeSettings Json     @map("theme_settings") @default("{}")
+  themeSettings Json     @default("{}") @map("theme_settings")
   content       Json     @default("{}")
   branding      Json     @default("{}")
   navigation    Json     @default("[]")

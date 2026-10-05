@@ -3,18 +3,6 @@ import { IconDots } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { ActionIcon, Menu, Tooltip } from '@mantine/core';
 
-/**
- * A 32px trigger inside a ~40px table row reads as part of the row; Mantine's
- * own 36px `sm` reads as a control pasted onto it.
- */
-const COMPACT_TRIGGER = {
-  root: {
-    width: 'var(--app-control-height-compact)',
-    height: 'var(--app-control-height-compact)',
-    minHeight: 'var(--app-control-height-compact)',
-  },
-} as const;
-
 export interface RowAction {
   key: string;
   label: string;
@@ -51,17 +39,11 @@ export function RowActionsMenu({
     <Menu position="bottom-end" withinPortal>
       <Menu.Target>
         <Tooltip label={resolvedLabel}>
-          {/* `compact-sm` keeps Mantine's own padding and font scale for a row
-              trigger; the explicit height/width are needed because the theme pins
-              `sm` on `ActionIcon`'s root, which would flatten it back to the
-              32px control height. */}
-          <ActionIcon
-            variant="subtle"
-            color="gray"
-            size="compact-sm"
-            styles={COMPACT_TRIGGER}
-            aria-label={resolvedLabel}
-          >
+          {/* A 26px trigger inside a ~40px table row reads as part of the row;
+              Mantine's own 36px `sm` reads as a control pasted onto it. The
+              compact step is Mantine's, and the ramp in `tokens.css` declares the
+              icon-button half of it, so the size needs nothing else here. */}
+          <ActionIcon variant="subtle" color="gray" size="compact-sm" aria-label={resolvedLabel}>
             <IconDots size={16} />
           </ActionIcon>
         </Tooltip>

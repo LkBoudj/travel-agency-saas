@@ -21,7 +21,7 @@ const jwtMock = {
 };
 
 const row = {
-  id: 1n,
+  id: '1',
   code: 'USR-ABCDEF123456',
   email: 'owner@example.com',
   passwordHash: 'mock-hashed-password',
@@ -50,6 +50,7 @@ describe('AuthService', () => {
         id: '1',
         code: 'USR-ABCDEF123456',
         email: 'owner@example.com',
+        status: 'ACTIVE',
         firstName: 'Ada',
         lastName: 'Lovelace',
       });

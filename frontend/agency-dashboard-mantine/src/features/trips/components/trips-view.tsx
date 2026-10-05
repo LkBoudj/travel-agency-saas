@@ -4,6 +4,7 @@ import { Button, Select, Stack, Text } from '@mantine/core';
 import { ContentContainer } from '../../../components/content-container.tsx';
 import { DataToolbar } from '../../../components/data-toolbar.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
+import { Panel } from '../../../components/panel.tsx';
 import { SearchInput } from '../../../components/search-input.tsx';
 import { SectionHeader } from '../../../components/section-header.tsx';
 import type { TripsPageController } from '../hooks/use-trips-page.ts';
@@ -29,7 +30,17 @@ export function TripsView(controller: TripsPageController) {
           subtitle={t('subtitle')}
           actions={
             controller.canCreate ? (
-              <Button leftSection={<IconPlus size={16} />} onClick={controller.openCreateDialog}>
+              <Button
+                color="blue"
+                leftSection={<IconPlus size={16} />}
+                onClick={controller.openCreateDialog}
+                styles={{
+                  root: {
+                    backgroundColor: '#1971c2',
+                    fontWeight: 600,
+                  },
+                }}
+              >
                 {t('create')}
               </Button>
             ) : null
@@ -68,26 +79,33 @@ export function TripsView(controller: TripsPageController) {
 
         <Stack gap="md">
           <SectionHeader title={t('tableCaption')} />
-          <ToursTable
-            tours={controller.tours}
-            canUpdate={controller.canUpdate}
-            canPublish={controller.canPublish}
-            canArchive={controller.canArchive}
-            loading={controller.isPending}
-            isError={controller.isError}
-            onRetry={controller.refetch}
-            onEdit={controller.openEditDialog}
-            onPublish={controller.publishTour}
-            onUnpublish={controller.unpublishTour}
-            onArchive={controller.archiveTour}
-            emptyAction={
-              controller.canCreate ? (
-                <Button leftSection={<IconPlus size={16} />} onClick={controller.openCreateDialog}>
-                  {t('create')}
-                </Button>
-              ) : undefined
-            }
-          />
+          <Panel p={0} style={{ overflow: 'hidden' }}>
+            <ToursTable
+              tours={controller.tours}
+              canUpdate={controller.canUpdate}
+              canPublish={controller.canPublish}
+              canArchive={controller.canArchive}
+              loading={controller.isPending}
+              isError={controller.isError}
+              onRetry={controller.refetch}
+              onEdit={controller.openEditDialog}
+              onPublish={controller.publishTour}
+              onUnpublish={controller.unpublishTour}
+              onArchive={controller.archiveTour}
+              emptyAction={
+                controller.canCreate ? (
+                  <Button
+                    color="blue"
+                    leftSection={<IconPlus size={16} />}
+                    onClick={controller.openCreateDialog}
+                    styles={{ root: { backgroundColor: '#1971c2', fontWeight: 600 } }}
+                  >
+                    {t('create')}
+                  </Button>
+                ) : undefined
+              }
+            />
+          </Panel>
         </Stack>
       </Stack>
     </ContentContainer>

@@ -4,6 +4,7 @@ import { Button, Select, Stack, Text } from '@mantine/core';
 import { ContentContainer } from '../../../components/content-container.tsx';
 import { DataToolbar } from '../../../components/data-toolbar.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
+import { Panel } from '../../../components/panel.tsx';
 import { SearchInput } from '../../../components/search-input.tsx';
 import { SectionHeader } from '../../../components/section-header.tsx';
 import type { BookingsPageController } from '../hooks/use-bookings-page.ts';
@@ -29,7 +30,17 @@ export function BookingsView(controller: BookingsPageController) {
           subtitle={t('page.subtitle')}
           actions={
             controller.canCreate ? (
-              <Button leftSection={<IconPlus size={16} />} onClick={controller.openCreate}>
+              <Button
+                color="blue"
+                leftSection={<IconPlus size={16} />}
+                onClick={controller.openCreate}
+                styles={{
+                  root: {
+                    backgroundColor: '#1971c2',
+                    fontWeight: 600,
+                  },
+                }}
+              >
                 {t('page.create')}
               </Button>
             ) : null
@@ -66,20 +77,27 @@ export function BookingsView(controller: BookingsPageController) {
 
         <Stack gap="md">
           <SectionHeader title={t('columns.tableCaption')} />
-          <BookingsTable
-            bookings={controller.bookings}
-            loading={controller.isPending}
-            isError={controller.isError}
-            onRetry={controller.refetch}
-            onViewDetails={controller.openDetails}
-            emptyAction={
-              controller.canCreate ? (
-                <Button leftSection={<IconPlus size={16} />} onClick={controller.openCreate}>
-                  {t('page.create')}
-                </Button>
-              ) : undefined
-            }
-          />
+          <Panel p={0} style={{ overflow: 'hidden' }}>
+            <BookingsTable
+              bookings={controller.bookings}
+              loading={controller.isPending}
+              isError={controller.isError}
+              onRetry={controller.refetch}
+              onViewDetails={controller.openDetails}
+              emptyAction={
+                controller.canCreate ? (
+                  <Button
+                    color="blue"
+                    leftSection={<IconPlus size={16} />}
+                    onClick={controller.openCreate}
+                    styles={{ root: { backgroundColor: '#1971c2', fontWeight: 600 } }}
+                  >
+                    {t('page.create')}
+                  </Button>
+                ) : undefined
+              }
+            />
+          </Panel>
         </Stack>
       </Stack>
     </ContentContainer>

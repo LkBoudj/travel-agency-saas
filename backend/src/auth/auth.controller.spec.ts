@@ -38,6 +38,11 @@ const prismaMock = {
       ...existingUser,
       ...data,
     })),
+    update: vi.fn(async ({ where, data }: any) => ({
+      ...existingUser,
+      id: where?.id ?? existingUser.id,
+      ...data,
+    })),
     count: vi.fn(async () => 1),
   },
 };
@@ -78,9 +83,10 @@ describe('Auth API (POST /v1/auth/login, POST /v1/auth/logout, GET /v1/auth/me)'
       expect(res.body).not.toHaveProperty('accessToken');
       expect(res.body).not.toHaveProperty('token');
 
-      const setCookie = res.headers['set-cookie'] as string[] | undefined;
-      expect(setCookie).toBeDefined();
-      const authCookie = setCookie!.find((cookie) => cookie.startsWith(`${AUTH_COOKIE_NAME}=`));
+      const setCookie = (res.headers['set-cookie'] as unknown as string[] | string | undefined);
+      const setCookieArr = Array.isArray(setCookie) ? setCookie : (setCookie ? [setCookie] : undefined);
+      expect(setCookieArr).toBeDefined();
+      const authCookie = setCookieArr!.find((cookie) => String(cookie).startsWith(`${AUTH_COOKIE_NAME}=`));
       expect(authCookie).toBeDefined();
       expect(authCookie).toMatch(/HttpOnly/i);
       expect(authCookie).toMatch(/SameSite=Lax/i);
@@ -175,9 +181,10 @@ describe('Auth API (POST /v1/auth/login, POST /v1/auth/logout, GET /v1/auth/me)'
       const res = await request(app.getHttpServer()).post('/v1/auth/logout');
 
       expect(res.status).toBe(200);
-      const setCookie = res.headers['set-cookie'] as string[] | undefined;
-      expect(setCookie).toBeDefined();
-      const authCookie = setCookie!.find((cookie) => cookie.startsWith(`${AUTH_COOKIE_NAME}=`));
+      const setCookie = (res.headers['set-cookie'] as unknown as string[] | string | undefined);
+      const setCookieArr = Array.isArray(setCookie) ? setCookie : (setCookie ? [setCookie] : undefined);
+      expect(setCookieArr).toBeDefined();
+      const authCookie = setCookieArr!.find((cookie) => String(cookie).startsWith(`${AUTH_COOKIE_NAME}=`));
       expect(authCookie).toBeDefined();
       expect(authCookie).toMatch(/Expires=Thu, 01 Jan 1970/i);
       expect(authCookie).toMatch(/HttpOnly/i);
@@ -187,6 +194,44 @@ describe('Auth API (POST /v1/auth/login, POST /v1/auth/logout, GET /v1/auth/me)'
       const res = await request(app.getHttpServer())
         .get('/v1/auth/me')
         .set('Cookie', `${AUTH_COOKIE_NAME}=`);
+
+      expect(res.status).toBe(401);
+    });
+  });
+
+  describe('change-password', () => {
+    it('changes password successfully when current password is correct', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/v1/auth/change-password')
+        .set('Cookie', `${AUTH_COOKIE_NAME}=${token}`)
+        .send({ currentPassword: 'correct-password', newPassword: 'newpass123' });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ success: true });
+    });
+
+    it('rejects with 401 when current password is wrong', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/v1/auth/change-password')
+        .set('Cookie', `${AUTH_COOKIE_NAME}=${token}`)
+        .send({ currentPassword: 'wrong-password', newPassword: 'newpass123' });
+
+      expect(res.status).toBe(401);
+    });
+
+    it('rejects with 400 when new password is too short', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/v1/auth/change-password')
+        .set('Cookie', `${AUTH_COOKIE_NAME}=${token}`)
+        .send({ currentPassword: 'correct-password', newPassword: 'short' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('rejects with 401 when not authenticated', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/v1/auth/change-password')
+        .send({ currentPassword: 'correct-password', newPassword: 'newpass123' });
 
       expect(res.status).toBe(401);
     });

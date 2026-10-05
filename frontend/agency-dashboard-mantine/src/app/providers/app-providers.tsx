@@ -54,7 +54,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         </DatesProvider>
       </MantineProvider>
       {/* Dev-only: the launcher must never ship in a production bundle. */}
-      {import.meta.env.DEV ? <ReactQueryDevtools buttonPosition="bottom-left" /> : null}
+      {import.meta.env.DEV ? <ReactQueryDevtools buttonPosition="bottom-right" /> : null}
     </QueryClientProvider>
   );
 }

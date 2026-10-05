@@ -211,6 +211,12 @@ export class BookingsService {
       await this.assertDepartureBookable(tx, locked);
 
       const priceSet = await this.loadPriceSet(tx, locked.id);
+      if (priceSet.length > 0 && input.pricingSelections.length === 0) {
+        throw conflict(
+          'BOOKING_INVALID_PRICING',
+          'At least one pricing option must be selected',
+        );
+      }
       const snapshot = this.buildSnapshot(
         input.pricingSelections,
         input.reservedSeats,

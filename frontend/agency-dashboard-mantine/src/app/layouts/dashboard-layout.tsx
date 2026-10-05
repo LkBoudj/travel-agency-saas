@@ -4,7 +4,6 @@ import { AppShell } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { DashboardHeader } from './dashboard-header.tsx';
 import { DashboardSidebar } from './dashboard-sidebar.tsx';
-import { SidebarFooter } from './sidebar-footer.tsx';
 
 export function DashboardLayout() {
   const { t } = useTranslation('common');
@@ -37,12 +36,11 @@ export function DashboardLayout() {
           links and stop being a stable "where am I logged in" anchor. */}
       <AppShell.Navbar
         data-shell-nav
-        p="md"
+        p="sm"
         className="app-shell-rail"
         style={{ borderInlineEnd: '1px solid var(--app-nav-border)' }}
       >
         <DashboardSidebar onNavigate={close} />
-        <SidebarFooter />
       </AppShell.Navbar>
       <AppShell.Main id="main" tabIndex={-1}>
         <Outlet />

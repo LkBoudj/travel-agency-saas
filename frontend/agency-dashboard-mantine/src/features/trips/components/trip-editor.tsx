@@ -1,9 +1,11 @@
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge, Box, Divider, Group, Stack, Text } from '@mantine/core';
+import { ContentContainer } from '../../../components/content-container.tsx';
 import { EntityCode } from '../../../components/entity-code.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
 import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
+import { Panel } from '../../../components/panel.tsx';
 import { StatusBadge } from '../../../components/status-badge.tsx';
 import { tripToFormValues, useTripForm } from '../hooks/use-tour-form.ts';
 import type { TripFormValues } from '../schemas/tour.schema.ts';
@@ -81,15 +83,15 @@ export function TripEditor({
   };
 
   return (
-    <Box maw={1240} mx="auto">
+    <ContentContainer>
       <form onSubmit={handleSubmit}>
-        <Stack gap={0}>
-          <Box px="md" pt="md">
+        <Stack gap="md">
+          <Box pt="xs">
             <FormErrorSummary errors={form.errors} />
           </Box>
-          <Group justify="space-between" py="md" wrap="nowrap">
+          <Group justify="space-between" py="xs" wrap="nowrap">
             <Stack gap={2}>
-              <Text fw={600} size="md" lineClamp={1}>
+              <Text fw={700} fz={20} lineClamp={1} c="var(--app-ink)">
                 {tour.name.trim().length > 0 ? tour.name : t('editor.untitled')}
               </Text>
               <Group gap="xs" wrap="nowrap">
@@ -115,14 +117,17 @@ export function TripEditor({
               190 + 290 is wider than a 375px phone, so `.app-editor-columns`
               wraps them below `md`. The rule lives in index.css because Mantine's
               `wrap` prop takes no breakpoint value. */}
-          <Group className="app-editor-columns" align="flex-start" gap="lg" py="md">
+          <Group className="app-editor-columns" align="flex-start" gap="lg" py="xs">
             <Box w={{ base: '100%', md: 190 }} style={{ position: 'sticky', top: 0 }}>
-              <TripEditorNav active={section} onChange={setSection} />
+              <Panel p="xs">
+                <TripEditorNav active={section} onChange={setSection} />
+              </Panel>
             </Box>
 
             <Stack flex={1} gap="md">
-              {renderSection()}
-              <Divider />
+              <Panel>
+                {renderSection()}
+              </Panel>
               {canUpdate ? (
                 <FormActions
                   submitLabel={t('editor.submitEdit')}
@@ -138,22 +143,24 @@ export function TripEditor({
             </Stack>
 
             <Box w={{ base: '100%', md: 290 }} style={{ position: 'sticky', top: 0 }}>
-              <TripReadinessPanel
-                tour={tour}
-                values={form.values}
-                canPublish={canPublish}
-                canArchive={canArchive}
-                isPublishing={isPublishing}
-                isUnpublishing={isUnpublishing}
-                isArchiving={isArchiving}
-                onPublish={onPublish}
-                onUnpublish={onUnpublish}
-                onArchive={onArchive}
-              />
+              <Panel>
+                <TripReadinessPanel
+                  tour={tour}
+                  values={form.values}
+                  canPublish={canPublish}
+                  canArchive={canArchive}
+                  isPublishing={isPublishing}
+                  isUnpublishing={isUnpublishing}
+                  isArchiving={isArchiving}
+                  onPublish={onPublish}
+                  onUnpublish={onUnpublish}
+                  onArchive={onArchive}
+                />
+              </Panel>
             </Box>
           </Group>
         </Stack>
       </form>
-    </Box>
+    </ContentContainer>
   );
 }

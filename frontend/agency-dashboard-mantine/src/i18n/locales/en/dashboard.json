@@ -2,6 +2,10 @@
   "page": {
     "title": "Overview",
     "subtitle": "A live snapshot of your agency",
+    "greeting": "Good afternoon, {{name}}",
+    "todayTitle": "Here's what's happening today.",
+    "todaySubtitle": "Manage your bookings, customers and upcoming departures.",
+    "dateFilter": "Oct 8, 2026",
     "errorTitle": "Unable to load the overview",
     "errorBody": "One of the overview sections failed to load. Try again.",
     "retry": "Retry"
@@ -11,6 +15,9 @@
     "tours": "Trips",
     "bookings": "Bookings",
     "members": "Team",
+    "departures": "Departures",
+    "revenue": "Revenue",
+    "vsLastMonth": "vs last month",
     "published": "{{count}} published",
     "pending": "{{count}} pending",
     "confirmed": "{{count}} confirmed",
@@ -18,8 +25,47 @@
     "viewAll": "Open {{section}}"
   },
   "recent": {
-    "title": "Recent bookings",
-    "empty": "No bookings yet. Create one from the Bookings page."
+    "title": "Recent Bookings",
+    "empty": "No bookings yet. Create one from the Bookings page.",
+    "viewAll": "View all →",
+    "all": "All",
+    "confirmed": "Confirmed",
+    "pending": "Pending",
+    "cancelled": "Cancelled"
+  },
+  "departuresSection": {
+    "title": "Upcoming Departures",
+    "viewAll": "View all →",
+    "travelersCount": "{{count}} travelers",
+    "guidesCount": "{{count}} guides",
+    "guideCount": "{{count}} guide",
+    "limited": "Limited"
+  },
+  "attention": {
+    "title": "Needs attention",
+    "pendingPayments": "2 pending payments",
+    "pendingPaymentsSub": "Total amount: $1,870",
+    "capacityWarning": "1 departure nearing capacity",
+    "capacityWarningSub": "Rome & Vatican · 2 seats left",
+    "customerRequests": "3 new customer requests",
+    "customerRequestsSub": "Require your review",
+    "view": "View"
+  },
+  "quickActions": {
+    "title": "Quick actions",
+    "newBooking": "New booking",
+    "addCustomer": "Add customer",
+    "createTour": "Create tour",
+    "addDeparture": "Add departure",
+    "recordPayment": "Record payment"
+  },
+  "columns": {
+    "customer": "Customer",
+    "tour": "Tour",
+    "date": "Date",
+    "travelers": "Travelers",
+    "amount": "Amount",
+    "status": "Status"
   },
   "sections": {
     "snapshot": "At a glance"

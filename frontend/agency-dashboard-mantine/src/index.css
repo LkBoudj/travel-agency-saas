@@ -176,3 +176,14 @@ thead[data-sticky] th {
   font-variant-numeric: tabular-nums;
   text-align: end;
 }
+
+/* Autofill override: browser user-agent stylesheets apply yellow or pale tint */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--mantine-color-white) inset !important;
+  -webkit-text-fill-color: var(--mantine-color-text) !important;
+  caret-color: var(--mantine-color-text) !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}

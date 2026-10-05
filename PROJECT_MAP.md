@@ -327,6 +327,41 @@ NOT in this slice: price-adjust / re-pricing flows, customer ↔ bookings
 cross-navigation. (Booking confirmation/travelers Module J SHIPPED; see
 travelers slice + Module J roadmap lines below.)
 
+## [PAYMENTS]
+Fourth agency business slice (backend Module K), closing the PRD §23 manual
+payment ledger. Backend only — there is no Dashboard payments surface yet and
+no external payment gateway anywhere in the MVP.
+
+Backend (Module K, IMPLEMENTED): `payment` table (migration
+`20261004090000_payments_module`), codes `PAY-…`, resolving through its
+booking so tenancy is inherited and the row carries no `agency_id` — a
+cross-tenant posting is structurally impossible, not merely unauthorized.
+REST under `/v1/agencies/:agencyCode/bookings/:bookingCode/payments`: `GET`
+returns the ledger (newest payment first) with server-derived `paidAmount` and
+`remainingAmount`, `POST` records one manual payment. Guarded by
+`AgencyPermissionGuard` on the pre-existing `AGENCY_PAYMENT_VIEW` /
+`AGENCY_PAYMENT_RECORD` permissions (no RBAC change).
+
+Money is server-authoritative: the body carries only `amount` (strictly
+positive, ≤ 2 decimals); `currency` is copied from the booking, and
+`totalAmount` / `paidAmount` / `remainingAmount` are always derived server-side
+(`totalAmount − Σ(payments)`) — a body that smuggles `currency`,
+`paidAmount` or `remainingAmount` is rejected by the strict zod contract.
+Sums run in integer minor units, so fractional amounts stay exact
+(0.1 + 0.2 = 0.3). Overpayment is rejected with `PAYMENT_OVERPAYMENT` under a
+booking row lock (`SELECT … FOR UPDATE`), which is what makes "paid + this
+payment ≤ total" hold under concurrency; a cancelled booking is rejected with
+`PAYMENT_BOOKING_CANCELLED`. The ledger is append-only: no update, no delete,
+and the migration's triggers reject both at the database, while the booking FK
+is `RESTRICT` so deleting a booking can never destroy financial history.
+Every write is audited as `AGENCY_PAYMENT_RECORDED`.
+
+Verified by 21 controller specs (`backend/src/payments/`) plus the live
+PostgreSQL spec `backend/test/payments.e2e-spec.ts` — 10/10 executed against the
+Neon dev database (happy-path arithmetic, accumulation, overpayment,
+append-only triggers under raw SQL, the CHECK constraints, cross-tenant 404 on
+both the read and the write path, and the concurrent-payments burst).
+
 ## [PLATFORM_ADMIN]
 IMPLEMENTED in `frontend/admin/`: authenticated Platform Super Dashboard shell
 (cookie-session login, `RequireAuth`/`GuestOnly` guards, sidebar shell, Overview

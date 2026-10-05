@@ -18,8 +18,8 @@ import { clearAuthCookie, setAuthCookie } from './auth.cookie.js';
 import { CurrentUser } from './decorators/current-user.decorator.js';
 import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 import { RateLimit, RateLimitGuard } from '../security/rate-limit.guard.js';
-import type { LoginBody } from './schemas.js';
-import { loginSchema } from './schemas.js';
+import type { ChangePasswordBody, LoginBody } from './schemas.js';
+import { changePasswordSchema, loginSchema } from './schemas.js';
 
 const SAFE_USER_EXAMPLE: AuthUser = {
   code: 'USR-ABCDEF123456',
@@ -116,5 +116,30 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   me(@CurrentUser() user: InternalAuthUser): AuthUser {
     return toAuthUser(user);
+  }
+
+  @Post('change-password')
+  @HttpCode(200)
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Change password for the currently authenticated user' })
+  @ApiCookieAuth(AUTH_COOKIE_NAME)
+  @ApiBody({
+    schema: {
+      type: 'object',
+      required: ['currentPassword', 'newPassword'],
+      properties: {
+        currentPassword: { type: 'string', minLength: 1 },
+        newPassword: { type: 'string', minLength: 8, maxLength: 72 },
+      },
+    },
+  })
+  @ApiOkResponse({ description: 'Password changed successfully' })
+  @ApiUnauthorizedResponse({ description: 'Invalid current password or not authenticated' })
+  async changePassword(
+    @CurrentUser() user: InternalAuthUser,
+    @Body({ schema: changePasswordSchema }) body: ChangePasswordBody,
+  ): Promise<{ success: boolean }> {
+    await this.authService.changePassword(BigInt(user.id), body.currentPassword, body.newPassword);
+    return { success: true };
   }
 }

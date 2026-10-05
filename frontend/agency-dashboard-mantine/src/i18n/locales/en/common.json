@@ -3,14 +3,18 @@
   "nav": {
     "overview": "Overview",
     "trips": "Trips",
+    "tours": "Tours",
     "departures": "Departures",
     "bookings": "Bookings",
     "customers": "Customers",
+    "payments": "Payments",
+    "reports": "Reports",
     "agency": "Agency",
     "team": "Team",
     "website": "Website",
     "themes": "Themes",
     "settings": "Settings",
+    "help": "Help",
     "groups": {
       "workspace": "Workspace",
       "operations": "Operations",
@@ -73,7 +77,14 @@
     "skipToContent": "Skip to content",
     "mainNav": "Main navigation",
     "breadcrumb": "Breadcrumb",
-    "openAccount": "Account"
+    "openAccount": "Account",
+    "searchPlaceholder": "Search bookings, customers, tours...",
+    "notifications": "Notifications",
+    "brandTitle": "Travel Connect",
+    "brandSubtitle": "Agency Dashboard",
+    "yourAgency": "Your Agency",
+    "yourAgencySubtitle": "Manage amazing trips for your customers",
+    "agencyOwner": "Agency Owner"
   },
   "lang": {
     "en": "English",

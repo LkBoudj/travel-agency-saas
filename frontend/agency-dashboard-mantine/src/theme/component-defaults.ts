@@ -1,37 +1,21 @@
-import type { CSSProperties } from 'react';
 import type { MantineThemeComponents, ModalProps } from '@mantine/core';
 
 type OverlayTransition = NonNullable<ModalProps['transitionProps']>;
 
 /**
- * One height for every control that defaults to `sm`.
+ * Control sizes are the token layer's job.
  *
- * Mantine's `sm` is 36px, sized for a standalone form. Beside a 13px table row
- * it left a visible step between a control and the row it filters, so `sm` is
- * pinned to `--app-control-height` (32px) here instead of at each call site.
+ * Every control that defaults to `md` reads `--input-height-md` (42px) and
+ * `--button-height-md` (42px), while row-level actions read
+ * `--app-control-height-compact` (26px) via `compact-sm`. This module therefore
+ * sets no control heights directly in `styles`: the ramp in `tokens.css` re-steps
+ * the size variables Mantine derives a control's line box, padding and section
+ * widths from, which is the only place that can move the box and its contents
+ * onto the same number at once.
  *
- * Applied through `styles` rather than a custom `size` entry: in Mantine 9
- * `createVarsResolver` is the identity function and `MantineThemeComponent` no
- * longer accepts `sizes`, so a named size cannot be declared in the theme at all.
- * The row-action step uses Mantine's own built-in `compact-sm` (26px) for the
- * same reason — the framework already ships it, so overriding it would only add
- * a second source of truth for a value Mantine owns.
- *
- * Two shapes, because the height does not live on the same slot everywhere: on
- * `Button`/`ActionIcon` the root *is* the control, while on every text input the
- * root is a wrapper around a separate `input` element that carries the height.
- * Setting the wrapper alone left a 32px box around a 36px input.
- *
- * `minHeight` is set alongside `height` because `.mantine-Input-input` carries
- * `min-height: var(--input-height)` in Mantine's own stylesheet. `min-height`
- * clamps `height`, so an inline `height` alone is silently ignored and the field
- * stays 36px tall inside a 32px wrapper.
+ * What is left here are the decisions a stylesheet cannot express — that `md`
+ * (42px) is the default step for form inputs and buttons, and the corner radius.
  */
-const CONTROL_ROOT: CSSProperties = {
-  height: 'var(--app-control-height)',
-  minHeight: 'var(--app-control-height)',
-};
-const CONTROL_INPUT: Record<string, CSSProperties> = { root: CONTROL_ROOT, input: CONTROL_ROOT };
 
 /**
  * Honours the OS "reduce motion" setting for the animated surfaces. The theme is
@@ -53,32 +37,40 @@ function overlayTransition(transition: OverlayTransition): OverlayTransition {
 
 export const componentDefaults: MantineThemeComponents = {
   Button: {
-    defaultProps: { size: 'sm', radius: 'md' },
-    styles: { root: CONTROL_ROOT },
+    defaultProps: { size: 'md', radius: 'md' },
   },
   ActionIcon: {
-    defaultProps: { size: 'sm', radius: 'md' },
-    styles: CONTROL_INPUT,
+    defaultProps: { size: 'md', radius: 'md' },
   },
   TextInput: {
-    defaultProps: { size: 'sm' },
-    styles: CONTROL_INPUT,
+    defaultProps: { size: 'md', radius: 'md' },
   },
   PasswordInput: {
-    defaultProps: { size: 'sm' },
-    styles: CONTROL_INPUT,
-  },
-  NumberInput: {
-    defaultProps: { size: 'sm' },
-    styles: CONTROL_INPUT,
-  },
-  Textarea: {
-    defaultProps: { size: 'sm' },
-    styles: CONTROL_INPUT,
+    defaultProps: { size: 'md', radius: 'md' },
   },
   Select: {
-    defaultProps: { size: 'sm' },
-    styles: CONTROL_INPUT,
+    defaultProps: { size: 'md', radius: 'md' },
+  },
+  MultiSelect: {
+    defaultProps: { size: 'md', radius: 'md' },
+  },
+  NumberInput: {
+    defaultProps: { size: 'md', radius: 'md' },
+  },
+  Textarea: {
+    defaultProps: { size: 'md', radius: 'md' },
+  },
+  Autocomplete: {
+    defaultProps: { size: 'md', radius: 'md' },
+  },
+  NativeSelect: {
+    defaultProps: { size: 'md', radius: 'md' },
+  },
+  Input: {
+    defaultProps: { size: 'md', radius: 'md' },
+  },
+  InputBase: {
+    defaultProps: { size: 'md', radius: 'md' },
   },
   Combobox: {
     defaultProps: {},

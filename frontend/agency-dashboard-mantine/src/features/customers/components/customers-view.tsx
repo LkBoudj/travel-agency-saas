@@ -4,6 +4,7 @@ import { Button, Select, Stack, Text } from '@mantine/core';
 import { ContentContainer } from '../../../components/content-container.tsx';
 import { DataToolbar } from '../../../components/data-toolbar.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
+import { Panel } from '../../../components/panel.tsx';
 import { SearchInput } from '../../../components/search-input.tsx';
 import { SectionHeader } from '../../../components/section-header.tsx';
 import type { CustomersPageController } from '../hooks/use-customers-page.ts';
@@ -29,8 +30,15 @@ export function CustomersView(controller: CustomersPageController) {
           actions={
             controller.canCreate ? (
               <Button
+                color="blue"
                 leftSection={<IconUserPlus size={16} />}
                 onClick={controller.openCreateDialog}
+                styles={{
+                  root: {
+                    backgroundColor: '#1971c2',
+                    fontWeight: 600,
+                  },
+                }}
               >
                 {t('create')}
               </Button>
@@ -68,26 +76,30 @@ export function CustomersView(controller: CustomersPageController) {
 
         <Stack gap="md">
           <SectionHeader title={t('columns.tableCaption')} />
-          <CustomersTable
-            customers={controller.customers}
-            canUpdate={controller.canUpdate}
-            canArchive={controller.canArchive}
-            loading={controller.isPending}
-            isError={controller.isError}
-            onRetry={controller.refetch}
-            onEdit={controller.openEditDialog}
-            onArchive={controller.archiveCustomer}
-            emptyAction={
-              controller.canCreate ? (
-                <Button
-                  leftSection={<IconUserPlus size={16} />}
-                  onClick={controller.openCreateDialog}
-                >
-                  {t('create')}
-                </Button>
-              ) : undefined
-            }
-          />
+          <Panel p={0} style={{ overflow: 'hidden' }}>
+            <CustomersTable
+              customers={controller.customers}
+              canUpdate={controller.canUpdate}
+              canArchive={controller.canArchive}
+              loading={controller.isPending}
+              isError={controller.isError}
+              onRetry={controller.refetch}
+              onEdit={controller.openEditDialog}
+              onArchive={controller.archiveCustomer}
+              emptyAction={
+                controller.canCreate ? (
+                  <Button
+                    color="blue"
+                    leftSection={<IconUserPlus size={16} />}
+                    onClick={controller.openCreateDialog}
+                    styles={{ root: { backgroundColor: '#1971c2', fontWeight: 600 } }}
+                  >
+                    {t('create')}
+                  </Button>
+                ) : undefined
+              }
+            />
+          </Panel>
         </Stack>
       </Stack>
     </ContentContainer>

@@ -139,10 +139,13 @@ describe('control rhythm', () => {
     expect(await screen.findByRole('button', { name: 'Row actions' })).toBeInTheDocument();
     const source = readFileSync(path.resolve(import.meta.dirname, 'row-actions-menu.tsx'), 'utf8');
     expect(source).toMatch(/size="compact-sm"/);
-    // The size prop alone is not enough: the theme pins `sm` on ActionIcon's
-    // root, which would flatten `compact-sm` back to the control height.
-    expect(source).toMatch(/COMPACT_TRIGGER/);
-    expect(source).toMatch(/height: 'var\(--app-control-height-compact\)'/);
+    // And nothing else: the size prop is the whole mechanism. The component used to
+    // also paint the compact width and height by hand, because Mantine resolves
+    // `compact-sm` on an ActionIcon to a variable it never declared — which the ramp
+    // in `tokens.css` now defines, so a hand-painted box would only be a second
+    // source of truth for a value that is already in one place.
+    expect(source).not.toMatch(/COMPACT_TRIGGER/);
+    expect(source).not.toMatch(/var\(--app-control-height-compact\)/);
   });
 
   test('both heights are declared once, as tokens', () => {
@@ -151,28 +154,28 @@ describe('control rhythm', () => {
     expect(tokensCss).toMatch(/--app-control-height-compact:\s*26px/);
   });
 
-  test('the theme wires every interactive control to that one height', () => {
+  test('the ramp, not the theme, is what moves a control onto that one height', () => {
     const defaults = readFileSync(
       path.resolve(import.meta.dirname, '../theme/component-defaults.ts'),
       'utf8'
     );
-    // Two shapes, because the height does not live on the same slot everywhere:
-    // on Button the root *is* the control, while on a text input the root is a
-    // wrapper around a separate `input` element. Setting the wrapper alone left a
-    // 32px box around a 36px input, so both are pinned. Applied via `styles`,
-    // not a custom `size`: Mantine 9 dropped `sizes` from `MantineThemeComponent`.
-    for (const component of [
-      'ActionIcon',
-      'TextInput',
-      'PasswordInput',
-      'NumberInput',
-      'Textarea',
-      'Select',
-    ]) {
-      expect(defaults).toMatch(
-        new RegExp(`${component}: \\{[\\s\\S]{0,160}?styles: CONTROL_INPUT`)
-      );
-    }
-    expect(defaults).toMatch(/Button: \{[\s\S]{0,160}?styles: \{ root: CONTROL_ROOT \}/);
+
+    // A theme can paint only the outer box; Mantine derives a control's line box,
+    // padding and section widths from its own size variables. So the theme pins no
+    // control heights, and the ramp re-steps those variables instead — which is why
+    // the input families this list never enumerated (`Autocomplete`, `MultiSelect`,
+    // `ColorInput`, the date inputs) come along on 32px as well.
+    expect(defaults).not.toMatch(/height: 'var\(--app-control-height/);
+    expect(defaults).not.toMatch(/CONTROL_INPUT|CONTROL_ROOT/);
+
+    expect(tokensCss).toMatch(
+      /\.mantine-Input-wrapper\[data-size\][\s\S]*?--input-height-sm:\s*var\(--app-control-height\)/
+    );
+    expect(tokensCss).toMatch(
+      /\.mantine-Button-root\[data-size\][\s\S]*?--button-height-sm:\s*var\(--app-control-height\)/
+    );
+    expect(tokensCss).toMatch(
+      /\.mantine-ActionIcon-root\[data-size\][\s\S]*?--ai-size-sm:\s*var\(--app-control-height\)/
+    );
   });
 });

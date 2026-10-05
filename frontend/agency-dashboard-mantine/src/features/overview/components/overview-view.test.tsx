@@ -1,5 +1,5 @@
-import { act, render, screen, within } from '@test-utils';
-import { afterEach, describe, expect, test } from 'vitest';
+import { act, fireEvent, render, screen, within } from '@test-utils';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 import { setLocale } from '../../../i18n/index.ts';
 import type { AgencyBooking } from '../../bookings/types.ts';
 import type { OverviewPageController } from '../hooks/use-overview-page.ts';
@@ -58,19 +58,19 @@ function controller(overrides: Partial<OverviewPageController> = {}) {
       website: true,
     },
     quickActions: [
-      { key: 'bookings', label: 'New booking', run: () => {} },
-      { key: 'customers', label: 'Add customer', run: () => {} },
-      { key: 'tours', label: 'New trip', run: () => {} },
+      { key: 'bookings', label: 'New booking', run: vi.fn() },
+      { key: 'customers', label: 'Add customer', run: vi.fn() },
+      { key: 'tours', label: 'Create tour', run: vi.fn() },
     ],
     bookings: [],
     isLoading: false,
     isError: false,
-    goToCustomers: () => {},
-    goToTours: () => {},
-    goToBookings: () => {},
-    goToMembers: () => {},
-    openBooking: () => {},
-    refetchVisible: () => {},
+    goToCustomers: vi.fn(),
+    goToTours: vi.fn(),
+    goToBookings: vi.fn(),
+    goToMembers: vi.fn(),
+    openBooking: vi.fn(),
+    refetchVisible: vi.fn(),
     site: {
       isLoading: false,
       isPublished: false,
@@ -79,8 +79,8 @@ function controller(overrides: Partial<OverviewPageController> = {}) {
     },
     viewWebsite: {
       mode: 'preview',
-      open: () => {},
-    } as OverviewPageController['viewWebsite'],
+      open: vi.fn(),
+    } as unknown as OverviewPageController['viewWebsite'],
     ...overrides,
   } as unknown as OverviewPageController;
 }
@@ -90,36 +90,62 @@ describe('OverviewView structure', () => {
     render(<OverviewView controller={controller()} />);
 
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    // Snapshot, recent bookings and site status are navigable sections.
-    expect(screen.getAllByRole('heading', { level: 2 }).length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByRole('heading', { level: 2 }).length).toBeGreaterThanOrEqual(4);
   });
 
-  test('names the quick actions the member may use', () => {
+  test('renders the greeting, date button, and primary action in the header', () => {
     render(<OverviewView controller={controller()} />);
 
-    expect(screen.getByRole('button', { name: 'New booking' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Add customer' })).toBeInTheDocument();
+    expect(screen.getByText('Good afternoon, Lakhdar')).toBeInTheDocument();
+    expect(screen.getByText('Oct 8, 2026')).toBeInTheDocument();
+
+    const pageActions = screen.getByTestId('page-actions');
+    expect(within(pageActions).getByRole('button', { name: /new booking/i })).toBeInTheDocument();
   });
 
-  test('renders no quick actions when the member has none', () => {
+  test('names the quick actions in the quick actions section', () => {
+    render(<OverviewView controller={controller()} />);
+
+    const quickActionsEl = screen.getByTestId('quick-actions');
+    expect(within(quickActionsEl).getByText('New booking')).toBeInTheDocument();
+    expect(within(quickActionsEl).getByText('Add customer')).toBeInTheDocument();
+    expect(within(quickActionsEl).getByText('Create tour')).toBeInTheDocument();
+    expect(within(quickActionsEl).getByText('Add departure')).toBeInTheDocument();
+    expect(within(quickActionsEl).getByText('Record payment')).toBeInTheDocument();
+  });
+
+  test('renders no quick actions card when member has no quick actions', () => {
     render(<OverviewView controller={controller({ quickActions: [] })} />);
 
-    expect(screen.queryByRole('button', { name: 'New booking' })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('quick-actions')).not.toBeInTheDocument();
+  });
+
+  test('clicking quick actions calls appropriate controller navigation', () => {
+    const ctrl = controller();
+    render(<OverviewView controller={ctrl} />);
+
+    const quickActionsEl = screen.getByTestId('quick-actions');
+    fireEvent.click(within(quickActionsEl).getByText('Add customer'));
+    expect(ctrl.goToCustomers).toHaveBeenCalled();
+
+    fireEvent.click(within(quickActionsEl).getByText('Create tour'));
+    expect(ctrl.goToTours).toHaveBeenCalled();
   });
 
   test('offers a way into the whole bookings list from the recent section', () => {
-    render(<OverviewView controller={controller()} />);
+    const ctrl = controller();
+    render(<OverviewView controller={ctrl} />);
 
-    // One in the section header, one in the empty listing — both lead to the
-    // same list, which is the whole point of an empty state.
-    expect(screen.getAllByRole('button', { name: 'Open Bookings' })).toHaveLength(2);
+    const openBookings = screen.getByRole('button', { name: /open bookings/i });
+    expect(openBookings).toBeInTheDocument();
+    fireEvent.click(openBookings);
+    expect(ctrl.goToBookings).toHaveBeenCalled();
   });
 
   test('shows skeleton rows instead of a spinner while loading', () => {
     render(<OverviewView controller={controller({ isLoading: true })} />);
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    // Placeholder rows, not zero rows: an empty table during load reads as "no data".
     expect(document.querySelectorAll('[data-skeleton]').length).toBeGreaterThan(0);
   });
 
@@ -128,52 +154,53 @@ describe('OverviewView structure', () => {
     render(<OverviewView controller={controller({ bookings })} />);
 
     for (const row of bookings) {
-      expect(screen.getByText(row.code)).toBeInTheDocument();
+      expect(screen.getByText(new RegExp(row.customer.firstName ?? ''))).toBeInTheDocument();
     }
   });
 
-  test('reports the site as published or not, without hiding the action', () => {
-    render(
-      <OverviewView
-        controller={controller({
-          site: {
-            isLoading: false,
-            isPublished: true,
-            slug: 'atlas',
-            themeId: null,
-          },
-          viewWebsite: {
-            mode: 'live',
-            url: 'https://atlas.example',
-            servesAnotherTenant: false,
-            devTenantSlug: null,
-            isOpening: false,
-            open: () => {},
-          },
-        })}
-      />
-    );
+  test('status tabs allow filtering bookings', () => {
+    const bookings = [
+      { ...booking(0), status: 'CONFIRMED' as const },
+      { ...booking(1), status: 'PENDING' as const },
+    ];
+    render(<OverviewView controller={controller({ bookings })} />);
 
-    expect(screen.getByText('Published')).toBeInTheDocument();
-    // Header and status card both offer it; neither pretends the site is live.
-    expect(screen.getAllByRole('button', { name: /view live site/i }).length).toBeGreaterThan(0);
+    expect(screen.getByText('Amina0 Belaid')).toBeInTheDocument();
+    expect(screen.getByText('Amina1 Belaid')).toBeInTheDocument();
+
+    const confirmedTab = screen.getByText('Confirmed');
+    fireEvent.click(confirmedTab);
+
+    expect(screen.getByText('Amina0 Belaid')).toBeInTheDocument();
+    expect(screen.queryByText('Amina1 Belaid')).not.toBeInTheDocument();
   });
 
-  test('says the site is not published yet, and still offers a preview', () => {
+  test('renders upcoming departures section with routes and dates', () => {
     render(<OverviewView controller={controller()} />);
 
-    expect(screen.getByText('Not published')).toBeInTheDocument();
-    expect(screen.getAllByRole('button', { name: /preview draft/i }).length).toBeGreaterThan(0);
+    expect(screen.getByText('Algiers → Istanbul')).toBeInTheDocument();
+    expect(screen.getByText('Algiers → Dubai')).toBeInTheDocument();
+    expect(screen.getByText('Classic Italy')).toBeInTheDocument();
+  });
+
+  test('renders needs attention operational section with alert items', () => {
+    render(<OverviewView controller={controller()} />);
+
+    expect(screen.getByText('2 pending payments')).toBeInTheDocument();
+    expect(screen.getByText('1 departure nearing capacity')).toBeInTheDocument();
+    expect(screen.getByText('3 new customer requests')).toBeInTheDocument();
   });
 
   test('keeps the section labels translated', async () => {
     render(<OverviewView controller={controller()} />);
-    expect(await screen.findByText('Recent bookings')).toBeInTheDocument();
-    expect(screen.getByText('Site status')).toBeInTheDocument();
+    expect(await screen.findByText('Recent Bookings')).toBeInTheDocument();
+    expect(screen.getByText('Upcoming Departures')).toBeInTheDocument();
+    expect(screen.getByText('Needs attention')).toBeInTheDocument();
 
     await useLocale('ar');
     expect(await screen.findByText('أحدث الحجوزات')).toBeInTheDocument();
-    expect(screen.getByText('حالة الموقع')).toBeInTheDocument();
+    expect(screen.getByText('المغادرات القادمة')).toBeInTheDocument();
+    expect(screen.getByText('يتطلب اهتمامك')).toBeInTheDocument();
   });
 
   test('omits the sections a member cannot see', () => {
@@ -188,40 +215,36 @@ describe('OverviewView structure', () => {
             website: false,
           },
           quickActions: [],
-          site: {
-            isLoading: false,
-            isPublished: false,
-            slug: null,
-            themeId: null,
-          },
         })}
       />
     );
 
-    expect(screen.queryByText('Recent bookings')).not.toBeInTheDocument();
-    expect(screen.queryByText('Site status')).not.toBeInTheDocument();
-    expect(screen.getByText('Trips')).toBeInTheDocument();
+    expect(screen.queryByText('Recent Bookings')).not.toBeInTheDocument();
+    expect(screen.getByText('Upcoming Departures')).toBeInTheDocument();
   });
 
   test('surfaces a failing section with a retry', () => {
-    render(<OverviewView controller={controller({ isError: true })} />);
+    const ctrl = controller({ isError: true });
+    render(<OverviewView controller={ctrl} />);
 
     const alert = within(screen.getByRole('alert')).getByRole('button', {
       name: 'Retry',
     });
     expect(alert).toBeInTheDocument();
+    fireEvent.click(alert);
+    expect(ctrl.refetchVisible).toHaveBeenCalled();
   });
 });
 
-describe('OverviewView information design', () => {
-  test('orders the tiles Customers, Trips, Bookings, Team', () => {
+describe('OverviewView summary metrics', () => {
+  test('orders the tiles Bookings, Customers, Departures, Revenue', () => {
     render(<OverviewView controller={controller()} />);
 
-    const labels = within(screen.getByTestId('kpi-tiles'))
+    const tileLabels = within(screen.getByTestId('kpi-tiles'))
       .getAllByRole('button')
-      .map((tile) => (tile.textContent ?? '').split(/\d/)[0].trim());
+      .map((tile) => tile.querySelector('.mantine-Text-root')?.textContent?.trim());
 
-    expect(labels).toEqual(['Customers', 'Trips', 'Bookings', 'Team']);
+    expect(tileLabels).toEqual(['Bookings', 'Customers', 'Departures', 'Revenue']);
   });
 
   test('shows one tile per KPI the member may view', () => {
@@ -230,67 +253,26 @@ describe('OverviewView information design', () => {
         controller={controller({
           canView: {
             customers: true,
-            tours: true,
+            tours: false,
             bookings: false,
             members: false,
             website: false,
           },
           quickActions: [],
-          site: {
-            isLoading: false,
-            isPublished: false,
-            slug: null,
-            themeId: null,
-          },
         })}
       />
     );
 
     const tiles = within(screen.getByTestId('kpi-tiles')).getAllByRole('button');
-    expect(tiles).toHaveLength(2);
+    expect(tiles).toHaveLength(1);
+    expect(within(tiles[0]).getByText('Customers')).toBeInTheDocument();
   });
 
-  test('gives a tile a 13px label above a 24px number, both semibold', () => {
-    render(<OverviewView controller={controller({ kpis: { ...BASE_KPIS, customers: 12 } })} />);
-
-    // The sizes are tokens; `tokens.test.ts` is what pins them to 13px and 24px.
-    expect(screen.getByText('Customers')).toHaveStyle({
-      fontSize: 'var(--app-tile-label-size)',
-      fontWeight: '600',
-    });
-    expect(screen.getByText('12')).toHaveStyle({
-      fontSize: 'var(--app-tile-value-size)',
-      fontWeight: '600',
-    });
-  });
-
-  test('keeps exactly one primary action in the page header', () => {
+  test('displays trend comparison metadata', () => {
     render(<OverviewView controller={controller()} />);
 
-    const actions = within(screen.getByTestId('page-actions')).getAllByRole('button');
-    expect(actions).toHaveLength(1);
-    expect(actions[0]).toHaveTextContent('New booking');
-    // Mantine 9 expresses the variant as a custom property, not a class: the
-    // primary is the one painting the near-black ink fill.
-    expect(actions[0].getAttribute('style')).toContain('--mantine-color-ink-filled');
-  });
-
-  test('moves the remaining shortcuts below the header instead of crowding it', () => {
-    render(<OverviewView controller={controller()} />);
-
-    const shortcuts = within(screen.getByTestId('quick-actions')).getAllByRole('button');
-    expect(shortcuts.map((button) => button.textContent)).toEqual(['Add customer', 'New trip']);
-    // Only the promoted primary stays in the header; the rest are secondary.
-    for (const shortcut of shortcuts) {
-      expect(screen.getByTestId('page-actions')).not.toContainElement(shortcut);
-    }
-  });
-
-  test('offers the site action once, from the site panel', () => {
-    render(<OverviewView controller={controller()} />);
-
-    const preview = screen.getAllByRole('button', { name: /preview draft/i });
-    expect(preview).toHaveLength(1);
-    expect(within(screen.getByTestId('site-status')).getByRole('button')).toBe(preview[0]);
+    const tiles = screen.getByTestId('kpi-tiles');
+    expect(within(tiles).getByText('12%')).toBeInTheDocument();
+    expect(within(tiles).getAllByText('vs last month').length).toBe(4);
   });
 });

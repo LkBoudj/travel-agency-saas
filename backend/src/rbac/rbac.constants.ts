@@ -723,3 +723,4 @@ export function validateRbacCatalog(): void {
     ALL_AGENCY_PERMISSION_KEYS,
   );
 }
+

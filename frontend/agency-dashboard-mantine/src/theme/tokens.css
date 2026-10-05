@@ -20,11 +20,8 @@
   --app-heading-h5: 0.875rem;
   --app-heading-h6: 0.8125rem;
 
-  /* Shell metrics other layers need to reason about: a sticky table header has
-     to start below the header, not behind it. The header is a 44px strip — the
-     reference's top band — because identity, language, and account all live in
-     the rail footer now, so the band has nothing else to carry. */
-  --app-header-height: 44px;
+  /* Shell metrics: compact 56px header top bar per approved reference. */
+  --app-header-height: 56px;
 
   /* The rail's width. The reference measures ~202px at 1536px wide (13.2%); this
      is 220px so the Arabic labels and the uppercase group headings still fit
@@ -40,14 +37,18 @@
      sized for a standalone marketing form; against a 13px table row it left a
      visible step between a control and the row it filters. 32px puts every
      button, input, and select on the same line as its neighbours. Row-level
-     actions step down again — see `--app-control-height-compact`. */
+     actions step down again — see `--app-control-height-compact`.
+
+     This is the only place 32px is written. The ramp at the end of this file
+     re-steps Mantine's size variables onto it, so changing this one line moves
+     every control in the product together. */
   --app-control-height: 32px;
 
   /* The row-action step: 26px, which is exactly Mantine's built-in `compact-sm`
-     (`1.625rem`). Declared here rather than left to Mantine because the theme
-     pins `sm` on `ActionIcon`'s root, which would otherwise flatten every size
-     back to the control height; keeping our own token means the step stays
-     visible in one place and cannot drift from the framework's value. */
+     (`1.625rem`). Declared here rather than left to Mantine because it is a
+     product decision — row actions sit inside a 40px row, so they take the
+     compact step rather than the control height — and a decision belongs in the
+     token layer next to the height it steps down from. */
   --app-control-height-compact: 26px;
 
   /* The stat-tile anatomy: a label you can read at arm's length above a number
@@ -87,6 +88,16 @@
      "add" affordance — and behind every success state. It is not a surface. */
   --app-accent-border: var(--mantine-color-brand-6);
 
+  /* The sign-in call to action. `primaryColor` is `ink` because every screen in
+     the workspace is neutral, but the login card is a marketing surface that
+     stands apart from the product, so its one action takes a blue: `info[7]`,
+     white on it measures 6.6:1, where `info[6]` sits at 3.7:1 and fails AA for
+     a 14px label, and `info[8]` (what `primaryShade` picks for any non-primary
+     colour) is a navy that reads as ink again. Declared here because this layer
+     is where every colour in the app is funnelled through, and
+     `login-form.tsx` names only the token. */
+  --app-cta-fill: #1974d8;
+
   /* Status iconography. Same steps the `light` status badge pairs with its
      background, so an icon and its chip never disagree about severity. */
   --app-icon-danger: var(--mantine-color-danger-6);
@@ -100,17 +111,99 @@
   --app-border-danger: var(--mantine-color-danger-4);
   --app-text-danger: var(--mantine-color-danger-9);
 
-  /* The navigation rail is the one dark surface in a light workspace. Its four
-     values are the whole shell: the rail itself, a hover wash, the active fill,
-     and the two label weights. Every pair here is pinned in `contrast.test.ts`.
-     `#8A8A8A` is used for muted labels on *this* surface only — it clears 5.7:1
-     against near-black but fails AA on white, so it must never reach a light
-     surface. */
-  --app-surface-nav: #0b0b0b;
-  --app-nav-border: #1f1f1f;
-  --app-nav-hover: #1f1f1f;
-  --app-nav-active: #252525;
-  --app-nav-text: #d4d4d4;
+  /* The navigation rail: dark navy/slate per approved reference. */
+  --app-surface-nav: #0d1726;
+  --app-nav-border: #1a2638;
+  --app-nav-hover: #172338;
+  --app-nav-active: #1971c2;
+  --app-nav-text: #fefefe;
   --app-nav-text-active: #fff;
-  --app-nav-text-muted: #8a8a8a;
+  --app-nav-text-muted: #94a3b8;
+}
+
+/* ---------------------------------------------------------------------------
+   The control ramp
+
+   Mantine does not size a control with one number. It declares a custom property
+   per size step on the control's root and derives everything else from it: the
+   line box the text sits in, the padding, the width of the input's sections, the
+   side length of an icon button, the size of a nested control. A component theme
+   can only paint the outer box, so setting `height` through `componentDefaults`
+   left those variables on Mantine's own 36px `sm` — a 32px box with a 34px line
+   box inside it, icon buttons stretched out of square, and each input family on a
+   different step depending on whether the theme remembered it.
+
+   Re-stepping the variables moves the box *and* its contents together, which is
+   the only way the two stay on the same number. Each ramp is Mantine's own,
+   shifted 4px so `sm` lands on `--app-control-height`; the rhythm between the
+   steps is Mantine's, so `md`/`lg`/`xl` keep the weight they ship with.
+
+   `[data-size]` is on every selector deliberately: it lifts these rules to
+   (0,2,0) so they beat Mantine's single-class declarations whatever order the two
+   stylesheets happen to be loaded in.
+   --------------------------------------------------------------------------- */
+
+.mantine-Input-wrapper[data-size] {
+  --input-height-xs: 26px;
+  --input-height-sm: var(--app-control-height);
+  --input-height-md: 42px;
+  --input-height-lg: 48px;
+  --input-height-xl: 56px;
+
+  /* Multiline padding is a share of the box rather than a fixed step, so it moves
+     with the heights: a 56px textarea cannot keep a 13px top and bottom pad and
+     still hold two rows. */
+  --input-padding-y-xs: 4px;
+  --input-padding-y-sm: 5px;
+  --input-padding-y-md: 8px;
+  --input-padding-y-lg: 10px;
+  --input-padding-y-xl: 12px;
+}
+
+.mantine-Button-root[data-size] {
+  --button-height-xs: 26px;
+  --button-height-sm: var(--app-control-height);
+  --button-height-md: 42px;
+  --button-height-lg: 48px;
+  --button-height-xl: 56px;
+
+  /* Mantine's compact ramp already sits at 26px, so it needs no shift — pinned
+     here only so the compact step is visible next to the heights it steps down
+     from, and so it cannot drift if Mantine ever moves it. */
+  --button-height-compact-xs: 22px;
+  --button-height-compact-sm: var(--app-control-height-compact);
+  --button-height-compact-md: 30px;
+  --button-height-compact-lg: 34px;
+  --button-height-compact-xl: 40px;
+}
+
+.mantine-ActionIcon-root[data-size] {
+  /* An icon button is square and deliberately a step below the input of the same
+     name, so its ramp is shifted by 10px rather than 4px: `sm` still lands on the
+     control height while `xs` keeps the 4px gap Mantine gives it. */
+  --ai-size-xs: 28px;
+  --ai-size-sm: var(--app-control-height);
+  --ai-size-md: 42px;
+  --ai-size-lg: 48px;
+  --ai-size-xl: 56px;
+
+  /* Mantine resolves `size="compact-sm"` to `var(--ai-size-compact-sm)` but never
+     declares it, so an ActionIcon at that size fell through to the width of its
+     own icon and rendered as a 16px sliver beside a 32px neighbour. Declaring the
+     compact ramp is what makes the row-action step square; the values are
+     Mantine's, unchanged. */
+  --ai-size-compact-xs: 22px;
+  --ai-size-compact-sm: var(--app-control-height-compact);
+  --ai-size-compact-md: 30px;
+  --ai-size-compact-lg: 34px;
+  --ai-size-compact-xl: 40px;
+
+  /* The variants Mantine uses for an icon button sitting inside an input — a
+     password toggle, a clear button, a dropdown chevron. These follow the input
+     ramp, so a nested control can never out-measure the box that holds it. */
+  --ai-size-input-xs: 26px;
+  --ai-size-input-sm: var(--app-control-height);
+  --ai-size-input-md: 42px;
+  --ai-size-input-lg: 48px;
+  --ai-size-input-xl: 56px;
 }

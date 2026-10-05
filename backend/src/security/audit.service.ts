@@ -32,6 +32,7 @@ export const AUDIT_ACTIONS = {
   agencyBookingCancelled: 'AGENCY_BOOKING_CANCELLED',
   agencyTravelerCreated: 'AGENCY_TRAVELER_CREATED',
   agencyTravelerUpdated: 'AGENCY_TRAVELER_UPDATED',
+  agencyPaymentRecorded: 'AGENCY_PAYMENT_RECORDED',
   agencyWebsiteDraftContentUpdated: 'AGENCY_WEBSITE_DRAFT_CONTENT_UPDATED',
   agencyWebsiteDraftThemeUpdated: 'AGENCY_WEBSITE_DRAFT_THEME_UPDATED',
   agencyWebsitePublished: 'AGENCY_WEBSITE_PUBLISHED',

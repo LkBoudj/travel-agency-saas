@@ -2,6 +2,10 @@
   "page": {
     "title": "نظرة عامة",
     "subtitle": "لمحة مباشرة عن وكالتك",
+    "greeting": "مساء الخير، {{name}}",
+    "todayTitle": "إليك ما يحدث اليوم.",
+    "todaySubtitle": "إدارة الحجوزات والعملاء والمغادرات القادمة.",
+    "dateFilter": "8 أكتوبر 2026",
     "errorTitle": "تعذّر تحميل النظرة العامة",
     "errorBody": "تعذّر تحميل أحد أقسام النظرة العامة. حاول مرة أخرى.",
     "retry": "إعادة المحاولة"
@@ -11,6 +15,9 @@
     "tours": "الرحلات",
     "bookings": "الحجوزات",
     "members": "الفريق",
+    "departures": "المغادرات",
+    "revenue": "الإيرادات",
+    "vsLastMonth": "مقارنة بالشهر الماضي",
     "published": "منشور: {{count}}",
     "pending": "قيد الانتظار: {{count}}",
     "confirmed": "مؤكَّد: {{count}}",
@@ -19,7 +26,46 @@
   },
   "recent": {
     "title": "أحدث الحجوزات",
-    "empty": "لا توجد حجوزات بعد. أنشئ حجزًا من صفحة الحجوزات."
+    "empty": "لا توجد حجوزات بعد. أنشئ حجزًا من صفحة الحجوزات.",
+    "viewAll": "عرض الكل ←",
+    "all": "الكل",
+    "confirmed": "مؤكد",
+    "pending": "قيد الانتظار",
+    "cancelled": "ملغى"
+  },
+  "departuresSection": {
+    "title": "المغادرات القادمة",
+    "viewAll": "عرض الكل ←",
+    "travelersCount": "{{count}} مسافر",
+    "guidesCount": "{{count}} مرشد",
+    "guideCount": "مرشد واحد",
+    "limited": "محدود"
+  },
+  "attention": {
+    "title": "يتطلب اهتمامك",
+    "pendingPayments": "دفعتان معلقتان",
+    "pendingPaymentsSub": "المبلغ الإجمالي: $1,870",
+    "capacityWarning": "مغادرة واحدة قاربت الاكتمال",
+    "capacityWarningSub": "روما والفاتيكان · مقعدان متبقيان",
+    "customerRequests": "3 طلبات عملاء جديدة",
+    "customerRequestsSub": "تتطلب مراجعتك",
+    "view": "عرض"
+  },
+  "quickActions": {
+    "title": "إجراءات سريعة",
+    "newBooking": "حجز جديد",
+    "addCustomer": "إضافة عميل",
+    "createTour": "إنشاء جولة",
+    "addDeparture": "إضافة مغادرة",
+    "recordPayment": "تسجيل دفعة"
+  },
+  "columns": {
+    "customer": "العميل",
+    "tour": "الجولة",
+    "date": "التاريخ",
+    "travelers": "المسافرون",
+    "amount": "المبلغ",
+    "status": "الحالة"
   },
   "sections": {
     "snapshot": "لمحة سريعة"

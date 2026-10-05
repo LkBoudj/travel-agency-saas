@@ -84,28 +84,51 @@ Maps answer "where is X". Agent files answer "how should X be built".
 Skills live in `.opencode/skills/` (repo-wide) and `frontend/<app>/.opencode/skills/` (app-specific). OpenCode discovers both by walking up from the working directory to the git root.
 
 - Before implementing, identify which skills are relevant; read only those; follow their conventions.
-- Skill `name` matches its directory and is lower-kebab (no dots).
-- App-specific skills apply to that app only — e.g. dashboard framework skills must not be treated as storefront rules.
-- If a needed pattern lacks a skill, implement to the app's AGENTS.md conventions — do not invent a cross-app rule.
+## 11. Superpowers Workflow (Primary)
 
-## 9. Composition Rules
+This project uses **Superpowers** as the primary development workflow. Treat the installed Superpowers version as the authority. Do not duplicate its native capabilities with custom mechanisms.
 
-- Repo-wide policy belongs **here**, not in app files.
-- App `AGENTS.md` files are **deltas**: stack, directory structure, naming, and conventions specific to that app. Keep them slim.
-- If a rule applies to more than one app, move it here.
+### Principles
+- **Skill-first**: Invoke relevant Superpowers skills according to the installed version. Start with `using-superpowers`; use `brainstorming` before planning when intent is unclear.
+- **Native over custom**: Prefer Superpowers native capabilities. `planning-with-files` is a separate, opt-in skill and is not the primary workflow for Superpowers SDD.
+- **Minimal context**: Read only what is necessary; do not re-scan the repository to "rediscover" state. Rely on task-scoped briefs and the native SDD ledger.
 
-## 10. Frontend Structure
+### Core Skills
+Use the following Superpowers skills when applicable:
+- `using-superpowers` — skill-first gate before any action/clarification
+- `brainstorming` — clarify intent/constraints/success before planning
+- `writing-plans` — produce right-sized plans with file map and per-task verification (implementation plans tracked under `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md`)
+- `using-git-worktrees` — isolation (detect existing worktree first; native tools, then Git)
+- `test-driven-development` — failing test first before production code
+- `subagent-driven-development` — per-task implementer/reviewer with continuous execution by plan
+- `executing-plans` — inline execution when appropriate
+- `systematic-debugging` — root-cause-first for bugs/failures
+- `verification-before-completion` — fresh evidence before any completion claim
+- `requesting-code-review` / `receiving-code-review` — task-level and final reviews
+- `finishing-a-development-branch` — green suite, environment detection, cleanup decisions
 
-For React/frontend code, optimize for easy tracing and clear separation of responsibilities.
+### Plan vs Runtime State
+- **Implementation plans**: tracked project documents at `docs/superpowers/plans/YYYY-MM-DD-<feature-name>.md` (produced by `writing-plans`).
+- **SDD runtime state**: `.superpowers/sdd/<plan-basename>/` contains progress ledger, task briefs, reports, review packages, and temporary execution state. This is **git-ignored scratch state** and must remain git-ignored (do not modify its `.gitignore`). It is not portable via Git.
 
-- Page components must stay thin and focus on composition/orchestration.
-- Move data fetching, navigation, side effects, and derived state into feature hooks.
-- Move meaningful UI sections into components.
-- Keep components primarily focused on rendering and user interaction.
-- Move pure calculations, transforms, predicates, and decision logic into `lib` helpers.
-- Prefer feature-local `components/`, `hooks/`, and `lib/` folders.
-- Promote code to shared/global components only when it is genuinely reused.
-- Do not create tiny wrapper components or abstractions with no clear value.
-- Avoid mixing fetching, business decisions, side effects, and large UI markup in one file.
-- Prefer this flow: **Page → Hooks → Components → Lib**.
-- Keep changes minimal. Preserve existing behavior unless the task explicitly requires a behavior change. Do not refactor unrelated working code.
+### Resume Model
+- **Same machine / same working tree**: resume via Superpowers SDD native ledger/workspace for the active plan.
+- **Reopened session / missing SDD state**: resume from tracked plan (`docs/superpowers/plans/`) + branch + local Git history and task commits. If `.superpowers/sdd/<plan-basename>/` is missing (expected on another machine), use Superpowers' native Git-history recovery/fallback to reconstruct execution state.
+- **Different agent / same working tree**: reuse native SDD state if present; otherwise fall back to tracked plan + local Git history.
+- **Different computer via Git**: sync branch + tracked plan + task commits (push/pull only with explicit approval). `.superpowers/sdd/` does not travel in Git; reconstruction uses tracked plan + Git history.
+- **No custom handoff**: do not create `.opencode/continuation.json` or `TEMP_HANDOFF.md`.
+
+### Git Rules (Aligned with Superpowers)
+- **Local commits** required by the active Superpowers workflow are allowed (they are part of SDD durability/recovery).
+- **Remote/shared side effects**: push, merge, rebase, publish, tag, or any remote/shared side effects require explicit user approval.
+- **No destructive Git commands** (`reset --hard`, `push --force`, etc.) unless explicitly approved.
+
+### Execution Guardrails
+- One task at a time.
+- Minimal relevant context; read only files needed by the current task.
+- Repository evidence is authoritative.
+- Smallest safe changes; Clean Code.
+- Analyze before architecture/database/security/major-dependency changes.
+- Completed modules stay closed unless there is a new bug or requirement.
+- Do not create unnecessary handoff/progress/ledger systems.
+- `planning-with-files` remains opt-in and is not the primary planning/execution/resume system for Superpowers SDD.

@@ -17,6 +17,16 @@ vi.mock('../../features/agency-context/provider/agency-provider.tsx', () => ({
   useAgencyContext: () => ({ code: 'AGY-TEST', can: () => true }),
 }));
 
+vi.mock('../../features/auth/hooks/use-auth.ts', () => ({
+  useCurrentUser: () => ({
+    data: {
+      firstName: 'Lakhdar',
+      lastName: 'Boudjahfa',
+      email: 'lakhdar@example.com',
+    },
+  }),
+}));
+
 vi.mock('./hooks/use-sidebar-footer.ts', () => ({
   useSidebarFooter: () => ({
     agencyName: 'Atlas Travel',
@@ -114,48 +124,41 @@ describe('DashboardLayout dark rail', () => {
 
 describe('DashboardLayout header band', () => {
   test('is the reference height, not the old 60px', () => {
-    expect(tokensCss).toMatch(/--app-header-height:\s*44px/);
+    expect(tokensCss).toMatch(/--app-header-height:\s*56px/);
   });
 
-  test('does not carry the agency identity, language, or account controls', () => {
+  test('carries search, language toggle, and notifications in the header', () => {
     renderLayout();
 
-    // All three moved to the rail footer: the spec asks for them to read as
-    // secondary, and a 44px band cannot hold them without competing with the page.
-    expect(within(header()).queryByText('Atlas Travel')).not.toBeInTheDocument();
-    expect(within(header()).queryByRole('button', { name: /language/i })).not.toBeInTheDocument();
+    expect(within(header()).getByPlaceholderText(/search/i)).toBeInTheDocument();
+    expect(within(header()).getByRole('button', { name: /english/i })).toBeInTheDocument();
+    expect(within(header()).getByRole('button', { name: /العربية/i })).toBeInTheDocument();
+    expect(within(header()).getByRole('button', { name: /notifications/i })).toBeInTheDocument();
   });
 
-  test('places the agency identity, language, and account controls in the rail', () => {
+  test('places the account control in the header', () => {
     renderLayout();
 
-    expect(within(rail()).getByText('Atlas Travel')).toBeInTheDocument();
-    expect(within(rail()).getByRole('button', { name: /language/i })).toBeInTheDocument();
-    expect(within(rail()).getByRole('button', { name: /^account$/i })).toBeInTheDocument();
+    expect(within(header()).getByRole('button', { name: /^account$/i })).toBeInTheDocument();
   });
 
-  test('puts the account control after the navigation links, at the end of the rail', () => {
+  test('places branding, navigation links, and bottom controls in the rail', () => {
     renderLayout();
 
-    const railChildren = [...rail().children];
-    const accountIndex = railChildren.findIndex((child) =>
-      child.textContent?.includes('Atlas Travel')
-    );
-    const navIndex = railChildren.findIndex((child) => child.tagName === 'NAV');
-
-    expect(navIndex).toBeGreaterThanOrEqual(0);
-    expect(accountIndex).toBeGreaterThan(navIndex);
+    expect(within(rail()).getByText('Travel Connect')).toBeInTheDocument();
+    expect(within(rail()).getByText('Agency Dashboard')).toBeInTheDocument();
+    expect(
+      within(rail()).getByRole('navigation', { name: /main navigation/i })
+    ).toBeInTheDocument();
+    expect(within(rail()).getByRole('link', { name: 'Overview' })).toBeInTheDocument();
+    expect(within(rail()).getByRole('link', { name: 'Bookings' })).toBeInTheDocument();
+    expect(within(rail()).getByText('Your Agency')).toBeInTheDocument();
   });
 
   test('orients the breadcrumb from the route, without a data fetch', () => {
     renderLayout('/AGY-TEST/bookings');
 
-    // "Operations / Bookings" — the group, then the page. Reading the route is
-    // navigation chrome, not a new query. Asserted through the breadcrumb's own
-    // landmark rather than `textContent`, which also picks up Mantine's injected
-    // responsive CSS text.
     const crumb = within(header()).getByRole('navigation', { name: /breadcrumb/i });
-    expect(crumb.textContent).toContain('Operations');
     expect(crumb.textContent).toContain('Bookings');
   });
 

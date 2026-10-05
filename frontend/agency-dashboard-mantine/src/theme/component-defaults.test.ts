@@ -50,6 +50,51 @@ describe('overlay transitions', () => {
 });
 
 /**
+ * Control geometry is the token layer's job, not this module's.
+ *
+ * `styles` can only paint the outer box. Everything inside a control — its line
+ * box, its padding, its section widths, an icon button's side length — is derived
+ * by Mantine from custom properties on the control's root, and setting `height`
+ * here left those on Mantine's 36px `sm`: a 32px box with a 34px line box in it,
+ * icon buttons stretched out of square, and each input family on a different step
+ * depending on whether this module remembered it. The ramp in `control-ramp.ts`
+ * re-steps the variables themselves, so no entry may paint a control height again.
+ */
+const CONTROL_COMPONENTS = [
+  'ActionIcon',
+  'Button',
+  'Checkbox',
+  'ColorInput',
+  'Input',
+  'MultiSelect',
+  'NumberInput',
+  'PasswordInput',
+  'PillInput',
+  'Radio',
+  'SegmentedControl',
+  'Select',
+  'Switch',
+  'Textarea',
+  'TextInput',
+] as const;
+
+describe('control geometry', () => {
+  test('no control paints its own height', async () => {
+    const defaults = await defaultsWithReducedMotion(false);
+
+    const offenders = CONTROL_COMPONENTS.flatMap((name) => {
+      const styles = (defaults[name]?.styles ?? {}) as Record<string, object | undefined>;
+
+      return Object.entries(styles)
+        .filter(([, value]) => value != null && 'height' in value)
+        .map(([slot, value]) => `${name}.styles.${slot} paints ${JSON.stringify(value)}`);
+    });
+
+    expect(offenders).toEqual([]);
+  });
+});
+
+/**
  * The table contract.
  *
  * Every table in the product — bookings, customers, departures, invitations,

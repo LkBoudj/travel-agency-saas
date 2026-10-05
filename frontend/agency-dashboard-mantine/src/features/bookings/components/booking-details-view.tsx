@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Badge, Button, Divider, Group, Stack, Table, Text, Title } from '@mantine/core';
 import { dashboardPaths } from '../../../app/router/route-paths.ts';
+import { ContentContainer } from '../../../components/content-container.tsx';
 import { ErrorState } from '../../../components/empty-state.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
 import { Panel } from '../../../components/panel.tsx';
@@ -41,48 +42,55 @@ export function BookingDetailsView({
   const actions = booking ? bookingRowActions(booking, capabilities) : null;
 
   return (
-    <Stack gap="lg">
-      <Link
-        to={dashboardPaths.bookings(agencyCode)}
-        style={{ display: 'inline-flex', alignItems: 'center', gap: 4, alignSelf: 'flex-start' }}
-      >
-        <Text
-          size="sm"
-          c="dimmed"
-          component="span"
-          style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+    <ContentContainer>
+      <Stack gap="lg">
+        <Link
+          to={dashboardPaths.bookings(agencyCode)}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 4, alignSelf: 'flex-start' }}
         >
-          {isRtl ? <IconArrowRight size={14} /> : <IconArrowLeft size={14} />}
-          {t('details.backToList')}
-        </Text>
-      </Link>
+          <Text
+            size="sm"
+            c="dimmed"
+            component="span"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
+          >
+            {isRtl ? <IconArrowRight size={14} /> : <IconArrowLeft size={14} />}
+            {t('details.backToList')}
+          </Text>
+        </Link>
 
-      {bookingQuery.isPending ? (
-        <Text size="sm" c="dimmed">
-          {t('page.loading')}
-        </Text>
-      ) : bookingQuery.isError ? (
-        <ErrorState title={t('details.loadError')} onRetry={() => void bookingQuery.refetch()} />
-      ) : booking ? (
-        <>
-          <PageHeader
-            title={booking.code}
-            subtitle={booking.tour.name}
-            actions={
-              actions && (actions.canConfirm || actions.canCancel) ? (
-                <Group gap="sm">
-                  {actions.canConfirm ? (
-                    <Button onClick={controller.openConfirm}>{t('details.confirm')}</Button>
-                  ) : null}
-                  {actions.canCancel ? (
-                    <Button color="red" variant="light" onClick={controller.openCancel}>
-                      {t('details.cancel')}
-                    </Button>
-                  ) : null}
-                </Group>
-              ) : null
-            }
-          />
+        {bookingQuery.isPending ? (
+          <Text size="sm" c="dimmed">
+            {t('page.loading')}
+          </Text>
+        ) : bookingQuery.isError ? (
+          <ErrorState title={t('details.loadError')} onRetry={() => void bookingQuery.refetch()} />
+        ) : booking ? (
+          <>
+            <PageHeader
+              title={booking.code}
+              subtitle={booking.tour.name}
+              actions={
+                actions && (actions.canConfirm || actions.canCancel) ? (
+                  <Group gap="sm">
+                    {actions.canConfirm ? (
+                      <Button
+                        color="blue"
+                        onClick={controller.openConfirm}
+                        styles={{ root: { backgroundColor: '#1971c2', fontWeight: 600 } }}
+                      >
+                        {t('details.confirm')}
+                      </Button>
+                    ) : null}
+                    {actions.canCancel ? (
+                      <Button color="red" variant="light" onClick={controller.openCancel}>
+                        {t('details.cancel')}
+                      </Button>
+                    ) : null}
+                  </Group>
+                ) : null
+              }
+            />
 
           <SummaryCard booking={booking} />
           <PriceLinesCard booking={booking} />
@@ -93,6 +101,7 @@ export function BookingDetailsView({
         </>
       ) : null}
     </Stack>
+    </ContentContainer>
   );
 }
 

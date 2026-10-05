@@ -3,14 +3,18 @@
   "nav": {
     "overview": "نظرة عامة",
     "trips": "الرحلات",
+    "tours": "الجولات",
     "departures": "المغادرة",
     "bookings": "الحجوزات",
     "customers": "العملاء",
+    "payments": "المدفوعات",
+    "reports": "التقارير",
     "agency": "الوكالة",
     "team": "الفريق",
     "website": "الموقع الإلكتروني",
     "themes": "القوالب",
     "settings": "الإعدادات",
+    "help": "المساعدة",
     "groups": {
       "workspace": "مساحة العمل",
       "operations": "العمليات",
@@ -73,7 +77,14 @@
     "skipToContent": "تخطَّ إلى المحتوى",
     "mainNav": "التنقل الرئيسي",
     "breadcrumb": "مسار التنقل",
-    "openAccount": "الحساب"
+    "openAccount": "الحساب",
+    "searchPlaceholder": "البحث في الحجوزات والعملاء والجولات...",
+    "notifications": "الإشعارات",
+    "brandTitle": "ترافل كونكت",
+    "brandSubtitle": "لوحة تحكم الوكالة",
+    "yourAgency": "وكالتك",
+    "yourAgencySubtitle": "إدارة رحلات مميزة لعملائك",
+    "agencyOwner": "مالك الوكالة"
   },
   "lang": {
     "en": "English",

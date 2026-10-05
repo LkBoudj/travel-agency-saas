@@ -74,6 +74,7 @@ export const ModelName = {
   BookingPriceLine: 'BookingPriceLine',
   BookingStatusHistory: 'BookingStatusHistory',
   BookingTraveler: 'BookingTraveler',
+  Payment: 'Payment',
   AgencyWebsite: 'AgencyWebsite',
   AgencyWebsiteDraft: 'AgencyWebsiteDraft'
 } as const
@@ -444,6 +445,23 @@ export const BookingTravelerScalarFieldEnum = {
 } as const
 
 export type BookingTravelerScalarFieldEnum = (typeof BookingTravelerScalarFieldEnum)[keyof typeof BookingTravelerScalarFieldEnum]
+
+
+export const PaymentScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  bookingId: 'bookingId',
+  amount: 'amount',
+  currency: 'currency',
+  method: 'method',
+  reference: 'reference',
+  note: 'note',
+  paidAt: 'paidAt',
+  recordedByCode: 'recordedByCode',
+  createdAt: 'createdAt'
+} as const
+
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
 
 
 export const AgencyWebsiteScalarFieldEnum = {

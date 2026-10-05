@@ -231,7 +231,13 @@ export function DeparturesManager({
         }
         actions={
           canCreate ? (
-            <Button leftSection={<IconPlus size={16} />} size="sm" onClick={openCreate}>
+            <Button
+              color="blue"
+              leftSection={<IconPlus size={16} />}
+              size="sm"
+              onClick={openCreate}
+              styles={{ root: { backgroundColor: '#1971c2', fontWeight: 600 } }}
+            >
               {t('create')}
             </Button>
           ) : null

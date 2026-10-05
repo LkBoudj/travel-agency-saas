@@ -314,6 +314,32 @@ export type BookingStatusHistory = Prisma.BookingStatusHistoryModel
  */
 export type BookingTraveler = Prisma.BookingTravelerModel
 /**
+ * Model Payment
+ * *
+ *  * One manual payment recorded against a Booking (Module K).
+ *  * There is NO external payment gateway in the MVP: a payment is a fact an
+ *  * agency asserts about money it actually received (cash handed over, a bank
+ *  * transfer it saw land), so the row is an append-only ledger entry, never a
+ *  * mutable "current balance". The client never computes money: `amount` and
+ *  * `currency` are stored facts, and the booking's remaining balance is always
+ *  * derived server-side as `booking.totalAmount - SUM(payment.amount)`.
+ *  * The ledger is APPEND-ONLY and is protected at the database by the module
+ *  * migration's triggers: UPDATE and DELETE are rejected unconditionally, so a
+ *  * correction is recorded as a new row, never as an edit of history. For the
+ *  * same accounting reason the booking FK is `Restrict`, not `Cascade`: deleting
+ *  * a booking must never silently destroy the financial record of what was paid.
+ *  * Tenancy is inherited through the Booking (`:agencyCode` + `:bookingCode`
+ *  * route), so a payment row carries no `agency_id` of its own — a cross-tenant
+ *  * posting is structurally impossible because the service resolves the booking
+ *  * through the caller's agency on every write.
+ *  * `currency` is copied from the Booking at record time and a payment whose
+ *  * currency differs from its booking is rejected, so a booking is settled in
+ *  * exactly one currency. `method` is a free-form-but-constrained label
+ *  * (CHECK in the migration) and `reference` holds whatever the agency uses to
+ *  * trace the money (receipt number, transfer id).
+ */
+export type Payment = Prisma.PaymentModel
+/**
  * Model AgencyWebsite
  * *
  *  * An agency's published public website, 1:1 with Agency.

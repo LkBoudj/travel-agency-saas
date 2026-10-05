@@ -33,86 +33,66 @@ function navName() {
   return nav().getAttribute('aria-label');
 }
 
-/** Section labels, in render order. Read off the group names: the "Team" label
-    is also a link label, so a text query would match both. */
-function sectionLabels() {
-  return within(nav())
-    .getAllByRole('group')
-    .map((group) => group.getAttribute('aria-label'));
-}
-
-/** Section label → the links under it, in order. */
-function sections() {
-  return within(nav())
-    .getAllByRole('group')
-    .map((group) =>
-      within(group)
-        .getAllByRole('link')
-        .map((link) => link.textContent)
-    );
-}
-
 afterEach(async () => {
   await useLocale('en');
   can.mockImplementation(() => true);
 });
 
-describe('DashboardSidebar grouping', () => {
-  test('groups the links under the four section labels', () => {
+describe('DashboardSidebar navigation', () => {
+  test('renders the navigation landmark with correct label', () => {
     renderSidebar();
 
     expect(navName()).toBe('Main navigation');
-    expect(sectionLabels()).toEqual(['Workspace', 'Operations', 'Team', 'Online presence']);
-    // Each label is a visible heading above its links, not just an aria-label.
-    for (const label of ['Workspace', 'Operations', 'Online presence']) {
-      expect(within(nav()).getByText(label)).toBeInTheDocument();
-    }
   });
 
-  test('shows the Arabic section labels for an Arabic session', async () => {
+  test('shows the Arabic nav landmark for an Arabic session', async () => {
     renderSidebar();
     await useLocale('ar');
 
     expect(navName()).toBe('التنقل الرئيسي');
-    expect(sectionLabels()).toEqual(['مساحة العمل', 'العمليات', 'الفريق', 'الحضور الإلكتروني']);
   });
 
-  test('every link sits under the section that owns it', () => {
+  test('renders the approved main navigation items in order', () => {
     renderSidebar();
 
-    expect(sections()).toEqual([
-      ['Overview'],
-      ['Trips', 'Departures', 'Bookings', 'Customers'],
-      ['Team'],
-      ['Website', 'Themes'],
+    const links = within(nav())
+      .getAllByRole('link')
+      .map((link) => link.textContent?.trim());
+
+    expect(links).toEqual([
+      'Overview',
+      'Bookings',
+      'Customers',
+      'Tours',
+      'Departures',
+      'Payments',
+      'Team',
+      'Reports',
     ]);
   });
 
-  test('drops a section entirely when the member cannot open anything in it', () => {
-    can.mockImplementation((permission) => permission !== 'AGENCY_WEBSITE_VIEW');
+  test('renders bottom navigation items (Settings, Help)', () => {
     renderSidebar();
 
-    expect(sections()).toEqual([
-      ['Overview'],
-      ['Trips', 'Departures', 'Bookings', 'Customers'],
-      ['Team'],
-    ]);
-    expect(within(nav()).queryByText('Online presence')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Settings' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Help' })).toBeInTheDocument();
   });
 
-  test('keeps the sections a member has partial access to', () => {
-    can.mockImplementation(
-      (permission) => permission === 'AGENCY_BOOKING_VIEW' || permission === 'AGENCY_MEMBER_VIEW'
-    );
+  test('filters out items the member cannot open', () => {
+    can.mockImplementation((permission) => permission !== 'AGENCY_BOOKING_VIEW');
     renderSidebar();
 
-    // Operations and Team each keep the one link the member may open; only the
-    // fully empty section disappears.
-    expect(sections()).toEqual([['Overview'], ['Bookings'], ['Team']]);
-    expect(sectionLabels()).toEqual(['Workspace', 'Operations', 'Team']);
+    const links = within(nav())
+      .getAllByRole('link')
+      .map((link) => link.textContent?.trim());
+
+    expect(links).not.toContain('Bookings');
+    expect(links).not.toContain('Payments');
+    expect(links).toContain('Overview');
+    expect(links).toContain('Customers');
   });
 
-  test('marks the active link on a section index route', () => {
+  test('marks the active link on an index route', () => {
     renderSidebar('/AGY-TEST/bookings');
 
     expect(within(nav()).getByRole('link', { name: 'Bookings' })).toHaveAttribute(
@@ -124,7 +104,7 @@ describe('DashboardSidebar grouping', () => {
     );
   });
 
-  test('keeps the parent section active on a detail route', () => {
+  test('keeps the parent link active on a detail route', () => {
     renderSidebar('/AGY-TEST/bookings/BKG-0C937B377B89');
 
     expect(within(nav()).getByRole('link', { name: 'Bookings' })).toHaveAttribute(
@@ -136,7 +116,7 @@ describe('DashboardSidebar grouping', () => {
   test('an inactive sibling never looks active', () => {
     renderSidebar('/AGY-TEST/trips/TUR-0C937B377B89');
 
-    expect(within(nav()).getByRole('link', { name: 'Trips' })).toHaveAttribute(
+    expect(within(nav()).getByRole('link', { name: 'Tours' })).toHaveAttribute(
       'data-active',
       'true'
     );
