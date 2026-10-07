@@ -43,7 +43,7 @@ export function DashboardSidebar({ onNavigate }: { onNavigate: () => void }) {
         leftSection={<Icon size={18} />}
         active={isActive}
         onClick={onNavigate}
-        fw={isActive ? 600 : 400}
+        fw={500}
         styles={{
           root: {
             borderRadius: 'var(--mantine-radius-md)',

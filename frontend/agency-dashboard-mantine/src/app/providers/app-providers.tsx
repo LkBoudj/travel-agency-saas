@@ -46,7 +46,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         <DatesProvider settings={DATE_SETTINGS[locale]}>
           <ModalsProvider
             labels={{ confirm: t('actions.confirm'), cancel: t('actions.cancel') }}
-            modalProps={{ centered: true }}
+            modalProps={{ centered: true, removeScrollProps: { removeScrollBar: false } }}
           >
             <Notifications position={isRtl ? 'bottom-left' : 'bottom-right'} limit={4} />
             {children}

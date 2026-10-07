@@ -6,6 +6,7 @@ import { CustomersPage } from '../../features/customers/index.ts';
 import { DeparturesPage } from '../../features/departures/index.ts';
 import { MembersPage } from '../../features/members/index.ts';
 import { OverviewPage } from '../../features/overview/index.ts';
+import { PaymentsPage } from '../../features/payments/index.ts';
 import { ThemesPage } from '../../features/themes/index.ts';
 import { TripsEditorPage, TripsPage } from '../../features/trips/index.ts';
 import { WebsitePage } from '../../features/website/index.ts';
@@ -96,6 +97,14 @@ export const routes: RouteObject[] = [
                 element: (
                   <RequirePermission permissions={['AGENCY_BOOKING_VIEW']}>
                     <BookingDetailsPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: 'payments',
+                element: (
+                  <RequirePermission permissions={['AGENCY_PAYMENT_VIEW']}>
+                    <PaymentsPage />
                   </RequirePermission>
                 ),
               },

@@ -105,6 +105,7 @@ export const componentDefaults: MantineThemeComponents = {
         fontSize: 'var(--mantine-font-size-sm)',
         color: 'var(--mantine-color-text)',
         verticalAlign: 'middle',
+        fontVariantNumeric: 'tabular-nums',
       },
     },
   },
@@ -113,12 +114,18 @@ export const componentDefaults: MantineThemeComponents = {
       type: 'native',
     },
   },
+  AppShell: {
+    defaultProps: {
+      offsetScrollbars: false,
+    },
+  },
   Modal: {
     defaultProps: {
       centered: true,
       radius: 'md',
       padding: 'lg',
       transitionProps: overlayTransition({ transition: 'pop', duration: 150 }),
+      removeScrollProps: { removeScrollBar: false },
     },
   },
   Drawer: {
@@ -126,6 +133,7 @@ export const componentDefaults: MantineThemeComponents = {
       radius: 'md',
       padding: 'lg',
       transitionProps: overlayTransition({ transition: 'slide-right', duration: 150 }),
+      removeScrollProps: { removeScrollBar: false },
     },
   },
   Tooltip: {
@@ -140,6 +148,11 @@ export const componentDefaults: MantineThemeComponents = {
       size: 'sm',
       radius: 'sm',
       variant: 'light',
+    },
+    styles: {
+      root: {
+        fontVariantNumeric: 'tabular-nums',
+      },
     },
   },
 };

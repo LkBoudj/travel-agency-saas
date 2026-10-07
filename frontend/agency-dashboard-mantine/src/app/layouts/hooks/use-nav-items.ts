@@ -58,9 +58,9 @@ export const MAIN_NAV_ITEMS: readonly NavDefinition[] = [
   },
   {
     labelKey: 'nav.payments',
-    to: (code: string) => `/${code}/payments`,
+    to: dashboardPaths.payments,
     icon: IconCreditCard,
-    permission: 'AGENCY_BOOKING_VIEW',
+    permission: 'AGENCY_PAYMENT_VIEW',
   },
   {
     labelKey: 'nav.team',

@@ -60,5 +60,6 @@ export const theme = createTheme({
   cursorType: 'pointer',
   focusRing: 'auto',
   fontSmoothing: true,
+  activeClassName: '',
   components: componentDefaults,
 });

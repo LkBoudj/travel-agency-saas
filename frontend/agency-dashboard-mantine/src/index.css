@@ -20,6 +20,20 @@ body,
   height: 100%;
 }
 
+html {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
@@ -54,6 +68,11 @@ body {
 :focus-visible {
   outline: 2px solid var(--app-focus-ring);
   outline-offset: 2px;
+}
+
+/* Prevent active button/control transforms from physically shifting element geometry on click */
+:where(.mantine-active:active) {
+  transform: none !important;
 }
 
 /* The navigation rail: the one dark surface in a light workspace. Painted by an

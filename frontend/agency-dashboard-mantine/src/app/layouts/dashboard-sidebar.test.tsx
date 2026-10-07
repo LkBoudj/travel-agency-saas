@@ -79,6 +79,20 @@ describe('DashboardSidebar navigation', () => {
   });
 
   test('filters out items the member cannot open', () => {
+    can.mockImplementation((permission) => permission !== 'AGENCY_PAYMENT_VIEW');
+    renderSidebar();
+
+    const links = within(nav())
+      .getAllByRole('link')
+      .map((link) => link.textContent?.trim());
+
+    expect(links).not.toContain('Payments');
+    expect(links).toContain('Bookings');
+    expect(links).toContain('Overview');
+    expect(links).toContain('Customers');
+  });
+
+  test('filters out bookings when member lacks AGENCY_BOOKING_VIEW', () => {
     can.mockImplementation((permission) => permission !== 'AGENCY_BOOKING_VIEW');
     renderSidebar();
 
@@ -87,7 +101,7 @@ describe('DashboardSidebar navigation', () => {
       .map((link) => link.textContent?.trim());
 
     expect(links).not.toContain('Bookings');
-    expect(links).not.toContain('Payments');
+    expect(links).toContain('Payments');
     expect(links).toContain('Overview');
     expect(links).toContain('Customers');
   });

@@ -17,7 +17,14 @@ export function ModalFormShell({
   children,
 }: ModalFormShellProps) {
   return (
-    <Modal opened={opened} onClose={onClose} title={title} size={size} centered>
+    <Modal
+      opened={opened}
+      onClose={onClose}
+      title={title}
+      size={size}
+      centered
+      removeScrollProps={{ removeScrollBar: false }}
+    >
       {children}
     </Modal>
   );

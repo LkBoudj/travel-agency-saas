@@ -80,7 +80,7 @@ function MetricCard({
         style={{
           borderColor: 'var(--app-border-subtle)',
           boxShadow: '0 1px 2px rgba(0, 0, 0, 0.03)',
-          transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+          transition: 'box-shadow 0.15s ease',
         }}
       >
         <Group justify="space-between" align="flex-start" wrap="nowrap" mb="xs">
@@ -464,8 +464,8 @@ export function OverviewView({ controller }: { controller: OverviewPageControlle
                             backgroundColor: isActive ? '#e7f5ff' : 'transparent',
                             color: isActive ? '#1971c2' : 'var(--mantine-color-dimmed)',
                             fontSize: 12.5,
-                            fontWeight: isActive ? 600 : 500,
-                            transition: 'all 0.15s ease',
+                            fontWeight: 500,
+                            transition: 'background-color 0.15s ease, color 0.15s ease',
                             display: 'flex',
                             alignItems: 'center',
                             gap: 6,
