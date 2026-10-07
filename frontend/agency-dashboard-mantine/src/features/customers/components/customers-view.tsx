@@ -35,7 +35,7 @@ export function CustomersView(controller: CustomersPageController) {
                 onClick={controller.openCreateDialog}
                 styles={{
                   root: {
-                    backgroundColor: '#1971c2',
+                    backgroundColor: 'var(--app-action-primary)',
                     fontWeight: 600,
                   },
                 }}
@@ -92,7 +92,9 @@ export function CustomersView(controller: CustomersPageController) {
                     color="blue"
                     leftSection={<IconUserPlus size={16} />}
                     onClick={controller.openCreateDialog}
-                    styles={{ root: { backgroundColor: '#1971c2', fontWeight: 600 } }}
+                    styles={{
+                      root: { backgroundColor: 'var(--app-action-primary)', fontWeight: 600 },
+                    }}
                   >
                     {t('create')}
                   </Button>

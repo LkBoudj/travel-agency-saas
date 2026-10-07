@@ -76,8 +76,8 @@ export function BookingsTable({
               color="blue"
               styles={{
                 placeholder: {
-                  backgroundColor: '#3b82f6',
-                  color: '#fff',
+                  backgroundColor: 'var(--app-action-primary)',
+                  color: 'var(--mantine-color-white)',
                   fontSize: 11,
                   fontWeight: 600,
                 },

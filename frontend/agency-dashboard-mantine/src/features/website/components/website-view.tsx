@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Group, Stack, Tabs, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { ContentContainer } from '../../../components/content-container.tsx';
 import { EntityCode } from '../../../components/entity-code.tsx';
 import { FormActions } from '../../../components/form/form-actions.tsx';
 import { FormErrorSummary } from '../../../components/form/form-error-summary.tsx';
@@ -84,66 +85,78 @@ export function WebsiteView({
   };
 
   return (
-    <Stack gap="lg">
-      <PageHeader
-        title={t('title')}
-        subtitle={t('subtitle')}
-        meta={
-          <Group gap="xs">
-            <StatusBadge status={isPublished ? 'published' : 'draft'} />
-            <EntityCode code={draft.slug} />
-          </Group>
-        }
-        actions={
-          <Group gap="xs">
-            <ViewWebsiteButton controller={viewWebsite} />
-            {canPublish ? (
-              <Button loading={isPublishing} onClick={onPublish}>
-                {t('publish')}
-              </Button>
-            ) : null}
-          </Group>
-        }
-      />
+    <ContentContainer>
+      <Stack gap="lg">
+        <PageHeader
+          title={t('title')}
+          subtitle={t('subtitle')}
+          meta={
+            <Group gap="xs">
+              <StatusBadge status={isPublished ? 'published' : 'draft'} />
+              <EntityCode code={draft.slug} />
+            </Group>
+          }
+          actions={
+            <Group gap="xs">
+              <ViewWebsiteButton controller={viewWebsite} />
+              {canPublish ? (
+                <Button
+                  color="blue"
+                  loading={isPublishing}
+                  onClick={onPublish}
+                  styles={{
+                    root: {
+                      backgroundColor: 'var(--app-action-primary)',
+                      fontWeight: 600,
+                    },
+                  }}
+                >
+                  {t('publish')}
+                </Button>
+              ) : null}
+            </Group>
+          }
+        />
 
-      <form onSubmit={form.onSubmit(onSave, onInvalid)}>
-        <Stack gap="md">
-          <Tabs value={tab} onChange={(value) => setTab((value ?? 'home') as WebsiteTabId)}>
-            <Tabs.List>
-              <Tabs.Tab value="home">{t('tabs.home')}</Tabs.Tab>
-              <Tabs.Tab value="tours">{t('tabs.tours')}</Tabs.Tab>
-              <Tabs.Tab value="navigation">{t('tabs.navigation')}</Tabs.Tab>
-              <Tabs.Tab value="footer">{t('tabs.footer')}</Tabs.Tab>
-              <Tabs.Tab value="branding">{t('tabs.branding')}</Tabs.Tab>
-            </Tabs.List>
-            <Tabs.Panel value={tab} pt="lg">
-              <Stack gap="lg">
-                <SectionHeader title={t(`tabs.${tab}`)} description={t(`tabHints.${tab}`)} />
-                {renderSection()}
-              </Stack>
-            </Tabs.Panel>
-          </Tabs>
+        <form onSubmit={form.onSubmit(onSave, onInvalid)}>
+          <Stack gap="md">
+            <Tabs value={tab} onChange={(value) => setTab((value ?? 'home') as WebsiteTabId)}>
+              <Tabs.List>
+                <Tabs.Tab value="home">{t('tabs.home')}</Tabs.Tab>
+                <Tabs.Tab value="tours">{t('tabs.tours')}</Tabs.Tab>
+                <Tabs.Tab value="navigation">{t('tabs.navigation')}</Tabs.Tab>
+                <Tabs.Tab value="footer">{t('tabs.footer')}</Tabs.Tab>
+                <Tabs.Tab value="branding">{t('tabs.branding')}</Tabs.Tab>
+              </Tabs.List>
+              <Tabs.Panel value={tab} pt="lg">
+                <Stack gap="lg">
+                  <SectionHeader title={t(`tabs.${tab}`)} description={t(`tabHints.${tab}`)} />
+                  {renderSection()}
+                </Stack>
+              </Tabs.Panel>
+            </Tabs>
 
-          <FormErrorSummary errors={form.errors} />
+            <FormErrorSummary errors={form.errors} />
 
-          {canEditContent ? (
-            /* Sticky at the bottom of the viewport: Save is reachable from the
+            {canEditContent ? (
+              /* Sticky at the bottom of the viewport: Save is reachable from the
                top of a long form and lands flush with the end of a short one. */
-            <div className="app-sticky-save-bar">
-              <Group justify="space-between" align="center" gap="sm" wrap="wrap">
-                <Text size="sm" c={isDirty ? 'brand.7' : 'dimmed'} fw={isDirty ? 600 : 400}>
-                  {isDirty ? t('saveBar.unsaved') : t('saveBar.upToDate')}
-                </Text>
-                <FormActions submitLabel={t('saveLabel')} submitting={isSaving} />
-              </Group>
-            </div>
-          ) : (
-            <Text size="sm" c="dimmed">
-              {t('readOnlyHint')}
-            </Text>
-          )}
-        </Stack>
-      </form>
-    </Stack>
+              <div className="app-sticky-save-bar">
+                <Group justify="space-between" align="center" gap="sm" wrap="wrap">
+                  <Text size="sm" c={isDirty ? 'brand.7' : 'dimmed'} fw={isDirty ? 600 : 400}>
+                    {isDirty ? t('saveBar.unsaved') : t('saveBar.upToDate')}
+                  </Text>
+                  <FormActions submitLabel={t('saveLabel')} submitting={isSaving} />
+                </Group>
+              </div>
+            ) : (
+              <Text size="sm" c="dimmed">
+                {t('readOnlyHint')}
+              </Text>
+            )}
+          </Stack>
+        </form>
+      </Stack>
+    </ContentContainer>
   );
 }

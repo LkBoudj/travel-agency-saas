@@ -97,6 +97,8 @@
      is where every colour in the app is funnelled through, and
      `login-form.tsx` names only the token. */
   --app-cta-fill: #1974d8;
+  /* Primary create/new action button accent per approved dashboard reference. */
+  --app-action-primary: #1971c2;
 
   /* Status iconography. Same steps the `light` status badge pairs with its
      background, so an icon and its chip never disagree about severity. */

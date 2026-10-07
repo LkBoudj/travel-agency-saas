@@ -77,7 +77,9 @@ export function BookingDetailsView({
                       <Button
                         color="blue"
                         onClick={controller.openConfirm}
-                        styles={{ root: { backgroundColor: '#1971c2', fontWeight: 600 } }}
+                        styles={{
+                          root: { backgroundColor: 'var(--app-action-primary)', fontWeight: 600 },
+                        }}
                       >
                         {t('details.confirm')}
                       </Button>
@@ -92,15 +94,15 @@ export function BookingDetailsView({
               }
             />
 
-          <SummaryCard booking={booking} />
-          <PriceLinesCard booking={booking} />
-          {capabilities.traveler.canView ? (
-            <TravelersManager booking={booking} capabilities={capabilities} />
-          ) : null}
-          <StatusHistoryCard booking={booking} />
-        </>
-      ) : null}
-    </Stack>
+            <SummaryCard booking={booking} />
+            <PriceLinesCard booking={booking} />
+            {capabilities.traveler.canView ? (
+              <TravelersManager booking={booking} capabilities={capabilities} />
+            ) : null}
+            <StatusHistoryCard booking={booking} />
+          </>
+        ) : null}
+      </Stack>
     </ContentContainer>
   );
 }

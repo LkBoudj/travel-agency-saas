@@ -36,7 +36,7 @@ export function TripsView(controller: TripsPageController) {
                 onClick={controller.openCreateDialog}
                 styles={{
                   root: {
-                    backgroundColor: '#1971c2',
+                    backgroundColor: 'var(--app-action-primary)',
                     fontWeight: 600,
                   },
                 }}
@@ -98,7 +98,9 @@ export function TripsView(controller: TripsPageController) {
                     color="blue"
                     leftSection={<IconPlus size={16} />}
                     onClick={controller.openCreateDialog}
-                    styles={{ root: { backgroundColor: '#1971c2', fontWeight: 600 } }}
+                    styles={{
+                      root: { backgroundColor: 'var(--app-action-primary)', fontWeight: 600 },
+                    }}
                   >
                     {t('create')}
                   </Button>

@@ -1,8 +1,9 @@
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, Group, Stack } from '@mantine/core';
+import { Button, Group, Stack } from '@mantine/core';
 import { EmptyState } from '../../../../components/empty-state.tsx';
 import { FormSection } from '../../../../components/form/form-section.tsx';
+import { Panel } from '../../../../components/panel.tsx';
 import type { WebsiteForm } from '../../hooks/use-website-form.ts';
 import { NavigationLinkRow } from '../repeating-rows.tsx';
 
@@ -14,7 +15,7 @@ export function NavigationSection({ form }: NavigationSectionProps) {
   const { t } = useTranslation('website');
 
   return (
-    <Card withBorder radius="md">
+    <Panel>
       <FormSection title={t('sections.navigation')} description={t('sectionHints.navigation')}>
         <Stack gap="sm">
           {form.values.navigation.length === 0 ? (
@@ -35,6 +36,6 @@ export function NavigationSection({ form }: NavigationSectionProps) {
           </Group>
         </Stack>
       </FormSection>
-    </Card>
+    </Panel>
   );
 }

@@ -1,8 +1,9 @@
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Button, Card, Group, Stack, Textarea } from '@mantine/core';
+import { Button, Group, Stack, Textarea } from '@mantine/core';
 import { EmptyState } from '../../../../components/empty-state.tsx';
 import { FormSection } from '../../../../components/form/form-section.tsx';
+import { Panel } from '../../../../components/panel.tsx';
 import type { WebsiteForm } from '../../hooks/use-website-form.ts';
 import { FooterColumnRow, FooterLegalRow, FooterLinkRow } from '../repeating-rows.tsx';
 
@@ -50,7 +51,7 @@ export function FooterSection({ form }: FooterSectionProps) {
 
   return (
     <Stack gap="lg">
-      <Card withBorder radius="md">
+      <Panel>
         <FormSection title={t('sections.footer')} description={t('sectionHints.footerDescription')}>
           <Textarea
             label={t('fields.footerDescription')}
@@ -60,9 +61,9 @@ export function FooterSection({ form }: FooterSectionProps) {
             {...form.getInputProps('footer.description')}
           />
         </FormSection>
-      </Card>
+      </Panel>
 
-      <Card withBorder radius="md">
+      <Panel>
         <FormSection
           title={t('sections.footerColumns')}
           description={t('sectionHints.footerColumns')}
@@ -86,9 +87,9 @@ export function FooterSection({ form }: FooterSectionProps) {
             </Group>
           </Stack>
         </FormSection>
-      </Card>
+      </Panel>
 
-      <Card withBorder radius="md">
+      <Panel>
         <FormSection title={t('sections.footerLegal')} description={t('sectionHints.footerLegal')}>
           <Stack gap="sm">
             {form.values.footer.legal.length === 0 ? (
@@ -109,7 +110,7 @@ export function FooterSection({ form }: FooterSectionProps) {
             </Group>
           </Stack>
         </FormSection>
-      </Card>
+      </Panel>
     </Stack>
   );
 }

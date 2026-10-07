@@ -236,7 +236,9 @@ export function DeparturesManager({
               leftSection={<IconPlus size={16} />}
               size="sm"
               onClick={openCreate}
-              styles={{ root: { backgroundColor: '#1971c2', fontWeight: 600 } }}
+              styles={{
+                root: { backgroundColor: 'var(--app-action-primary)', fontWeight: 600 },
+              }}
             >
               {t('create')}
             </Button>

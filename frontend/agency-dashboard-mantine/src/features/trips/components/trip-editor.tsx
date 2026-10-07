@@ -125,9 +125,7 @@ export function TripEditor({
             </Box>
 
             <Stack flex={1} gap="md">
-              <Panel>
-                {renderSection()}
-              </Panel>
+              <Panel>{renderSection()}</Panel>
               {canUpdate ? (
                 <FormActions
                   submitLabel={t('editor.submitEdit')}

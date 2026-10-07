@@ -1,8 +1,9 @@
 import { IconPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
-import { Avatar, Button, Card, Group, Stack, TextInput, Textarea } from '@mantine/core';
+import { Avatar, Button, Group, Stack, TextInput, Textarea } from '@mantine/core';
 import { EmptyState } from '../../../../components/empty-state.tsx';
 import { FormSection } from '../../../../components/form/form-section.tsx';
+import { Panel } from '../../../../components/panel.tsx';
 import type { WebsiteForm } from '../../hooks/use-website-form.ts';
 import { TestimonialRow, TrustPointRow } from '../repeating-rows.tsx';
 
@@ -15,7 +16,7 @@ export function HomeSection({ form }: HomeSectionProps) {
 
   return (
     <Stack gap="lg">
-      <Card withBorder radius="md">
+      <Panel>
         <FormSection title={t('sections.hero')} description={t('sectionHints.hero')}>
           <TextInput
             label={t('fields.image')}
@@ -39,9 +40,9 @@ export function HomeSection({ form }: HomeSectionProps) {
             {...form.getInputProps('hero.subtitle')}
           />
         </FormSection>
-      </Card>
+      </Panel>
 
-      <Card withBorder radius="md">
+      <Panel>
         <FormSection title={t('sections.trustPoints')} description={t('sectionHints.trustPoints')}>
           <Stack gap="sm">
             {form.values.trustPoints.length === 0 ? (
@@ -64,9 +65,9 @@ export function HomeSection({ form }: HomeSectionProps) {
             </Group>
           </Stack>
         </FormSection>
-      </Card>
+      </Panel>
 
-      <Card withBorder radius="md">
+      <Panel>
         <FormSection title={t('sections.promotion')} description={t('sectionHints.promotion')}>
           <TextInput label={t('fields.eyebrow')} {...form.getInputProps('promotion.eyebrow')} />
           <TextInput label={t('fields.title')} {...form.getInputProps('promotion.title')} />
@@ -86,9 +87,9 @@ export function HomeSection({ form }: HomeSectionProps) {
             />
           </Group>
         </FormSection>
-      </Card>
+      </Panel>
 
-      <Card withBorder radius="md">
+      <Panel>
         <FormSection
           title={t('sections.testimonials')}
           description={t('sectionHints.testimonials')}
@@ -114,9 +115,9 @@ export function HomeSection({ form }: HomeSectionProps) {
             </Group>
           </Stack>
         </FormSection>
-      </Card>
+      </Panel>
 
-      <Card withBorder radius="md">
+      <Panel>
         <FormSection title={t('sections.finalCta')} description={t('sectionHints.finalCta')}>
           <TextInput label={t('fields.title')} {...form.getInputProps('finalCta.title')} />
           <Textarea
@@ -135,7 +136,7 @@ export function HomeSection({ form }: HomeSectionProps) {
             />
           </Group>
         </FormSection>
-      </Card>
+      </Panel>
     </Stack>
   );
 }

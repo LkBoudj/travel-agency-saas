@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Button, Card, Group, SimpleGrid, Skeleton, Stack, Text } from '@mantine/core';
+import { ContentContainer } from '../../../components/content-container.tsx';
 import { EmptyState, ErrorState } from '../../../components/empty-state.tsx';
 import { DrawerFormShell } from '../../../components/form/drawer-form-shell.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
@@ -42,115 +43,138 @@ export function ThemesPage() {
     // Skeleton cards, not a spinner: the page is about to show a grid of theme
     // cards, and reserving their space keeps the page from jumping.
     return (
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-        {Array.from({ length: 6 }, (_, index) => (
-          <Card key={index} withBorder radius="md" p="lg">
-            <Skeleton height="var(--app-theme-card-media-height)" radius="sm" />
-            <Stack gap="xs" mt="sm">
-              <Skeleton height="1rem" width="55%" />
-              <Skeleton height="0.75rem" />
-              <Skeleton height="0.75rem" width="80%" />
-            </Stack>
-          </Card>
-        ))}
-      </SimpleGrid>
+      <ContentContainer>
+        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+          {Array.from({ length: 6 }, (_, index) => (
+            <Card key={index} withBorder radius="md" p="lg">
+              <Skeleton height="var(--app-theme-card-media-height)" radius="sm" />
+              <Stack gap="xs" mt="sm">
+                <Skeleton height="1rem" width="55%" />
+                <Skeleton height="0.75rem" />
+                <Skeleton height="0.75rem" width="80%" />
+              </Stack>
+            </Card>
+          ))}
+        </SimpleGrid>
+      </ContentContainer>
     );
   }
 
   if (controller.manifestError || controller.draft === null) {
     return (
-      <ErrorState
-        title={t('loadErrorTitle')}
-        description={t('loadErrorBody')}
-        onRetry={controller.refetchManifest}
-      />
+      <ContentContainer>
+        <ErrorState
+          title={t('loadErrorTitle')}
+          description={t('loadErrorBody')}
+          onRetry={controller.refetchManifest}
+        />
+      </ContentContainer>
     );
   }
 
   return (
-    <Stack gap="lg">
-      <PageHeader
-        title={t('title')}
-        subtitle={t('subtitle')}
-        actions={
-          <Group gap="xs">
-            <StatusBadge status={controller.isPublished ? 'published' : 'draft'} />
-            {controller.canPublish ? (
-              <Button loading={controller.publishing} onClick={controller.publishWebsite}>
-                {t('publish')}
-              </Button>
-            ) : null}
-          </Group>
-        }
-      />
-
-      {controller.publishState === 'unpublished' ? (
-        <Alert color="yellow" title={t('noticeUnpublishedTitle')} role="status">
-          {t('noticeUnpublishedBody')}
-        </Alert>
-      ) : null}
-      {controller.publishState === 'pending-publish' ? (
-        <Alert color="yellow" title={t('noticePendingTitle')} role="status">
-          {t('noticePendingBody', { liveTheme: liveThemeLabel })}
-        </Alert>
-      ) : null}
-
-      {controller.manifest.length === 0 ? (
-        <EmptyState title={t('emptyCatalogTitle')} description={t('emptyCatalog')} />
-      ) : (
-        <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
-          {controller.manifest.map((theme) => (
-            <ThemeCard
-              key={theme.themeId}
-              themeId={theme.themeId}
-              name={themeKey(theme.nameKey)}
-              description={themeKey(theme.descriptionKey)}
-              version={theme.version}
-              // The manifest ships a path on the *theme app* origin.
-              previewUrl={themePreviewUrl(theme.previewImage, themesBaseUrl)}
-              state={controller.cardState(theme.themeId)}
-              canEdit={controller.canEditTheme}
-              busy={controller.previewing || controller.savingTheme}
-              onPreview={() => controller.openPreview('home')}
-              onCustomize={() => openCustomize(theme)}
-              onActivate={() => controller.activate(theme.themeId)}
-            />
-          ))}
-        </SimpleGrid>
-      )}
-
-      <DrawerFormShell
-        opened={customizeOpen}
-        onClose={() => setCustomizeOpen(false)}
-        title={t('customizeDrawerTitle')}
-        size="md"
-      >
-        {controller.activeTheme === null ? (
-          <Text size="sm" c="dimmed">
-            {t('noThemeBody')}
-          </Text>
-        ) : (
-          <Stack gap="md">
-            <SchemaSettingsRenderer
-              schema={controller.activeTheme.settingsSchema}
-              value={customizeSettings}
-              onChange={setCustomizeSettings}
-              disabled={controller.savingTheme}
-            />
-            <Group justify="flex-end" gap="sm">
-              <Button variant="default" onClick={() => setCustomizeOpen(false)}>
-                {t('discard')}
-              </Button>
-              <Button
-                loading={controller.savingTheme}
-                onClick={() => controller.saveCustomization(customizeSettings)}
-              >
-                {t('saveLabel')}
-              </Button>
+    <ContentContainer>
+      <Stack gap="lg">
+        <PageHeader
+          title={t('title')}
+          subtitle={t('subtitle')}
+          actions={
+            <Group gap="xs">
+              <StatusBadge status={controller.isPublished ? 'published' : 'draft'} />
+              {controller.canPublish ? (
+                <Button
+                  color="blue"
+                  loading={controller.publishing}
+                  onClick={controller.publishWebsite}
+                  styles={{
+                    root: {
+                      backgroundColor: 'var(--app-action-primary)',
+                      fontWeight: 600,
+                    },
+                  }}
+                >
+                  {t('publish')}
+                </Button>
+              ) : null}
             </Group>
-          </Stack>
+          }
+        />
+
+        {controller.publishState === 'unpublished' ? (
+          <Alert color="yellow" title={t('noticeUnpublishedTitle')} role="status">
+            {t('noticeUnpublishedBody')}
+          </Alert>
+        ) : null}
+        {controller.publishState === 'pending-publish' ? (
+          <Alert color="yellow" title={t('noticePendingTitle')} role="status">
+            {t('noticePendingBody', { liveTheme: liveThemeLabel })}
+          </Alert>
+        ) : null}
+
+        {controller.manifest.length === 0 ? (
+          <EmptyState title={t('emptyCatalogTitle')} description={t('emptyCatalog')} />
+        ) : (
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+            {controller.manifest.map((theme) => (
+              <ThemeCard
+                key={theme.themeId}
+                themeId={theme.themeId}
+                name={themeKey(theme.nameKey)}
+                description={themeKey(theme.descriptionKey)}
+                version={theme.version}
+                // The manifest ships a path on the *theme app* origin.
+                previewUrl={themePreviewUrl(theme.previewImage, themesBaseUrl)}
+                state={controller.cardState(theme.themeId)}
+                canEdit={controller.canEditTheme}
+                busy={controller.previewing || controller.savingTheme}
+                onPreview={() => controller.openPreview('home')}
+                onCustomize={() => openCustomize(theme)}
+                onActivate={() => controller.activate(theme.themeId)}
+              />
+            ))}
+          </SimpleGrid>
         )}
-      </DrawerFormShell>
-    </Stack>
+
+        <DrawerFormShell
+          opened={customizeOpen}
+          onClose={() => setCustomizeOpen(false)}
+          title={t('customizeDrawerTitle')}
+          size="md"
+        >
+          {controller.activeTheme === null ? (
+            <Text size="sm" c="dimmed">
+              {t('noThemeBody')}
+            </Text>
+          ) : (
+            <Stack gap="md">
+              <SchemaSettingsRenderer
+                schema={controller.activeTheme.settingsSchema}
+                value={customizeSettings}
+                onChange={setCustomizeSettings}
+                disabled={controller.savingTheme}
+              />
+              <Group justify="flex-end" gap="sm">
+                <Button variant="default" onClick={() => setCustomizeOpen(false)}>
+                  {t('discard')}
+                </Button>
+                <Button
+                  color="blue"
+                  loading={controller.savingTheme}
+                  onClick={() => controller.saveCustomization(customizeSettings)}
+                  styles={{
+                    root: {
+                      backgroundColor: 'var(--app-action-primary)',
+                      fontWeight: 600,
+                    },
+                  }}
+                >
+                  {t('saveLabel')}
+                </Button>
+              </Group>
+            </Stack>
+          )}
+        </DrawerFormShell>
+      </Stack>
+    </ContentContainer>
   );
 }

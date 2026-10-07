@@ -1,9 +1,11 @@
 import { IconUserPlus } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { Button, Divider, Stack } from '@mantine/core';
+import { ContentContainer } from '../../../components/content-container.tsx';
 import { DataToolbar } from '../../../components/data-toolbar.tsx';
 import { EmptyState as NotFoundState } from '../../../components/empty-state.tsx';
 import { PageHeader } from '../../../components/page-header.tsx';
+import { Panel } from '../../../components/panel.tsx';
 import { SearchInput } from '../../../components/search-input.tsx';
 import { SectionHeader } from '../../../components/section-header.tsx';
 import type { MembersPageController } from '../hooks/use-members-page.ts';
@@ -14,63 +16,81 @@ export function MembersView(controller: MembersPageController) {
   const { t } = useTranslation('members');
 
   return (
-    <Stack gap="lg">
-      <PageHeader
-        title={t('title')}
-        subtitle={t('subtitle')}
-        actions={
-          controller.canInvite ? (
-            <Button leftSection={<IconUserPlus size={16} />} onClick={controller.openInviteDialog}>
-              {t('invite')}
-            </Button>
-          ) : null
-        }
-      />
-
-      <Stack gap="sm">
-        <SectionHeader title={t('membersTitle')} />
-        <DataToolbar
-          search={
-            <SearchInput
-              value={controller.search.raw}
-              onChange={controller.search.setRaw}
-              placeholder={t('searchPlaceholder')}
-            />
+    <ContentContainer>
+      <Stack gap="lg">
+        <PageHeader
+          title={t('title')}
+          subtitle={t('subtitle')}
+          actions={
+            controller.canInvite ? (
+              <Button
+                color="blue"
+                leftSection={<IconUserPlus size={16} />}
+                onClick={controller.openInviteDialog}
+                styles={{
+                  root: {
+                    backgroundColor: 'var(--app-action-primary)',
+                    fontWeight: 600,
+                  },
+                }}
+              >
+                {t('invite')}
+              </Button>
+            ) : null
           }
         />
-        <MembersTable
-          members={controller.members}
-          currentUserCode={controller.currentUserCode}
-          canRoleManage={controller.canRoleManage}
-          canUpdate={controller.canUpdate}
-          canRemove={controller.canRemove}
-          loading={controller.isPending}
-          isError={controller.isError}
-          onRetry={controller.refetch}
-          onManageRoles={controller.openRolesDialog}
-          onToggleStatus={controller.toggleMemberStatus}
-          onRemove={controller.removeMember}
-        />
-      </Stack>
 
-      {controller.canInvite ? (
-        <>
-          <Divider />
-          <Stack gap="sm">
-            <SectionHeader title={t('invitationsTitle')} />
-            {!controller.invitationsPending && controller.invitations.length === 0 ? (
-              <NotFoundState description={t('invitationsEmpty')} />
-            ) : (
-              <InvitationsTable
-                invitations={controller.invitations}
-                loading={controller.invitationsPending}
-                canRevoke={controller.canRevoke}
-                onRevoke={controller.revokeInvitation}
+        <Stack gap="sm">
+          <SectionHeader title={t('membersTitle')} />
+          <DataToolbar
+            search={
+              <SearchInput
+                value={controller.search.raw}
+                onChange={controller.search.setRaw}
+                placeholder={t('searchPlaceholder')}
               />
-            )}
-          </Stack>
-        </>
-      ) : null}
-    </Stack>
+            }
+          />
+          <Panel p={0} style={{ overflow: 'hidden' }}>
+            <MembersTable
+              members={controller.members}
+              currentUserCode={controller.currentUserCode}
+              canRoleManage={controller.canRoleManage}
+              canUpdate={controller.canUpdate}
+              canRemove={controller.canRemove}
+              loading={controller.isPending}
+              isError={controller.isError}
+              onRetry={controller.refetch}
+              onManageRoles={controller.openRolesDialog}
+              onToggleStatus={controller.toggleMemberStatus}
+              onRemove={controller.removeMember}
+            />
+          </Panel>
+        </Stack>
+
+        {controller.canInvite ? (
+          <>
+            <Divider />
+            <Stack gap="sm">
+              <SectionHeader title={t('invitationsTitle')} />
+              {!controller.invitationsPending && controller.invitations.length === 0 ? (
+                <Panel>
+                  <NotFoundState description={t('invitationsEmpty')} />
+                </Panel>
+              ) : (
+                <Panel p={0} style={{ overflow: 'hidden' }}>
+                  <InvitationsTable
+                    invitations={controller.invitations}
+                    loading={controller.invitationsPending}
+                    canRevoke={controller.canRevoke}
+                    onRevoke={controller.revokeInvitation}
+                  />
+                </Panel>
+              )}
+            </Stack>
+          </>
+        ) : null}
+      </Stack>
+    </ContentContainer>
   );
 }
