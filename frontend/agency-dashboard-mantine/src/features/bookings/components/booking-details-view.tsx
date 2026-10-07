@@ -180,7 +180,7 @@ function PriceLinesCard({ booking }: { booking: BookingDetail }) {
           {t('details.pricingEmpty')}
         </Text>
       ) : (
-        <Table striped highlightOnHover withTableBorder>
+        <Table striped withTableBorder>
           <Table.Thead>
             <Table.Tr>
               <Table.Th>{t('columns.tour')}</Table.Th>

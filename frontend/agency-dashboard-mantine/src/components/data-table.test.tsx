@@ -105,16 +105,9 @@ describe('DataTable structure', () => {
     // Mantine's own `stickyHeader`, not a hand-rolled `position: sticky` per
     // cell. It matters for more than tidiness: with `border-collapse: collapse`
     // a sticky cell drops its borders, and Mantine only redraws them with a
-    // box-shadow under `[data-sticky]`. An inline sticky header keeps the
-    // position but loses the separator line underneath it while scrolling.
+    // box-shadow under `[data-sticky]`.
     const head = container.querySelector('thead');
     expect(head).toHaveAttribute('data-sticky');
-    // Offset by the shell header, or the header slides behind it. The token is
-    // read directly with no fallback: a stale literal here is how the offset
-    // silently decouples from the real header height.
-    expect(
-      container.querySelector('table')?.style.getPropertyValue('--table-sticky-header-offset')
-    ).toBe('var(--app-header-height)');
 
     rerender(<DataTable rows={ROWS} columns={COLUMNS} keyOf={(row) => row.code} />);
     expect(container.querySelector('thead')).not.toHaveAttribute('data-sticky');
@@ -124,16 +117,14 @@ describe('DataTable structure', () => {
     const { container } = renderTable({ minWidth: 980 });
 
     // A per-table contract: the trips table needs 980px, a status list does not.
-    // Mantine hands the floor width to the scroll container as a variable and
-    // lets the table sit on it, so the container — not the table — scrolls.
+    // Uses native horizontal scrolling so vertical mousewheel/touch events are not hijacked.
     const root = container.querySelector(
       '.mantine-TableScrollContainer-scrollContainer'
     ) as HTMLElement;
     expect(root.style.getPropertyValue('--table-min-width')).toBe(
       'calc(61.25rem * var(--mantine-scale))'
     );
-    const viewport = container.querySelector('.mantine-ScrollArea-viewport') as HTMLElement;
-    expect(viewport.style.overflowX).toBe('scroll');
+    expect(root.style.getPropertyValue('--table-overflow')).toBe('auto');
   });
 
   test('reserves one placeholder row per column, per requested row', () => {

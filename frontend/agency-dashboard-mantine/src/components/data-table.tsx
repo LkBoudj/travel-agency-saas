@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table } from '@mantine/core';
+import { Table, VisuallyHidden } from '@mantine/core';
 import { EmptyState } from './empty-state.tsx';
 import { TableSkeleton } from './table-skeleton.tsx';
 
@@ -22,8 +22,10 @@ export interface DataTableProps<T> {
   loading?: boolean;
   /** Per-table min width, so a wide table scrolls instead of squashing. */
   minWidth?: number;
-  /** Keeps the header row visible while the page scrolls under it. */
+  /** Keeps the header row visible while the container scrolls. */
   stickyHeader?: boolean;
+  /** Optional sticky top offset, defaults to 0 flush with table container. */
+  stickyHeaderOffset?: number | string;
   /** Accessible description of the table. */
   caption?: string;
   emptyState?: ReactNode;
@@ -31,20 +33,6 @@ export interface DataTableProps<T> {
   /** Accessible name for a clickable row; defaults to its cell text. */
   rowLabel?: (row: T) => string;
 }
-
-/**
- * The sticky offset is the shell header, and it is read with no fallback value.
- * A sticky header sitting at `top: 0` disappears behind the shell header; one
- * hardcoding its own number silently decouples the moment the header resizes,
- * which is exactly how a 60px literal outlived a 44px header.
- *
- * Mantine's own `stickyHeader` is used rather than a per-cell
- * `position: sticky`, because `border-collapse: collapse` drops borders on sticky
- * cells and Mantine only redraws them under `[data-sticky]`. The hand-rolled
- * version kept the position and lost the separator line under the header while
- * the page scrolled.
- */
-const STICKY_HEADER_OFFSET = 'var(--app-header-height)';
 
 export function DataTable<T>({
   rows,
@@ -54,6 +42,7 @@ export function DataTable<T>({
   loading,
   minWidth = 640,
   stickyHeader = false,
+  stickyHeaderOffset,
   caption,
   emptyState,
   onRowClick,
@@ -74,13 +63,17 @@ export function DataTable<T>({
   };
 
   return (
-    <Table.ScrollContainer minWidth={minWidth}>
+    <Table.ScrollContainer minWidth={minWidth} type="native">
       <Table
         aria-label={caption}
         stickyHeader={stickyHeader}
-        stickyHeaderOffset={stickyHeader ? STICKY_HEADER_OFFSET : undefined}
+        stickyHeaderOffset={stickyHeaderOffset}
       >
-        {caption ? <Table.Caption>{caption}</Table.Caption> : null}
+        {caption ? (
+          <Table.Caption>
+            <VisuallyHidden>{caption}</VisuallyHidden>
+          </Table.Caption>
+        ) : null}
         <Table.Thead>
           <Table.Tr>
             {columns.map((column) => (
@@ -97,7 +90,7 @@ export function DataTable<T>({
             <TableSkeleton columns={columns} rows={skeletonRows} />
           ) : rows.length === 0 ? (
             <Table.Tr>
-              <Table.Td colSpan={columns.length} align="center">
+              <Table.Td colSpan={columns.length} ta="center">
                 {/* Falls back to the shared, translated empty presentation so a
                     table that has no results never leaks an untranslated string;
                     pages pass a richer node with the next action when they have one. */}

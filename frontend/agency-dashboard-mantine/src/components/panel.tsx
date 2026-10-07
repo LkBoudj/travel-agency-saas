@@ -23,6 +23,7 @@ import { Box, type BoxProps, type ElementProps } from '@mantine/core';
 export function Panel({
   children,
   p,
+  style,
   ...props
 }: { children: ReactNode } & BoxProps & ElementProps<'div'>) {
   // A `div` with an `aria-label` is not a landmark, so an unlabelled panel must
@@ -36,6 +37,7 @@ export function Panel({
       className="app-panel"
       data-shell-panel=""
       p={p ?? 'md'}
+      style={p === 0 ? { overflow: 'hidden', ...style } : style}
       {...props}
     >
       {children}

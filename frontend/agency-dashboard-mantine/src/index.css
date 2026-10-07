@@ -168,8 +168,17 @@ html,
    override. Mantine's rule strips its inner selectors with `:where()`, leaving
    `.m_b242d975[data-sticky]` at (0,2,0); `thead[data-sticky] th` below reaches
    (0,1,2) from the attribute plus the element, and wins. */
+thead th {
+  background-color: var(--app-table-header-surface);
+  user-select: none;
+}
+
 thead[data-sticky] th {
   background-color: var(--app-table-header-surface);
+}
+
+.mantine-Table-tr {
+  transition: background-color 100ms ease;
 }
 
 .tabular-end {

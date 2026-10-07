@@ -523,31 +523,25 @@ export function OverviewView({ controller }: { controller: OverviewPageControlle
                     />
                   ) : (
                     <Table.ScrollContainer minWidth={620}>
-                      <Table verticalSpacing={10} horizontalSpacing="sm" highlightOnHover>
+                      <Table>
                         <Table.Thead>
                           <Table.Tr>
-                            <Table.Th fz={11} fw={600} c="dimmed">
-                              #
-                            </Table.Th>
-                            <Table.Th fz={11} fw={600} c="dimmed">
+                            <Table.Th>#</Table.Th>
+                            <Table.Th>
                               {t('columns.customer', { defaultValue: 'Customer' })}
                             </Table.Th>
-                            <Table.Th fz={11} fw={600} c="dimmed">
-                              {t('columns.tour', { defaultValue: 'Tour' })}
-                            </Table.Th>
-                            <Table.Th fz={11} fw={600} c="dimmed">
-                              {t('columns.date', { defaultValue: 'Date' })}
-                            </Table.Th>
-                            <Table.Th fz={11} fw={600} c="dimmed" ta="center">
+                            <Table.Th>{t('columns.tour', { defaultValue: 'Tour' })}</Table.Th>
+                            <Table.Th>{t('columns.date', { defaultValue: 'Date' })}</Table.Th>
+                            <Table.Th ta="center">
                               {t('columns.travelers', { defaultValue: 'Travelers' })}
                             </Table.Th>
-                            <Table.Th fz={11} fw={600} c="dimmed" ta="end">
+                            <Table.Th ta="end">
                               {t('columns.amount', { defaultValue: 'Amount' })}
                             </Table.Th>
-                            <Table.Th fz={11} fw={600} c="dimmed" ta="center">
+                            <Table.Th ta="center">
                               {t('columns.status', { defaultValue: 'Status' })}
                             </Table.Th>
-                            <Table.Th fz={11} fw={600} c="dimmed" style={{ width: 36 }} />
+                            <Table.Th style={{ width: 36 }} />
                           </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>

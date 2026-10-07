@@ -82,11 +82,10 @@ export const componentDefaults: MantineThemeComponents = {
     defaultProps: {
       fz: 'sm',
       verticalSpacing: 'sm',
-      horizontalSpacing: 'sm',
+      horizontalSpacing: 'md',
       // One contract for every table in the product: bottom-only separators in
       // the neutral token, and row hover through the token that was already
-      // declared but never wired. Both default to a blue-tinted palette step, so
-      // leaving either unset is how the cast sneaks back in.
+      // declared but never wired.
       borderColor: 'var(--app-table-separator)',
       withRowBorders: true,
       withColumnBorders: false,
@@ -99,7 +98,19 @@ export const componentDefaults: MantineThemeComponents = {
         color: 'var(--mantine-color-dimmed)',
         fontWeight: 600,
         fontSize: 'var(--mantine-font-size-xs)',
+        letterSpacing: '0.02em',
+        whiteSpace: 'nowrap',
       },
+      td: {
+        fontSize: 'var(--mantine-font-size-sm)',
+        color: 'var(--mantine-color-text)',
+        verticalAlign: 'middle',
+      },
+    },
+  },
+  TableScrollContainer: {
+    defaultProps: {
+      type: 'native',
     },
   },
   Modal: {
