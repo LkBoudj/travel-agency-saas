@@ -147,4 +147,20 @@ describe('DashboardSidebar navigation', () => {
       .map((link) => link.getAttribute('href'));
     expect(hrefs.every((href) => href?.startsWith('/AGY-TEST/'))).toBe(true);
   });
+
+  test('marks Themes active on the themes route', () => {
+    renderSidebar('/AGY-TEST/themes');
+
+    expect(within(nav()).getByRole('link', { name: 'Themes' })).toHaveAttribute(
+      'data-active',
+      'true'
+    );
+  });
+
+  test('filters out Website/Themes when member lacks AGENCY_WEBSITE_VIEW', () => {
+    can.mockImplementation((permission) => permission !== 'AGENCY_WEBSITE_VIEW');
+    renderSidebar();
+
+    expect(screen.queryByText('Themes')).not.toBeInTheDocument();
+  });
 });

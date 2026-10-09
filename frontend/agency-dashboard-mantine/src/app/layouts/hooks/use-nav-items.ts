@@ -9,6 +9,7 @@ import {
   IconTicket,
   IconUsers,
   IconUsersGroup,
+  IconWorld,
 } from '@tabler/icons-react';
 import { useLocation } from 'react-router-dom';
 import { useAgencyContext } from '../../../features/agency-context/provider/agency-provider.tsx';
@@ -18,6 +19,10 @@ export interface DashboardNavItem {
   labelKey: string;
   to: string;
   icon: typeof IconLayoutGrid;
+  children?: {
+    labelKey: string;
+    to: string;
+  }[];
 }
 
 export interface DashboardNavGroup {
@@ -25,9 +30,14 @@ export interface DashboardNavGroup {
   items: DashboardNavItem[];
 }
 
-interface NavDefinition extends Omit<DashboardNavItem, 'to'> {
+interface NavDefinition extends Omit<DashboardNavItem, 'to' | 'children'> {
   to: (code: string) => string;
   permission?: string;
+  children?: {
+    labelKey: string;
+    to: (code: string) => string;
+    permission?: string;
+  }[];
 }
 
 export const MAIN_NAV_ITEMS: readonly NavDefinition[] = [
@@ -63,6 +73,34 @@ export const MAIN_NAV_ITEMS: readonly NavDefinition[] = [
     permission: 'AGENCY_PAYMENT_VIEW',
   },
   {
+    labelKey: 'nav.website',
+    to: dashboardPaths.themes,
+    icon: IconWorld,
+    permission: 'AGENCY_WEBSITE_VIEW',
+    children: [
+      {
+        labelKey: 'nav.themes',
+        to: dashboardPaths.themes,
+        permission: 'AGENCY_WEBSITE_VIEW',
+      },
+      {
+        labelKey: 'nav.pages',
+        to: dashboardPaths.pages,
+        permission: 'AGENCY_WEBSITE_VIEW',
+      },
+      {
+        labelKey: 'nav.menu',
+        to: dashboardPaths.menu,
+        permission: 'AGENCY_WEBSITE_VIEW',
+      },
+      {
+        labelKey: 'nav.settings',
+        to: dashboardPaths.website,
+        permission: 'AGENCY_WEBSITE_VIEW',
+      },
+    ],
+  },
+  {
     labelKey: 'nav.team',
     to: dashboardPaths.members,
     icon: IconUsersGroup,
@@ -96,6 +134,12 @@ export function useNavItems(): DashboardNavItem[] {
     labelKey: item.labelKey,
     to: item.to(code),
     icon: item.icon,
+    children: item.children
+      ?.filter((child) => !child.permission || can(child.permission))
+      .map((child) => ({
+        labelKey: child.labelKey,
+        to: child.to(code),
+      })),
   }));
 }
 
@@ -119,9 +163,17 @@ export interface ActiveNavLocation {
 
 export function useActiveNavLocation(): ActiveNavLocation | null {
   const { pathname } = useLocation();
-  const items = [...useNavItems(), ...useBottomNavItems()];
+  const allItems: { labelKey: string; to: string }[] = [];
+  for (const item of [...useNavItems(), ...useBottomNavItems()]) {
+    allItems.push({ labelKey: item.labelKey, to: item.to });
+    if (item.children) {
+      for (const child of item.children) {
+        allItems.push({ labelKey: child.labelKey, to: child.to });
+      }
+    }
+  }
 
-  const match = items
+  const match = allItems
     .filter((item) => pathname === item.to || pathname.startsWith(`${item.to}/`))
     .sort((a, b) => b.to.length - a.to.length)[0];
 

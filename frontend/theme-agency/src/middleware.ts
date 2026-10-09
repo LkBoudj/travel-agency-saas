@@ -26,10 +26,14 @@ function withPreviewHeaders(response: Response): Response {
 }
 
 export const onRequest = defineMiddleware(async (context, next) => {
+  const secret =
+    import.meta.env.PREVIEW_TOKEN_SECRET ??
+    (typeof process !== "undefined" ? process.env?.PREVIEW_TOKEN_SECRET : undefined);
+
   const decision = await decidePreviewRequest({
     pathname: context.url.pathname,
     searchParams: context.url.searchParams,
-    secret: import.meta.env.PREVIEW_TOKEN_SECRET,
+    secret,
   });
 
   if (decision.type === "not-found") return notFound();
@@ -48,6 +52,13 @@ export const onRequest = defineMiddleware(async (context, next) => {
     return withPreviewHeaders(await next());
   }
 
+  const localhostTenantSlug =
+    (typeof process !== "undefined" && process.env?.THEME_TEST === "true")
+      ? "demo"
+      : import.meta.env.LOCALHOST_TENANT_SLUG ||
+        (typeof process !== "undefined" ? process.env?.LOCALHOST_TENANT_SLUG : undefined) ||
+        "demo";
+
   const resolution = resolveTenantFromHostname(context.url.hostname, {
     allowLocalhost: import.meta.env.DEV,
     // `demo` is the built-in local tenant. `LOCALHOST_TENANT_SLUG` points the
@@ -55,7 +66,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     // backend-backed flow can be exercised locally without a domain mapping —
     // dev only, and an invalid value fails closed (404) rather than silently
     // falling back, so a typo is never mistaken for a working site.
-    localhostTenantSlug: import.meta.env.LOCALHOST_TENANT_SLUG || "demo",
+    localhostTenantSlug,
   });
   if (!resolution.ok) return notFound();
 

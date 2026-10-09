@@ -3,6 +3,7 @@ import Layout from "./Layout.astro";
 import home from "./pages/home.astro";
 import trips from "./pages/trips.astro";
 import tripDetail from "./pages/trip-detail.astro";
+import customPage from "./pages/custom-page.astro";
 import Hero from "./components/Hero.astro";
 import FeaturedTours from "./components/FeaturedTours.astro";
 import FeaturedDestinations from "./components/FeaturedDestinations.astro";
@@ -15,7 +16,7 @@ import { starterManifest } from "./manifest";
 import { starterSettingsDefaults, starterSettingsSchema } from "./settings-schema";
 
 const homeKinds: PageKind[] = ["home"];
-const allKinds: PageKind[] = ["home", "trips", "trip-detail"];
+const allKinds: PageKind[] = ["home", "trips", "trip-detail", "custom-page"];
 
 const sections: SectionDefinition[] = [
   { id: "hero", nameKey: "sections.starter.hero", pages: homeKinds, component: Hero },
@@ -56,7 +57,7 @@ const sections: SectionDefinition[] = [
 export const starterTheme: ThemeDefinition = {
   ...starterManifest,
   Layout,
-  pages: { home, trips, "trip-detail": tripDetail },
+  pages: { home, trips, "trip-detail": tripDetail, "custom-page": customPage },
   sections,
   settings: {
     schema: starterSettingsSchema,

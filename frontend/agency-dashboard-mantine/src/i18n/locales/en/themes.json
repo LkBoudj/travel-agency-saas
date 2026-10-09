@@ -45,5 +45,64 @@
   "noticeUnpublishedTitle": "Your site is not published yet",
   "noticeUnpublishedBody": "Visitors cannot see the site until you publish. Activating a theme only changes your draft.",
   "noticePendingTitle": "Draft differs from the live site",
-  "noticePendingBody": "The live site still serves \"{{liveTheme}}\". Publish to switch the site to the current theme."
+  "noticePendingBody": "The live site still serves \"{{liveTheme}}\". Publish to switch the site to the current theme.",
+  "eyebrow": "WEBSITE & BRANDING",
+  "pageTitle": "Website Themes",
+  "pageSubtitle": "Choose a professional theme for your travel agency website and customize it to match your brand.",
+  "viewWebsite": "View My Website",
+  "customizeTheme": "Customize Theme",
+  "hero": {
+    "tag": "PROFESSIONAL THEMES",
+    "title": "Beautiful Websites for Unforgettable Journeys",
+    "subtitle": "Modern, responsive and conversion-focused themes designed specifically for travel agencies.",
+    "trustedBadge": "Trusted by 500+ travel agencies worldwide",
+    "benefitResponsive": "Mobile Responsive",
+    "benefitResponsiveSub": "All devices",
+    "benefitCustomizable": "Fully Customizable",
+    "benefitCustomizableSub": "Colors, fonts, content",
+    "benefitSeo": "SEO Optimized",
+    "benefitSeoSub": "Better visibility",
+    "benefitConversions": "Built for Conversions",
+    "benefitConversionsSub": "Turn visitors into customers"
+  },
+  "categories": {
+    "all": "All Themes",
+    "popular": "Popular",
+    "new": "New",
+    "minimal": "Minimal",
+    "adventure": "Adventure",
+    "luxury": "Luxury"
+  },
+  "searchPlaceholder": "Search themes...",
+  "sort": {
+    "label": "Sort by",
+    "popular": "Popular",
+    "newest": "Newest",
+    "name": "Name"
+  },
+  "card": {
+    "activeBadge": "Active",
+    "useTheme": "Use Theme",
+    "preview": "Preview",
+    "customize": "Customize"
+  },
+  "detail": {
+    "fullyResponsive": "Fully responsive design",
+    "fullyResponsiveDesc": "Looks great on all devices",
+    "customizableColors": "Customizable colors",
+    "customizableColorsDesc": "Match your brand identity",
+    "seoOptimized": "SEO optimized",
+    "seoOptimizedDesc": "Built for better visibility",
+    "conversionFocused": "Conversion focused",
+    "conversionFocusedDesc": "Turn visitors into customers",
+    "viewLiveWebsite": "View Live Website",
+    "lastUpdated": "Last updated: Oct 5, 2026 · Version 1.2.0"
+  },
+  "previewDialog": {
+    "title": "Theme Preview",
+    "desktop": "Desktop",
+    "tablet": "Tablet",
+    "mobile": "Mobile",
+    "applyTheme": "Apply Theme"
+  }
 }

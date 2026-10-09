@@ -11,6 +11,7 @@ export function DashboardLayout() {
 
   return (
     <AppShell
+      layout="alt"
       header={{ height: 'var(--app-header-height)' }}
       navbar={{
         width: { base: 'var(--app-rail-width)' },

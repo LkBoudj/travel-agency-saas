@@ -354,6 +354,55 @@ describe('PublicWebsiteController', () => {
       expect(body.hero.title).toBe('Sahara hero');
       expect(JSON.stringify(body)).not.toContain('Atlas');
     });
+
+    it('composes published custom pages and filters out unpublished pages and reserved slugs', async () => {
+      const { app, published, agencies } = await createTestApp();
+      const { agencyId, name } = seedSahara();
+      agencies.set(String(agencyId), { id: agencyId, name });
+
+      published.set('demo', {
+        ...draftRow(agencyId, {
+          slug: 'demo',
+          content: {
+            pages: [
+              {
+                id: 'p1',
+                title: 'About Us',
+                slug: '/about-us',
+                content: 'We are passionate about travel.',
+                isPublished: true,
+              },
+              {
+                id: 'p2',
+                title: 'Draft Page',
+                slug: '/draft-preview',
+                content: 'Secret upcoming feature.',
+                isPublished: false,
+              },
+              {
+                id: 'p3',
+                title: 'Trips Override',
+                slug: '/trips',
+                content: 'Should not shadow system route.',
+                isPublished: true,
+              },
+            ],
+          },
+        }),
+        publishedAt: new Date(),
+      });
+
+      const res = await request(app.getHttpServer()).get('/v1/public/website/demo').expect(200);
+      const body = res.body as Record<string, any>;
+
+      expect(body.pages).toHaveLength(1);
+      expect(body.pages[0]).toEqual({
+        id: 'p1',
+        title: 'About Us',
+        slug: '/about-us',
+        content: 'We are passionate about travel.',
+      });
+    });
   });
 
   describe('GET /v1/public/website/:slug/draft', () => {
@@ -473,6 +522,39 @@ describe('PublicWebsiteController', () => {
         .get('/v1/public/website/demo/draft')
         .set('Authorization', `bearer ${token}`)
         .expect(200);
+    });
+
+    it('composes all draft custom pages for signed preview', async () => {
+      const { app, drafts, agencies } = await createTestApp();
+      const { agencyId, name } = seedSahara();
+      agencies.set(String(agencyId), { id: agencyId, name });
+      drafts.set(
+        'demo',
+        draftRow(agencyId, {
+          slug: 'demo',
+          content: {
+            pages: [
+              {
+                id: 'p1',
+                title: 'Draft Feature',
+                slug: 'feature',
+                content: 'Coming soon...',
+                isPublished: false,
+              },
+            ],
+          },
+        }),
+      );
+
+      const token = tokenFor('demo', 'starter');
+      const res = await request(app.getHttpServer())
+        .get('/v1/public/website/demo/draft')
+        .set('Authorization', `Bearer ${token}`)
+        .expect(200);
+
+      expect(res.body.pages).toHaveLength(1);
+      expect(res.body.pages[0].slug).toBe('/feature');
+      expect(res.body.pages[0].title).toBe('Draft Feature');
     });
   });
 });

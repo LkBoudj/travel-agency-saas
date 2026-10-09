@@ -3,6 +3,7 @@ import type { RenderContext, ThemeSettings, TourSummary } from "@theme-agency/sd
 import { booleanSetting } from "@theme-agency/sdk";
 import TourCard from "./TourCard.astro";
 import Section from "./Section.astro";
+import Icon from "./Icon.astro";
 
 interface Props {
   context: RenderContext;
@@ -19,15 +20,31 @@ const isTrips = page.kind === "trips";
 {
   show && tours.length > 0 && (
     <Section
-      id={isTrips ? "tours" : "featured-tours"}
-      eyebrow={isTrips ? undefined : "Top tours"}
-      title={isTrips ? "All tours" : "Featured tours"}
-      description={isTrips ? undefined : "Handpicked itineraries our travelers love."}
+      id={isTrips ? "tours" : "tours"}
+      eyebrow={isTrips ? "Collection" : "Featured Tours"}
+      title={isTrips ? "All Expeditions" : "Unforgettable journeys,\nhandpicked for you"}
+      description={isTrips ? "Explore our complete portfolio of crafted itineraries." : "Explore our most popular tours and create memories that last a lifetime."}
       headingId={isTrips ? "tours-heading" : "featured-tours-heading"}
+      variant="default"
     >
-      <div class="theme-tour-grid">
+      <div class="theme-tour-grid-container">
+        <div class="theme-tour-grid">
+          {
+            tours.map((tour) => (
+              <TourCard tour={tour} detailHref={context.paths.tripDetail(tour.slug)} />
+            ))
+          }
+        </div>
+
         {
-          tours.map((tour) => <TourCard tour={tour} detailHref={context.paths.tripDetail(tour.slug)} />)
+          !isTrips && (
+            <div class="theme-tours-action">
+              <a href={context.paths.trips} class="theme-btn-primary theme-tours-view-all">
+                <span>View All Tours</span>
+                <Icon name="arrow" size={18} strokeWidth={2.2} />
+              </a>
+            </div>
+          )
         }
       </div>
     </Section>
@@ -35,25 +52,58 @@ const isTrips = page.kind === "trips";
 }
 
 <style is:global>
-  .theme-tour-grid {
-    display: grid;
-    gap: 1.25rem;
-    grid-template-columns: 1fr;
+  .theme-tour-grid-container {
+    max-width: 80rem; /* 1280px */
+    margin-inline: auto;
   }
 
-  .theme-tour-grid > * {
-    min-width: 0;
+  .theme-tour-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
   }
 
   @media (min-width: 40rem) {
     .theme-tour-grid {
       grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
     }
   }
 
-  @media (min-width: 60rem) {
+  @media (min-width: 64rem) {
     .theme-tour-grid {
       grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
     }
+  }
+
+  .theme-tours-action {
+    margin-block-start: 3.5rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  @media (min-width: 64rem) {
+    .theme-tours-action {
+      margin-block-start: 4rem;
+    }
+  }
+
+  .theme-tours-view-all {
+    height: 3.5rem; /* 56px */
+    padding-inline: 2.25rem;
+    font-size: 1rem; /* 16px */
+  }
+
+  .theme-tours-view-all .theme-icon {
+    transition: transform 200ms ease;
+  }
+
+  .theme-tours-view-all:hover .theme-icon {
+    transform: translateX(3px);
+  }
+
+  [dir="rtl"] .theme-tours-view-all:hover .theme-icon {
+    transform: translateX(-3px);
   }
 </style>

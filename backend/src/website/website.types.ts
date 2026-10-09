@@ -138,6 +138,13 @@ export interface TourPublicDto {
   itinerary: { day: number; title: string; description: string }[];
 }
 
+export interface CustomPageDto {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+}
+
 export interface StorefrontDataDto {
   config: {
     tenantSlug: string;
@@ -154,4 +161,5 @@ export interface StorefrontDataDto {
   promotion: PromotionDto;
   testimonials: TestimonialDto[];
   finalCta: FinalCtaDto;
+  pages?: CustomPageDto[];
 }

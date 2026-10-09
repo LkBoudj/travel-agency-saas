@@ -109,6 +109,7 @@ export const websiteThemePatchSchema = z
 export const websitePreviewBodySchema = z
   .object({
     page: z.enum(['home', 'trips']).optional(),
+    themeId: z.string().min(1).max(64).optional(),
   })
   .strict();
 

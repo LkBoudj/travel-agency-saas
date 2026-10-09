@@ -76,6 +76,8 @@ async function waitUntilGone() {
   console.warn(`[theme:test] ${baseUrl} still responding; continuing anyway`);
 }
 
+let daemonChild = null;
+
 try {
   process.stdout.write(`[theme:test] resetting the project dev server (port ${port})\n`);
   runSync(bin("astro"), ["dev", "stop"]);
@@ -84,14 +86,11 @@ try {
   process.stdout.write(
     `[theme:test] starting fresh server with PREVIEW_TOKEN_SECRET=${secret}\n`,
   );
-  const daemon = spawnSync(bin("astro"), ["dev", "--port", String(port)], {
+  daemonChild = spawn(bin("astro"), ["dev", "--port", String(port)], {
     cwd: root,
     stdio: "ignore",
-    env: { ...process.env, PREVIEW_TOKEN_SECRET: secret },
+    env: { ...process.env, PREVIEW_TOKEN_SECRET: secret, THEME_TEST: "true", WEBSITE_API_URL: "", STORE_URL: "", LOCALHOST_TENANT_SLUG: "demo" },
   });
-  if (daemon.status !== 0) {
-    throw new Error(`failed to start the dev server (exit ${daemon.status})`);
-  }
   await waitUntilReady();
 
   const playwrightArgs = [
@@ -108,5 +107,12 @@ try {
   process.exitCode = code;
 } finally {
   process.stdout.write("[theme:test] stopping the dev server\n");
+  if (daemonChild) {
+    try {
+      daemonChild.kill("SIGTERM");
+    } catch {
+      // ignore
+    }
+  }
   runSync(bin("astro"), ["dev", "stop"]);
 }

@@ -265,7 +265,7 @@ export class WebsiteService {
     body: WebsitePreviewBody,
   ): Promise<WebsitePreviewResponse> {
     const draft = await this.ensureDraft(agencyId, agencyCode);
-    const themeId = draft.themeId ?? DEFAULT_THEME_ID;
+    const themeId = body.themeId ?? draft.themeId ?? DEFAULT_THEME_ID;
     const secret = this.config.get<string>('PREVIEW_TOKEN_SECRET');
     const base = this.config.get<string>('STOREFRONT_BASE_URL') ?? 'http://localhost:4321';
     const page = body.page ?? 'home';
@@ -314,7 +314,7 @@ export class WebsiteService {
         errorCode: WEBSITE_NOT_PUBLISHED,
       });
     }
-    return this.composeForRow(row, row.agency.id, row.agency.name, row.themeId);
+    return this.composeForRow(row, row.agency.id, row.agency.name, row.themeId, false);
   }
 
   /**
@@ -347,7 +347,7 @@ export class WebsiteService {
         errorCode: WEBSITE_DRAFT_NOT_FOUND,
       });
     }
-    return this.composeForRow(row, row.agency.id, row.agency.name, claims.themeId);
+    return this.composeForRow(row, row.agency.id, row.agency.name, claims.themeId, true);
   }
 
   private async fetchPublishedTours(agencyId: bigint) {
@@ -416,6 +416,7 @@ export class WebsiteService {
     agencyId: bigint,
     agencyName: string,
     themeIdOverride: string | null,
+    isDraft = false,
   ): Promise<StorefrontDataDto> {
     const content = (row.content as Record<string, unknown>) ?? {};
     const featured = new Set(pickContent(content).featuredTourCodes ?? []);
@@ -434,6 +435,7 @@ export class WebsiteService {
       themeSettings: row.themeSettings,
       content,
       tours,
+      isDraft,
     });
   }
 }

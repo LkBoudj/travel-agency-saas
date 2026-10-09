@@ -402,6 +402,7 @@ describe('Agency website e2e (live PostgreSQL)', () => {
       'config',
       'finalCta',
       'hero',
+      'pages',
       'promotion',
       'testimonials',
       'tours',

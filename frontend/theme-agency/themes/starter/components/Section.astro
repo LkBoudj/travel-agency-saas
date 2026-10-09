@@ -1,8 +1,7 @@
 ---
 /**
  * Shared section shell — consistent eyebrow/title/description header pattern
- * plus a slot. Components use token vars via `is:global` styles keyed by
- * `.theme-section` classes (theme sections, not framework components).
+ * matching the approved storefront design.
  */
 interface Props {
   id?: string;
@@ -10,17 +9,31 @@ interface Props {
   title?: string;
   description?: string;
   headingId?: string;
+  variant?: "default" | "muted" | "subtle" | "dark";
+  centered?: boolean;
 }
 
-const { id, eyebrow, title, description, headingId } = Astro.props as Props;
+const {
+  id,
+  eyebrow,
+  title,
+  description,
+  headingId,
+  variant = "default",
+  centered = true,
+} = Astro.props as Props;
 const heading = headingId ?? (id ? `${id}-heading` : undefined);
 ---
 
-<section class="theme-section" {...(id ? { id } : {})} {...(heading ? { "aria-labelledby": heading } : {})}>
+<section
+  class={`theme-section theme-section--${variant} ${centered ? "theme-section--centered" : ""}`}
+  {...(id ? { id } : {})}
+  {...(heading ? { "aria-labelledby": heading } : {})}
+>
   <div class="theme-section-inner">
     {
       (eyebrow || title || description) && (
-        <header class="theme-section-header">
+        <header class={`theme-section-header ${centered ? "theme-section-header--centered" : ""}`}>
           {eyebrow && <p class="theme-section-eyebrow">{eyebrow}</p>}
           {title && <h2 class="theme-section-title" {...(heading ? { id: heading } : {})}>{title}</h2>}
           {description && <p class="theme-section-description">{description}</p>}
@@ -34,51 +47,116 @@ const heading = headingId ?? (id ? `${id}-heading` : undefined);
 <style is:global>
   .theme-section {
     display: block;
+    position: relative;
+    background: var(--semantic-surface);
+  }
+
+  .theme-section--default {
+    background: var(--semantic-surface);
+  }
+
+  .theme-section--muted {
+    background: var(--semantic-surface-muted);
+  }
+
+  .theme-section--subtle {
+    background: var(--semantic-surface-subtle);
+  }
+
+  .theme-section--dark {
+    background: var(--semantic-surface-dark);
+    color: var(--primitive-color-white);
+  }
+
+  .theme-section--dark .theme-section-title {
+    color: var(--primitive-color-white);
+  }
+
+  .theme-section--dark .theme-section-description {
+    color: var(--primitive-color-neutral-300);
   }
 
   .theme-section-inner {
-    max-width: 80rem;
+    max-width: 90rem; /* 1440px */
     margin-inline: auto;
-    padding: 3rem 1.25rem;
+    padding-inline: 1.25rem;
+    padding-block: 6rem;
+  }
+
+  @media (min-width: 40rem) {
+    .theme-section-inner {
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-section-inner {
+      padding-inline: 2.5rem;
+      padding-block: 7.5rem;
+    }
   }
 
   .theme-section-header {
-    max-width: 40rem;
-    margin-block-end: 2rem;
-    display: grid;
-    gap: 0.5rem;
+    max-width: 52.5rem; /* 840px */
+    margin-block-end: 3.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .theme-section-header--centered {
+    margin-inline: auto;
+    text-align: center;
+    align-items: center;
   }
 
   .theme-section-eyebrow {
     margin: 0;
-    color: var(--component-eyebrow-color);
-    font-size: var(--primitive-font-size-sm);
+    color: var(--semantic-brand);
+    font-size: var(--primitive-font-size-xs);
     font-weight: var(--primitive-font-weight-semibold);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
+  }
+
+  .theme-section--dark .theme-section-eyebrow {
+    color: var(--primitive-color-neutral-400);
   }
 
   .theme-section-title {
     margin: 0;
     color: var(--semantic-text);
-    font-size: var(--primitive-font-size-2xl);
+    font-family: var(--primitive-font-family-sans);
+    font-size: 2.25rem; /* 36px */
     font-weight: var(--primitive-font-weight-bold);
-    line-height: 1.2;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+  }
+
+  @media (min-width: 40rem) {
+    .theme-section-title {
+      font-size: 2.875rem; /* 46px */
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-section-title {
+      font-size: 3.25rem; /* 52px */
+      line-height: 1.06;
+    }
   }
 
   .theme-section-description {
     margin: 0;
     color: var(--semantic-text-muted);
-    font-size: var(--primitive-font-size-md);
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.6;
+    max-width: 43.75rem; /* 700px */
   }
 
-  @media (min-width: 48rem) {
-    .theme-section-inner {
-      padding-block: 4.5rem;
-    }
-
-    .theme-section-title {
-      font-size: var(--primitive-font-size-4xl);
+  @media (min-width: 40rem) {
+    .theme-section-description {
+      font-size: 1.125rem; /* 18px */
     }
   }
 </style>

@@ -1,7 +1,7 @@
 ---
 import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
 import { booleanSetting } from "@theme-agency/sdk";
-import Section from "./Section.astro";
+import Icon from "./Icon.astro";
 
 interface Props {
   context: RenderContext;
@@ -11,51 +11,281 @@ interface Props {
 const { context, settings } = Astro.props as Props;
 const promotion = context.page.kind === "home" ? context.page.content.promotion : null;
 const show = booleanSetting(settings, "homepage.showPromotion", true);
+
+const bannerImage = "/demo/promo-maldives.jpg";
+const ctaHref = promotion?.cta?.href ?? context.paths.trips;
+const ctaLabel = promotion?.cta?.label ?? "Browse Tours";
 ---
 
 {
   show && promotion && (
-    <Section
-      id="promotion"
-      eyebrow={promotion.eyebrow}
-      title={promotion.title}
-      description={promotion.description}
-      headingId="promotion-heading"
-    >
-      {
-        promotion.cta && (
-          <p>
-            <a href={promotion.cta.href} class="theme-btn theme-btn-accent">
-              {promotion.cta.label}
-            </a>
-          </p>
-        )
-      }
-    </Section>
+    <section class="theme-promo-section" id="offers" aria-labelledby="promotional-banner-heading">
+      <div class="theme-promo-container">
+        <div class="theme-promo-card">
+          <img
+            src={bannerImage}
+            alt={promotion.title}
+            class="theme-promo-bg-img"
+            loading="lazy"
+            decoding="async"
+          />
+
+          <div class="theme-promo-overlay" aria-hidden="true"></div>
+
+          <div class="theme-promo-content-wrapper">
+            <div class="theme-promo-content">
+              <div class="theme-promo-badge-row">
+                <span class="theme-promo-badge">Limited Time</span>
+                {
+                  promotion.eyebrow && (
+                    <span class="theme-promo-eyebrow">{promotion.eyebrow}</span>
+                  )
+                }
+              </div>
+
+              <h2 class="theme-promo-title" id="promotional-banner-heading">
+                {promotion.title}
+              </h2>
+
+              {
+                promotion.description && (
+                  <p class="theme-promo-description">{promotion.description}</p>
+                )
+              }
+
+              <div class="theme-promo-action">
+                <a href={ctaHref} class="theme-promo-btn">
+                  <span>{ctaLabel}</span>
+                  <Icon name="arrow" size={18} strokeWidth={2} />
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   )
 }
 
 <style is:global>
-  .theme-btn {
+  .theme-promo-section {
+    padding-block: 6rem;
+    padding-inline: 1.25rem;
+    background: var(--semantic-surface);
+  }
+
+  @media (min-width: 40rem) {
+    .theme-promo-section {
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-promo-section {
+      padding-block: 7.5rem;
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .theme-promo-container {
+    max-width: 90rem; /* 1440px */
+    margin-inline: auto;
+  }
+
+  .theme-promo-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.5rem; /* 24px */
+    min-height: 35rem; /* 560px */
+    background: var(--primitive-color-dark-950);
+  }
+
+  @media (min-width: 64rem) {
+    .theme-promo-card {
+      height: 27.5rem; /* 440px */
+      min-height: 0;
+    }
+  }
+
+  .theme-promo-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 68% center;
+  }
+
+  .theme-promo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgba(7, 16, 30, 0.88) 0%,
+      rgba(7, 16, 30, 0.45) 55%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+  }
+
+  @media (min-width: 64rem) {
+    .theme-promo-overlay {
+      background: linear-gradient(
+        to right,
+        rgba(7, 16, 30, 0.92) 0%,
+        rgba(7, 16, 30, 0.45) 60%,
+        transparent 100%
+      );
+    }
+
+    [dir="rtl"] .theme-promo-overlay {
+      background: linear-gradient(
+        to left,
+        rgba(7, 16, 30, 0.92) 0%,
+        rgba(7, 16, 30, 0.45) 60%,
+        transparent 100%
+      );
+    }
+  }
+
+  .theme-promo-content-wrapper {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  @media (min-width: 64rem) {
+    .theme-promo-content-wrapper {
+      align-items: center;
+    }
+  }
+
+  .theme-promo-content {
+    position: relative;
+    z-index: 10;
+    max-width: 38.75rem; /* 620px */
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .theme-promo-content {
+      padding: 2.5rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-promo-content {
+      padding: 3rem;
+      max-width: 35rem; /* 560px */
+    }
+  }
+
+  .theme-promo-badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .theme-promo-badge {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-height: 2.75rem;
-    padding: 0.625rem 1.25rem;
-    border-radius: var(--primitive-radius-md);
-    font-size: var(--primitive-font-size-sm);
+    border-radius: var(--primitive-radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    padding: 0.25rem 0.875rem;
+    font-size: 0.6875rem; /* 11px */
+    font-weight: var(--primitive-font-weight-semibold);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--primitive-color-white);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  .theme-promo-eyebrow {
+    font-size: 0.75rem; /* 12px */
+    font-weight: var(--primitive-font-weight-semibold);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .theme-promo-title {
+    margin: 1.25rem 0 0 0;
+    font-size: 2.25rem; /* 36px */
+    font-weight: var(--primitive-font-weight-bold);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--primitive-color-white);
+  }
+
+  @media (min-width: 40rem) {
+    .theme-promo-title {
+      font-size: 2.75rem; /* 44px */
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-promo-title {
+      font-size: 3rem; /* 48px */
+    }
+  }
+
+  .theme-promo-description {
+    margin: 1rem 0 0 0;
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    max-width: 30rem;
+  }
+
+  @media (min-width: 64rem) {
+    .theme-promo-description {
+      font-size: 1.125rem; /* 18px */
+    }
+  }
+
+  .theme-promo-action {
+    margin-block-start: 1.75rem;
+  }
+
+  @media (min-width: 64rem) {
+    .theme-promo-action {
+      margin-block-start: 2rem;
+    }
+  }
+
+  .theme-promo-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    height: 3.375rem; /* 54px */
+    padding-inline: 2rem;
+    border-radius: var(--primitive-radius-full);
+    background: var(--primitive-color-white);
+    color: var(--primitive-color-neutral-900);
+    font-size: 1rem;
     font-weight: var(--primitive-font-weight-semibold);
     text-decoration: none;
-    border: 1px solid transparent;
-    transition: opacity 120ms ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+    transition: transform 200ms ease, background-color 200ms ease;
   }
 
-  .theme-btn:hover {
-    opacity: 0.9;
+  .theme-promo-btn:hover {
+    transform: translateY(-2px);
+    background: var(--primitive-color-neutral-100);
   }
 
-  .theme-btn-accent {
-    background: var(--component-button-accent-bg);
-    color: var(--semantic-brand-fg);
+  .theme-promo-btn .theme-icon {
+    transition: transform 200ms ease;
+  }
+
+  .theme-promo-btn:hover .theme-icon {
+    transform: translateX(3px);
+  }
+
+  [dir="rtl"] .theme-promo-btn:hover .theme-icon {
+    transform: translateX(-3px);
   }
 </style>

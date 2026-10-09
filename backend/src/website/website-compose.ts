@@ -1,5 +1,6 @@
 import type {
   CtaLinkDto,
+  CustomPageDto,
   FooterDto,
   HeroDto,
   ImageRefDto,
@@ -281,6 +282,50 @@ export interface StorefrontComposeSource {
   themeSettings: unknown;
   content: Record<string, unknown>;
   tours: TourPublicDto[];
+  isDraft?: boolean;
+}
+
+export const RESERVED_CUSTOM_PAGE_SLUGS = new Set([
+  '',
+  '/',
+  '/home',
+  '/trips',
+  '/lab',
+  '/_lab',
+  '/themes.json',
+  '/api',
+  '/admin',
+]);
+
+export function pickCustomPages(
+  value: unknown,
+  isDraft = false,
+): CustomPageDto[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.flatMap((entry) => {
+    if (typeof entry !== 'object' || entry === null) {
+      return [];
+    }
+    const raw = entry as Record<string, unknown>;
+    const id = nonEmpty(raw.id);
+    const title = nonEmpty(raw.title);
+    const rawSlug = nonEmpty(raw.slug);
+    if (!id || !title || !rawSlug) {
+      return [];
+    }
+    const formattedSlug = rawSlug.startsWith('/') ? rawSlug : `/${rawSlug}`;
+    if (RESERVED_CUSTOM_PAGE_SLUGS.has(formattedSlug.toLowerCase())) {
+      return [];
+    }
+    const isPublished = raw.isPublished !== false;
+    if (!isDraft && !isPublished) {
+      return [];
+    }
+    const content = typeof raw.content === 'string' ? raw.content : '';
+    return [{ id, title, slug: formattedSlug, content }];
+  });
 }
 
 export function composeHero(
@@ -406,5 +451,6 @@ export function composeStorefrontData(source: StorefrontComposeSource): Storefro
     promotion: composePromotion(storedContent, source.agencyName),
     testimonials: composeTestimonials(storedContent),
     finalCta: composeFinalCta(storedContent, source.agencyName),
+    pages: pickCustomPages((source.content as Record<string, unknown>)?.pages, source.isDraft),
   };
 }

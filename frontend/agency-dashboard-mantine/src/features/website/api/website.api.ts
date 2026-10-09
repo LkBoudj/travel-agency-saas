@@ -47,11 +47,12 @@ export function requestPatchDraftTheme(
 
 export function requestMintPreview(
   agencyCode: string,
-  page?: 'home' | 'trips'
+  options?: 'home' | 'trips' | { page?: 'home' | 'trips'; themeId?: string }
 ): Promise<WebsitePreviewResponse> {
+  const payload = typeof options === 'string' ? { page: options } : (options ?? {});
   return apiRequest<WebsitePreviewResponse>(`${websitePath(agencyCode)}/preview`, {
     method: 'POST',
-    body: JSON.stringify(page ? { page } : {}),
+    body: JSON.stringify(payload),
   });
 }
 

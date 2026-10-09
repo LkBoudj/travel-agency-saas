@@ -1,4 +1,5 @@
 import type {
+  CustomPageModel,
   FinalCtaContent,
   HeroContent,
   HomePageModel,
@@ -25,6 +26,7 @@ export interface StorefrontPageData {
   promotion: PromotionContent;
   testimonials: TestimonialContent[];
   finalCta: FinalCtaContent;
+  pages?: Array<{ id: string; title: string; slug: string; content: string }>;
 }
 
 export function buildHomePageModel(data: StorefrontPageData): HomePageModel {
@@ -67,5 +69,25 @@ export function buildTripDetailPageModel(
     kind: "trip-detail",
     slug,
     content: { tour },
+  };
+}
+
+export function buildCustomPageModel(
+  data: StorefrontPageData,
+  slug: string,
+): CustomPageModel | undefined {
+  const normalized = slug.replace(/^\/+|\/+$/g, "").toLowerCase();
+  const page = data.pages?.find(
+    (p) => p.slug.replace(/^\/+|\/+$/g, "").toLowerCase() === normalized,
+  );
+  if (!page) return undefined;
+  return {
+    kind: "custom-page",
+    slug: page.slug,
+    content: {
+      title: page.title,
+      slug: page.slug,
+      content: page.content,
+    },
   };
 }

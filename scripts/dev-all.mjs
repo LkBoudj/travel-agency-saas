@@ -52,7 +52,7 @@ const APPS = [
     name: "website-ui",
     dir: "frontend/theme-agency",
     run: "dev",
-    url: "http://localhost:5176",
+    url: "http://localhost:4321",
     color: "\x1b[34m",
   },
 ];

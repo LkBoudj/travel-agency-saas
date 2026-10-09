@@ -385,6 +385,19 @@ describe('WebsiteController', () => {
       expect(new URL(res.body.previewUrl).pathname).toBe('/_lab/starter/home');
       await app.close();
     });
+
+    it('allows previewing a specific requested theme without modifying the draft theme', async () => {
+      const { app, drafts } = await createTestApp();
+      const res = await request(app.getHttpServer())
+        .post('/v1/agencies/AGY-SAHARA00001/website/preview')
+        .send({ themeId: 'luxury', page: 'home' })
+        .expect(201);
+
+      expect(new URL(res.body.previewUrl).pathname).toBe('/_lab/luxury/home');
+      // Draft theme is untouched
+      expect(drafts.get('5')?.themeId).toBeNull();
+      await app.close();
+    });
   });
 
   describe('tour catalog', () => {

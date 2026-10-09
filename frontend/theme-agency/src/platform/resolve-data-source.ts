@@ -26,7 +26,15 @@ export function resolveStorefrontDataSource(
   env: StorefrontSourceEnv = {},
   locals: StorefrontSourceLocals = {},
 ): StorefrontDataSource {
-  const baseUrl = env.WEBSITE_API_URL ?? env.STORE_URL;
+  if (typeof process !== "undefined" && process.env?.THEME_TEST === "true") {
+    return createFixtureDataSource();
+  }
+  const baseUrl =
+    env.WEBSITE_API_URL ??
+    env.STORE_URL ??
+    (typeof process !== "undefined"
+      ? process.env?.WEBSITE_API_URL ?? process.env?.STORE_URL
+      : undefined);
   if (!baseUrl) {
     return createFixtureDataSource();
   }

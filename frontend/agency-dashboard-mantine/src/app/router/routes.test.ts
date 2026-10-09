@@ -26,7 +26,7 @@ const ROUTED_FEATURES = {
   payments: ['PaymentsPage'],
   themes: ['ThemesPage'],
   trips: ['TripsEditorPage', 'TripsPage'],
-  website: ['WebsitePage'],
+  website: ['MenuPage', 'PagesPage', 'WebsitePage'],
 } as const;
 
 const PERMISSION_GATES = [
@@ -40,6 +40,8 @@ const PERMISSION_GATES = [
   ['payments', 'AGENCY_PAYMENT_VIEW'],
   ['website', 'AGENCY_WEBSITE_VIEW'],
   ['themes', 'AGENCY_WEBSITE_VIEW'],
+  ['pages', 'AGENCY_WEBSITE_VIEW'],
+  ['menu', 'AGENCY_WEBSITE_VIEW'],
 ] as const;
 
 function walk(dir: string): string[] {
@@ -104,6 +106,8 @@ describe('route table location', () => {
       ['payments', 16],
       ['website', 16],
       ['themes', 16],
+      ['pages', 16],
+      ['menu', 16],
       ['/styleguide', 10],
     ]);
   });

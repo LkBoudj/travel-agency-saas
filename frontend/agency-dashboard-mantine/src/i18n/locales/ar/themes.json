@@ -45,5 +45,64 @@
   "noticeUnpublishedTitle": "موقعك لم يُنشر بعد",
   "noticeUnpublishedBody": "لا يمكن للزوار رؤية الموقع قبل النشر. تفعيل قالب يغيّر المسودة فقط.",
   "noticePendingTitle": "المسودة تختلف عن الموقع المنشور",
-  "noticePendingBody": "لا يزال الموقع المنشور يعرض «{{liveTheme}}». انشر الموقع للانتقال إلى القالب الحالي."
+  "noticePendingBody": "لا يزال الموقع المنشور يعرض «{{liveTheme}}». انشر الموقع للانتقال إلى القالب الحالي.",
+  "eyebrow": "الموقع الإلكتروني والهوية",
+  "pageTitle": "قوالب الموقع الإلكتروني",
+  "pageSubtitle": "اختر قالبًا احترافيًا لموقع وكالتك السياحية وخصّصه ليتناسب مع هويتك التجارية.",
+  "viewWebsite": "عرض موقعي",
+  "customizeTheme": "تخصيص القالب",
+  "hero": {
+    "tag": "قوالب احترافية",
+    "title": "مواقع متميزة لرحلات لا تُنسى",
+    "subtitle": "قوالب حديثة ومتجاوبة ومصممة خصيصاً لوكالات السفر لزيادة الحجوزات.",
+    "trustedBadge": "موثوق من أكثر من 500 وكالة سياحية حول العالم",
+    "benefitResponsive": "متجاوب مع الهواتف",
+    "benefitResponsiveSub": "كافة الأجهزة",
+    "benefitCustomizable": "قابل للتخصيص بالكامل",
+    "benefitCustomizableSub": "الألوان والخطوط والمحتوى",
+    "benefitSeo": "محسن لمحركات البحث",
+    "benefitSeoSub": "ظهور أفضل",
+    "benefitConversions": "مصمم لزيادة التحويلات",
+    "benefitConversionsSub": "تحويل الزوار إلى عملاء"
+  },
+  "categories": {
+    "all": "جميع القوالب",
+    "popular": "الأكثر شيوعاً",
+    "new": "جديد",
+    "minimal": "بسيط",
+    "adventure": "مغامرات",
+    "luxury": "فاخر"
+  },
+  "searchPlaceholder": "بحث في القوالب...",
+  "sort": {
+    "label": "ترتيب حسب",
+    "popular": "الأكثر شيوعاً",
+    "newest": "الأحدث",
+    "name": "الاسم"
+  },
+  "card": {
+    "activeBadge": "نشط",
+    "useTheme": "استخدام القالب",
+    "preview": "معاينة",
+    "customize": "تخصيص"
+  },
+  "detail": {
+    "fullyResponsive": "تصميم متجاوب بالكامل",
+    "fullyResponsiveDesc": "مظهر رائع على جميع الأجهزة",
+    "customizableColors": "ألوان قابلة للتخصيص",
+    "customizableColorsDesc": "مطابقة هويتك البصرية",
+    "seoOptimized": "محسن لمحركات البحث",
+    "seoOptimizedDesc": "مصمم لظهور أفضل في النتائج",
+    "conversionFocused": "موجّه لزيادة التحويلات",
+    "conversionFocusedDesc": "تحويل الزوار إلى عملاء",
+    "viewLiveWebsite": "عرض الموقع المباشر",
+    "lastUpdated": "آخر تحديث: 5 أكتوبر 2026 · الإصدار 1.2.0"
+  },
+  "previewDialog": {
+    "title": "معاينة القالب",
+    "desktop": "شاشة عريضة",
+    "tablet": "جهاز لوحي",
+    "mobile": "هاتف محمول",
+    "applyTheme": "تطبيق القالب"
+  }
 }

@@ -1,6 +1,11 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
 import { useConfirmDialog } from '../../../components/confirm-dialog.tsx';
+import {
+  useViewWebsite,
+  type ViewWebsiteController,
+} from '../../website/hooks/use-view-website.ts';
 import { useWebsiteCapabilities } from '../../website/hooks/use-website-capabilities.ts';
 import {
   usePublishedWebsite,
@@ -9,7 +14,11 @@ import {
 } from '../../website/hooks/use-website.ts';
 import { classifyWebsiteError, type WebsiteErrorKind } from '../../website/lib/website-errors.ts';
 import type { WebsiteDraftResponse } from '../../website/types.ts';
-import { buildActivateThemePatch, buildThemePatch } from '../lib/settings-map.ts';
+import {
+  buildActivateThemePatch,
+  buildThemePatch,
+  initialSettingsMap,
+} from '../lib/settings-map.ts';
 import {
   liveThemeId,
   themeCardState,
@@ -55,8 +64,15 @@ export interface ThemesPageController {
   previewing: boolean;
   activate: (themeId: string) => void;
   saveCustomization: (settings: SettingsMap) => void;
-  openPreview: (page?: 'home' | 'trips') => void;
+  openPreview: (page?: 'home' | 'trips', themeId?: string) => void;
   publishWebsite: () => void;
+  viewWebsite: ViewWebsiteController;
+  customizeOpen: boolean;
+  customizeTheme: ThemeManifestEntry | null;
+  customizeSettings: SettingsMap;
+  setCustomizeSettings: (settings: SettingsMap) => void;
+  openCustomize: (theme: ThemeManifestEntry) => void;
+  closeCustomize: () => void;
 }
 
 export function useThemesPage(): ThemesPageController {
@@ -67,11 +83,16 @@ export function useThemesPage(): ThemesPageController {
   const draftQuery = useWebsiteDraft();
   const publishedQuery = usePublishedWebsite();
   const { saveTheme, publish, mintPreview } = useWebsiteMutations();
+  const viewWebsite = useViewWebsite();
+
+  const [customizeOpen, setCustomizeOpen] = useState(false);
+  const [customizeTheme, setCustomizeTheme] = useState<ThemeManifestEntry | null>(null);
+  const [customizeSettings, setCustomizeSettings] = useState<SettingsMap>({});
 
   const draft = draftQuery.data ?? null;
   const activeThemeId = draft?.themeId ?? null;
-  const activeTheme =
-    manifestQuery.data?.themes.find((theme) => theme.themeId === activeThemeId) ?? null;
+  const rawManifest = manifestQuery.data?.themes ?? [];
+  const activeTheme = rawManifest.find((theme) => theme.themeId === activeThemeId) ?? null;
   const isPublished = publishedQuery.isSuccess;
   const publishedThemeId = publishedQuery.data?.themeId ?? null;
   const currentLiveThemeId = liveThemeId(publishedThemeId, isPublished);
@@ -98,26 +119,39 @@ export function useThemesPage(): ThemesPageController {
     });
   };
 
+  const openCustomize = (theme: ThemeManifestEntry) => {
+    setCustomizeTheme(theme);
+    setCustomizeSettings(initialSettingsMap(theme.settingsSchema, draft?.themeSettings));
+    setCustomizeOpen(true);
+  };
+
+  const closeCustomize = () => {
+    setCustomizeOpen(false);
+    setCustomizeTheme(null);
+  };
+
   const saveCustomization = (settings: SettingsMap) => {
-    if (activeTheme === null) {
+    const targetTheme = customizeTheme ?? activeTheme;
+    if (targetTheme === null) {
       return;
     }
     saveTheme.mutate(
       {
-        values: buildThemePatch(activeTheme.themeId, activeTheme.settingsSchema, settings),
+        values: buildThemePatch(targetTheme.themeId, targetTheme.settingsSchema, settings),
       },
       {
         onSuccess: () => {
           notifications.show({ message: t('notifications.customizationSaved'), color: 'teal' });
+          closeCustomize();
         },
         onError: notifyError,
       }
     );
   };
 
-  const openPreview = (page: 'home' | 'trips' = 'home') => {
+  const openPreview = (page: 'home' | 'trips' = 'home', themeId?: string) => {
     mintPreview.mutate(
-      { page },
+      { page, themeId },
       {
         onSuccess: (response) => {
           window.open(response.previewUrl, '_blank', 'noopener,noreferrer');
@@ -142,10 +176,10 @@ export function useThemesPage(): ThemesPageController {
   };
 
   return {
-    manifest: manifestQuery.data?.themes ?? [],
+    manifest: rawManifest,
     manifestPending: manifestQuery.isPending,
     manifestError: manifestQuery.isError,
-    refetchManifest: manifestQuery.refetch,
+    refetchManifest: () => void manifestQuery.refetch(),
     draft,
     draftPending: draftQuery.isPending,
     isPublished,
@@ -162,5 +196,12 @@ export function useThemesPage(): ThemesPageController {
     saveCustomization,
     openPreview,
     publishWebsite,
+    viewWebsite,
+    customizeOpen,
+    customizeTheme,
+    customizeSettings,
+    setCustomizeSettings,
+    openCustomize,
+    closeCustomize,
   };
 }

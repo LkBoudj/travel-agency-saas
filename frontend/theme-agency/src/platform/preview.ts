@@ -183,7 +183,8 @@ export async function verifyPreviewToken(
 export type PreviewPageRequest =
   | { kind: "home" }
   | { kind: "trips" }
-  | { kind: "trip-detail"; slug: string };
+  | { kind: "trip-detail"; slug: string }
+  | { kind: "custom-page"; slug: string };
 
 export interface LabRequestPath {
   themeId: string;
@@ -231,14 +232,28 @@ export function parseLabPath(pathname: string): LabRequestPath | null {
     return slug ? { themeId, page: { kind: "trip-detail", slug } } : null;
   }
 
+  if (segments.length === 3 && pageSegment === "page" && slugSegment) {
+    let slug: string;
+    try {
+      slug = decodeURIComponent(slugSegment);
+    } catch {
+      return null;
+    }
+    return slug ? { themeId, page: { kind: "custom-page", slug } } : null;
+  }
+
   return null;
 }
 
 function internalLabPath(path: LabRequestPath): string {
   const base = `${LAB_INTERNAL_PREFIX}${path.themeId}`;
-  return path.page.kind === "trip-detail"
-    ? `${base}/trip-detail/${encodeURIComponent(path.page.slug)}`
-    : `${base}/${path.page.kind}`;
+  if (path.page.kind === "trip-detail") {
+    return `${base}/trip-detail/${encodeURIComponent(path.page.slug)}`;
+  }
+  if (path.page.kind === "custom-page") {
+    return `${base}/page/${encodeURIComponent(path.page.slug)}`;
+  }
+  return `${base}/${path.page.kind}`;
 }
 
 /** Raw settings overrides from the `s` query param; non-primitives are dropped. */
