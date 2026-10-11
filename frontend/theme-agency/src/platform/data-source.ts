@@ -32,6 +32,13 @@ export interface StorefrontConfig {
   settings: Record<string, unknown>;
 }
 
+export interface CustomPageData {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+}
+
 export interface StorefrontData {
   config: StorefrontConfig;
   hero: HeroContent;
@@ -41,6 +48,7 @@ export interface StorefrontData {
   promotion: PromotionContent;
   testimonials: TestimonialContent[];
   finalCta: FinalCtaContent;
+  pages?: CustomPageData[];
 }
 
 export interface StorefrontDataSource {

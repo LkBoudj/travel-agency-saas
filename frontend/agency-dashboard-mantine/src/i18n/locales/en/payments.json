@@ -1,0 +1,59 @@
+{
+  "title": "Payments",
+  "subtitle": "Manage booking payments and track payment ledgers",
+  "searchBookingPlaceholder": "Search bookings by code, customer, or tour...",
+  "selectBookingPrompt": "Select a booking from the list to view its payment ledger and record payments.",
+  "noBookingsFound": "No bookings found matching your search.",
+  "selectBookingLabel": "Selected Booking",
+  "recordPaymentButton": "Record payment",
+  "summary": {
+    "title": "Payment Summary",
+    "totalAmount": "Total Amount",
+    "paidAmount": "Total Paid",
+    "remainingAmount": "Remaining Balance",
+    "settled": "Fully Paid",
+    "partiallyPaid": "Partially Paid",
+    "unpaid": "Unpaid"
+  },
+  "history": {
+    "title": "Payment History",
+    "empty": "No payments recorded for this booking yet.",
+    "columns": {
+      "code": "Payment Code",
+      "date": "Date Paid",
+      "amount": "Amount",
+      "method": "Method",
+      "reference": "Reference",
+      "note": "Note"
+    }
+  },
+  "methods": {
+    "CASH": "Cash",
+    "BANK_TRANSFER": "Bank Transfer",
+    "CARD": "Card",
+    "CHECK": "Check",
+    "OTHER": "Other"
+  },
+  "recordDialog": {
+    "title": "Record Payment",
+    "description": "Record money received for booking {{code}}",
+    "amount": "Amount",
+    "method": "Payment Method",
+    "methodPlaceholder": "Select method (optional)",
+    "reference": "Reference / Transaction ID",
+    "referencePlaceholder": "e.g. Bank slip or receipt number",
+    "paidAt": "Payment Date & Time",
+    "note": "Notes",
+    "notePlaceholder": "Internal notes regarding this payment...",
+    "submit": "Record payment",
+    "cancel": "Cancel",
+    "success": "Payment recorded successfully",
+    "error": "Failed to record payment"
+  },
+  "validation": {
+    "amountInvalid": "Please enter a valid positive amount",
+    "amountDecimals": "Amount cannot have more than 2 decimal places",
+    "referenceMax": "Reference must be at most 120 characters",
+    "noteMax": "Note must be at most 2000 characters"
+  }
+}

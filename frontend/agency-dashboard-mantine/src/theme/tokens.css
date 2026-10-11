@@ -28,6 +28,7 @@
      without truncation. Narrower than the old fixed 260px, which spent 29% of a
      1440px screen on chrome instead of data. */
   --app-rail-width: 220px;
+  --app-sidebar-width: var(--app-rail-width);
 
   /* Media height for catalog cards (Themes today). A token because the image
      and the no-preview placeholder must stay the same height. */
@@ -72,6 +73,7 @@
   --app-surface-page: var(--mantine-color-gray-0);
   --app-surface-raised: var(--mantine-color-white);
   --app-surface-sunken: var(--mantine-color-gray-1);
+  --app-surface-subtle: var(--mantine-color-gray-1);
   --app-border-subtle: var(--mantine-color-gray-3);
   --app-border-strong: var(--mantine-color-gray-4);
   --app-row-hover: var(--mantine-color-gray-0);

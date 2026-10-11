@@ -142,4 +142,34 @@ describe('table contract', () => {
     expect(table.defaultProps?.withColumnBorders).toBe(false);
     expect(table.defaultProps?.withTableBorder).toBeUndefined();
   });
+
+  test('table data cells default to tabular numerals to prevent layout jitter', async () => {
+    const table = await tableDefaults();
+
+    expect(table.styles?.td).toMatchObject({
+      fontVariantNumeric: 'tabular-nums',
+    });
+  });
+});
+
+describe('numeric stability', () => {
+  test('badges default to tabular numerals to prevent width shake on count updates', async () => {
+    const defaults = await defaultsWithReducedMotion(false);
+    expect(defaults.Badge?.styles?.root).toMatchObject({
+      fontVariantNumeric: 'tabular-nums',
+    });
+  });
+});
+
+describe('modal and layout stability', () => {
+  test('modals and drawers preserve the scrollbar track to prevent viewport shift', async () => {
+    const defaults = await defaultsWithReducedMotion(false);
+    expect(defaults.Modal?.defaultProps?.removeScrollProps).toEqual({ removeScrollBar: false });
+    expect(defaults.Drawer?.defaultProps?.removeScrollProps).toEqual({ removeScrollBar: false });
+  });
+
+  test('app shell disables scrollbar offsetting to prevent fixed header jumps', async () => {
+    const defaults = await defaultsWithReducedMotion(false);
+    expect(defaults.AppShell?.defaultProps?.offsetScrollbars).toBe(false);
+  });
 });

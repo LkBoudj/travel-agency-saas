@@ -11,7 +11,7 @@ export type ThemeId = string;
  * Routes are owned by the platform: "/" (home), "/trips" (trips),
  * "/trips/[slug]" (trip-detail).
  */
-export type PageKind = "home" | "trips" | "trip-detail";
+export type PageKind = "home" | "trips" | "trip-detail" | "custom-page";
 
 // ---------------------------------------------------------------------------
 // Settings (schema-driven; validated in src/core/settings-schema.ts, T3)
@@ -193,10 +193,23 @@ export interface TripDetailPageModel {
   content: TripDetailPageContent;
 }
 
+export interface CustomPageContent {
+  title: string;
+  slug: string;
+  content: string;
+}
+
+export interface CustomPageModel {
+  kind: "custom-page";
+  slug: string;
+  content: CustomPageContent;
+}
+
 export type PageModel =
   | HomePageModel
   | TripsPageModel
-  | TripDetailPageModel;
+  | TripDetailPageModel
+  | CustomPageModel;
 
 // ---------------------------------------------------------------------------
 // RenderContext — the single platform-owned props bag for every theme component

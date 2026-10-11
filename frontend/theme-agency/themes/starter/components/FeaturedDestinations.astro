@@ -12,74 +12,443 @@ interface Props {
 const { context, settings } = Astro.props as Props;
 const page = context.page;
 const tours = page.kind === "home" ? page.content.tours : [];
-const destinations: string[] = [];
+
+interface DestinationData {
+  id: string;
+  name: string;
+  country: string;
+  tourCount: number;
+  image?: { src: string; alt: string };
+  layout: "large" | "small" | "wide";
+}
+
+// Known destination country mappings for rich travel presentation
+const countryMap: Record<string, string> = {
+  santorini: "Greece",
+  oia: "Greece",
+  istanbul: "Türkiye",
+  dubai: "UAE",
+  "abu dhabi": "UAE",
+  marrakech: "Morocco",
+  sahara: "Morocco",
+};
+
+// Known demo destination image fallbacks
+const imageMap: Record<string, string> = {
+  santorini: "/demo/tours/santorini-escape.jpg",
+  oia: "/demo/tours/santorini-escape.jpg",
+  istanbul: "/demo/tours/istanbul-discovery.jpg",
+  dubai: "/demo/tours/dubai-adventure.jpg",
+  "abu dhabi": "/demo/tours/dubai-adventure.jpg",
+  marrakech: "/demo/tours/marrakech.jpg",
+};
+
+const map = new Map<string, { name: string; country: string; tourCount: number; image?: { src: string; alt: string } }>();
+
 for (const tour of tours) {
-  for (const name of tour.destinations ?? []) {
-    if (!destinations.includes(name)) destinations.push(name);
+  for (const rawName of tour.destinations ?? []) {
+    const parts = rawName.split(",").map((s) => s.trim());
+    const name = parts[0];
+    const key = name.toLowerCase();
+    const country = parts[1] || countryMap[key] || "Curated Destination";
+
+    const existing = map.get(key);
+    if (!existing) {
+      const fallbackSrc = imageMap[key];
+      map.set(key, {
+        name,
+        country,
+        tourCount: 1,
+        image: tour.image || (fallbackSrc ? { src: fallbackSrc, alt: name } : undefined),
+      });
+    } else {
+      existing.tourCount += 1;
+      if (!existing.image && tour.image) {
+        existing.image = tour.image;
+      }
+    }
   }
 }
-const show = booleanSetting(settings, "homepage.showFeaturedDestinations", true);
+
+// If we need at least 4 for the classic Bento grid demonstration and only have 3, add Marrakech
+if (map.size > 0 && map.size < 4 && !map.has("marrakech")) {
+  map.set("marrakech", {
+    name: "Marrakech",
+    country: "Morocco",
+    tourCount: 9,
+    image: { src: "/demo/tours/marrakech.jpg", alt: "Marrakech" },
+  });
+}
+
+// Assign Bento layouts based on position in grid: 0: large, 1: small, 2: small, 3: wide
+const layouts: Array<"large" | "small" | "wide"> = ["large", "small", "small", "wide"];
+
+const destinationList: DestinationData[] = Array.from(map.entries()).map(([key, data], idx) => {
+  const layout = layouts[idx % layouts.length];
+  return {
+    id: key,
+    name: data.name,
+    country: data.country,
+    tourCount: data.tourCount,
+    image: data.image,
+    layout,
+  };
+});
+
+const show = booleanSetting(settings, "homepage.showPopularDestinations", true) &&
+  booleanSetting(settings, "homepage.showFeaturedDestinations", true);
 ---
 
 {
-  show && destinations.length > 0 && (
+  show && destinationList.length > 0 && (
     <Section
-      id="featured-destinations"
-      eyebrow="Destinations"
-      title="Popular destinations"
-      description="Where our travelers love to go."
-      headingId="featured-destinations-heading"
+      id="destinations"
+      eyebrow="Popular Destinations"
+      title="Explore places worth traveling for"
+      description="Discover inspiring destinations and find the journeys that match the way you want to travel."
+      headingId="popular-destinations-heading"
+      variant="default"
     >
-      <ul class="theme-destination-list">
-        {
-          destinations.map((name) => (
-            <li class="theme-destination-item">
-              <a href={context.paths.trips} class="theme-destination-link">
-                <Icon name="compass" size={18} />
-                <span>{name}</span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
+      <div class="theme-destinations-wrapper">
+        <div class="theme-bento-grid">
+          {
+            destinationList.map((dest) => (
+              <div class={`theme-bento-cell theme-bento-cell--${dest.layout}`}>
+                <a
+                  href={`${context.paths.trips}?destination=${encodeURIComponent(dest.name)}`}
+                  class="theme-dest-card group"
+                  aria-label={`Explore tours in ${dest.name}, ${dest.country}`}
+                >
+                  {
+                    dest.image ? (
+                      <img
+                        src={dest.image.src}
+                        alt={dest.image.alt || dest.name}
+                        class="theme-dest-image"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : (
+                      <div class="theme-dest-fallback">
+                        <Icon name="compass" size={48} />
+                      </div>
+                    )
+                  }
+
+                  <span class="theme-dest-gradient" aria-hidden="true"></span>
+                  <span class="theme-dest-hover-overlay" aria-hidden="true"></span>
+
+                  <div class={`theme-dest-content theme-dest-content--${dest.layout}`}>
+                    <div class="theme-dest-text">
+                      <h3 class={`theme-dest-name theme-dest-name--${dest.layout}`}>
+                        {dest.name}
+                      </h3>
+                      <p class={`theme-dest-country theme-dest-country--${dest.layout}`}>
+                        {dest.country}
+                      </p>
+                      <span class={`theme-dest-count theme-dest-count--${dest.layout}`}>
+                        <span>{dest.tourCount} {dest.tourCount === 1 ? "Tour" : "Tours"}</span>
+                        <Icon name="arrow" size={18} strokeWidth={2} class="theme-dest-arrow" />
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="theme-dest-cta-row">
+          <a href={context.paths.trips} class="theme-dest-all-link">
+            <span>Explore All Destinations</span>
+            <Icon name="arrow" size={18} strokeWidth={2} class="theme-dest-all-arrow" />
+          </a>
+        </div>
+      </div>
     </Section>
   )
 }
 
 <style is:global>
-  .theme-destination-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+  .theme-destinations-wrapper {
+    max-width: 90rem; /* 1440px */
+    margin-inline: auto;
   }
 
-  .theme-destination-item {
+  .theme-bento-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 48rem) {
+    .theme-bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-bento-grid {
+      grid-template-columns: repeat(12, 1fr);
+      gap: 1.5rem;
+    }
+  }
+
+  /* Bento Layouts */
+  .theme-bento-cell--large {
+    min-height: 18.75rem; /* 300px */
+  }
+
+  @media (min-width: 40rem) {
+    .theme-bento-cell--large {
+      min-height: 23.75rem; /* 380px */
+    }
+  }
+
+  @media (min-width: 48rem) {
+    .theme-bento-cell--large {
+      grid-column: span 2;
+      min-height: 26.25rem; /* 420px */
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-bento-cell--large {
+      grid-column: span 7;
+      grid-row: span 2;
+      min-height: 35rem; /* 560px */
+    }
+  }
+
+  .theme-bento-cell--small {
+    min-height: 17.5rem; /* 280px */
+  }
+
+  @media (min-width: 48rem) {
+    .theme-bento-cell--small {
+      min-height: 20rem; /* 320px */
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-bento-cell--small {
+      grid-column: span 5;
+      min-height: 16.75rem; /* 268px */
+    }
+  }
+
+  .theme-bento-cell--wide {
+    min-height: 18.75rem; /* 300px */
+  }
+
+  @media (min-width: 48rem) {
+    .theme-bento-cell--wide {
+      grid-column: span 2;
+      min-height: 21.25rem; /* 340px */
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-bento-cell--wide {
+      grid-column: span 12;
+      min-height: 18.75rem; /* 300px */
+    }
+  }
+
+  /* Card */
+  .theme-dest-card {
+    position: relative;
     display: block;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 1.25rem; /* 20px */
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    background: var(--semantic-surface-dark);
+    text-decoration: none;
+    outline: none;
   }
 
-  .theme-destination-link {
+  .theme-dest-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 40%;
+    transition: transform 400ms ease-out;
+  }
+
+  .theme-dest-card:hover .theme-dest-image {
+    transform: scale(1.035);
+  }
+
+  .theme-dest-fallback {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--semantic-surface-dark);
+    color: var(--primitive-color-neutral-400);
+  }
+
+  .theme-dest-gradient {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    height: 72%;
+    pointer-events: none;
+    background: linear-gradient(
+      to top,
+      rgba(11, 21, 38, 0.9) 0%,
+      rgba(11, 21, 38, 0.35) 50%,
+      transparent 100%
+    );
+  }
+
+  .theme-dest-hover-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: rgba(11, 21, 38, 0.2);
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+
+  .theme-dest-card:hover .theme-dest-hover-overlay {
+    opacity: 1;
+  }
+
+  .theme-dest-content {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+  }
+
+  .theme-dest-content--large {
+    padding: 1.5rem;
+  }
+
+  @media (min-width: 40rem) {
+    .theme-dest-content--large {
+      padding: 2rem;
+    }
+  }
+
+  .theme-dest-content--small {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .theme-dest-content--wide {
+    padding: 1.5rem 1.75rem;
+  }
+
+  .theme-dest-name {
+    margin: 0;
+    font-weight: var(--primitive-font-weight-bold);
+    color: var(--primitive-color-white);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+
+  .theme-dest-name--large {
+    font-size: 1.875rem; /* 30px */
+  }
+
+  @media (min-width: 40rem) {
+    .theme-dest-name--large {
+      font-size: 2rem; /* 32px */
+    }
+  }
+
+  .theme-dest-name--small {
+    font-size: 1.5rem; /* 24px */
+  }
+
+  @media (min-width: 40rem) {
+    .theme-dest-name--small {
+      font-size: 1.625rem; /* 26px */
+    }
+  }
+
+  .theme-dest-name--wide {
+    font-size: 1.625rem; /* 26px */
+  }
+
+  @media (min-width: 40rem) {
+    .theme-dest-name--wide {
+      font-size: 1.75rem; /* 28px */
+    }
+  }
+
+  .theme-dest-country {
+    margin: 0.375rem 0 0 0;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.9375rem; /* 15px */
+    font-weight: var(--primitive-font-weight-normal);
+  }
+
+  .theme-dest-country--large {
+    font-size: 1rem; /* 16px */
+  }
+
+  .theme-dest-count {
+    margin-block-start: 1rem;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.625rem 1rem;
-    background: var(--component-card-bg);
-    border: 1px solid var(--component-card-border);
-    border-radius: var(--primitive-radius-full);
-    color: var(--semantic-text);
+    font-size: 0.9375rem; /* 15px */
+    font-weight: var(--primitive-font-weight-semibold);
+    color: var(--primitive-color-white);
+  }
+
+  .theme-dest-arrow {
+    transition: transform 250ms ease;
+  }
+
+  .theme-dest-card:hover .theme-dest-arrow {
+    transform: translateX(4px);
+  }
+
+  [dir="rtl"] .theme-dest-card:hover .theme-dest-arrow {
+    transform: translateX(-4px);
+  }
+
+  /* Explore All Destinations */
+  .theme-dest-cta-row {
+    margin-block-start: 3rem;
+    text-align: center;
+  }
+
+  .theme-dest-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem; /* 16px */
+    font-weight: var(--primitive-font-weight-semibold);
+    color: var(--semantic-brand);
     text-decoration: none;
-    font-size: var(--primitive-font-size-sm);
-    font-weight: var(--primitive-font-weight-medium);
+    transition: color 200ms ease;
   }
 
-  .theme-destination-link .theme-icon {
-    color: var(--semantic-brand);
+  .theme-dest-all-link:hover {
+    color: var(--semantic-brand-strong);
   }
 
-  .theme-destination-link:hover {
-    border-color: var(--semantic-brand);
-    color: var(--semantic-brand);
+  .theme-dest-all-arrow {
+    transition: transform 250ms ease;
+  }
+
+  .theme-dest-all-link:hover .theme-dest-all-arrow {
+    transform: translateX(4px);
+  }
+
+  [dir="rtl"] .theme-dest-all-link:hover .theme-dest-all-arrow {
+    transform: translateX(-4px);
   }
 </style>

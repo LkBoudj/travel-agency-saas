@@ -1,7 +1,7 @@
 ---
 import type { RenderContext, ThemeSettings } from "@theme-agency/sdk";
 import { booleanSetting } from "@theme-agency/sdk";
-import Section from "./Section.astro";
+import Icon from "./Icon.astro";
 
 interface Props {
   context: RenderContext;
@@ -11,70 +11,263 @@ interface Props {
 const { context, settings } = Astro.props as Props;
 const finalCta = context.page.kind === "home" ? context.page.content.finalCta : null;
 const show = booleanSetting(settings, "homepage.showFinalCta", true);
+
+const primaryLabel = finalCta?.primaryCta?.label ?? "Explore Tours";
+const primaryUrl = finalCta?.primaryCta?.href ?? context.paths.trips;
+const secondaryLabel = finalCta?.secondaryCta?.label ?? "Contact Us";
+const secondaryUrl = finalCta?.secondaryCta?.href ?? "#contact";
 ---
 
 {
   show && finalCta && (
-    <Section
-      id="final-cta"
-      eyebrow={finalCta.eyebrow}
-      title={finalCta.title}
-      description={finalCta.description}
-      headingId="final-cta-heading"
-    >
-      <div class="theme-finalcta-actions">
-        {
-          finalCta.primaryCta && (
-            <a href={finalCta.primaryCta.href} class="theme-btn theme-btn-primary">
-              {finalCta.primaryCta.label}
+    <section class="theme-final-cta-section" id="final-cta" aria-labelledby="final-cta-heading">
+      <div class="theme-final-cta-container">
+        <div class="theme-final-cta-card">
+          {
+            finalCta.eyebrow && (
+              <p class="theme-final-cta-eyebrow">{finalCta.eyebrow}</p>
+            )
+          }
+
+          <h2 class="theme-final-cta-title" id="final-cta-heading">
+            {finalCta.title}
+          </h2>
+
+          {
+            finalCta.description && (
+              <p class="theme-final-cta-description">{finalCta.description}</p>
+            )
+          }
+
+          <div class="theme-final-cta-actions">
+            <a href={primaryUrl} class="theme-final-cta-btn-primary">
+              <span>{primaryLabel}</span>
+              <Icon name="arrow" size={18} strokeWidth={2.2} />
             </a>
-          )
-        }
-        {
-          finalCta.secondaryCta && (
-            <a href={finalCta.secondaryCta.href} class="theme-btn theme-btn-secondary">
-              {finalCta.secondaryCta.label}
+
+            <a href={secondaryUrl} class="theme-final-cta-btn-secondary">
+              <span>{secondaryLabel}</span>
             </a>
-          )
-        }
+          </div>
+
+          <div class="theme-final-cta-trust-row">
+            <div class="theme-final-cta-trust-item">
+              <Icon name="clock" size={16} strokeWidth={2} />
+              <span>Personal response within 24 hours</span>
+            </div>
+            <div class="theme-final-cta-trust-item">
+              <Icon name="shield" size={16} strokeWidth={2} />
+              <span>Complimentary, no-obligation itinerary</span>
+            </div>
+            <div class="theme-final-cta-trust-item">
+              <Icon name="check" size={16} strokeWidth={2.2} />
+              <span>Direct licensed operator rates</span>
+            </div>
+          </div>
+        </div>
       </div>
-    </Section>
+    </section>
   )
 }
 
 <style is:global>
-  .theme-finalcta-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
+  .theme-final-cta-section {
+    padding-block: 6rem;
+    padding-inline: 1.25rem;
+    background: var(--semantic-surface);
   }
 
-  .theme-btn {
+  @media (min-width: 40rem) {
+    .theme-final-cta-section {
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-final-cta-section {
+      padding-block: 7.5rem;
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .theme-final-cta-container {
+    max-width: 90rem; /* 1440px */
+    margin-inline: auto;
+  }
+
+  .theme-final-cta-card {
+    border-radius: 1.5rem; /* 24px */
+    background: var(--semantic-surface-dark);
+    padding-inline: 1.5rem;
+    padding-block: 5.5rem;
+    text-align: center;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.35);
+  }
+
+  @media (min-width: 40rem) {
+    .theme-final-cta-card {
+      padding-block: 6rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-final-cta-card {
+      padding-block: 7rem;
+    }
+  }
+
+  .theme-final-cta-eyebrow {
+    margin: 0;
+    font-size: 0.75rem; /* 12px */
+    font-weight: var(--primitive-font-weight-semibold);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--primitive-color-neutral-400);
+  }
+
+  .theme-final-cta-title {
+    margin: 1.25rem auto 0 auto;
+    font-size: 2.25rem; /* 36px */
+    font-weight: var(--primitive-font-weight-bold);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    color: var(--primitive-color-white);
+    max-width: 42.5rem; /* 680px */
+  }
+
+  @media (min-width: 40rem) {
+    .theme-final-cta-title {
+      font-size: 2.875rem; /* 46px */
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-final-cta-title {
+      font-size: 3.25rem; /* 52px */
+      line-height: 1.06;
+    }
+  }
+
+  .theme-final-cta-description {
+    margin: 1.25rem auto 0 auto;
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.6;
+    color: var(--primitive-color-neutral-300);
+    max-width: 38.75rem; /* 620px */
+  }
+
+  @media (min-width: 40rem) {
+    .theme-final-cta-description {
+      font-size: 1.125rem; /* 18px */
+    }
+  }
+
+  .theme-final-cta-actions {
+    margin-block-start: 2.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  @media (min-width: 40rem) {
+    .theme-final-cta-actions {
+      flex-direction: row;
+      gap: 1.25rem;
+      margin-block-start: 2.5rem;
+    }
+  }
+
+  .theme-final-cta-btn-primary {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.75rem;
-    padding: 0.625rem 1.25rem;
-    border-radius: var(--primitive-radius-md);
-    font-size: var(--primitive-font-size-sm);
+    gap: 0.625rem;
+    width: 100%;
+    height: 3.5rem; /* 56px */
+    padding-inline: 2.25rem;
+    border-radius: var(--primitive-radius-full);
+    background: var(--semantic-brand);
+    color: var(--primitive-color-white);
+    font-size: 1rem;
     font-weight: var(--primitive-font-weight-semibold);
     text-decoration: none;
-    border: 1px solid transparent;
-    transition: opacity 120ms ease;
+    box-shadow: 0 4px 14px -2px rgba(15, 118, 110, 0.4);
+    transition: transform 250ms ease, box-shadow 250ms ease, filter 200ms ease;
   }
 
-  .theme-btn:hover {
-    opacity: 0.9;
+  @media (min-width: 40rem) {
+    .theme-final-cta-btn-primary {
+      width: auto;
+    }
   }
 
-  .theme-btn-primary {
-    background: var(--component-button-bg);
-    color: var(--component-button-fg);
+  .theme-final-cta-btn-primary:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 8px 24px -2px rgba(15, 118, 110, 0.5);
   }
 
-  .theme-btn-secondary {
-    background: var(--semantic-surface);
-    color: var(--semantic-text);
-    border-color: var(--semantic-border);
+  .theme-final-cta-btn-primary .theme-icon {
+    transition: transform 200ms ease;
+  }
+
+  .theme-final-cta-btn-primary:hover .theme-icon {
+    transform: translateX(3px);
+  }
+
+  [dir="rtl"] .theme-final-cta-btn-primary:hover .theme-icon {
+    transform: translateX(-3px);
+  }
+
+  .theme-final-cta-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 3.5rem; /* 56px */
+    padding-inline: 2.25rem;
+    border-radius: var(--primitive-radius-full);
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: var(--primitive-color-white);
+    font-size: 1rem;
+    font-weight: var(--primitive-font-weight-semibold);
+    text-decoration: none;
+    transition: background-color 200ms ease, border-color 200ms ease;
+  }
+
+  @media (min-width: 40rem) {
+    .theme-final-cta-btn-secondary {
+      width: auto;
+    }
+  }
+
+  .theme-final-cta-btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .theme-final-cta-trust-row {
+    margin-block-start: 2.5rem;
+    padding-block-start: 2rem;
+    border-block-start: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.75rem;
+  }
+
+  .theme-final-cta-trust-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem; /* 12px */
+    color: var(--primitive-color-neutral-400);
+  }
+
+  .theme-final-cta-trust-item .theme-icon {
+    color: var(--semantic-brand-soft);
   }
 </style>

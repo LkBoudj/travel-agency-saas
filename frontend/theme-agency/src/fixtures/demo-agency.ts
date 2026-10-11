@@ -10,7 +10,7 @@ export const demoAgencyConfig: StorefrontConfig = {
   themeId: "starter",
   branding: {
     name: "Sahara",
-    logo: null,
+    logo: "/demo/logo.png",
     tagline: "Crafted journeys, unforgettable travel",
     colors: {
       primary: "#0f766e",

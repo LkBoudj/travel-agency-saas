@@ -1,6 +1,20 @@
 import react from "@astrojs/react";
 import cloudflare from "@astrojs/cloudflare";
 import { defineConfig } from "astro/config";
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
+
+if (process.env.THEME_TEST !== "true" && typeof process.loadEnvFile === "function") {
+  const envPath = resolve(process.cwd(), ".env");
+  if (existsSync(envPath)) {
+    try {
+      process.loadEnvFile(envPath);
+    } catch (error) {
+      // Ignore if .env is missing or invalid in restricted environments
+      void error;
+    }
+  }
+}
 
 /**
  * `site` is the canonical origin of the demo storefront: it is the host the
@@ -17,4 +31,8 @@ export default defineConfig({
   site: "https://demo.platform.com",
   adapter: cloudflare(),
   integrations: [react()],
+  devToolbar: {
+    enabled: false,
+  },
 });
+

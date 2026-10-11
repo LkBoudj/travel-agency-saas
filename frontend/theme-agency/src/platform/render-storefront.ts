@@ -5,6 +5,7 @@ import type {
   ThemeSettings,
 } from "../core/contracts.ts";
 import {
+  buildCustomPageModel,
   buildHomePageModel,
   buildTripDetailPageModel,
   buildTripsPageModel,
@@ -18,7 +19,8 @@ import type {
 export type StorefrontPageRequest =
   | { kind: "home" }
   | { kind: "trips" }
-  | { kind: "trip-detail"; slug: string };
+  | { kind: "trip-detail"; slug: string }
+  | { kind: "custom-page"; slug: string };
 
 export interface StorefrontRenderInput {
   dataSource: StorefrontDataSource;
@@ -75,6 +77,11 @@ function buildPageModel(
       return buildTripsPageModel(data);
     case "trip-detail": {
       const model = buildTripDetailPageModel(data, page.slug);
+      if (!model) throw new StorefrontPageNotFoundError(page.slug);
+      return model;
+    }
+    case "custom-page": {
+      const model = buildCustomPageModel(data, page.slug);
       if (!model) throw new StorefrontPageNotFoundError(page.slug);
       return model;
     }

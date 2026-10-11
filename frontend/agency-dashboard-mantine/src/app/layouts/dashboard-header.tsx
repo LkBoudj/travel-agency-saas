@@ -2,18 +2,20 @@
 import {
   IconBell,
   IconChevronDown,
+  IconHelpCircle,
   IconLogout,
   IconSearch,
   IconSwitchHorizontal,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import {
   ActionIcon,
   Avatar,
   Burger,
   Button,
   Group,
-  Indicator,
+  Kbd,
   Menu,
   Stack,
   Text,
@@ -31,6 +33,7 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
   const { data: user } = useCurrentUser();
   const {
     agencyName,
+    agencyCode,
     membershipLabel,
     locale,
     handleSetLocale,
@@ -50,27 +53,45 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
   const initials =
     user?.firstName && user?.lastName
       ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
-      : 'LA';
+      : 'TB';
 
   const roleLabel = membershipLabel || t('shell.agencyOwner');
 
   return (
-    <Group h="100%" px={{ base: 'sm', sm: 'lg' }} justify="space-between" wrap="nowrap">
+    <Group h="100%" px={{ base: 'sm', sm: 'xl' }} justify="space-between" wrap="nowrap">
       <Group gap="sm" wrap="nowrap" style={{ minWidth: 0 }}>
         <Burger onClick={onToggleNav} hiddenFrom="sm" size="sm" aria-label={t('shell.openNav')} />
 
-        {/* Search input per visual target */}
+        {/* Search input per approved visual reference */}
         <TextInput
           leftSection={<IconSearch size={16} stroke={1.5} color="var(--mantine-color-dimmed)" />}
+          rightSection={
+            <Kbd
+              size="xs"
+              styles={{
+                root: {
+                  fontSize: 10,
+                  padding: '2px 5px',
+                  color: '#64748b',
+                  backgroundColor: '#ffffff',
+                  borderColor: '#e2e8f0',
+                },
+              }}
+            >
+              Ctrl K
+            </Kbd>
+          }
+          rightSectionWidth={60}
           placeholder={t('shell.searchPlaceholder')}
           size="sm"
           radius="md"
-          w={{ base: 180, sm: 260, md: 340 }}
+          w={{ base: 180, sm: 280, md: 380 }}
           styles={{
             input: {
-              backgroundColor: 'var(--app-surface-page)',
-              borderColor: 'var(--app-border-subtle)',
+              backgroundColor: '#f8fafc',
+              borderColor: '#e2e8f0',
               fontSize: '13px',
+              height: 36,
             },
           }}
         />
@@ -97,6 +118,30 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
 
       {/* Top right utility area */}
       <Group gap="md" wrap="nowrap" align="center">
+        {/* Help icon linked to agency help route */}
+        <ActionIcon
+          component={Link}
+          to={`/${agencyCode}/help`}
+          variant="subtle"
+          color="gray"
+          size="md"
+          aria-label={t('nav.help')}
+          style={{ color: '#64748b' }}
+        >
+          <IconHelpCircle size={18} stroke={1.5} />
+        </ActionIcon>
+
+        {/* Notifications (no fake count badge) */}
+        <ActionIcon
+          variant="subtle"
+          color="gray"
+          size="md"
+          aria-label={t('shell.notifications')}
+          style={{ color: '#64748b' }}
+        >
+          <IconBell size={18} stroke={1.5} />
+        </ActionIcon>
+
         {/* Language switch EN | عربي */}
         <Group gap={2} align="center" wrap="nowrap">
           <Button
@@ -126,19 +171,6 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
           </Button>
         </Group>
 
-        {/* Notifications */}
-        <Indicator label="3" size={16} offset={4} color="danger" withBorder>
-          <ActionIcon
-            variant="subtle"
-            color="gray"
-            size="md"
-            aria-label={t('shell.notifications')}
-            style={{ color: 'var(--mantine-color-dimmed)' }}
-          >
-            <IconBell size={18} stroke={1.5} />
-          </ActionIcon>
-        </Indicator>
-
         {/* User Account / Avatar Menu */}
         <Menu shadow="md" width={220} position="bottom-end">
           <Menu.Target>
@@ -150,9 +182,9 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
                   color="blue"
                   styles={{
                     placeholder: {
-                      backgroundColor: '#3b82f6',
-                      color: '#ffffff',
-                      fontWeight: 600,
+                      backgroundColor: '#dbeafe',
+                      color: '#1d4ed8',
+                      fontWeight: 700,
                       fontSize: '12px',
                     },
                   }}
@@ -161,7 +193,7 @@ export function DashboardHeader({ onToggleNav }: { onToggleNav: () => void }) {
                 </Avatar>
                 <Stack gap={0} visibleFrom="sm" style={{ textAlign: 'start' }}>
                   <Text size="xs" fw={600} c="var(--app-ink)" lineClamp={1}>
-                    {displayName}
+                    {agencyName || displayName}
                   </Text>
                   <Text size="xs" c="dimmed" lineClamp={1} fz={11}>
                     {roleLabel}

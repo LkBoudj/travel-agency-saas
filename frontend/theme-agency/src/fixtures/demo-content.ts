@@ -17,8 +17,8 @@ export const demoHero: HeroContent = {
   subtitle:
     "Amazing destinations, carefully crafted tours, and unforgettable experiences await you.",
   image: {
-    src: "/demo/hero.jpg",
-    alt: "Santorini at golden hour",
+    src: "/demo/bg.jpg",
+    alt: "A premium travel destination",
   },
   primaryCta: { label: "Explore Tours", href: "/trips" },
   secondaryCta: { label: "View Destinations", href: "#destinations" },

@@ -26,7 +26,7 @@ export function PageHeader({
   h?: TitleProps['order'];
 }) {
   return (
-    <Group justify="space-between" align={actions ? 'center' : 'flex-start'} wrap="wrap" gap="sm">
+    <Group justify="space-between" align="center" wrap="wrap" gap="sm">
       <Stack gap={2}>
         <Title order={h ?? 1}>{title}</Title>
         {subtitle ? (

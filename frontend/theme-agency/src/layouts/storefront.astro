@@ -15,9 +15,13 @@ const Layout = theme.Layout;
 const Page = theme.pages[context.page.kind];
 
 function labPageSegment(page: PageModel): string {
-  return page.kind === "trip-detail"
-    ? `trip-detail/${encodeURIComponent(page.slug)}`
-    : page.kind;
+  if (page.kind === "trip-detail") {
+    return `trip-detail/${encodeURIComponent(page.slug)}`;
+  }
+  if (page.kind === "custom-page") {
+    return `page/${encodeURIComponent(page.slug.replace(/^\/+|\/+$/g, ""))}`;
+  }
+  return page.kind;
 }
 
 const labToken = context.preview ? previewToken : undefined;

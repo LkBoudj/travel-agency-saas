@@ -30,6 +30,7 @@ const PAGE_LABELS: Record<PageKind, string> = {
   home: "Home",
   trips: "Tours",
   "trip-detail": "Tour",
+  "custom-page": "Page",
 };
 
 /** WebPage subtype per page kind. */
@@ -37,6 +38,7 @@ const PAGE_SCHEMA_TYPES: Record<PageKind, string> = {
   home: "WebPage",
   trips: "CollectionPage",
   "trip-detail": "ItemPage",
+  "custom-page": "WebPage",
 };
 
 export type SeoContext = Pick<
@@ -185,6 +187,17 @@ function buildPageSeo(
         image: tour.image,
         tours: [tour],
         tour,
+      };
+    }
+    case "custom-page": {
+      const { title, content } = page.content;
+      return {
+        title: joinTitle(title, branding.name),
+        description: clampText(content, SEO_DESCRIPTION_MAX_LENGTH),
+        path: `/${page.slug.replace(/^\/+/, "")}`,
+        image: undefined,
+        tours: [],
+        tour: undefined,
       };
     }
   }

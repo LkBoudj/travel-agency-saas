@@ -79,6 +79,20 @@ describe('DashboardSidebar navigation', () => {
   });
 
   test('filters out items the member cannot open', () => {
+    can.mockImplementation((permission) => permission !== 'AGENCY_PAYMENT_VIEW');
+    renderSidebar();
+
+    const links = within(nav())
+      .getAllByRole('link')
+      .map((link) => link.textContent?.trim());
+
+    expect(links).not.toContain('Payments');
+    expect(links).toContain('Bookings');
+    expect(links).toContain('Overview');
+    expect(links).toContain('Customers');
+  });
+
+  test('filters out bookings when member lacks AGENCY_BOOKING_VIEW', () => {
     can.mockImplementation((permission) => permission !== 'AGENCY_BOOKING_VIEW');
     renderSidebar();
 
@@ -87,7 +101,7 @@ describe('DashboardSidebar navigation', () => {
       .map((link) => link.textContent?.trim());
 
     expect(links).not.toContain('Bookings');
-    expect(links).not.toContain('Payments');
+    expect(links).toContain('Payments');
     expect(links).toContain('Overview');
     expect(links).toContain('Customers');
   });
@@ -132,5 +146,21 @@ describe('DashboardSidebar navigation', () => {
       .getAllByRole('link')
       .map((link) => link.getAttribute('href'));
     expect(hrefs.every((href) => href?.startsWith('/AGY-TEST/'))).toBe(true);
+  });
+
+  test('marks Themes active on the themes route', () => {
+    renderSidebar('/AGY-TEST/themes');
+
+    expect(within(nav()).getByRole('link', { name: 'Themes' })).toHaveAttribute(
+      'data-active',
+      'true'
+    );
+  });
+
+  test('filters out Website/Themes when member lacks AGENCY_WEBSITE_VIEW', () => {
+    can.mockImplementation((permission) => permission !== 'AGENCY_WEBSITE_VIEW');
+    renderSidebar();
+
+    expect(screen.queryByText('Themes')).not.toBeInTheDocument();
   });
 });

@@ -11,6 +11,7 @@ export function DashboardLayout() {
 
   return (
     <AppShell
+      layout="alt"
       header={{ height: 'var(--app-header-height)' }}
       navbar={{
         width: { base: 'var(--app-rail-width)' },
@@ -18,6 +19,7 @@ export function DashboardLayout() {
         collapsed: { mobile: !navOpened },
       }}
       padding="0"
+      offsetScrollbars={false}
     >
       {/* First focusable thing in the document, so a keyboard user can bypass the
           header and the eight nav links on every page. Off-screen rather than

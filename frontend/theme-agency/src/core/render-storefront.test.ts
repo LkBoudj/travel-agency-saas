@@ -187,3 +187,60 @@ test("renderStorefront honours an explicit direction override over the locale", 
   assert.equal(result.context.dir, "rtl");
   assert.equal(result.context.locale, "en");
 });
+
+test("renderStorefront resolves a custom page with title, content and slug", async () => {
+  const config = await fixtureConfig();
+  const baseSource = createDataSource(config);
+  const dataSource: StorefrontDataSource = {
+    ...baseSource,
+    async published(tenantSlug) {
+      const data = await baseSource.published(tenantSlug);
+      return {
+        ...data,
+        pages: [
+          {
+            id: "about-page",
+            title: "About Our Agency",
+            slug: "/about-us",
+            content: "We specialize in personalized Algerian desert expeditions.",
+          },
+        ],
+      };
+    },
+  };
+
+  const result = await renderStorefront({
+    dataSource,
+    registry,
+    tenantSlug: "demo",
+    page: { kind: "custom-page", slug: "/about-us" },
+  });
+
+  assert.equal(result.context.page.kind, "custom-page");
+  assert.equal(result.context.page.slug, "/about-us");
+  assert.equal(result.context.page.content.title, "About Our Agency");
+  assert.equal(
+    result.context.page.content.content,
+    "We specialize in personalized Algerian desert expeditions.",
+  );
+});
+
+test("renderStorefront rejects an unknown custom page slug with StorefrontPageNotFoundError", async () => {
+  const config = await fixtureConfig();
+  const dataSource = createDataSource(config);
+
+  await assert.rejects(
+    () =>
+      renderStorefront({
+        dataSource,
+        registry,
+        tenantSlug: "demo",
+        page: { kind: "custom-page", slug: "/non-existent" },
+      }),
+    (error: unknown) => {
+      assert(error instanceof StorefrontPageNotFoundError);
+      assert.equal(error.slug, "/non-existent");
+      return true;
+    },
+  );
+});

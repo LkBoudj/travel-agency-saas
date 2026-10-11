@@ -11,87 +11,110 @@ interface Props {
 
 const { context, settings } = Astro.props as Props;
 const trustPoints = context.page.kind === "home" ? context.page.content.trustPoints : [];
-const show = booleanSetting(settings, "homepage.showWhyUs", true);
+const show = booleanSetting(settings, "homepage.showWhyChooseUs", true) &&
+  booleanSetting(settings, "homepage.showWhyUs", true);
 ---
 
 {
   show && trustPoints.length > 0 && (
     <Section
       id="why-us"
-      eyebrow="Why choose us"
-      title="Travel with confidence"
+      eyebrow="Why Choose Us"
+      title={"Travel with confidence,\nfrom planning to return."}
       description="We make every journey simpler, safer, and more personal."
-      headingId="why-us-heading"
+      headingId="why-choose-us-heading"
+      variant="default"
     >
-      <ul class="theme-why-grid">
-        {
-          trustPoints.map((point) => (
-            <li class="theme-why-card">
-              <span class="theme-why-icon">
-                <Icon name={point.icon} size={22} />
-              </span>
-              <h3 class="theme-why-title">{point.title}</h3>
-              <p class="theme-why-description">{point.description}</p>
-            </li>
-          ))
-        }
-      </ul>
+      <div class="theme-why-container">
+        <div class="theme-why-grid">
+          {
+            trustPoints.map((point) => (
+              <article class="theme-why-card">
+                <span class="theme-why-icon-bubble">
+                  <Icon name={point.icon} size={26} strokeWidth={1.8} />
+                </span>
+                <h3 class="theme-why-title">{point.title}</h3>
+                <p class="theme-why-description">{point.description}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
     </Section>
   )
 }
 
 <style is:global>
+  .theme-why-container {
+    max-width: 80rem; /* 1280px */
+    margin-inline: auto;
+  }
+
   .theme-why-grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
     display: grid;
-    gap: 1.25rem;
     grid-template-columns: 1fr;
-  }
-
-  .theme-why-card {
-    display: grid;
-    gap: 0.5rem;
-    padding: 1.5rem;
-    background: var(--component-card-bg);
-    border: 1px solid var(--component-card-border);
-    border-radius: var(--primitive-radius-lg);
-  }
-
-  .theme-why-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    inline-size: 2.75rem;
-    block-size: 2.75rem;
-    border-radius: var(--primitive-radius-md);
-    background: var(--semantic-brand-soft);
-    color: var(--semantic-brand);
-  }
-
-  .theme-why-title {
-    margin: 0;
-    font-size: var(--primitive-font-size-lg);
-    font-weight: var(--primitive-font-weight-semibold);
-    color: var(--semantic-text);
-  }
-
-  .theme-why-description {
-    margin: 0;
-    color: var(--semantic-text-muted);
-    font-size: var(--primitive-font-size-sm);
+    gap: 1.25rem;
   }
 
   @media (min-width: 40rem) {
     .theme-why-grid {
       grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem;
     }
   }
 
   @media (min-width: 64rem) {
     .theme-why-grid {
       grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
     }
+  }
+
+  .theme-why-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    padding: 2.5rem 1.5rem;
+    background: var(--primitive-color-white);
+    border: 1px solid var(--semantic-border);
+    border-radius: 1.25rem; /* 20px */
+    transition: box-shadow 300ms ease, border-color 300ms ease, transform 200ms ease;
+  }
+
+  .theme-why-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--primitive-color-neutral-300);
+    box-shadow: 0 16px 32px -22px rgba(15, 23, 42, 0.16);
+  }
+
+  .theme-why-icon-bubble {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 3.5rem; /* 56px */
+    block-size: 3.5rem; /* 56px */
+    border-radius: 0.875rem; /* 14px */
+    background: var(--semantic-brand-soft);
+    color: var(--semantic-brand);
+    flex-shrink: 0;
+  }
+
+  .theme-why-title {
+    margin: 1.25rem 0 0 0;
+    font-size: 1.3125rem; /* 21px */
+    font-weight: var(--primitive-font-weight-semibold);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--semantic-text);
+  }
+
+  .theme-why-description {
+    margin: 0.625rem 0 0 0;
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.6;
+    color: var(--semantic-text-muted);
+    max-width: 14rem;
   }
 </style>

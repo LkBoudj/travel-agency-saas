@@ -1,5 +1,6 @@
 ---
 import type { RenderContext } from "@theme-agency/sdk";
+import Icon from "./Icon.astro";
 
 interface Props {
   context: RenderContext;
@@ -7,50 +8,190 @@ interface Props {
 
 const { context } = Astro.props as Props;
 const nav = context.navigation;
+const tripsHref = context.paths.trips;
+const isHome = context.page.kind === "home";
+const agencyName = context.branding.name;
+const logoSrc = context.branding.logo;
 ---
 
-<header class="site-header">
+<header
+  class={`site-header ${!isHome ? "site-header--always-scrolled" : ""}`}
+  id="site-header"
+>
   <div class="site-header-inner">
-    <a class="site-header-brand" href={context.paths.home} aria-label={context.branding.name}>
-      {context.branding.logo ? (
-        <img src={context.branding.logo} alt={context.branding.name} class="site-header-logo" />
+    <a
+      class="site-header-brand"
+      href={context.paths.home}
+      aria-label={`${agencyName} — Home`}
+    >
+      {logoSrc ? (
+        <img
+          src={logoSrc}
+          alt={agencyName}
+          class="site-header-logo"
+          loading="eager"
+        />
       ) : (
-        <span class="site-header-wordmark">{context.branding.name}</span>
+        <div class="site-header-brand-wrap">
+          <span class="site-header-avatar" aria-hidden="true">
+            {agencyName.slice(0, 1)}
+          </span>
+          <span class="site-header-wordmark">{agencyName}</span>
+        </div>
       )}
     </a>
-    {
-      nav.length > 0 && (
-        <nav class="site-header-nav" aria-label="Primary">
-          <ul class="site-header-list">
-            {
-              nav.map((link) => (
-                <li>
-                  <a href={link.href} class="site-header-link">{link.label}</a>
-                </li>
-              ))
-            }
-          </ul>
-        </nav>
-      )
-    }
+
+    {nav.length > 0 && (
+      <nav class="site-header-nav" aria-label="Main">
+        <ul class="site-header-list">
+          {nav.map((link) => (
+            <li>
+              <a href={link.href} class="site-header-link">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
+
+    <div class="site-header-actions">
+      <a href={tripsHref} class="site-header-cta">
+        <span>Explore Tours</span>
+        <Icon name="arrow" size={18} strokeWidth={2.2} />
+      </a>
+
+      <button
+        type="button"
+        class="site-header-menu-btn"
+        aria-expanded="false"
+        aria-controls="mobile-nav-menu"
+        aria-label="Toggle navigation menu"
+      >
+        <span class="site-header-icon-menu">
+          <Icon name="menu" size={24} strokeWidth={2} />
+        </span>
+        <span class="site-header-icon-close">
+          <Icon name="close" size={24} strokeWidth={2} />
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <div id="mobile-nav-menu" class="site-header-drawer" inert>
+    <nav aria-label="Mobile navigation" class="site-header-drawer-nav">
+      <ul class="site-header-drawer-list">
+        {nav.map((link) => (
+          <li class="site-header-drawer-item">
+            <a href={link.href} class="site-header-drawer-link">
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <a href={tripsHref} class="site-header-drawer-cta">
+        <span>Explore Tours</span>
+      </a>
+    </nav>
   </div>
 </header>
+
+<script is:inline>
+  (function () {
+    function initHeader() {
+      var header = document.getElementById("site-header");
+      if (!header) return;
+      var isAlways = header.classList.contains("site-header--always-scrolled");
+
+      function updateScroll() {
+        if (isAlways || window.scrollY > 32) {
+          header.classList.add("site-header--scrolled");
+        } else {
+          header.classList.remove("site-header--scrolled");
+        }
+      }
+
+      window.addEventListener("scroll", updateScroll, { passive: true });
+      updateScroll();
+
+      var btn = header.querySelector(".site-header-menu-btn");
+      var drawer = document.getElementById("mobile-nav-menu");
+      if (!btn || !drawer) return;
+
+      function closeMenu() {
+        btn.setAttribute("aria-expanded", "false");
+        drawer.classList.remove("is-open");
+        drawer.setAttribute("inert", "");
+        document.body.style.overflow = "";
+      }
+
+      function openMenu() {
+        btn.setAttribute("aria-expanded", "true");
+        drawer.classList.add("is-open");
+        drawer.removeAttribute("inert");
+        document.body.style.overflow = "hidden";
+      }
+
+      btn.addEventListener("click", function () {
+        var isOpen = btn.getAttribute("aria-expanded") === "true";
+        if (isOpen) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      var drawerLinks = drawer.querySelectorAll("a");
+      for (var i = 0; i < drawerLinks.length; i++) {
+        drawerLinks[i].addEventListener("click", closeMenu);
+      }
+
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && btn.getAttribute("aria-expanded") === "true") {
+          closeMenu();
+          btn.focus();
+        }
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initHeader);
+    } else {
+      initHeader();
+    }
+  })();
+</script>
 
 <style is:global>
   :root {
     --site-header-height: 4rem;
   }
 
+  @media (min-width: 64rem) {
+    :root {
+      --site-header-height: 6rem;
+    }
+  }
+
   .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    background: var(--component-header-bg);
-    border-block-end: 1px solid var(--component-header-border);
+    position: fixed;
+    inset-inline: 0;
+    inset-block-start: 0;
+    z-index: 50;
+    background: transparent;
+    transition: background-color 400ms ease, box-shadow 400ms ease, backdrop-filter 400ms ease;
+  }
+
+  .site-header--scrolled,
+  .site-header--always-scrolled {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
   }
 
   .site-header-inner {
-    max-width: 80rem;
+    max-width: 90rem; /* 1440px */
     margin-inline: auto;
     padding-inline: 1.25rem;
     height: var(--site-header-height);
@@ -60,27 +201,91 @@ const nav = context.navigation;
     gap: 1rem;
   }
 
+  @media (min-width: 40rem) {
+    .site-header-inner {
+      padding-inline: 2rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .site-header-inner {
+      padding-inline: 2.5rem;
+    }
+  }
+
   .site-header-brand {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-weight: var(--primitive-font-weight-semibold);
-    letter-spacing: 0.01em;
-    color: var(--component-header-link);
+    gap: 0.75rem;
     text-decoration: none;
-    font-size: var(--primitive-font-size-lg);
+    flex-shrink: 0;
+    border-radius: var(--primitive-radius-md);
+  }
+
+  .site-header-brand-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .site-header-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: var(--primitive-radius-full);
+    background: var(--semantic-brand);
+    color: var(--primitive-color-white);
+    font-size: 1rem;
+    font-weight: var(--primitive-font-weight-bold);
+    flex-shrink: 0;
+  }
+
+  @media (min-width: 64rem) {
+    .site-header-avatar {
+      inline-size: 2.75rem;
+      block-size: 2.75rem;
+    }
+  }
+
+  .site-header-wordmark {
+    font-size: 1.1875rem;
+    font-weight: var(--primitive-font-weight-semibold);
+    letter-spacing: -0.015em;
+    color: var(--primitive-color-white);
+    transition: color 400ms ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 15rem;
+  }
+
+  .site-header--scrolled .site-header-wordmark,
+  .site-header--always-scrolled .site-header-wordmark {
+    color: var(--semantic-text);
   }
 
   .site-header-logo {
-    max-height: 2.25rem;
+    height: 2.75rem;
     width: auto;
-    height: auto;
+    object-fit: contain;
+  }
+
+  @media (min-width: 64rem) {
+    .site-header-logo {
+      height: 3.5rem;
+    }
   }
 
   .site-header-nav {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .site-header-nav {
+      display: block;
+    }
   }
 
   .site-header-list {
@@ -88,28 +293,185 @@ const nav = context.navigation;
     margin: 0;
     padding: 0;
     display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
     align-items: center;
+    gap: 2.5rem;
   }
 
   .site-header-link {
-    display: inline-block;
-    padding: 0.5rem 0.75rem;
-    border-radius: var(--primitive-radius-sm);
-    color: var(--component-header-link);
-    text-decoration: none;
-    font-size: var(--primitive-font-size-sm);
+    font-size: 1rem; /* 16px */
     font-weight: var(--primitive-font-weight-medium);
+    letter-spacing: 0.01em;
+    color: rgba(255, 255, 255, 0.9);
+    transition: color 300ms ease;
+    text-decoration: none;
   }
 
   .site-header-link:hover {
-    background: var(--semantic-surface-muted);
+    color: var(--primitive-color-white);
   }
 
-  @media (min-width: 40rem) {
-    .site-header-link {
-      padding-inline: 1rem;
+  .site-header--scrolled .site-header-link,
+  .site-header--always-scrolled .site-header-link {
+    color: var(--primitive-color-neutral-700);
+  }
+
+  .site-header--scrolled .site-header-link:hover,
+  .site-header--always-scrolled .site-header-link:hover {
+    color: var(--semantic-text);
+  }
+
+  .site-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .site-header-cta {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .site-header-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.625rem;
+      height: 3.375rem; /* 54px */
+      padding-inline: 2rem;
+      border-radius: var(--primitive-radius-full);
+      background: var(--semantic-brand);
+      color: var(--primitive-color-white);
+      font-size: 1rem;
+      font-weight: var(--primitive-font-weight-semibold);
+      text-decoration: none;
+      box-shadow: 0 4px 14px -2px rgba(15, 118, 110, 0.35);
+      transition: transform 250ms ease, box-shadow 250ms ease, filter 200ms ease;
     }
+
+    .site-header-cta:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.06);
+      box-shadow: 0 6px 20px -2px rgba(15, 118, 110, 0.45);
+    }
+
+    .site-header-cta .theme-icon {
+      transition: transform 200ms ease;
+    }
+
+    .site-header-cta:hover .theme-icon {
+      transform: translateX(3px);
+    }
+
+    [dir="rtl"] .site-header-cta:hover .theme-icon {
+      transform: translateX(-3px);
+    }
+  }
+
+  .site-header-menu-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2.75rem;
+    block-size: 2.75rem;
+    border: none;
+    background: transparent;
+    color: var(--primitive-color-white);
+    cursor: pointer;
+    border-radius: var(--primitive-radius-md);
+    transition: color 300ms ease, transform 200ms ease;
+  }
+
+  @media (min-width: 64rem) {
+    .site-header-menu-btn {
+      display: none;
+    }
+  }
+
+  .site-header--scrolled .site-header-menu-btn,
+  .site-header--always-scrolled .site-header-menu-btn {
+    color: var(--semantic-text);
+  }
+
+  .site-header-icon-close {
+    display: none;
+  }
+
+  .site-header-menu-btn[aria-expanded="true"] .site-header-icon-menu {
+    display: none;
+  }
+
+  .site-header-menu-btn[aria-expanded="true"] .site-header-icon-close {
+    display: inline-flex;
+  }
+
+  /* Mobile Drawer */
+  .site-header-drawer {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 400ms ease-in-out, opacity 350ms ease-in-out;
+    background: var(--semantic-surface);
+    border-block-start: 1px solid var(--semantic-border-subtle);
+  }
+
+  .site-header-drawer.is-open {
+    max-height: 80vh;
+    opacity: 1;
+  }
+
+  @media (min-width: 64rem) {
+    .site-header-drawer {
+      display: none !important;
+    }
+  }
+
+  .site-header-drawer-nav {
+    padding-inline: 1.5rem;
+    padding-block: 1rem 2.5rem;
+  }
+
+  .site-header-drawer-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .site-header-drawer-item {
+    border-block-end: 1px solid var(--semantic-border-subtle);
+  }
+
+  .site-header-drawer-item:last-child {
+    border-block-end: none;
+  }
+
+  .site-header-drawer-link {
+    display: flex;
+    align-items: center;
+    height: 3.5rem;
+    font-size: 1rem;
+    font-weight: var(--primitive-font-weight-medium);
+    color: var(--semantic-text);
+    text-decoration: none;
+    transition: color 150ms ease;
+  }
+
+  .site-header-drawer-link:hover {
+    color: var(--semantic-brand);
+  }
+
+  .site-header-drawer-cta {
+    margin-block-start: 1.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 3rem;
+    border-radius: var(--primitive-radius-full);
+    background: var(--semantic-brand);
+    color: var(--primitive-color-white);
+    font-size: 1rem;
+    font-weight: var(--primitive-font-weight-semibold);
+    text-decoration: none;
+    box-shadow: 0 4px 14px -2px rgba(15, 118, 110, 0.3);
   }
 </style>

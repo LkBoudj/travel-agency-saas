@@ -1,136 +1,412 @@
 ---
 import type { RenderContext } from "@theme-agency/sdk";
+import Icon from "./Icon.astro";
 
 interface Props {
   context: RenderContext;
 }
 
 const { context } = Astro.props as Props;
+const agencyName = context.branding.name;
+const logoSrc = context.branding.logo;
+const currentYear = new Date().getFullYear();
+
+// Standard contact items with icons matching approved storefront
+const contactItems = [
+  { id: "phone", icon: "phone", label: "+1 (555) 013-0000", href: "tel:+15550130000" },
+  { id: "email", icon: "mail", label: "hello@saharatravel.example", href: "mailto:hello@saharatravel.example" },
+  { id: "location", icon: "map-pin", label: "12 Marina Walk, Old Town, Greece", href: null },
+  { id: "whatsapp", icon: "message-circle", label: "WhatsApp Concierge", href: "https://wa.me/15550130000" },
+];
+
+const socialLinks = [
+  { id: "instagram", label: "Instagram", href: "https://instagram.com" },
+  { id: "facebook", label: "Facebook", href: "https://facebook.com" },
+  { id: "linkedin", label: "LinkedIn", href: "https://linkedin.com" },
+];
 ---
 
 <footer class="site-footer">
   <div class="site-footer-inner">
-    <div class="site-footer-top">
-      <div class="site-footer-brand">
-        <span class="site-footer-name">{context.branding.name}</span>
-        {context.footer.description && (
-          <p class="site-footer-description">{context.footer.description}</p>
-        )}
-      </div>
-      <div class="site-footer-columns">
-        {
-          context.footer.columns.map((column) => (
-            <div class="site-footer-column">
-              <h3 class="site-footer-heading">{column.title}</h3>
-              <ul class="site-footer-list">
-                {column.links.map((link) => (
-                  <li>
-                    <a href={link.href} class="site-footer-link">{link.label}</a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-    {
-      context.footer.legal && context.footer.legal.length > 0 && (
-        <div class="site-footer-legal">
+    <div class="site-footer-grid">
+      <!-- Brand Column (5 cols on desktop) -->
+      <div class="site-footer-brand-col">
+        <a href={context.paths.home} class="site-footer-brand-link" aria-label={`${agencyName} — Home`}>
           {
-            context.footer.legal.map((link) => (
-              <a href={link.href} class="site-footer-link">{link.label}</a>
+            logoSrc ? (
+              <img src={logoSrc} alt={agencyName} class="site-footer-logo" />
+            ) : (
+              <span class="site-footer-brand-name">{agencyName}</span>
+            )
+          }
+        </a>
+
+        {
+          context.footer.description && (
+            <p class="site-footer-description">{context.footer.description}</p>
+          )
+        }
+
+        <nav aria-label="Social media" class="site-footer-social">
+          {
+            socialLinks.map((social) => (
+              <a
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="site-footer-social-pill"
+                aria-label={social.label}
+              >
+                <span>{social.label}</span>
+              </a>
             ))
           }
-        </div>
-      )
-    }
+        </nav>
+      </div>
+
+      <!-- Navigation Columns (Explore + Company) -->
+      {
+        context.footer.columns.map((column) => (
+          <nav aria-label={column.title} class="site-footer-nav-col">
+            <h3 class="site-footer-heading">{column.title}</h3>
+            <ul class="site-footer-link-list">
+              {column.links.map((link) => (
+                <li>
+                  <a href={link.href} class="site-footer-link">
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))
+      }
+
+      <!-- Contact Column (3 cols on desktop) -->
+      <div class="site-footer-contact-col">
+        <h3 class="site-footer-heading">Contact</h3>
+        <ul class="site-footer-contact-list">
+          {
+            contactItems.map((item) => (
+              <li class="site-footer-contact-item">
+                <Icon name={item.icon} size={18} strokeWidth={1.8} class="site-footer-contact-icon" />
+                {
+                  item.href ? (
+                    <a href={item.href} class="site-footer-contact-link">
+                      {item.label}
+                    </a>
+                  ) : (
+                    <span class="site-footer-contact-text">{item.label}</span>
+                  )
+                }
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="site-footer-bottom">
+      <p class="site-footer-copyright">
+        &copy; {currentYear} {agencyName}. All rights reserved.
+      </p>
+
+      <nav aria-label="Legal" class="site-footer-legal">
+        <ul class="site-footer-legal-list">
+          {
+            context.footer.legal && context.footer.legal.length > 0 ? (
+              context.footer.legal.map((link) => (
+                <li>
+                  <a href={link.href} class="site-footer-legal-link">
+                    {link.label}
+                  </a>
+                </li>
+              ))
+            ) : (
+              <>
+                <li>
+                  <a href="/privacy" class="site-footer-legal-link">
+                    Privacy Policy
+                  </a>
+                </li>
+                <li>
+                  <a href="/terms" class="site-footer-legal-link">
+                    Terms of Service
+                  </a>
+                </li>
+              </>
+            )
+          }
+        </ul>
+      </nav>
+    </div>
   </div>
 </footer>
 
 <style is:global>
   .site-footer {
-    background: var(--component-footer-bg);
-    color: var(--component-footer-text);
-    border-block-start: 1px solid var(--component-header-border);
+    background: var(--semantic-surface-dark);
+    color: var(--primitive-color-white);
   }
 
   .site-footer-inner {
-    max-width: 80rem;
+    max-width: 90rem; /* 1440px */
     margin-inline: auto;
-    padding-block: 2.5rem 1.75rem;
     padding-inline: 1.25rem;
-  }
-
-  .site-footer-top {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: 1fr;
-  }
-
-  .site-footer-brand {
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .site-footer-name {
-    font-weight: var(--primitive-font-weight-semibold);
-    color: var(--semantic-text);
-    font-size: var(--primitive-font-size-lg);
-  }
-
-  .site-footer-description {
-    margin: 0;
-    color: inherit;
-    max-width: 24rem;
-  }
-
-  .site-footer-columns {
-    display: grid;
-    gap: 1.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
-  }
-
-  .site-footer-heading {
-    margin: 0 0 0.75rem;
-    font-size: var(--primitive-font-size-sm);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--semantic-text);
-  }
-
-  .site-footer-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 0.5rem;
-  }
-
-  .site-footer-link {
-    color: inherit;
-    text-decoration: none;
-    font-size: var(--primitive-font-size-sm);
-  }
-
-  .site-footer-link:hover {
-    color: var(--semantic-brand);
-    text-decoration: underline;
-  }
-
-  .site-footer-legal {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    margin-block-start: 1.5rem;
-    padding-block-start: 1.25rem;
-    border-block-start: 1px solid var(--semantic-border);
-    font-size: var(--primitive-font-size-sm);
+    padding-block-start: 5rem;
+    padding-block-end: 3.5rem;
   }
 
   @media (min-width: 40rem) {
-    .site-footer-top {
-      grid-template-columns: 1.4fr 1fr;
+    .site-footer-inner {
+      padding-inline: 2rem;
     }
+  }
+
+  @media (min-width: 64rem) {
+    .site-footer-inner {
+      padding-inline: 2.5rem;
+      padding-block-start: 6rem;
+      padding-block-end: 4.5rem;
+    }
+  }
+
+  .site-footer-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  @media (min-width: 40rem) {
+    .site-footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 2rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .site-footer-grid {
+      grid-template-columns: repeat(12, 1fr);
+      column-gap: 2rem;
+    }
+  }
+
+  .site-footer-brand-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 40rem) {
+    .site-footer-brand-col {
+      grid-column: span 2;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .site-footer-brand-col {
+      grid-column: span 5;
+    }
+  }
+
+  .site-footer-brand-link {
+    display: inline-block;
+    width: fit-content;
+  }
+
+  .site-footer-brand-name {
+    font-size: 1.5rem; /* 24px */
+    font-weight: var(--primitive-font-weight-bold);
+    letter-spacing: -0.015em;
+    color: var(--primitive-color-white);
+  }
+
+  .site-footer-logo {
+    height: 2.75rem;
+    width: auto;
+    object-fit: contain;
+  }
+
+  @media (min-width: 64rem) {
+    .site-footer-logo {
+      height: 3rem;
+    }
+  }
+
+  .site-footer-description {
+    margin: 1.5rem 0 0 0;
+    max-width: 21.25rem; /* 340px */
+    font-size: 0.9375rem; /* 15px */
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  .site-footer-social {
+    margin-block-start: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .site-footer-social-pill {
+    display: inline-flex;
+    align-items: center;
+    height: 2.75rem; /* 44px */
+    padding-inline: 1rem;
+    border-radius: var(--primitive-radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.06);
+    font-size: 0.8125rem; /* 13px */
+    font-weight: var(--primitive-font-weight-medium);
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+  }
+
+  .site-footer-social-pill:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--primitive-color-white);
+  }
+
+  /* Nav Columns */
+  .site-footer-nav-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 64rem) {
+    .site-footer-nav-col {
+      grid-column: span 2;
+    }
+  }
+
+  .site-footer-heading {
+    margin: 0;
+    font-size: 0.8125rem; /* 13px */
+    font-weight: var(--primitive-font-weight-semibold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--primitive-color-white);
+  }
+
+  .site-footer-link-list {
+    list-style: none;
+    margin: 1.5rem 0 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+  }
+
+  .site-footer-link {
+    font-size: 0.90625rem; /* 14.5px */
+    font-weight: var(--primitive-font-weight-normal);
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .site-footer-link:hover {
+    color: var(--primitive-color-white);
+  }
+
+  /* Contact Column */
+  .site-footer-contact-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 40rem) {
+    .site-footer-contact-col {
+      grid-column: span 2;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .site-footer-contact-col {
+      grid-column: span 3;
+    }
+  }
+
+  .site-footer-contact-list {
+    list-style: none;
+    margin: 1.5rem 0 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .site-footer-contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .site-footer-contact-icon {
+    color: rgba(255, 255, 255, 0.6);
+    flex-shrink: 0;
+    margin-block-start: 0.125rem;
+  }
+
+  .site-footer-contact-link,
+  .site-footer-contact-text {
+    font-size: 0.90625rem; /* 14.5px */
+    line-height: 1.5;
+    color: rgba(255, 255, 255, 0.75);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .site-footer-contact-link:hover {
+    color: var(--primitive-color-white);
+  }
+
+  /* Bottom Bar */
+  .site-footer-bottom {
+    margin-block-start: 4rem;
+    padding-block-start: 1.75rem;
+    border-block-start: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+  }
+
+  @media (min-width: 48rem) {
+    .site-footer-bottom {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: start;
+    }
+  }
+
+  .site-footer-copyright {
+    margin: 0;
+    font-size: 0.8125rem; /* 13px */
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .site-footer-legal-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .site-footer-legal-link {
+    font-size: 0.8125rem; /* 13px */
+    color: rgba(255, 255, 255, 0.6);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .site-footer-legal-link:hover {
+    color: var(--primitive-color-white);
   }
 </style>

@@ -44,6 +44,20 @@ function controller(overrides: Partial<ThemesPageController> = {}) {
     saveCustomization: vi.fn(),
     openPreview: vi.fn(),
     publishWebsite: vi.fn(),
+    viewWebsite: {
+      mode: 'live',
+      url: 'https://example.com',
+      servesAnotherTenant: false,
+      devTenantSlug: null,
+      isOpening: false,
+      open: vi.fn(),
+    },
+    customizeOpen: false,
+    customizeTheme: null,
+    customizeSettings: {},
+    setCustomizeSettings: vi.fn(),
+    openCustomize: vi.fn(),
+    closeCustomize: vi.fn(),
     ...overrides,
   };
   useThemesPage.mockReturnValue(value);
@@ -141,9 +155,24 @@ describe('ThemesPage', () => {
     expect(document.body.textContent).not.toMatch(/themes\.[a-z]/);
     expect(document.body.textContent).not.toMatch(/settings\.[a-z]/);
   });
+
+  test('displays pending publish alert and enables publish when draft differs from live', () => {
+    const publishWebsite = vi.fn();
+    controller({
+      publishState: 'pending-publish',
+      liveTheme: 'starter',
+      canPublish: true,
+      publishWebsite,
+    });
+    render(<ThemesPage />);
+    expect(screen.getByRole('status')).toBeInTheDocument();
+    const publishBtn = screen.getByRole('button', { name: /Publish|نشر/ });
+    expect(publishBtn).toBeInTheDocument();
+  });
 });
 
 async function userOpenCustomize() {
   const { default: userEvent } = await import('@testing-library/user-event');
-  await userEvent.setup().click(screen.getByRole('button', { name: /Customize|تخصيص/ }));
+  const buttons = screen.getAllByRole('button', { name: /Customize|تخصيص/ });
+  await userEvent.setup().click(buttons[0]);
 }

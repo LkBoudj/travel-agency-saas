@@ -79,6 +79,7 @@ export function buildTestTheme(options: TestThemeOptions = {}): ThemeDefinition 
       home: dummyComponent,
       trips: dummyComponent,
       "trip-detail": dummyComponent,
+      "custom-page": dummyComponent,
     },
     sections: [],
     settings: { schema: settingsSchema, defaults: settingsDefaults },

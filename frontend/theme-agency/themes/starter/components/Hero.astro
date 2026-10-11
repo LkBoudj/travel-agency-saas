@@ -12,180 +12,620 @@ const content = context.page.kind === "home" ? context.page.content.hero : null;
 if (!content) {
   throw new Error(`[starter] hero section requires a home page model (got ${context.page.kind})`);
 }
+
+const primaryCta = content.primaryCta ?? {
+  label: "Explore Tours",
+  href: context.paths.trips,
+};
+const secondaryCta = content.secondaryCta ?? {
+  label: "View Destinations",
+  href: "#destinations",
+};
+
+const trustItems =
+  content.trustItems && content.trustItems.length > 0
+    ? content.trustItems
+    : [
+        { icon: "shield", label: "Trusted Travel Agency" },
+        { icon: "star", label: "Handpicked Destinations" },
+        { icon: "lock", label: "Secure Booking" },
+      ];
+
+// Get unique destinations from tours for the search dropdown
+const availableDestinations =
+  context.page.kind === "home"
+    ? Array.from(
+        new Set(
+          context.page.content.tours.flatMap((t) => t.destinations ?? []),
+        ),
+      )
+    : [];
+
+const heroImageSrc = content.image?.src || "/demo/bg.jpg";
+const heroImageAlt = content.image?.alt || content.title;
 ---
 
-<section class="theme-hero">
-  <div class="theme-hero-inner">
-    <div class="theme-hero-body">
-      {content.eyebrow && <p class="theme-hero-eyebrow">{content.eyebrow}</p>}
-      <h1 class="theme-hero-title">{content.title}</h1>
-      {content.subtitle && <p class="theme-hero-subtitle">{content.subtitle}</p>}
-      {
-        (content.primaryCta || content.secondaryCta) && (
-          <div class="theme-hero-actions">
-            {content.primaryCta && (
-              <a href={content.primaryCta.href} class="theme-btn theme-btn-primary">
-                {content.primaryCta.label}
-              </a>
-            )}
-            {content.secondaryCta && (
-              <a href={content.secondaryCta.href} class="theme-btn theme-btn-secondary">
-                {content.secondaryCta.label}
-              </a>
-            )}
-          </div>
-        )
-      }
-      {
-        content.trustItems && content.trustItems.length > 0 && (
-          <ul class="theme-hero-trust">
-            {
-              content.trustItems.map((item) => (
-                <li class="theme-hero-trust-item">
-                  <Icon name={item.icon} size={18} />
-                  <span>{item.label}</span>
-                </li>
-              ))
-            }
-          </ul>
-        )
-      }
+<section class="theme-hero" aria-label="Hero">
+  <div class="theme-hero-media" aria-hidden="true">
+    <img
+      src={heroImageSrc}
+      alt={heroImageAlt}
+      class="theme-hero-bg-img"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="theme-hero-overlay"></div>
+  </div>
+
+  <div class="theme-hero-container">
+    <div class="theme-hero-content">
+      {content.eyebrow && (
+        <p class="theme-hero-eyebrow">{content.eyebrow}</p>
+      )}
+
+      <h1 class="theme-hero-title">
+        {content.title}
+      </h1>
+
+      {content.subtitle && (
+        <p class="theme-hero-description">{content.subtitle}</p>
+      )}
+
+      <div class="theme-hero-actions">
+        <a href={primaryCta.href} class="theme-btn-primary theme-hero-btn-primary">
+          <span>{primaryCta.label}</span>
+          <Icon name="arrow" size={18} strokeWidth={2.2} />
+        </a>
+        <a href={secondaryCta.href} class="theme-btn-secondary theme-hero-btn-secondary">
+          <span>{secondaryCta.label}</span>
+        </a>
+      </div>
+
+      <ul class="theme-hero-trust-list">
+        {
+          trustItems.map((item) => (
+            <li class="theme-hero-trust-item">
+              <span class="theme-hero-trust-icon-bubble">
+                <Icon name={item.icon} size={18} strokeWidth={2} />
+              </span>
+              <span class="theme-hero-trust-label">{item.label}</span>
+            </li>
+          ))
+        }
+      </ul>
     </div>
-    {
-      content.image && (
-        <div class="theme-hero-media">
-          <img
-            src={content.image.src}
-            alt={content.image.alt}
-            class="theme-hero-image"
-            decoding="async"
-          />
-        </div>
-      )
-    }
+  </div>
+
+  <!-- Search Panel Anchor -->
+  <div class="theme-hero-search-wrapper">
+    <div class="theme-hero-search-container">
+      <div class="theme-search-panel">
+        <form
+          action={context.paths.trips}
+          method="GET"
+          role="search"
+          aria-label="Search tours"
+          class="theme-search-form"
+        >
+          <!-- Destination Field -->
+          <div class="theme-search-field">
+            <span class="theme-search-icon">
+              <Icon name="map-pin" size={20} strokeWidth={1.8} />
+            </span>
+            <div class="theme-search-field-content">
+              <label for="search-destination" class="theme-search-label">
+                Destination
+              </label>
+              <select
+                id="search-destination"
+                name="destination"
+                class="theme-search-select"
+              >
+                <option value="">Where do you want to go?</option>
+                {
+                  availableDestinations.length > 0 ? (
+                    availableDestinations.map((dest) => (
+                      <option value={dest}>{dest}</option>
+                    ))
+                  ) : (
+                    <>
+                      <option value="Santorini">Santorini, Greece</option>
+                      <option value="Istanbul">Istanbul, Türkiye</option>
+                      <option value="Dubai">Dubai, UAE</option>
+                      <option value="Marrakech">Marrakech, Morocco</option>
+                    </>
+                  )
+                }
+              </select>
+            </div>
+            <span class="theme-search-chevron" aria-hidden="true">
+              <Icon name="chevron-down" size={16} strokeWidth={2} />
+            </span>
+          </div>
+
+          <span class="theme-search-divider" aria-hidden="true"></span>
+
+          <!-- Travel Dates Field -->
+          <div class="theme-search-field">
+            <span class="theme-search-icon">
+              <Icon name="calendar" size={20} strokeWidth={1.8} />
+            </span>
+            <div class="theme-search-field-content">
+              <label for="search-dates" class="theme-search-label">
+                Travel Dates
+              </label>
+              <input
+                type="text"
+                id="search-dates"
+                name="dates"
+                placeholder="Select dates"
+                class="theme-search-input"
+              />
+            </div>
+          </div>
+
+          <span class="theme-search-divider" aria-hidden="true"></span>
+
+          <!-- Travelers Field -->
+          <div class="theme-search-field">
+            <span class="theme-search-icon">
+              <Icon name="users" size={20} strokeWidth={1.8} />
+            </span>
+            <div class="theme-search-field-content">
+              <label for="search-travelers" class="theme-search-label">
+                Travelers
+              </label>
+              <select
+                id="search-travelers"
+                name="travelers"
+                class="theme-search-select"
+              >
+                <option value="1">1 Adult</option>
+                <option value="2" selected>2 Adults</option>
+                <option value="3">3 Adults</option>
+                <option value="4">4+ Adults / Family</option>
+              </select>
+            </div>
+            <span class="theme-search-chevron" aria-hidden="true">
+              <Icon name="chevron-down" size={16} strokeWidth={2} />
+            </span>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="theme-search-action">
+            <button type="submit" class="theme-search-btn">
+              <Icon name="search" size={20} strokeWidth={2.2} />
+              <span>Search Tours</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </section>
 
 <style is:global>
   .theme-hero {
-    background: var(--semantic-surface-muted);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 40rem; /* 640px */
+    overflow: visible;
+    background: var(--semantic-surface-dark);
   }
 
-  .theme-hero-inner {
-    max-width: 80rem;
+  @media (min-width: 40rem) {
+    .theme-hero {
+      min-height: 43.75rem; /* 700px */
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-hero {
+      min-height: 45rem; /* 720px */
+      padding-block-end: 3.5rem;
+    }
+  }
+
+  .theme-hero-media {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .theme-hero-bg-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 22% 32%;
+    filter: brightness(1.06) saturate(1.12);
+  }
+
+  .theme-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      rgba(4, 32, 57, 0.78) 0%,
+      rgba(4, 32, 57, 0.57) 30%,
+      rgba(4, 32, 57, 0.26) 55%,
+      rgba(4, 32, 57, 0.08) 78%,
+      rgba(4, 32, 57, 0.02) 100%
+    );
+  }
+
+  [dir="rtl"] .theme-hero-overlay {
+    background: linear-gradient(
+      270deg,
+      rgba(4, 32, 57, 0.78) 0%,
+      rgba(4, 32, 57, 0.57) 30%,
+      rgba(4, 32, 57, 0.26) 55%,
+      rgba(4, 32, 57, 0.08) 78%,
+      rgba(4, 32, 57, 0.02) 100%
+    );
+  }
+
+  .theme-hero-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 90rem; /* 1440px */
     margin-inline: auto;
-    padding: 3rem 1.25rem;
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: 1fr;
-    align-items: center;
+    padding-inline: 1.25rem;
+    padding-block-start: 6rem;
+    padding-block-end: 4rem;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
   }
 
-  .theme-hero-body {
-    display: grid;
-    gap: 1rem;
+  @media (min-width: 40rem) {
+    .theme-hero-container {
+      padding-inline: 2rem;
+      padding-block-start: 7rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-hero-container {
+      padding-inline: 2.5rem;
+      padding-block-start: 10rem;
+      padding-block-end: 0;
+    }
+  }
+
+  .theme-hero-content {
+    max-width: 44rem;
+    display: flex;
+    flex-direction: column;
   }
 
   .theme-hero-eyebrow {
-    margin: 0;
-    color: var(--component-eyebrow-color);
-    font-size: var(--primitive-font-size-sm);
+    margin: 0 0 1.5rem 0;
+    font-size: 0.75rem; /* 12px */
     font-weight: var(--primitive-font-weight-semibold);
-    letter-spacing: 0.08em;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
   }
 
   .theme-hero-title {
     margin: 0;
-    color: var(--semantic-text);
-    font-size: var(--primitive-font-size-2xl);
+    color: var(--primitive-color-white);
+    font-size: 2.625rem; /* 42px */
     font-weight: var(--primitive-font-weight-bold);
-    line-height: 1.15;
+    line-height: 1.0;
+    letter-spacing: -0.025em;
+    max-width: 38.75rem;
   }
 
-  .theme-hero-subtitle {
-    margin: 0;
-    color: var(--semantic-text-muted);
-    font-size: var(--primitive-font-size-lg);
-    max-width: 34rem;
+  @media (min-width: 40rem) {
+    .theme-hero-title {
+      font-size: 3.5rem; /* 56px */
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-hero-title {
+      font-size: 4.375rem; /* 70px */
+    }
+  }
+
+  .theme-hero-description {
+    margin: 2rem 0 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.6;
+    max-width: 32.5rem; /* 520px */
+  }
+
+  @media (min-width: 40rem) {
+    .theme-hero-description {
+      font-size: 1.125rem; /* 18px */
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-hero-description {
+      margin-block-start: 2.25rem;
+      font-size: 1.1875rem; /* 19px */
+    }
   }
 
   .theme-hero-actions {
+    margin-block-start: 2.25rem;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    align-items: center;
+    gap: 1rem;
   }
 
-  .theme-hero-media {
-    display: flex;
+  .theme-hero-btn-primary {
+    height: 3.5rem; /* 56px */
+    padding-inline: 2rem;
+    font-size: 1rem;
+    font-weight: var(--primitive-font-weight-semibold);
   }
 
-  .theme-hero-image {
-    width: 100%;
-    max-height: 26rem;
-    object-fit: cover;
-    border-radius: var(--primitive-radius-lg);
+  .theme-hero-btn-primary .theme-icon {
+    transition: transform 200ms ease;
   }
 
-  .theme-hero-trust {
+  .theme-hero-btn-primary:hover .theme-icon {
+    transform: translateX(3px);
+  }
+
+  [dir="rtl"] .theme-hero-btn-primary:hover .theme-icon {
+    transform: translateX(-3px);
+  }
+
+  .theme-hero-btn-secondary {
+    height: 3.5rem; /* 56px */
+    padding-inline: 2rem;
+    font-size: 1rem;
+    font-weight: var(--primitive-font-weight-semibold);
+  }
+
+  .theme-hero-trust-list {
     list-style: none;
-    margin: 0.5rem 0 0;
+    margin: 3rem 0 0 0;
     padding: 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem 1.5rem;
+    align-items: center;
+    row-gap: 0.75rem;
   }
 
   .theme-hero-trust-item {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    color: var(--semantic-text);
-    font-size: var(--primitive-font-size-sm);
-    font-weight: var(--primitive-font-weight-medium);
+    gap: 0.75rem;
+    padding-block: 0.25rem;
+    padding-inline-end: 2rem;
+    position: relative;
   }
 
-  .theme-hero-trust-item .theme-icon {
-    color: var(--semantic-brand);
+  @media (min-width: 40rem) {
+    .theme-hero-trust-item {
+      padding-inline-end: 2.5rem;
+    }
+
+    .theme-hero-trust-item:not(:first-child) {
+      padding-inline-start: 2.5rem;
+    }
+
+    .theme-hero-trust-item:not(:first-child)::before {
+      content: "";
+      position: absolute;
+      inset-inline-start: 0;
+      top: 20%;
+      height: 60%;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.15);
+    }
   }
 
-  .theme-btn {
+  .theme-hero-trust-icon-bubble {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 2.75rem;
-    padding: 0.625rem 1.25rem;
-    border-radius: var(--primitive-radius-md);
-    font-size: var(--primitive-font-size-sm);
-    font-weight: var(--primitive-font-weight-semibold);
-    text-decoration: none;
-    border: 1px solid transparent;
-    transition: opacity 120ms ease;
+    inline-size: 2.25rem;
+    block-size: 2.25rem;
+    border-radius: var(--primitive-radius-full);
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.9);
+    flex-shrink: 0;
   }
 
-  .theme-btn:hover {
-    opacity: 0.9;
+  .theme-hero-trust-label {
+    white-space: nowrap;
+    font-size: 0.9375rem; /* 15px */
+    font-weight: var(--primitive-font-weight-medium);
+    color: rgba(255, 255, 255, 0.9);
   }
 
-  .theme-btn-primary {
-    background: var(--component-button-bg);
-    color: var(--component-button-fg);
-  }
-
-  .theme-btn-secondary {
-    background: var(--semantic-surface);
-    color: var(--semantic-text);
-    border-color: var(--semantic-border);
+  /* Search Panel */
+  .theme-hero-search-wrapper {
+    position: relative;
+    z-index: 20;
+    width: 100%;
+    margin-block-start: 2.5rem;
   }
 
   @media (min-width: 48rem) {
-    .theme-hero-inner {
-      grid-template-columns: 1.1fr 1fr;
-      padding-block: 4.5rem;
+    .theme-hero-search-wrapper {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      margin-block-start: 0;
+      transform: translateY(45%);
     }
+  }
 
-    .theme-hero-title {
-      font-size: var(--primitive-font-size-4xl);
+  .theme-hero-search-container {
+    max-width: 90rem; /* 1440px */
+    margin-inline: auto;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 40rem) {
+    .theme-hero-search-container {
+      padding-inline: 2rem;
     }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-hero-search-container {
+      padding-inline: 2.5rem;
+    }
+  }
+
+  .theme-search-panel {
+    border-radius: 1.125rem; /* 18px */
+    background: var(--primitive-color-white);
+    padding: 0.875rem;
+    box-shadow: 0 18px 45px rgba(15, 35, 50, 0.1), 0 2px 8px rgba(15, 35, 50, 0.06);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  .theme-search-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.625rem;
+  }
+
+  @media (min-width: 48rem) {
+    .theme-search-form {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-search-form {
+      grid-template-columns: 1.35fr auto 1.05fr auto 1fr auto;
+      gap: 0;
+      align-items: center;
+    }
+  }
+
+  .theme-search-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 0.875rem 1.25rem;
+    border-radius: var(--primitive-radius-lg);
+    transition: background-color 150ms ease;
+  }
+
+  .theme-search-field:hover,
+  .theme-search-field:focus-within {
+    background: var(--semantic-surface-subtle);
+  }
+
+  .theme-search-icon {
+    color: var(--semantic-brand);
+    display: inline-flex;
+    flex-shrink: 0;
+  }
+
+  .theme-search-field-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .theme-search-label {
+    font-size: 0.6875rem; /* 11px */
+    font-weight: var(--primitive-font-weight-semibold);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--semantic-text-muted);
+  }
+
+  .theme-search-select,
+  .theme-search-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 1rem;
+    color: var(--semantic-text);
+    font-weight: var(--primitive-font-weight-medium);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .theme-search-input::placeholder {
+    color: var(--primitive-color-neutral-400);
+    font-weight: var(--primitive-font-weight-normal);
+  }
+
+  .theme-search-chevron {
+    color: var(--primitive-color-neutral-400);
+    pointer-events: none;
+    display: inline-flex;
+  }
+
+  .theme-search-divider {
+    display: none;
+  }
+
+  @media (min-width: 64rem) {
+    .theme-search-divider {
+      display: block;
+      width: 1px;
+      height: 2.5rem;
+      background: rgba(15, 23, 42, 0.08);
+      margin-inline: 0.5rem;
+    }
+  }
+
+  .theme-search-action {
+    display: flex;
+    align-items: center;
+  }
+
+  @media (min-width: 64rem) {
+    .theme-search-action {
+      padding-inline-start: 1rem;
+    }
+  }
+
+  .theme-search-btn {
+    width: 100%;
+    height: 4rem; /* 64px */
+    border-radius: 0.875rem; /* 14px */
+    background: var(--semantic-brand);
+    color: var(--primitive-color-white);
+    font-size: 1rem;
+    font-weight: var(--primitive-font-weight-semibold);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.625rem;
+    padding-inline: 2rem;
+    box-shadow: 0 4px 14px -2px rgba(15, 118, 110, 0.35);
+    transition: transform 250ms ease, box-shadow 250ms ease, filter 200ms ease;
+  }
+
+  @media (min-width: 64rem) {
+    .theme-search-btn {
+      width: 13.125rem; /* 210px */
+    }
+  }
+
+  .theme-search-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.06);
+    box-shadow: 0 6px 20px -2px rgba(15, 118, 110, 0.45);
   }
 </style>

@@ -12,83 +12,321 @@ interface Props {
 const { context, settings } = Astro.props as Props;
 const testimonials = context.page.kind === "home" ? context.page.content.testimonials : [];
 const show = booleanSetting(settings, "homepage.showTestimonials", true);
+
+function getInitials(name: string): string {
+  return name
+    .split(" ")
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+const mainTestimonial = testimonials[0];
+const smallTestimonials = testimonials.slice(1);
 ---
 
 {
   show && testimonials.length > 0 && (
     <Section
-      id="testimonials"
-      eyebrow="Traveler stories"
-      title="What our travelers say"
-      headingId="testimonials-heading"
+      id="stories"
+      eyebrow="Traveler Stories"
+      title="What our travelers remember most"
+      description="Real experiences from travelers who trusted us with their journeys."
+      headingId="traveler-stories-heading"
+      variant="subtle"
     >
-      <ul class="theme-testimonial-grid">
-        {
-          testimonials.map((item) => (
-            <li class="theme-testimonial-card">
-              <Icon name="star" size={18} />
-              <blockquote class="theme-testimonial-quote">{item.quote}</blockquote>
-              <footer class="theme-testimonial-author">
-                <strong>{item.author}</strong>
-                {item.role && <span>{item.role}</span>}
-              </footer>
-            </li>
-          ))
-        }
-      </ul>
+      <div class="theme-stories-container">
+        <div class="theme-stories-grid">
+          <!-- Main Testimonial (Left) -->
+          {
+            mainTestimonial && (
+              <article class="theme-story-card theme-story-card--main">
+                <div class="theme-story-stars-row">
+                  <div class="theme-story-stars" aria-label="5 out of 5 stars">
+                    <Icon name="star" size={16} fill="currentColor" />
+                    <Icon name="star" size={16} fill="currentColor" />
+                    <Icon name="star" size={16} fill="currentColor" />
+                    <Icon name="star" size={16} fill="currentColor" />
+                    <Icon name="star" size={16} fill="currentColor" />
+                  </div>
+                  <span class="theme-story-rating-number">5.0</span>
+                </div>
+
+                <div class="theme-story-quote-icon" aria-hidden="true">
+                  <Icon name="quote" size={32} strokeWidth={1.5} fill="currentColor" />
+                </div>
+
+                <blockquote class="theme-story-quote-text theme-story-quote-text--main">
+                  &ldquo;{mainTestimonial.quote}&rdquo;
+                </blockquote>
+
+                <footer class="theme-story-footer">
+                  <div class="theme-story-avatar theme-story-avatar--main">
+                    {getInitials(mainTestimonial.author)}
+                  </div>
+                  <div class="theme-story-author-meta">
+                    <strong class="theme-story-author-name">{mainTestimonial.author}</strong>
+                    {
+                      mainTestimonial.role && (
+                        <p class="theme-story-author-role">{mainTestimonial.role}</p>
+                      )
+                    }
+                  </div>
+                </footer>
+              </article>
+            )
+          }
+
+          <!-- Stack of Small Testimonials (Right) -->
+          {
+            smallTestimonials.length > 0 && (
+              <div class="theme-stories-stack">
+                {
+                  smallTestimonials.map((item) => (
+                    <article class="theme-story-card theme-story-card--small">
+                      <div class="theme-story-stars-row">
+                        <div class="theme-story-stars" aria-label="5 out of 5 stars">
+                          <Icon name="star" size={15} fill="currentColor" />
+                          <Icon name="star" size={15} fill="currentColor" />
+                          <Icon name="star" size={15} fill="currentColor" />
+                          <Icon name="star" size={15} fill="currentColor" />
+                          <Icon name="star" size={15} fill="currentColor" />
+                        </div>
+                        <span class="theme-story-rating-number">5.0</span>
+                      </div>
+
+                      <div class="theme-story-quote-icon theme-story-quote-icon--small" aria-hidden="true">
+                        <Icon name="quote" size={24} strokeWidth={1.5} fill="currentColor" />
+                      </div>
+
+                      <blockquote class="theme-story-quote-text theme-story-quote-text--small">
+                        &ldquo;{item.quote}&rdquo;
+                      </blockquote>
+
+                      <footer class="theme-story-footer">
+                        <div class="theme-story-avatar theme-story-avatar--small">
+                          {getInitials(item.author)}
+                        </div>
+                        <div class="theme-story-author-meta">
+                          <strong class="theme-story-author-name">{item.author}</strong>
+                          {
+                            item.role && (
+                              <p class="theme-story-author-role">{item.role}</p>
+                            )
+                          }
+                        </div>
+                      </footer>
+                    </article>
+                  ))
+                }
+              </div>
+            )
+          }
+        </div>
+
+        <div class="theme-stories-action">
+          <a href={context.paths.trips} class="theme-stories-more-link">
+            <span>Read more traveler stories</span>
+            <Icon name="arrow" size={18} strokeWidth={2} class="theme-stories-more-arrow" />
+          </a>
+        </div>
+      </div>
     </Section>
   )
 }
 
 <style is:global>
-  .theme-testimonial-grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
+  .theme-stories-container {
+    max-width: 80rem; /* 1280px */
+    margin-inline: auto;
+  }
+
+  .theme-stories-grid {
     display: grid;
-    gap: 1.25rem;
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
-  .theme-testimonial-card {
-    display: grid;
-    gap: 0.75rem;
-    padding: 1.5rem;
-    background: var(--component-card-bg);
-    border: 1px solid var(--component-card-border);
-    border-radius: var(--primitive-radius-lg);
-  }
-
-  .theme-testimonial-card > .theme-icon {
-    color: var(--semantic-accent);
-  }
-
-  .theme-testimonial-quote {
-    margin: 0;
-    color: var(--semantic-text);
-    font-size: var(--primitive-font-size-md);
-    line-height: 1.5;
-  }
-
-  .theme-testimonial-author {
-    display: grid;
-    gap: 0.15rem;
-  }
-
-  .theme-testimonial-author strong {
-    color: var(--semantic-text);
-    font-weight: var(--primitive-font-weight-semibold);
-    font-size: var(--primitive-font-size-sm);
-  }
-
-  .theme-testimonial-author span {
-    color: var(--semantic-text-muted);
-    font-size: var(--primitive-font-size-sm);
-  }
-
-  @media (min-width: 48rem) {
-    .theme-testimonial-grid {
-      grid-template-columns: repeat(3, 1fr);
+  @media (min-width: 64rem) {
+    .theme-stories-grid {
+      grid-template-columns: 1.3fr 1fr;
+      gap: 2rem;
     }
+  }
+
+  .theme-stories-stack {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  @media (min-width: 64rem) {
+    .theme-stories-stack {
+      gap: 2rem;
+    }
+  }
+
+  .theme-story-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: var(--primitive-color-white);
+    border: 1px solid var(--semantic-border);
+    border-radius: 1.25rem; /* 20px */
+    padding: 1.5rem;
+    box-shadow: 0 16px 40px -32px rgba(15, 23, 42, 0.25);
+  }
+
+  @media (min-width: 40rem) {
+    .theme-story-card {
+      padding: 1.75rem;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .theme-story-card--main {
+      padding: 2.25rem;
+    }
+  }
+
+  .theme-story-stars-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .theme-story-stars {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--primitive-color-accent-500);
+  }
+
+  .theme-story-rating-number {
+    font-size: 0.875rem; /* 14px */
+    font-weight: var(--primitive-font-weight-semibold);
+    color: var(--primitive-color-neutral-700);
+  }
+
+  .theme-story-quote-icon {
+    margin-block-start: 1.5rem;
+    color: var(--semantic-text);
+    opacity: 0.12;
+    display: inline-flex;
+  }
+
+  .theme-story-quote-icon--small {
+    margin-block-start: 1.25rem;
+  }
+
+  .theme-story-quote-text {
+    margin: 0.75rem 0 0 0;
+    color: var(--semantic-text);
+    font-weight: var(--primitive-font-weight-medium);
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    flex: 1;
+  }
+
+  .theme-story-quote-text--main {
+    font-size: 1.3125rem; /* 21px */
+  }
+
+  @media (min-width: 40rem) {
+    .theme-story-quote-text--main {
+      font-size: 1.5rem; /* 24px */
+    }
+  }
+
+  .theme-story-quote-text--small {
+    font-size: 1.03125rem; /* 16.5px */
+  }
+
+  .theme-story-footer {
+    margin-block-start: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .theme-story-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--primitive-radius-full);
+    background: var(--semantic-brand-soft);
+    color: var(--semantic-brand);
+    font-weight: var(--primitive-font-weight-bold);
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .theme-story-avatar--main {
+    inline-size: 3.125rem; /* 50px */
+    block-size: 3.125rem;
+    font-size: 1rem;
+  }
+
+  .theme-story-avatar--small {
+    inline-size: 2.75rem; /* 44px */
+    block-size: 2.75rem;
+    font-size: 0.875rem;
+  }
+
+  .theme-story-author-meta {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .theme-story-author-name {
+    font-size: 0.9375rem; /* 15px */
+    font-weight: var(--primitive-font-weight-semibold);
+    color: var(--semantic-text);
+  }
+
+  .theme-story-author-role {
+    margin: 0.125rem 0 0 0;
+    font-size: 0.84375rem; /* 13.5px */
+    color: var(--semantic-text-muted);
+  }
+
+  .theme-stories-action {
+    margin-block-start: 3rem;
+    text-align: center;
+  }
+
+  @media (min-width: 64rem) {
+    .theme-stories-action {
+      margin-block-start: 3.5rem;
+    }
+  }
+
+  .theme-stories-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem; /* 16px */
+    font-weight: var(--primitive-font-weight-semibold);
+    color: var(--semantic-brand);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .theme-stories-more-link:hover {
+    color: var(--semantic-brand-strong);
+  }
+
+  .theme-stories-more-arrow {
+    transition: transform 250ms ease;
+  }
+
+  .theme-stories-more-link:hover .theme-stories-more-arrow {
+    transform: translateX(4px);
+  }
+
+  [dir="rtl"] .theme-stories-more-link:hover .theme-stories-more-arrow {
+    transform: translateX(-4px);
   }
 </style>

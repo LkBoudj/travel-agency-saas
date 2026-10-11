@@ -20,6 +20,7 @@ import arCustomers from './locales/ar/customers.json';
 import arDashboard from './locales/ar/dashboard.json';
 import arDepartures from './locales/ar/departures.json';
 import arMembers from './locales/ar/members.json';
+import arPayments from './locales/ar/payments.json';
 import arPricing from './locales/ar/pricing.json';
 import arSettings from './locales/ar/settings.json';
 import arThemes from './locales/ar/themes.json';
@@ -32,6 +33,7 @@ import enCustomers from './locales/en/customers.json';
 import enDashboard from './locales/en/dashboard.json';
 import enDepartures from './locales/en/departures.json';
 import enMembers from './locales/en/members.json';
+import enPayments from './locales/en/payments.json';
 import enPricing from './locales/en/pricing.json';
 import enSettings from './locales/en/settings.json';
 import enThemes from './locales/en/themes.json';
@@ -60,6 +62,7 @@ void i18n.use(initReactI18next).init({
       departures: enDepartures,
       pricing: enPricing,
       bookings: enBookings,
+      payments: enPayments,
       dashboard: enDashboard,
       website: enWebsite,
       themes: enThemes,
@@ -74,6 +77,7 @@ void i18n.use(initReactI18next).init({
       departures: arDepartures,
       pricing: arPricing,
       bookings: arBookings,
+      payments: arPayments,
       dashboard: arDashboard,
       website: arWebsite,
       themes: arThemes,
@@ -92,6 +96,7 @@ void i18n.use(initReactI18next).init({
     'departures',
     'pricing',
     'bookings',
+    'payments',
     'dashboard',
     'website',
     'themes',

@@ -23,9 +23,10 @@ const ROUTED_FEATURES = {
   departures: ['DeparturesPage'],
   members: ['MembersPage'],
   overview: ['OverviewPage'],
+  payments: ['PaymentsPage'],
   themes: ['ThemesPage'],
   trips: ['TripsEditorPage', 'TripsPage'],
-  website: ['WebsitePage'],
+  website: ['MenuPage', 'PagesPage', 'WebsitePage'],
 } as const;
 
 const PERMISSION_GATES = [
@@ -36,8 +37,11 @@ const PERMISSION_GATES = [
   ['departures', 'AGENCY_DEPARTURE_VIEW'],
   ['bookings', 'AGENCY_BOOKING_VIEW'],
   ['bookings/:bookingCode', 'AGENCY_BOOKING_VIEW'],
+  ['payments', 'AGENCY_PAYMENT_VIEW'],
   ['website', 'AGENCY_WEBSITE_VIEW'],
   ['themes', 'AGENCY_WEBSITE_VIEW'],
+  ['pages', 'AGENCY_WEBSITE_VIEW'],
+  ['menu', 'AGENCY_WEBSITE_VIEW'],
 ] as const;
 
 function walk(dir: string): string[] {
@@ -99,8 +103,11 @@ describe('route table location', () => {
       ['departures', 16],
       ['bookings', 16],
       ['bookings/:bookingCode', 16],
+      ['payments', 16],
       ['website', 16],
       ['themes', 16],
+      ['pages', 16],
+      ['menu', 16],
       ['/styleguide', 10],
     ]);
   });

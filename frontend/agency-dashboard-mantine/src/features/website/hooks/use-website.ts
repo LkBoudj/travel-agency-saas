@@ -72,7 +72,8 @@ export function useWebsiteMutations() {
   });
 
   const mintPreview = useMutation({
-    mutationFn: ({ page }: { page?: 'home' | 'trips' } = {}) => requestMintPreview(code, page),
+    mutationFn: (options?: { page?: 'home' | 'trips'; themeId?: string }) =>
+      requestMintPreview(code, options),
   });
 
   return { saveContent, saveTheme, publish, mintPreview };

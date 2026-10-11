@@ -6,9 +6,10 @@ import { CustomersPage } from '../../features/customers/index.ts';
 import { DeparturesPage } from '../../features/departures/index.ts';
 import { MembersPage } from '../../features/members/index.ts';
 import { OverviewPage } from '../../features/overview/index.ts';
+import { PaymentsPage } from '../../features/payments/index.ts';
 import { ThemesPage } from '../../features/themes/index.ts';
 import { TripsEditorPage, TripsPage } from '../../features/trips/index.ts';
-import { WebsitePage } from '../../features/website/index.ts';
+import { MenuPage, PagesPage, WebsitePage } from '../../features/website/index.ts';
 import { StyleGuidePage } from '../../pages/StyleGuide.page.tsx';
 import { AuthLayout } from '../layouts/auth-layout.tsx';
 import { DashboardLayout } from '../layouts/dashboard-layout.tsx';
@@ -100,6 +101,14 @@ export const routes: RouteObject[] = [
                 ),
               },
               {
+                path: 'payments',
+                element: (
+                  <RequirePermission permissions={['AGENCY_PAYMENT_VIEW']}>
+                    <PaymentsPage />
+                  </RequirePermission>
+                ),
+              },
+              {
                 path: 'website',
                 element: (
                   <RequirePermission permissions={['AGENCY_WEBSITE_VIEW']}>
@@ -112,6 +121,22 @@ export const routes: RouteObject[] = [
                 element: (
                   <RequirePermission permissions={['AGENCY_WEBSITE_VIEW']}>
                     <ThemesPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: 'pages',
+                element: (
+                  <RequirePermission permissions={['AGENCY_WEBSITE_VIEW']}>
+                    <PagesPage />
+                  </RequirePermission>
+                ),
+              },
+              {
+                path: 'menu',
+                element: (
+                  <RequirePermission permissions={['AGENCY_WEBSITE_VIEW']}>
+                    <MenuPage />
                   </RequirePermission>
                 ),
               },
